@@ -1813,7 +1813,6 @@ inline void FixUV(u32 * wrap, s16 * c0_, s16 * c1_, s16 offset, u32 size)
 			c0 += trans;
 			c1 += trans;
 		}
-
 		// If both coords are in the range [0,size], we can clamp safely.
 		if ((u16)c0 <= size &&
 			(u16)c1 <= size)
