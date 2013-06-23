@@ -209,6 +209,33 @@ static inline void CopyLine(void * dst, const void * src, u32 bytes)
 #endif
 }
 
+static inline void CopyLine16(u16 * dst16, const u16 * src16, u32 words)
+{
+#ifdef FAST_TMEM_COPY
+	u32 dwords = words >> 1;
+	while(dwords--)
+	{
+		*(u16*)(dst16 + 0x0) = src16[1];
+		*(u16*)(dst16 + 0x4) = src16[0];
+		dst16+=8;
+		src16+=2;
+	}
+
+	// Copy any remaining word
+	words&= 0x1;
+#endif
+	u8* src8 = (u8*)src16;
+	u8* dst8 = (u8*)dst16;
+	while(words--)
+	{
+		u32 a = *(u8*)((uintptr_t)src8++ ^ U8_TWIDDLE);
+		u32 b = *(u8*)((uintptr_t)src8++ ^ U8_TWIDDLE);
+
+		*dst16 = ((a << 8) | b);
+		dst16+=4;
+	}
+}
+
 static inline void CopyLineSwap(void * dst, const void * src, u32 bytes)
 {
 	u32* src32 = (u32*)src;
@@ -538,7 +565,7 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 	u32	   lrt		  = load.th;	    //Bottom
 	u32    tile_idx   = load.tile;
 	u32    ram_offset = g_TI.GetAddress16bpp(uls >> 2, ult >> 2);
-	void * address    = g_pu8RamBase + ram_offset;
+	u8*	   address	  = g_pu8RamBase + ram_offset;
 
 	const RDP_Tile & rdp_tile = mTiles[tile_idx];
 
@@ -568,11 +595,10 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 		address, rdp_tile.tmem, tile_idx, count, kTLUTTypeName[gRDPOtherMode.text_tlut], uls >> 2, ult >> 2, lrs >> 2, lrt >> 2);
 
 #ifdef DAEDALUS_ACCURATE_TMEM
-	//u32 pitch       = g_TI.GetPitch16bpp();
-	u32 bytes       = count*2;
-	u32 tmem_offset = rdp_tile.tmem << 3;
+	u16* dst = (u16*)(((u64*)gTMEM) + rdp_tile.tmem);
+	u16* src = (u16*)(address);
 
-	CopyLine(gTMEM + tmem_offset, g_pu8RamBase + ram_offset, bytes);
+	CopyLine16(dst, src, count);
 #endif
 }
 
