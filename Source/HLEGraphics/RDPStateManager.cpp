@@ -40,14 +40,11 @@ static const char * const kTLUTTypeName[] = {"None", "?", "RGBA16", "IA16"};
 
 RDP_OtherMode		gRDPOtherMode;
 
-#ifdef DAEDALUS_FAST_TMEM
-//Granularity down to 24bytes is good enuff also only need to address the upper half of TMEM for palettes//Corn
-u32* gTlutLoadAddresses[ 4096 >> 6 ];
-#else
-u16 gPaletteMemory[ 512 ];
-#endif
-
 #define MAX_TMEM_ADDRESS 4096
+
+//Granularity down to 24bytes is good enuff also only need to address the upper half of TMEM for palettes//Corn
+u32* gTlutLoadAddresses[ MAX_TMEM_ADDRESS >> 6 ];
+
 
 #ifdef DAEDALUS_ACCURATE_TMEM
 ALIGNED_GLOBAL(u8, gTMEM[ MAX_TMEM_ADDRESS ], 16);	// 4Kb
@@ -207,6 +204,33 @@ static inline void CopyLine(void * dst, const void * src, u32 bytes)
 		*dst8++ = *(u8*)((uintptr_t)src8++ ^ U8_TWIDDLE);
 	}
 #endif
+}
+
+static inline void CopyLine16(u16 * dst16, const u16 * src16, u32 words)
+{
+#ifdef FAST_TMEM_COPY
+	u32 dwords = words >> 1;
+	while(dwords--)
+	{
+		*(u16*)(dst16 + 0x0) = src16[1];
+		*(u16*)(dst16 + 0x4) = src16[0];
+		dst16+=8;
+		src16+=2;
+	}
+
+	// Copy any remaining word
+	words&= 0x1;
+#endif
+	u8* src8 = (u8*)src16;
+	u8* dst8 = (u8*)dst16;
+	while(words--)
+	{
+		u32 a = *(u8*)((uintptr_t)src8++ ^ U8_TWIDDLE);
+		u32 b = *(u8*)((uintptr_t)src8++ ^ U8_TWIDDLE);
+
+		*dst16 = ((a << 8) | b);
+		dst16+=4;
+	}
 }
 
 static inline void CopyLineSwap(void * dst, const void * src, u32 bytes)
@@ -476,7 +500,7 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 	u32 w           = ((lrs-uls)>>2) + 1;
 	u32 bytes       = ((h * w) << g_TI.Size) >> 1;
 
-	DAEDALUS_DL_ASSERT( bytes <= 4096,
+	DAEDALUS_DL_ASSERT( bytes <= MAX_TMEM_ADDRESS,
 		"Suspiciously large texture load: %d bytes (%dx%d, %dbpp)",
 		bytes, w, h, (1<<(g_TI.Size+2)) );
 
@@ -538,7 +562,7 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 	u32	   lrt		  = load.th;	    //Bottom
 	u32    tile_idx   = load.tile;
 	u32    ram_offset = g_TI.GetAddress16bpp(uls >> 2, ult >> 2);
-	void * address    = g_pu8RamBase + ram_offset;
+	u8*	   address	  = g_pu8RamBase + ram_offset;
 
 	const RDP_Tile & rdp_tile = mTiles[tile_idx];
 
@@ -546,33 +570,17 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 	DAEDALUS_USE(count);
 	DAEDALUS_USE(lrt);
 
-#ifdef DAEDALUS_FAST_TMEM
 	//Store address of PAL (assuming PAL is only stored in upper half of TMEM) //Corn
 	gTlutLoadAddresses[ (rdp_tile.tmem>>2) & 0x3F ] = (u32*)address;
-#else
-	//This corresponds to the number of palette entries (16 or 256) 16bit
-	//Seems partial load of palette is allowed -> count != 16 or 256 (MM, SSB, Starfox64, MRC) //Corn
-	u32 offset = rdp_tile.tmem - 256;				// starting location in the palettes
-	DAEDALUS_ASSERT( count <= 256, "Check me: TMEM - count is %d", count );
-
-	//Copy PAL to the PAL memory
-	u16 * palette = (u16*)address;
-
-	for (u32 i=0; i<count; i++)
-	{
-		gPaletteMemory[ i+offset ] = palette[ i ];
-	}
-#endif
 
 	DL_PF("    TLut Addr[0x%08x] TMEM[0x%03x] Tile[%d] Count[%d] Format[%s] (%d,%d)->(%d,%d)",
 		address, rdp_tile.tmem, tile_idx, count, kTLUTTypeName[gRDPOtherMode.text_tlut], uls >> 2, ult >> 2, lrs >> 2, lrt >> 2);
 
 #ifdef DAEDALUS_ACCURATE_TMEM
-	//u32 pitch       = g_TI.GetPitch16bpp();
-	u32 bytes       = count*2;
-	u32 tmem_offset = rdp_tile.tmem << 3;
+	u16* dst = (u16*)(((u64*)gTMEM) + rdp_tile.tmem);
+	u16* src = (u16*)(address);
 
-	CopyLine(gTMEM + tmem_offset, g_pu8RamBase + ram_offset, bytes);
+	CopyLine16(dst, src, count);
 #endif
 }
 
@@ -645,9 +653,9 @@ const TextureInfo & CRDPStateManager::GetUpdatedTextureDescriptor( u32 idx )
 		u16		tile_width  = GetTextureDimension( rdp_tilesize.GetWidth(),  rdp_tile.mask_s, rdp_tile.clamp_s );
 		u16		tile_height = GetTextureDimension( rdp_tilesize.GetHeight(), rdp_tile.mask_t, rdp_tile.clamp_t );
 
-#if defined(DAEDALUS_ACCURATE_TMEM)
+#ifdef DAEDALUS_ACCURATE_TMEM
 		ti.SetTlutAddress( tlut );
-#elif defined(DAEDALUS_FAST_TMEM)
+#else
 		//
 		//If indexed TMEM PAL address is NULL then assume that the base address is stored in
 		//TMEM address 0x100 (gTlutLoadAddresses[ 0 ]) and calculate offset from there with TLutIndex(palette index)
@@ -669,8 +677,6 @@ const TextureInfo & CRDPStateManager::GetUpdatedTextureDescriptor( u32 idx )
 			}
 		}
 		ti.SetTlutAddress( tlut );
-#else
-		ti.SetTlutAddress( rdp_tile.size == G_IM_SIZ_4b ? tlut + (rdp_tile.palette << 5) : tlut );
 #endif
 
 #ifdef DAEDALUS_ACCURATE_TMEM
