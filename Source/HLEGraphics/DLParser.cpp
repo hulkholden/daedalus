@@ -934,7 +934,7 @@ void DLParser_TexRect( MicroCodeCommand command )
 	tex_rect.cmd1 = command.inst.cmd1;
 	tex_rect.cmd2 = command2.inst.cmd1;
 	tex_rect.cmd3 = command3.inst.cmd1;
-
+	
 	DAEDALUS_DL_ASSERT(gRDPOtherMode.cycle_type != CYCLE_COPY || tex_rect.dsdx == (4<<10), "Expecting dsdx of 4<<10 in copy mode, got %d", tex_rect.dsdx);
 
 	// NB: In FILL and COPY mode, rectangles are scissored to the nearest four pixel boundary.
@@ -944,6 +944,13 @@ void DLParser_TexRect( MicroCodeCommand command )
 
 	// X for upper left corner should be less than X for lower right corner else skip rendering it, seems to happen in Rayman 2 and Star Soldier
 	//if( tex_rect.x0 >= tex_rect.x1 )
+
+	// Fixes black box in SSB when moving far way from the screen
+	if (g_DI.Address == g_CI.Address)
+	{
+		// Clear ZBuffer?
+		return;
+	}
 
 	// Removes offscreen texrect, also fixes several glitches like in John Romero's Daikatana
 	if( tex_rect.x0 >= (scissors.right<<2) ||
