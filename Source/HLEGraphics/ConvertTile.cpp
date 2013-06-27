@@ -6,6 +6,8 @@
 #include "Core/ROM.h"
 #include "TextureInfo.h"
 #include "Graphics/NativePixelFormat.h"
+
+#include "Utility/Endian.h"
 #include "Utility/Alignment.h"
 
 #include <vector>
@@ -116,6 +118,14 @@ static u32 I4(u8 v)
 	return (i<<24) | (i<<16) | (i<<8) | i;
 }
 
+static u32 IA4(u8 v)
+{
+	u32 i = ThreeToEight[(v & 0x0f) >> 1];
+	u32 a = OneToEight[(v & 0x01)];	
+
+	return (a<<24) | (i<<16) | (i<<8) | i;
+}
+
 static void ConvertRGBA32(const TileDestInfo & dsti, const TextureInfo & ti)
 {
 	u32 width = dsti.Width;
@@ -176,9 +186,9 @@ static void ConvertRGBA16(const TileDestInfo & dsti, const TextureInfo & ti)
 		u32 dst_offset = dst_row_offset;
 		for (u32 x = 0; x < width; ++x)
 		{
-			u16 src_pixel = src[src_offset^row_swizzle];
+			u16 src_pixel = BSWAP16( src[src_offset^row_swizzle] );
 
-			dst[dst_offset+0] = RGBA16( BSWAP16(src_pixel) );
+			dst[dst_offset+0] = RGBA16(src_pixel);
 
 			src_offset += 1;
 			dst_offset += 1;
@@ -186,7 +196,7 @@ static void ConvertRGBA16(const TileDestInfo & dsti, const TextureInfo & ti)
 		src_row_offset += src_row_stride;
 		dst_row_offset += dst_row_stride;
 
-		row_swizzle ^= 0x4;   // Alternate lines are word-swapped
+		row_swizzle ^= 0x2;   // Alternate lines are word-swapped
 	}
 }
 
@@ -352,7 +362,6 @@ static void ConvertIA16(const TileDestInfo & dsti, const TextureInfo & ti)
 		for (u32 x = 0; x < width; ++x)
 		{
 			u32 o        = src_offset^row_swizzle;
-			//u8 src_pixel = src[o];
 
 			u8 i = src[o+0];
 			u8 a = src[o+1];
@@ -392,8 +401,7 @@ static void ConvertIA8(const TileDestInfo & dsti, const TextureInfo & ti)
 		u32 dst_offset = dst_row_offset;
 		for (u32 x = 0; x < width; ++x)
 		{
-			u32 o        = src_offset^row_swizzle;
-			u8 src_pixel = src[o];
+			u8 src_pixel = src[src_offset^row_swizzle];
 
 			u8 i = FourToEight[(src_pixel>>4)&0xf];
 			u8 a = FourToEight[(src_pixel   )&0xf];
@@ -418,8 +426,8 @@ static void ConvertIA4(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u8 * dst = static_cast<u8*>(dsti.Data);
-	u32 dst_row_stride = dsti.Pitch;
+	u32 * dst = static_cast<u32*>(dsti.Data);
+	u32 dst_row_stride = dsti.Pitch / sizeof(u32);
 	u32 dst_row_offset = 0;
 
 	const u8 * src     = gTMEM;
@@ -435,45 +443,23 @@ static void ConvertIA4(const TileDestInfo & dsti, const TextureInfo & ti)
 		// Process 2 pixels at a time
 		for (u32 x = 0; x+1 < width; x += 2)
 		{
-			u32 o         = src_offset^row_swizzle;
-			u16 src_pixel = src[o];
+			u8 src_pixel = src[src_offset^row_swizzle];
 
-			u8 i0 = ThreeToEight[(src_pixel&0xe0)>>5];
-			u8 a0 =   OneToEight[(src_pixel&0x10)>>4];
-
-			u8 i1 = ThreeToEight[(src_pixel&0x0e)>>1];
-			u8 a1 =   OneToEight[(src_pixel&0x01)>>0];
-
-			dst[dst_offset+0] = i0;
-			dst[dst_offset+1] = i0;
-			dst[dst_offset+2] = i0;
-			dst[dst_offset+3] = a0;
-
-			dst[dst_offset+4] = i1;
-			dst[dst_offset+5] = i1;
-			dst[dst_offset+6] = i1;
-			dst[dst_offset+7] = a1;
+			dst[dst_offset+0] = IA4(src_pixel>>4);
+			dst[dst_offset+1] = IA4((src_pixel&0xf));
 
 			src_offset += 1;
-			dst_offset += 8;
+			dst_offset += 2;
 		}
 
-		// Handle trailing pixel, if odd width
 		if (width&1)
 		{
-			u32 o        = src_offset^row_swizzle;
-			u8 src_pixel = src[o];
+			u8 src_pixel = src[src_offset^row_swizzle];
 
-			u8 i0 = ThreeToEight[(src_pixel&0xe0)>>5];
-			u8 a0 =   OneToEight[(src_pixel&0x10)>>4];
-
-			dst[dst_offset+0] = i0;
-			dst[dst_offset+1] = i0;
-			dst[dst_offset+2] = i0;
-			dst[dst_offset+3] = a0;
+			dst[dst_offset+0] = IA4(src_pixel>>4);
 
 			src_offset += 1;
-			dst_offset += 4;
+			dst_offset += 1;
 		}
 
 	  src_row_offset += src_row_stride;
@@ -503,9 +489,7 @@ static void ConvertI8(const TileDestInfo & dsti, const TextureInfo & ti)
 		u32 dst_offset = dst_row_offset;
 		for (u32 x = 0; x < width; ++x)
 		{
-			u32 o = src_offset^row_swizzle;
-
-			u8 i = src[o];
+			u8 i = src[src_offset^row_swizzle];
 
 			dst[dst_offset+0] = i;
 			dst[dst_offset+1] = i;
@@ -545,10 +529,10 @@ static void ConvertI4(const TileDestInfo & dsti, const TextureInfo & ti)
 		// Process 2 pixels at a time
 		for (u32 x = 0; x+1 < width; x += 2)
 		{
-			u16 src_pixel = src[src_offset^row_swizzle];
+			u8 src_pixel = src[src_offset^row_swizzle];
 
 			dst[dst_offset+0] = I4(src_pixel>>4);
-			dst[dst_offset+1] = I4((src_pixel&0xF));
+			dst[dst_offset+1] = I4((src_pixel&0xf));
 
 			src_offset += 1;
 			dst_offset += 2;
