@@ -40,7 +40,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#if defined( __GNUC__ )
 
 		#define BSWAP32(x) __builtin_bswap32(x)
-		#define BSWAP16(x) __builtin_bswap16(x)
+
+		//__builtin_bswap16 is not defined on the PSP toolchain..
+		#ifdef DAEDALUS_PSP
+			#define BSWAP16(x) __builtin_allegrex_wsbh(x)
+		#else
+			#define BSWAP16(x) __builtin_bswap16(x)
+		#endif
 
 	#elif defined( _MSC_VER )
 
