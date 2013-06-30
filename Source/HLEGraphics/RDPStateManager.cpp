@@ -247,10 +247,11 @@ static inline void CopyLineSwap(void * dst, const void * src, u32 bytes)
 		}
 	}
 	else
+#endif
 	{
 		// Optimize me: Bomberman, Zelda, and Quest 64 have unaligned copies here
 		//DBGConsole_Msg(0, "[WWarning CopyLineSwap: Performing slow copy]" );
-#endif
+
 		u8* src8 = (u8*)src32;
 		u8* dst8 = (u8*)dst32;
 		while(bytes--)
@@ -293,10 +294,11 @@ static inline void CopyLineSwap32(void * dst, const void * src, u32 bytes)
 		}
 	}
 	else
+#endif
 	{
 		// Have yet to see game with unaligned copies here
 		//DBGConsole_Msg(0, "[WWarning CopyLineSwap32: Performing slow copy]" );
-#endif
+
 		u8* src8 = (u8*)src32;
 		u8* dst8 = (u8*)dst32;
 		while(bytes--)
@@ -579,9 +581,6 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 // See the detailed noted in BaseRenderer::UpdateTileSnapshots for issues relating to this.
 static inline u16 GetTextureDimension( u16 tile_dimension, u8 mask, bool clamp )
 {
-	// FIXME(strmnnrmn): I think this should be fine for all builds (not just
-	// DAEDALUS_ACCURATE_TMEM), but it needs checking.
-#ifdef DAEDALUS_ACCURATE_TMEM
 	if (mask)
 	{
 		u16 mask_dimension = 1 << mask;
@@ -597,9 +596,6 @@ static inline u16 GetTextureDimension( u16 tile_dimension, u8 mask, bool clamp )
 	}
 
 	return tile_dimension;
-#else
-	return mask ? Min< u16 >( 1 << mask, tile_dimension ) : tile_dimension;
-#endif
 }
 
 const TextureInfo & CRDPStateManager::GetUpdatedTextureDescriptor( u32 idx )
