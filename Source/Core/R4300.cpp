@@ -42,7 +42,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_LINUX)
 #include <fenv.h>
-#define _isnan isnan
+#endif
+
+#ifdef DAEDALUS_W32
+#define isnan _isnan
 #endif
 
 #ifdef DAEDALUS_PSP
@@ -66,6 +69,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Can we disable this for the PSP? doesn't seem to do anything when dynarec is enabled (trace is active) /Salvy
 #define SPEEDHACK_INTERPRETER
 
+//TODO: Implement accurate cvt for W32/OSX, we should convert using the current rounding mode
+//#define ACCURATE_CVT
+
 #define	R4300_CALL_MAKE_OP( var )	OpCode	var;	var._u32 = op_code_bits
 //*************************************************************************************
 //
@@ -73,14 +79,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define R4300_Rand()		FastRand()
 
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) && defined(SIM_DOUBLES)
 #define R4300_IsNaN(x) 		pspFpuIsNaN((x))
 #define R4300_Sqrt(x)		pspFpuSqrt((x))
 #define R4300_SqrtD(x)		pspFpuSqrt((x))
 #define R4300_AbsS(x) 		pspFpuAbs((x))
 #define R4300_AbsD(x) 		pspFpuAbs((x))
 #else
-#define R4300_IsNaN(x)		_isnan((x))
+#define R4300_IsNaN(x)		isnan((x))
 #define R4300_Sqrt(x)		Sqrt((x))
 #define R4300_SqrtD(x)		sqrt((x))
 #define R4300_AbsS(x) 		fabsf((x))
@@ -332,7 +338,7 @@ static const PspFpuRoundMode		gNativeRoundingModes[ RM_NUM_MODES ] =
 
 inline void SET_ROUND_MODE( ERoundingMode mode )
 {
-	// I don't think anything is required here?
+	// This is very expensive on the PSP, so is disabled
 	//pspFpuSetRoundmode( gNativeRoundingModes[ mode ] );
 }
 
@@ -350,7 +356,9 @@ inline s32 f32_to_s32_ceil( f32 x )					{ return pspFpuCeil(x); }
 inline s32 f32_to_s32_floor( f32 x )				{ return pspFpuFloor(x); }
 inline s32 f32_to_s32( f32 x, ERoundingMode mode )	{ pspFpuSetRoundmode( gNativeRoundingModes[ mode ] ); return cvt_w_s( x ); }
 
-inline s64 f32_to_s64_trunc( f32 x )				{ return (s64)trunc_w_s( x ); }
+// Not sure why PSP trunc.w.s instruction fails badly in DK64, it breaks the door in the fourth level
+//inline s64 f32_to_s64_trunc( f32 x )				{ return (s64)trunc_w_s( x ); }
+inline s64 f32_to_s64_trunc( f32 x )				{ return (s64)truncf( x ); }
 inline s64 f32_to_s64_round( f32 x )				{ return (s64)round_w_s( x ); }
 inline s64 f32_to_s64_ceil( f32 x )					{ return (s64)ceil_w_s( x ); }
 inline s64 f32_to_s64_floor( f32 x )				{ return (s64)floor_w_s( x ); }
@@ -366,7 +374,7 @@ inline s64 d64_to_s64_trunc( d64 x )				{ return (s64)x; }
 inline s64 d64_to_s64_round( d64 x )				{ return (s64)( x + 0.5f ); }
 inline s64 d64_to_s64_ceil( d64 x )					{ return (s64)ceilf( x ); }
 inline s64 d64_to_s64_floor( d64 x )				{ return (s64)floorf( x ); }
-inline s64 d64_to_s64( d64 x, ERoundingMode mode )	{ pspFpuSetRoundmode( gNativeRoundingModes[ mode ] ); return (s64)x; }	// XXXX Need to do a cvt really
+inline s64 d64_to_s64( d64 x, ERoundingMode mode )	{ pspFpuSetRoundmode( gNativeRoundingModes[ RM_TRUNC ] ); return (s64)x; }	// XXXX Need to do a cvt really
 
 #elif defined(DAEDALUS_W32)
 
@@ -2527,8 +2535,13 @@ static void R4300_CALL_TYPE R4300_Cop1_CTC1( R4300_CALL_SIGNATURE ) 		// move Co
 		case FPCSR_RM_RM:		gRoundingMode = RM_FLOOR;	break;
 		default:				NODEFAULT;
 		}
-
+// Hack for the PSP, only set rounding mode here, since is very expensive to enable it in SET_ROUND_MODE
+// Fixes collision issues in the final boss of DK64 and camera icon not rotating
+#ifdef DAEDALUS_PSP
+		pspFpuSetRoundmode( gNativeRoundingModes[ gRoundingMode ] );
+#else
 		SET_ROUND_MODE(gRoundingMode);
+#endif
 	}
 	//else
 	//{
@@ -3289,6 +3302,8 @@ static void R4300_CALL_TYPE R4300_Cop1_D_MOV( R4300_CALL_SIGNATURE )
 {
 	R4300_CALL_MAKE_OP( op_code );
 
+	SET_ROUND_MODE( gRoundingMode );		//XXXX Is this needed?
+
 #if 1
 	//Fast way, just copy registers //Corn
 	gCPUState.FPU[op_code.fd+0]._u32 = gCPUState.FPU[op_code.fs+0]._u32;
@@ -3296,9 +3311,6 @@ static void R4300_CALL_TYPE R4300_Cop1_D_MOV( R4300_CALL_SIGNATURE )
 #else
 	// fd = fs
 	d64 fX = LoadFPR_Double( op_code.fs );
-
-	SET_ROUND_MODE( gRoundingMode );		//XXXX Is this needed?
-
 	StoreFPR_Double( op_code.fd, fX );
 #endif
 }
