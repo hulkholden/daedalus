@@ -37,13 +37,15 @@ public:
 	virtual const char *		GetConfigurationName( u32 configuration_idx ) const;
 	virtual const char *		GetConfigurationDescription( u32 configuration_idx ) const;
 	virtual void				SetConfiguration( u32 configuration_idx );
-
+	virtual void				GetGamePadStatus();
 	virtual u32					GetConfigurationFromName( const char * name ) const;
 private:
 	void GetJoyPad(OSContPad *pPad);
+	bool mGamePadAvailable;
 };
 
 IInputManager::IInputManager()
+:	mGamePadAvailable(false)
 {
 }
 
@@ -54,6 +56,11 @@ IInputManager::~IInputManager()
 bool IInputManager::Initialise()
 {
 	return true;
+}
+
+void IInputManager::GetGamePadStatus()
+{
+	mGamePadAvailable = glfwJoystickPresent(GLFW_JOYSTICK_1);
 }
 
 void IInputManager::GetJoyPad(OSContPad *pPad)
@@ -124,7 +131,7 @@ void IInputManager::GetState( OSContPad pPad[4] )
 	}
 
 	// Check if a gamepad is connected, If not fallback to keyboard
-	if(glfwJoystickPresent(GLFW_JOYSTICK_1))
+	if(mGamePadAvailable)
 	{
 		GetJoyPad(&pPad[0]);
 	}

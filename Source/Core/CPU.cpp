@@ -42,6 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Config/ConfigOptions.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
+#include "Input/InputManager.h"
 #include "OSHLE/ultra_R4300.h"
 #include "System/System.h"
 #include "Utility/AtomicPrimitives.h"
@@ -680,7 +681,12 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			//   interrupt the dynamo tracer for instance)
 			// TODO(strmnnrmn): should register this with CPU_RegisterVblCallback.
 			if ((gVerticalInterrupts & 0x3F) == 0) // once every 60 VBLs
+			{
 				Save_Flush();
+#ifdef DAEDALUS_GL
+				CInputManager::Get()->GetGamePadStatus();
+#endif
+			}
 
 			for (size_t i = 0; i < gVblCallbacks.size(); ++i)
 			{

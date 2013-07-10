@@ -26,6 +26,9 @@ class CInputManager : public CSingleton< CInputManager >
 
 		static bool Init() { return CInputManager::Get()->Initialise();}
 		static void Fini() { CInputManager::Get()->Finalise();}
+#ifdef DAEDALUS_GL
+		virtual void GetGamePadStatus() = 0;
+#endif
 };
 
 #ifdef DAEDALUS_PSP
