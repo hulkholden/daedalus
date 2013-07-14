@@ -6,6 +6,8 @@
 #include "Core/ROM.h"
 #include "TextureInfo.h"
 #include "Graphics/NativePixelFormat.h"
+
+#include "Utility/Endian.h"
 #include "Utility/Alignment.h"
 
 #include <vector>
@@ -18,7 +20,7 @@ struct TileDestInfo
 		,	Height( 0 )
 		,	Pitch( 0 )
 		,	Data( NULL )
-		,	Palette( NULL )
+		//,	Palette( NULL )
 	{
 	}
 
@@ -27,7 +29,7 @@ struct TileDestInfo
 	u32					Height;			// Describes the height of the locked area
 	s32					Pitch;			// Specifies the number of bytes on each row (not necessarily bitdepth*width/8)
 	void *				Data;			// Pointer to the top left pixel of the image
-	NativePf8888 *		Palette;
+	//NativePf8888 *		Palette;
 };
 
 static const u8 OneToEight[] = {
@@ -91,6 +93,39 @@ static const u8 FiveToEight[] = {
 
 ALIGNED_EXTERN(u8, gTMEM[4096], 16);
 
+
+u32 RGBA16(u16 v)
+{
+	u32 r = FiveToEight[(v>>11)&0x1f];
+	u32 g = FiveToEight[(v>> 6)&0x1f];
+	u32 b = FiveToEight[(v>> 1)&0x1f];
+	u32 a = ((v     )&0x01)? 255 : 0;
+
+	return (a<<24) | (b<<16) | (g<<8) | r;
+}
+
+u32 IA16(u16 v)
+{
+	u32 i = (v>>8)&0xff;
+	u32 a = (v   )&0xff;
+
+	return (a<<24) | (i<<16) | (i<<8) | i;
+}
+
+static u32 I4(u8 v)
+{
+	u32 i = FourToEight[v & 0x0F];
+	return (i<<24) | (i<<16) | (i<<8) | i;
+}
+
+static u32 IA4(u8 v)
+{
+	u32 i = ThreeToEight[(v & 0x0f) >> 1];
+	u32 a = OneToEight[(v & 0x01)];	
+
+	return (a<<24) | (i<<16) | (i<<8) | i;
+}
+
 static void ConvertRGBA32(const TileDestInfo & dsti, const TextureInfo & ti)
 {
 	u32 width = dsti.Width;
@@ -136,13 +171,13 @@ static void ConvertRGBA16(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u8 * dst = static_cast<u8*>(dsti.Data);
-	u32 dst_row_stride = dsti.Pitch;
+	u32 * dst = static_cast<u32*>(dsti.Data);
+	u32 dst_row_stride = dsti.Pitch / sizeof(u32);
 	u32 dst_row_offset = 0;
 
-	const u8 * src     = gTMEM;
-	u32 src_row_stride = ti.GetLine()<<3;
-	u32 src_row_offset = ti.GetTmemAddress()<<3;
+	const u16 * src     = (u16*)gTMEM;
+	u32 src_row_stride = ti.GetLine()<<2;
+	u32 src_row_offset = ti.GetTmemAddress()<<2;
 
 	u32 row_swizzle = 0;
 	for (u32 y = 0; y < height; ++y)
@@ -151,21 +186,17 @@ static void ConvertRGBA16(const TileDestInfo & dsti, const TextureInfo & ti)
 		u32 dst_offset = dst_row_offset;
 		for (u32 x = 0; x < width; ++x)
 		{
-			u32 o         = src_offset^row_swizzle;
-			u16 src_pixel = (src[o]<<8) | src[o+1];
+			u16 src_pixel = BSWAP16( src[src_offset^row_swizzle] );
 
-			dst[dst_offset+0] = FiveToEight[(src_pixel>>11)&0x1f];
-			dst[dst_offset+1] = FiveToEight[(src_pixel>> 6)&0x1f];
-			dst[dst_offset+2] = FiveToEight[(src_pixel>> 1)&0x1f];
-			dst[dst_offset+3] = ((src_pixel     )&0x01)? 255 : 0;
+			dst[dst_offset+0] = RGBA16(src_pixel);
 
-			src_offset += 2;
-			dst_offset += 4;
+			src_offset += 1;
+			dst_offset += 1;
 		}
 		src_row_offset += src_row_stride;
 		dst_row_offset += dst_row_stride;
 
-		row_swizzle ^= 0x4;   // Alternate lines are word-swapped
+		row_swizzle ^= 0x2;   // Alternate lines are word-swapped
 	}
 }
 
@@ -180,16 +211,16 @@ static void ConvertCI8T(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 dst_row_offset = 0;
 
 	const u8 * src     = gTMEM;
+	const u16 * src16  = (u16*)src;
+
 	u32 src_row_stride = ti.GetLine()<<3;
 	u32 src_row_offset = ti.GetTmemAddress()<<3;
 
 	// Convert the palette once, here.
-	u32 pal_address = 0x100;
-	u32 pal_offset = pal_address << 3;
 	u32 palette[256];
 	for (u32 i = 0; i < 256; ++i)
 	{
-		u16 src_pixel = (src[pal_offset + i*2 + 0]<<8) | src[pal_offset + i*2 + 1];
+		u16 src_pixel = src16[0x400+(i<<2)];
 		palette[i] = PalConvertFn(src_pixel);
 	}
 
@@ -225,22 +256,17 @@ static void ConvertCI4T(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 dst_row_offset = 0;
 
 	const u8 * src     = gTMEM;
+	const u16 * src16  = (u16*)src;
+
 	u32 src_row_stride = ti.GetLine()<<3;
 	u32 src_row_offset = ti.GetTmemAddress()<<3;
 
 	// Convert the palette once, here.
-	u32 pal_address = 0x100 + ((ti.GetPalette() * 16 * 2) >> 3);
-
-	// Animal Crossing, Majora's Mask, SSV, Banjo K's N64 logo
-	// Would be nice to have a proper fix
-	if(g_ROM.TLUT_HACK)
-		pal_address = 0x100 + (ti.GetPalette() << 4);
-
-	u32 pal_offset = pal_address << 3;
+	u32 pal_address = 0x400 + (ti.GetPalette()<<6);
 	u32 palette[16];
 	for (u32 i = 0; i < 16; ++i)
 	{
-		u16 src_pixel = (src[pal_offset + i*2 + 0]<<8) | src[pal_offset + i*2 + 1];
+		u16 src_pixel = src16[pal_address+(i<<2)];
 		palette[i] = PalConvertFn(src_pixel);
 	}
 
@@ -279,24 +305,6 @@ static void ConvertCI4T(const TileDestInfo & dsti, const TextureInfo & ti)
 
 		row_swizzle ^= 0x4;   // Alternate lines are word-swapped
 	}
-}
-
-u32 RGBA16(u16 v)
-{
-	u32 r = FiveToEight[(v>>11)&0x1f];
-	u32 g = FiveToEight[(v>> 6)&0x1f];
-	u32 b = FiveToEight[(v>> 1)&0x1f];
-	u32 a = ((v     )&0x01)? 255 : 0;
-
-	return (a<<24) | (b<<16) | (g<<8) | r;
-}
-
-u32 IA16(u16 v)
-{
-	u32 i = (v>>8)&0xff;
-	u32 a = (v   )&0xff;
-
-	return (a<<24) | (i<<16) | (i<<8) | i;
 }
 
 static void ConvertCI8(const TileDestInfo & dsti, const TextureInfo & ti)
@@ -354,7 +362,6 @@ static void ConvertIA16(const TileDestInfo & dsti, const TextureInfo & ti)
 		for (u32 x = 0; x < width; ++x)
 		{
 			u32 o        = src_offset^row_swizzle;
-			//u8 src_pixel = src[o];
 
 			u8 i = src[o+0];
 			u8 a = src[o+1];
@@ -394,8 +401,7 @@ static void ConvertIA8(const TileDestInfo & dsti, const TextureInfo & ti)
 		u32 dst_offset = dst_row_offset;
 		for (u32 x = 0; x < width; ++x)
 		{
-			u32 o        = src_offset^row_swizzle;
-			u8 src_pixel = src[o];
+			u8 src_pixel = src[src_offset^row_swizzle];
 
 			u8 i = FourToEight[(src_pixel>>4)&0xf];
 			u8 a = FourToEight[(src_pixel   )&0xf];
@@ -420,8 +426,8 @@ static void ConvertIA4(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u8 * dst = static_cast<u8*>(dsti.Data);
-	u32 dst_row_stride = dsti.Pitch;
+	u32 * dst = static_cast<u32*>(dsti.Data);
+	u32 dst_row_stride = dsti.Pitch / sizeof(u32);
 	u32 dst_row_offset = 0;
 
 	const u8 * src     = gTMEM;
@@ -437,45 +443,24 @@ static void ConvertIA4(const TileDestInfo & dsti, const TextureInfo & ti)
 		// Process 2 pixels at a time
 		for (u32 x = 0; x+1 < width; x += 2)
 		{
-			u32 o         = src_offset^row_swizzle;
-			u16 src_pixel = src[o];
+			u8 src_pixel = src[src_offset^row_swizzle];
 
-			u8 i0 = ThreeToEight[(src_pixel&0xe0)>>5];
-			u8 a0 =   OneToEight[(src_pixel&0x10)>>4];
-
-			u8 i1 = ThreeToEight[(src_pixel&0x0e)>>1];
-			u8 a1 =   OneToEight[(src_pixel&0x01)>>0];
-
-			dst[dst_offset+0] = i0;
-			dst[dst_offset+1] = i0;
-			dst[dst_offset+2] = i0;
-			dst[dst_offset+3] = a0;
-
-			dst[dst_offset+4] = i1;
-			dst[dst_offset+5] = i1;
-			dst[dst_offset+6] = i1;
-			dst[dst_offset+7] = a1;
+			dst[dst_offset+0] = IA4(src_pixel>>4);
+			dst[dst_offset+1] = IA4((src_pixel&0xf));
 
 			src_offset += 1;
-			dst_offset += 8;
+			dst_offset += 2;
 		}
 
 		// Handle trailing pixel, if odd width
 		if (width&1)
 		{
-			u32 o        = src_offset^row_swizzle;
-			u8 src_pixel = src[o];
+			u8 src_pixel = src[src_offset^row_swizzle];
 
-			u8 i0 = ThreeToEight[(src_pixel&0xe0)>>5];
-			u8 a0 =   OneToEight[(src_pixel&0x10)>>4];
-
-			dst[dst_offset+0] = i0;
-			dst[dst_offset+1] = i0;
-			dst[dst_offset+2] = i0;
-			dst[dst_offset+3] = a0;
+			dst[dst_offset+0] = IA4(src_pixel>>4);
 
 			src_offset += 1;
-			dst_offset += 4;
+			dst_offset += 1;
 		}
 
 	  src_row_offset += src_row_stride;
@@ -505,9 +490,7 @@ static void ConvertI8(const TileDestInfo & dsti, const TextureInfo & ti)
 		u32 dst_offset = dst_row_offset;
 		for (u32 x = 0; x < width; ++x)
 		{
-			u32 o = src_offset^row_swizzle;
-
-			u8 i = src[o];
+			u8 i = src[src_offset^row_swizzle];
 
 			dst[dst_offset+0] = i;
 			dst[dst_offset+1] = i;
@@ -529,63 +512,48 @@ static void ConvertI4(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u8 * dst = static_cast<u8*>(dsti.Data);
-	u32 dst_row_stride = dsti.Pitch;
+	u32 * dst = static_cast<u32*>(dsti.Data);
+	u32 dst_row_stride = dsti.Pitch / sizeof(u32);
 	u32 dst_row_offset = 0;
 
 	const u8 * src     = gTMEM;
+
 	u32 src_row_stride = ti.GetLine()<<3;
 	u32 src_row_offset = ti.GetTmemAddress()<<3;
 
 	u32 row_swizzle = 0;
 	for (u32 y = 0; y < height; ++y)
 	{
-	  u32 src_offset = src_row_offset;
-	  u32 dst_offset = dst_row_offset;
+		u32 src_offset = src_row_offset;
+		u32 dst_offset = dst_row_offset;
 
-	  // Process 2 pixels at a time
-	  for (u32 x = 0; x+1 < width; x += 2)
-	  {
-		u16 src_pixel = src[src_offset^row_swizzle];
+		// Process 2 pixels at a time
+		for (u32 x = 0; x+1 < width; x += 2)
+		{
+			u8 src_pixel = src[src_offset^row_swizzle];
 
-		u8 i0 = FourToEight[(src_pixel&0xf0)>>4];
-		u8 i1 = FourToEight[(src_pixel&0x0f)>>0];
+			dst[dst_offset+0] = I4(src_pixel>>4);
+			dst[dst_offset+1] = I4((src_pixel&0xf));
 
-		dst[dst_offset+0] = i0;
-		dst[dst_offset+1] = i0;
-		dst[dst_offset+2] = i0;
-		dst[dst_offset+3] = i0;
-
-		dst[dst_offset+4] = i1;
-		dst[dst_offset+5] = i1;
-		dst[dst_offset+6] = i1;
-		dst[dst_offset+7] = i1;
-
-		src_offset += 1;
-		dst_offset += 8;
-	  }
+			src_offset += 1;
+			dst_offset += 2;
+		}
 
 		// Handle trailing pixel, if odd width
 		if (width&1)
 		{
-			u32 o        = src_offset^row_swizzle;
-			u8 src_pixel = src[o];
+			u8 src_pixel = src[src_offset^row_swizzle];
 
-			u8 i0 = FourToEight[(src_pixel&0xf0)>>4];
-
-			dst[dst_offset+0] = i0;
-			dst[dst_offset+1] = i0;
-			dst[dst_offset+2] = i0;
-			dst[dst_offset+3] = i0;
+			dst[dst_offset+0] = I4(src_pixel>>4);
 
 			src_offset += 1;
-			dst_offset += 4;
+			dst_offset += 1;
 		}
 
-	  src_row_offset += src_row_stride;
-	  dst_row_offset += dst_row_stride;
+		src_row_offset += src_row_stride;
+		dst_row_offset += dst_row_stride;
 
-	  row_swizzle ^= 0x4;   // Alternate lines are word-swapped
+		row_swizzle ^= 0x4;   // Alternate lines are word-swapped
 	}
 }
 
@@ -616,7 +584,7 @@ bool ConvertTile(const TextureInfo & ti,
 	dsti.Width   = ti.GetWidth();
 	dsti.Height  = ti.GetHeight();
 	dsti.Pitch   = pitch;
-	dsti.Palette = palette;
+	//dsti.Palette = palette;
 
 	DAEDALUS_ASSERT(ti.GetLine() != 0, "No line");
 

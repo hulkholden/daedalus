@@ -4,8 +4,8 @@
     ],
     'targets': [
       {
-        'target_name': 'daedalus',
-        'type': 'executable',
+        'target_name': 'daedalus_lib',
+        'type': 'static_library',
         'dependencies': [
           'SysGL/SysGL.gyp:SysGL',
           'third_party/glew/glew.gyp:glew', # FIXME: should transitively pull in include dir
@@ -21,6 +21,11 @@
         'defines': [
           'DAEDALUS_ACCURATE_TMEM',
         ],
+        'direct_dependent_settings': {
+          'include_dirs': [
+            '.'
+          ],
+        },
         'sources': [
           'Config/ConfigOptions.cpp',
           'Core/Cheats.cpp',
@@ -109,11 +114,7 @@
         ],
         'conditions': [
           ['OS=="win"', {
-            'include_dirs': [
-              'SysW32/Include',
-            ],
             'sources': [
-              'SysW32/main.cpp',
               'SysW32/HLEAudio/AudioPluginW32.cpp',
               'SysW32/Debug/DaedalusAssertW32.cpp',
               'SysW32/Debug/DebugConsoleW32.cpp',
@@ -123,16 +124,12 @@
             ],
           }],
           ['OS=="mac"', {
-            'include_dirs': [
-              'SysOSX/Include',
-            ],
             'link_settings': {
               'libraries': [
                 '$(SDKROOT)/System/Library/Frameworks/AudioToolbox.framework',
               ],
             },
             'sources': [
-              'SysOSX/main.cpp',
               'SysOSX/HLEAudio/AudioPluginOSX.cpp',
               'SysOSX/Debug/DaedalusAssertOSX.cpp',
               'SysOSX/Debug/DebugConsoleOSX.cpp',
@@ -147,12 +144,8 @@
             ],
           }],
           ['OS=="linux"', {
-            'include_dirs': [
-              'SysLinux/Include',
-            ],
             'sources': [
               # FIXME - we should move these to a common SysPosix dir...
-              'SysOSX/main.cpp',
               'SysOSX/Debug/DaedalusAssertOSX.cpp',
               'SysOSX/Debug/DebugConsoleOSX.cpp',
               'SysOSX/Debug/WebDebug.cpp',
@@ -209,5 +202,38 @@
           },
         ],
       },
+      {
+        'target_name': 'daedalus',
+        'type': 'executable',
+        'dependencies': [
+          'daedalus_lib',
+        ],
+        'conditions': [
+          ['OS=="win"', {
+            'sources': ['SysW32/main.cpp'],
+          }],
+          ['OS=="mac"', {
+            'sources': ['SysOSX/main.cpp'],
+          }],
+          ['OS=="linux"', {
+              # FIXME - we should move these to a common SysPosix dir...
+            'sources': ['SysOSX/main.cpp'],
+          }],
+        ],
+      },
+      {
+        'target_name': 'daedalus_test',
+        'type': 'executable',
+        'dependencies': [
+          'daedalus_lib',
+          'third_party/gtest/gtest.gyp:gtest_main',
+        ],
+        'include_dirs': [
+          '.',
+        ],
+        'sources': [
+          'Utility/FastMemcpy_test.cpp',
+        ],
+      }
     ],
   }

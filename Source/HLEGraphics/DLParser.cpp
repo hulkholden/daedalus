@@ -648,21 +648,23 @@ void RDP_MoveMemLight(u32 light_idx, u32 address)
 {
 	DAEDALUS_ASSERT( light_idx < 16, "Warning: invalid light # = %d", light_idx );
 
-	u8 *base = g_pu8RamBase + address;
-	f32 r, g, b, x, y, z;
+	const u8 *base = g_pu8RamBase + address;
+
+	// NB: The PSP compiler is really finicky about these. If r,g,b is u32, it generates much worse code.
+	u8 r, g, b;
+	s16 x, y, z;
 	bool valid;
-	
+
 	if((g_ROM.GameHacks == ZELDA_MM) && (base[0] == 0x08) && (base[4] == 0xFF))
 	{
 		N64LightMM *light = (N64LightMM*)base;
 		r = light->r;
 		g = light->g;
 		b = light->b;
-		
+
 		x = light->x;
 		y = light->y;
 		z = light->z;
-		valid = (light->x | light->y | light->z) ? true : false;
 	}
 	else
 	{
@@ -670,18 +672,16 @@ void RDP_MoveMemLight(u32 light_idx, u32 address)
 		r = light->r;
 		g = light->g;
 		b = light->b;
-		
+
 		x = light->x;
 		y = light->y;
 		z = light->z;
-		valid = (light->x | light->y | light->z) ? true : false;
-		
 	}
 
-	DL_PF("    Light[%d] RGB[%d, %d, %d] x[%d] y[%d] z[%d] %s direction",
-		light_idx, r, g, b, x, y, z,
-		valid ? "Valid" : "Invalid"
-		);
+	valid = (x | y | z) != 0;
+
+	DL_PF("    Light[%d] RGB[%d, %d, %d] x[%d] y[%d] z[%d]", light_idx, r, g, b, x, y, z);
+	DL_PF("    Light direction is %s",valid ? "valid" : "invalid");
 
 	//Light color
 	gRenderer->SetLightCol( light_idx, r, g, b );
@@ -703,7 +703,6 @@ void RDP_MoveMemLight(u32 light_idx, u32 address)
 
 void RDP_MoveMemViewport(u32 address)
 {
-
 	DAEDALUS_ASSERT( address+16 < MAX_RAM_ADDRESS, "MoveMem Viewport, invalid memory" );
 
 	s16 scale[2];
@@ -945,12 +944,24 @@ void DLParser_TexRect( MicroCodeCommand command )
 	// X for upper left corner should be less than X for lower right corner else skip rendering it, seems to happen in Rayman 2 and Star Soldier
 	//if( tex_rect.x0 >= tex_rect.x1 )
 
+	// Hack for Banjo Tooie shadow
+	if (g_ROM.GameHacks == BANJO_TOOIE && gRDPOtherMode.L == 0x00504241)
+	{
+		return;
+	}
+
+	// Fixes black box in SSB when moving far way from the screen and offscreen in Conker
+	if (g_DI.Address == g_CI.Address || g_CI.Format != G_IM_FMT_RGBA)
+	{
+		DL_PF("    Ignoring Texrect");
+		return;
+	}
+
 	// Removes offscreen texrect, also fixes several glitches like in John Romero's Daikatana
 	if( tex_rect.x0 >= (scissors.right<<2) ||
 		tex_rect.y0 >= (scissors.bottom<<2) ||
 		tex_rect.x1 <  (scissors.left<<2) ||
-		tex_rect.y1 <  (scissors.top<<2) ||
-		g_CI.Format != G_IM_FMT_RGBA )
+		tex_rect.y1 <  (scissors.top<<2) )
 	{
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 		++gNumRectsClipped;

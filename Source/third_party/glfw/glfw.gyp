@@ -36,9 +36,6 @@
       ],
       'conditions': [
         ['OS=="mac"', {
-          'include_dirs': [
-            'src/',
-          ],
           'link_settings': {
             'libraries': [
               '$(SDKROOT)/System/Library/Frameworks/Cocoa.framework',
@@ -62,9 +59,6 @@
           ],
         }],
         ['OS=="linux"', {
-          'include_dirs': [
-            'src/',
-          ],
           'link_settings': {
             'libraries': [
               '-lX11',
@@ -77,15 +71,15 @@
             '_GLFW_GLX=1',
           ],
           'sources': [
-            'src/glx_context.c',
-            'src/x11/x11_clipboard.c',
-            'src/x11/x11_gamma.c',
-            'src/x11/x11_init.c',
-            'src/x11/x11_joystick.c',
-            'src/x11/x11_monitor.c',
-            'src/x11/x11_time.c',
-            'src/x11/x11_unicode.c',
-            'src/x11/x11_window.c',
+            'src/glx_context.c', #Note if using ARM linux change to egl_context
+            'src/x11_clipboard.c',
+            'src/x11_gamma.c',
+            'src/x11_init.c',
+            'src/x11_joystick.c',
+            'src/x11_monitor.c',
+            'src/x11_time.c',
+            'src/x11_unicode.c',
+            'src/x11_window.c',
           ],
         }],
       ],

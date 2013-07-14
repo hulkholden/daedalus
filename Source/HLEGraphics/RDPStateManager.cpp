@@ -40,14 +40,11 @@ static const char * const kTLUTTypeName[] = {"None", "?", "RGBA16", "IA16"};
 
 RDP_OtherMode		gRDPOtherMode;
 
-#ifdef DAEDALUS_FAST_TMEM
-//Granularity down to 24bytes is good enuff also only need to address the upper half of TMEM for palettes//Corn
-u32* gTlutLoadAddresses[ 4096 >> 6 ];
-#else
-u16 gPaletteMemory[ 512 ];
-#endif
-
 #define MAX_TMEM_ADDRESS 4096
+
+//Granularity down to 24bytes is good enuff also only need to address the upper half of TMEM for palettes//Corn
+u32* gTlutLoadAddresses[ MAX_TMEM_ADDRESS >> 6 ];
+
 
 #ifdef DAEDALUS_ACCURATE_TMEM
 ALIGNED_GLOBAL(u8, gTMEM[ MAX_TMEM_ADDRESS ], 16);	// 4Kb
@@ -56,11 +53,11 @@ ALIGNED_GLOBAL(u8, gTMEM[ MAX_TMEM_ADDRESS ], 16);	// 4Kb
 
 #ifdef DAEDALUS_ACCURATE_TMEM
 
-// CopyLineQwords** passes in an offset in 32bit words, (i.e. does mem_address/4) 
+// CopyLineQwords** passes in an offset in 32bit words, (i.e. does mem_address/4)
 // So it's aligned by definition, we have asserts in place just in case!
 
 // Due to how TMEM is organized, erg the last 3 bits in the address are always "0"
-// It should be safe to assume copies will always be update in qwords
+// It should be safe to assume copies will always be in qwords
 #define FAST_TMEM_COPY
 
 static inline void CopyLineQwords(void * dst, const void * src, u32 qwords)
@@ -157,12 +154,9 @@ static void CopyLineQwordsSwap32(void * dst, const void * src, u32 qwords)
 
 static inline void CopyLine(void * dst, const void * src, u32 bytes)
 {
-	u8* src8 = (u8*)src;
-	u8* dst8 = (u8*)dst;
-
 #ifdef FAST_TMEM_COPY
-	u32* src32 = (u32*)src8;
-	u32* dst32 = (u32*)dst8;
+	u32* src32 = (u32*)src;
+	u32* dst32 = (u32*)dst;
 
 	DAEDALUS_ASSERT((bytes&0x3)==0, "CopyLine: Remaning bytes! (%d)",bytes);
 
@@ -176,12 +170,11 @@ static inline void CopyLine(void * dst, const void * src, u32 bytes)
 			*dst32++ = BSWAP32(src32[0]);
 			src32++;
 		}
-		src8 = (u8*)src32;
 	}
 	else
 	{
 		// Zelda and DK64 have unaligned copies. so let's optimize 'em
-		src32 = (u32*)((uintptr_t)src8 & ~0x3);
+		src32 = (u32*)((uintptr_t)src & ~0x3);
 		u32 src_tmp = *src32++;
 		u32 dst_tmp = 0;
 
@@ -197,16 +190,40 @@ static inline void CopyLine(void * dst, const void * src, u32 bytes)
 			dst_tmp|= src_tmp >> rshift;
 			*dst32++ = BSWAP32(dst_tmp);
 		}
-		src8 = (u8*)src32 - offset;
+		src32 -= offset;
 	}
-	dst8 = (u8*)dst32;
 #else
-
+	u8* src8 = (u8*)src;
+	u8* dst8 = (u8*)dst;
 	while(bytes--)
 	{
 		*dst8++ = *(u8*)((uintptr_t)src8++ ^ U8_TWIDDLE);
 	}
 #endif
+}
+
+static inline void CopyLine16(u16 * dst16, const u16 * src16, u32 words)
+{
+#ifdef FAST_TMEM_COPY
+	DAEDALUS_ASSERT( ((uintptr_t)src16&0x1 )==0, "src is not aligned!");
+
+	u32 dwords = words >> 1;
+	while(dwords--)
+	{
+		dst16[0] = src16[1];
+		dst16[4] = src16[0];
+		dst16+=8;
+		src16+=2;
+	}
+
+	// Copy any remaining word
+	words&= 0x1;
+#endif
+	while(words--)
+	{
+		*dst16 = *(u16*)((uintptr_t)src16++ ^ U16_TWIDDLE);
+		dst16+=4;
+	}
 }
 
 static inline void CopyLineSwap(void * dst, const void * src, u32 bytes)
@@ -230,27 +247,27 @@ static inline void CopyLineSwap(void * dst, const void * src, u32 bytes)
 		}
 	}
 	else
+#endif
 	{
 		// Optimize me: Bomberman, Zelda, and Quest 64 have unaligned copies here
 		//DBGConsole_Msg(0, "[WWarning CopyLineSwap: Performing slow copy]" );
-	}
-#endif
 
-	u8* src8 = (u8*)src;
-	u8* dst8 = (u8*)dst;
-	while(bytes--)
-	{
-		// Alternate 32 bit words are swapped
-		*(u8*)((uintptr_t)dst8++ ^ 0x4) = *(u8*)((uintptr_t)src8++ ^ U8_TWIDDLE);
+		u8* src8 = (u8*)src32;
+		u8* dst8 = (u8*)dst32;
+		while(bytes--)
+		{
+			// Alternate 32 bit words are swapped
+			*(u8*)((uintptr_t)dst8++ ^ 0x4) = *(u8*)((uintptr_t)src8++ ^ U8_TWIDDLE);
+		}
 	}
 }
 
 static inline void CopyLineSwap32(void * dst, const void * src, u32 bytes)
 {
-#ifdef FAST_TMEM_COPY	
 	u32* src32 = (u32*)(src);
 	u32* dst32 = (u32*)(dst);
 
+#ifdef FAST_TMEM_COPY
 	DAEDALUS_ASSERT((bytes&0x7)==0, "CopyLineSwap32: Remaning bytes! (%d)",bytes);
 
 	if( ((uintptr_t)src32&0x3 )==0)
@@ -277,20 +294,19 @@ static inline void CopyLineSwap32(void * dst, const void * src, u32 bytes)
 		}
 	}
 	else
+#endif
 	{
 		// Have yet to see game with unaligned copies here
-		DBGConsole_Msg(0, "[WWarning CopyLineSwap32: Performing slow copy]" );
-	}
-#else
+		//DBGConsole_Msg(0, "[WWarning CopyLineSwap32: Performing slow copy]" );
 
-	u8* src8 = (u8*)src32;
-	u8* dst8 = (u8*)dst32;
-	while(bytes--)
-	{
-		// Alternate 64 bit words are swapped
-		*(u8*)((uintptr_t)dst8++ ^ 0x8) = *(u8*)((uintptr_t)src8++ ^ U8_TWIDDLE);
+		u8* src8 = (u8*)src32;
+		u8* dst8 = (u8*)dst32;
+		while(bytes--)
+		{
+			// Alternate 64 bit words are swapped
+			*(u8*)((uintptr_t)dst8++ ^ 0x8) = *(u8*)((uintptr_t)src8++ ^ U8_TWIDDLE);
+		}
 	}
-#endif
 }
 #endif
 
@@ -429,8 +445,9 @@ void CRDPStateManager::LoadBlock(const SetLoadTile & load)
 			}
 
 			i           += qwords_to_copy;
-			dst			+= qwords_to_copy * 2;	// 2 32bit words per qword
-			src			+= qwords_to_copy * 2;
+			qwords_to_copy *= 2;				// 2 32bit words per qword
+			dst			+= qwords_to_copy;
+			src			+= qwords_to_copy;
 			odd_row     ^= 0x1;					// Odd lines are word swapped
 		}
 	}
@@ -476,7 +493,7 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 	u32 w           = ((lrs-uls)>>2) + 1;
 	u32 bytes       = ((h * w) << g_TI.Size) >> 1;
 
-	DAEDALUS_DL_ASSERT( bytes <= 4096,
+	DAEDALUS_DL_ASSERT( bytes <= MAX_TMEM_ADDRESS,
 		"Suspiciously large texture load: %d bytes (%dx%d, %dbpp)",
 		bytes, w, h, (1<<(g_TI.Size+2)) );
 
@@ -538,7 +555,7 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 	u32	   lrt		  = load.th;	    //Bottom
 	u32    tile_idx   = load.tile;
 	u32    ram_offset = g_TI.GetAddress16bpp(uls >> 2, ult >> 2);
-	void * address    = g_pu8RamBase + ram_offset;
+	u8*	   address	  = g_pu8RamBase + ram_offset;
 
 	const RDP_Tile & rdp_tile = mTiles[tile_idx];
 
@@ -546,33 +563,17 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 	DAEDALUS_USE(count);
 	DAEDALUS_USE(lrt);
 
-#ifdef DAEDALUS_FAST_TMEM
 	//Store address of PAL (assuming PAL is only stored in upper half of TMEM) //Corn
 	gTlutLoadAddresses[ (rdp_tile.tmem>>2) & 0x3F ] = (u32*)address;
-#else
-	//This corresponds to the number of palette entries (16 or 256) 16bit
-	//Seems partial load of palette is allowed -> count != 16 or 256 (MM, SSB, Starfox64, MRC) //Corn
-	u32 offset = rdp_tile.tmem - 256;				// starting location in the palettes
-	DAEDALUS_ASSERT( count <= 256, "Check me: TMEM - count is %d", count );
-
-	//Copy PAL to the PAL memory
-	u16 * palette = (u16*)address;
-
-	for (u32 i=0; i<count; i++)
-	{
-		gPaletteMemory[ i+offset ] = palette[ i ];
-	}
-#endif
 
 	DL_PF("    TLut Addr[0x%08x] TMEM[0x%03x] Tile[%d] Count[%d] Format[%s] (%d,%d)->(%d,%d)",
 		address, rdp_tile.tmem, tile_idx, count, kTLUTTypeName[gRDPOtherMode.text_tlut], uls >> 2, ult >> 2, lrs >> 2, lrt >> 2);
 
 #ifdef DAEDALUS_ACCURATE_TMEM
-	//u32 pitch       = g_TI.GetPitch16bpp();
-	u32 bytes       = count*2;
-	u32 tmem_offset = rdp_tile.tmem << 3;
+	u16* dst = (u16*)(((u64*)gTMEM) + rdp_tile.tmem);
+	u16* src = (u16*)(address);
 
-	CopyLine(gTMEM + tmem_offset, g_pu8RamBase + ram_offset, bytes);
+	CopyLine16(dst, src, count);
 #endif
 }
 
@@ -580,9 +581,6 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 // See the detailed noted in BaseRenderer::UpdateTileSnapshots for issues relating to this.
 static inline u16 GetTextureDimension( u16 tile_dimension, u8 mask, bool clamp )
 {
-	// FIXME(strmnnrmn): I think this should be fine for all builds (not just
-	// DAEDALUS_ACCURATE_TMEM), but it needs checking.
-#ifdef DAEDALUS_ACCURATE_TMEM
 	if (mask)
 	{
 		u16 mask_dimension = 1 << mask;
@@ -598,9 +596,6 @@ static inline u16 GetTextureDimension( u16 tile_dimension, u8 mask, bool clamp )
 	}
 
 	return tile_dimension;
-#else
-	return mask ? Min< u16 >( 1 << mask, tile_dimension ) : tile_dimension;
-#endif
 }
 
 const TextureInfo & CRDPStateManager::GetUpdatedTextureDescriptor( u32 idx )
@@ -645,9 +640,9 @@ const TextureInfo & CRDPStateManager::GetUpdatedTextureDescriptor( u32 idx )
 		u16		tile_width  = GetTextureDimension( rdp_tilesize.GetWidth(),  rdp_tile.mask_s, rdp_tile.clamp_s );
 		u16		tile_height = GetTextureDimension( rdp_tilesize.GetHeight(), rdp_tile.mask_t, rdp_tile.clamp_t );
 
-#if defined(DAEDALUS_ACCURATE_TMEM)
+#ifdef DAEDALUS_ACCURATE_TMEM
 		ti.SetTlutAddress( tlut );
-#elif defined(DAEDALUS_FAST_TMEM)
+#else
 		//
 		//If indexed TMEM PAL address is NULL then assume that the base address is stored in
 		//TMEM address 0x100 (gTlutLoadAddresses[ 0 ]) and calculate offset from there with TLutIndex(palette index)
@@ -669,8 +664,6 @@ const TextureInfo & CRDPStateManager::GetUpdatedTextureDescriptor( u32 idx )
 			}
 		}
 		ti.SetTlutAddress( tlut );
-#else
-		ti.SetTlutAddress( rdp_tile.size == G_IM_SIZ_4b ? tlut + (rdp_tile.palette << 5) : tlut );
 #endif
 
 #ifdef DAEDALUS_ACCURATE_TMEM
@@ -684,13 +677,6 @@ const TextureInfo & CRDPStateManager::GetUpdatedTextureDescriptor( u32 idx )
 		ti.SetPalette( rdp_tile.palette );
 		ti.SetFormat( rdp_tile.format );
 		ti.SetSize( rdp_tile.size );
-
-		// Hack to fix the sun in Zelda OOT/MM
-		if( g_ROM.ZELDA_HACK && (gRDPOtherMode.L == 0x0c184241) && (rdp_tile.format == G_IM_FMT_I) )	 //&& (ti.GetWidth() == 64)
-		{
-			tile_width >>= 1;
-			pitch >>= 1;
-		}
 
 		ti.SetWidth( tile_width );
 		ti.SetHeight( tile_height );
