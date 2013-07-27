@@ -29,9 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Alignment.h"
 #include "Utility/DaedalusTypes.h"
 
-//Size of N64 audio processing buffer (org. 0x10000). Have to be a power of 2 (2^N) //Corn
-#define N64_AUDIO_BUFF 0x1000
-
 struct AudioHLEState
 {
 	void	ClearBuffer( u16 addr, u16 count );
@@ -51,7 +48,7 @@ struct AudioHLEState
 	void	SetLoop( u32 loopval );
 	void	SetBuffer( u8 flags, u16 in, u16 out, u16 count );
 
-	void	DmemMove( u16 dst, u16 src, u16 count );
+	void	DmemMove( u32 dst, u32 src, u16 count );
 	void	LoadADPCM( u32 address, u16 count );
 
 	void	Interleave( u16 laddr, u16 raddr );								// Uses OutBuffer/Count
@@ -67,8 +64,7 @@ private:
 
 
 public:
-	ALIGNED_TYPE(u8, Buffer[N64_AUDIO_BUFF], 16);
-	s16		MixerWorkArea[256];
+	ALIGNED_TYPE(u8, Buffer[0x10000], 16);	// Seems excesively large? 0x1000 should be enough, but will require to make many changes, ex update the bitfields 
 	u16		ADPCMTable[0x88];
 
 	//u32		Segments[16];		// 0x0320
