@@ -514,7 +514,8 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 		CopyLineMode = CopyLineSwap;
 	}
 
-	if ((address + bytes_per_tmem_line) > MAX_RAM_ADDRESS || (tmem_offset + bytes_per_tmem_line) > MAX_TMEM_ADDRESS)
+	u32 bytes_to_copy = (bytes_per_tmem_line * h);
+	if ((address + bytes_to_copy) > MAX_RAM_ADDRESS || (tmem_offset + bytes_to_copy) > MAX_TMEM_ADDRESS)
 	{
 		DBGConsole_Msg(0, "[WWarning LoadTile address is invalid]" );
 		return;
