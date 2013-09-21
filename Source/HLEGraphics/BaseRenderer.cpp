@@ -89,6 +89,7 @@ struct TempVerts
 extern "C"
 {
 void	_TnLVFPU( const Matrix4x4 * world_matrix, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out, u32 num_vertices, const TnLParams * params );
+void	_TnLVFPU_Plight( const Matrix4x4 * world_matrix, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out, u32 num_vertices, const TnLParams * params );
 void	_TnLVFPUDKR( u32 num_vertices, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out );
 void	_TnLVFPUDKRB( u32 num_vertices, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out );
 void	_TnLVFPUCBFD( const Matrix4x4 * world_matrix, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out, u32 num_vertices, const TnLParams * params, const s8 * model_norm, u32 v0 );
@@ -420,6 +421,10 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 	//
 	if( mTnL.Flags.TriCull )
 	{
+#ifdef DAEDALUS_PSP_USE_VFPU
+		const s32 NSign = vfpu_TriNormSign((u8*)&mVtxProjected[0], v0, v1, v2);
+		if( NSign <= 0 )
+#else
 		const v4 & A = mVtxProjected[v0].ProjectedPos;
 		const v4 & B = mVtxProjected[v1].ProjectedPos;
 		const v4 & C = mVtxProjected[v2].ProjectedPos;
@@ -431,8 +436,9 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 		const f32 BCw  = B.w*C.w;
 		const f32 AxBC = A.x*BCw;
 		const f32 AyBC = A.y*BCw;
-
-		if( (((B.x*ACw - AxBC)*(C.y*ABw - AyBC) - (C.x*ABw - AxBC)*(B.y*ACw - AyBC)) * ABw * C.w) <= 0.f )
+		const f32 NSign = (((B.x*ACw - AxBC)*(C.y*ABw - AyBC) - (C.x*ABw - AxBC)*(B.y*ACw - AyBC)) * ABw * C.w);
+		if( NSign <= 0.0f )
+#endif
 		{
 			if( mTnL.Flags.CullBack )
 			{
@@ -857,9 +863,16 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 	const Matrix4x4 & mat_world = mModelViewStack[mModelViewTop];
 
 	DL_PF( "    Ambient color RGB[%f][%f][%f] Texture scale X[%f] Texture scale Y[%f]", mTnL.Lights[mTnL.NumLights].Colour.x, mTnL.Lights[mTnL.NumLights].Colour.y, mTnL.Lights[mTnL.NumLights].Colour.z, mTnL.TextureScaleX, mTnL.TextureScaleY);
-	DL_PF( "    Light[%s] Texture[%s] EnvMap[%s] Fog[%s]", (mTnL.Flags.Light)? "On":"Off", (mTnL.Flags.Texture)? "On":"Off", (mTnL.Flags.TexGen)? (mTnL.Flags.TexGenLin)? "Linear":"Spherical":"Off", (mTnL.Flags.Fog)? "On":"Off");
+	DL_PF( "    Light[%d %s] Texture[%s] EnvMap[%s] Fog[%s]", mTnL.NumLights, (mTnL.Flags.Light)? (mTnL.Flags.PointLight)? "Point":"Normal":"Off", (mTnL.Flags.Texture)? "On":"Off", (mTnL.Flags.TexGen)? (mTnL.Flags.TexGenLin)? "Linear":"Spherical":"Off", (mTnL.Flags.Fog)? "On":"Off");
 
-	_TnLVFPU( &mat_world, &mat_world_project, pVtxBase, &mVtxProjected[v0], n, &mTnL );
+	if ( !mTnL.Flags.PointLight )
+	{	//Normal rendering
+		_TnLVFPU( &mat_world, &mat_world_project, pVtxBase, &mVtxProjected[v0], n, &mTnL );
+	}
+	else
+	{	//Point light for Zelda MM
+		_TnLVFPU_Plight( &mat_world, &mat_world_project, pVtxBase, &mVtxProjected[v0], n, &mTnL );
+	}
 }
 
 //*****************************************************************************
@@ -945,15 +958,10 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 //*****************************************************************************
 v3 BaseRenderer::LightVert( const v3 & norm ) const
 {
+	const v3 & col = mTnL.Lights[mTnL.NumLights].Colour;
+	v3 result( col.x, col.y, col.z );
 
-	u32 num = mTnL.NumLights;
-
-	v3 result( mTnL.Lights[num].Colour.x,
-			   mTnL.Lights[num].Colour.y,
-			   mTnL.Lights[num].Colour.z );
-
-
-	for ( u32 l = 0; l < num; l++ )
+	for ( u32 l = 0; l < mTnL.NumLights; l++ )
 	{
 		f32 fCosT = norm.Dot( mTnL.Lights[l].Direction );
 		if (fCosT > 0.0f)
@@ -977,16 +985,16 @@ v3 BaseRenderer::LightVert( const v3 & norm ) const
 //*****************************************************************************
 v3 BaseRenderer::LightPointVert( const v4 & w ) const
 {
-	u32 num = mTnL.NumLights;
-	v3 result( mTnL.Lights[num].Colour.x, mTnL.Lights[num].Colour.y, mTnL.Lights[num].Colour.z );
+	const v3 & col = mTnL.Lights[mTnL.NumLights].Colour;
+	v3 result( col.x, col.y, col.z );
 
-	for ( u32 l = 0; l < num; l++ )
+	for ( u32 l = 0; l < mTnL.NumLights; l++ )
 	{
 		if ( mTnL.Lights[l].SkipIfZero )
 		{
-			v3 pos( mTnL.Lights[l].Position.x-w.x, mTnL.Lights[l].Position.y-w.y, mTnL.Lights[l].Position.z-w.z );
+			v3 distance_vec( mTnL.Lights[l].Position.x-w.x, mTnL.Lights[l].Position.y-w.y, mTnL.Lights[l].Position.z-w.z );
 
-			f32 light_qlen = pos.LengthSq();
+			f32 light_qlen = distance_vec.LengthSq();
 			f32 light_llen = sqrtf( light_qlen );
 
 			f32 at = mTnL.Lights[l].ca + mTnL.Lights[l].la * light_llen + mTnL.Lights[l].qa * light_qlen;
@@ -1021,7 +1029,7 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 	const Matrix4x4 & mat_world = mModelViewStack[mModelViewTop];
 
 	DL_PF( "    Ambient color RGB[%f][%f][%f] Texture scale X[%f] Texture scale Y[%f]", mTnL.Lights[mTnL.NumLights].Colour.x, mTnL.Lights[mTnL.NumLights].Colour.y, mTnL.Lights[mTnL.NumLights].Colour.z, mTnL.TextureScaleX, mTnL.TextureScaleY);
-	DL_PF( "    Light[%s] Texture[%s] EnvMap[%s] Fog[%s]", (mTnL.Flags.Light)? "On":"Off", (mTnL.Flags.Texture)? "On":"Off", (mTnL.Flags.TexGen)? (mTnL.Flags.TexGenLin)? "Linear":"Spherical":"Off", (mTnL.Flags.Fog)? "On":"Off");
+	DL_PF( "    Light[%d %s] Texture[%s] EnvMap[%s] Fog[%s]", mTnL.NumLights, (mTnL.Flags.Light)? (mTnL.Flags.PointLight)? "Point":"Normal":"Off", (mTnL.Flags.Texture)? "On":"Off", (mTnL.Flags.TexGen)? (mTnL.Flags.TexGenLin)? "Linear":"Spherical":"Off", (mTnL.Flags.Fog)? "On":"Off");
 
 	// Transform and Project + Lighting or Transform and Project with Colour
 	//
@@ -1029,10 +1037,10 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 	{
 		const FiddledVtx & vert = pVtxBase[i - v0];
 
-		v4 w( f32( vert.x ), f32( vert.y ), f32( vert.z ), 1.0f );
-
 		// VTX Transform
 		//
+		v4 w( f32( vert.x ), f32( vert.y ), f32( vert.z ), 1.0f );
+
 		v4 & projected( mVtxProjected[i].ProjectedPos );
 		projected = mat_world_project.Transform( w );
 		mVtxProjected[i].TransformedPos = mat_world.Transform( w );
@@ -1054,12 +1062,12 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 		//
 		if ( mTnL.Flags.Light )
 		{
-			v3	model_normal(f32( vert.norm_x ), f32( vert.norm_y ), f32( vert.norm_z ) );
-
-			v3 col;
+			v3 model_normal(f32( vert.norm_x ), f32( vert.norm_y ), f32( vert.norm_z ) );
 			v3 vecTransformedNormal;
 			vecTransformedNormal = mat_world.TransformNormal( model_normal );
 			vecTransformedNormal.Normalise();
+
+			v3 col;
 
 			if ( mTnL.Flags.PointLight )
 			{//POINT LIGHT
@@ -1110,40 +1118,38 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 		}
 		else
 		{
-			//if( mTnL.Flags.Shade )	//FLAT shade
-			{
+			//if( mTnL.Flags.Shade )	
+			{// FLAT shade
 				mVtxProjected[i].Colour = v4( vert.rgba_r * (1.0f / 255.0f), vert.rgba_g * (1.0f / 255.0f), vert.rgba_b * (1.0f / 255.0f), vert.rgba_a * (1.0f / 255.0f) );
 			}
-			/*else //Shade is disabled, doesn't work, is it even needed>?
-			{
+			/*else
+			{// PRIM shade, SSV uses this, doesn't seem to do anything????
 				mVtxProjected[i].Colour = mPrimitiveColour.GetColourV4();
 			}*/
+
 
 			//Set Texture coordinates
 			mVtxProjected[i].Texture.x = (float)vert.tu * mTnL.TextureScaleX;
 			mVtxProjected[i].Texture.y = (float)vert.tv * mTnL.TextureScaleY;
 		}
 
-		/*
-		// FOG
-		//
+#ifdef DAEDALUS_PSP
+		//Fog
 		if ( mTnL.Flags.Fog )
 		{
-			float	fog_coeff;
-			//if(fabsf(projected.w) > 0.0f)
+			if(projected.w > 0.0f)	//checking for positive w fixes near plane fog errors //Corn 
 			{
-				float eyespace_z = projected.z / projected.w;
-				fog_coeff = (eyespace_z * mTnL.FogMult) + mTnL.FogOffset;
+				f32 eye_z = projected.z / projected.w;
+				f32 fog_alpha = eye_z * mTnL.FogMult + mTnL.FogOffs;
+				//f32 fog_alpha = eye_z * 20.0f - 19.0f;	//Fog test line
+				mVtxProjected[i].Colour.w = Clamp< f32 >( fog_alpha, 0.0f, 1.0f );
 			}
-			//else
-			//{
-			//	fog_coeff = m_fFogOffset;
-			//}
-
-			// Set the alpha
-			mVtxProjected[i].Colour.w = Clamp< f32 >( fog_coeff, 0.0f, 1.0f );
+			else
+			{
+				mVtxProjected[i].Colour.w = 0.0f;
+			}
 		}
-		*/
+#endif
 	}
 }
 
@@ -1162,8 +1168,6 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 	DL_PF( "    Ambient color RGB[%f][%f][%f] Texture scale X[%f] Texture scale Y[%f]", mTnL.Lights[mTnL.NumLights].Colour.x, mTnL.Lights[mTnL.NumLights].Colour.y, mTnL.Lights[mTnL.NumLights].Colour.z, mTnL.TextureScaleX, mTnL.TextureScaleY);
 	DL_PF( "    Light[%s] Texture[%s] EnvMap[%s] Fog[%s]", (mTnL.Flags.Light)? "On":"Off", (mTnL.Flags.Texture)? "On":"Off", (mTnL.Flags.TexGen)? (mTnL.Flags.TexGenLin)? "Linear":"Spherical":"Off", (mTnL.Flags.Fog)? "On":"Off");
 
-	// Light is not handled for Conker
-	//
 	const s8 *mn = (s8*)(g_pu8RamBase + gAuxAddr);
 	_TnLVFPUCBFD( &mat_world, &mat_project, pVtxBase, &mVtxProjected[v0], n, &mTnL, mn, v0<<1 );
 }
@@ -1182,7 +1186,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 	DL_PF( "    Light[%s] Texture[%s] EnvMap[%s] Fog[%s]", (mTnL.Flags.Light)? "On":"Off", (mTnL.Flags.Texture)? "On":"Off", (mTnL.Flags.TexGen)? (mTnL.Flags.TexGenLin)? "Linear":"Spherical":"Off", (mTnL.Flags.Fog)? "On":"Off");
 
 	//Model normal base vector
-	const s8 *mn = (s8*)(g_pu8RamBase + gAuxAddr);
+	const s8 *mn = (const s8*)(g_pu8RamBase + gAuxAddr);
 
 	// Transform and Project + Lighting or Transform and Project with Colour
 	//
@@ -1222,14 +1226,21 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 		//
 		if ( mTnL.Flags.Light )
 		{
-			f32 light_intensity;
-			u32 l;
-			v3 result( mTnL.Lights[mTnL.NumLights].Colour.x, mTnL.Lights[mTnL.NumLights].Colour.y, mTnL.Lights[mTnL.NumLights].Colour.z );
-
 			v3 model_normal( mn[((i<<1)+0)^3], mn[((i<<1)+1)^3], vert.normz );
 			v3 vecTransformedNormal = mat_world.TransformNormal( model_normal );
 			vecTransformedNormal.Normalise();
 			const v3 & norm = vecTransformedNormal;
+			const v3 & col = mTnL.Lights[mTnL.NumLights].Colour;
+
+			v4 Pos;
+			Pos.x = (projected.x + mTnL.CoordMod[8]) * mTnL.CoordMod[12];
+			Pos.y = (projected.y + mTnL.CoordMod[9]) * mTnL.CoordMod[13];
+			Pos.z = (projected.z + mTnL.CoordMod[10])* mTnL.CoordMod[14];
+			Pos.w = (projected.w + mTnL.CoordMod[11])* mTnL.CoordMod[15];
+
+			v3 result( col.x, col.y, col.z );
+			f32 fCosT;
+			u32 l;
 
 			if ( mTnL.Flags.PointLight )
 			{	//POINT LIGHT
@@ -1237,34 +1248,25 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 				{
 					if ( mTnL.Lights[l].SkipIfZero )
 					{
-						light_intensity = norm.Dot( mTnL.Lights[l].Direction );	//DotProduct (Light vector, Model normal)
-
-						if (light_intensity > 0.0f)
+						fCosT = norm.Dot( mTnL.Lights[l].Direction );
+						if (fCosT > 0.0f)
 						{
-							f32 vx = (projected.x + mTnL.CoordMod[8]) * mTnL.CoordMod[12] - mTnL.Lights[l].Position.x;
-							f32 vy = (projected.y + mTnL.CoordMod[9]) * mTnL.CoordMod[13] - mTnL.Lights[l].Position.y;
-							f32 vz = (projected.z + mTnL.CoordMod[10])* mTnL.CoordMod[14] - mTnL.Lights[l].Position.z;
-							f32 vw = (projected.w + mTnL.CoordMod[11])* mTnL.CoordMod[15] - mTnL.Lights[l].Position.w;
-
-							f32 p_i = mTnL.Lights[l].Iscale / (vx*vx+vy*vy+vz*vz+vw*vw);
-							if (p_i > 1.0f) p_i = 1.0f;
-
-							light_intensity *= p_i;
-
-							result.x += mTnL.Lights[l].Colour.x * light_intensity;
-							result.y += mTnL.Lights[l].Colour.y * light_intensity;
-							result.z += mTnL.Lights[l].Colour.z * light_intensity;
+							f32 pi = mTnL.Lights[l].Iscale / (Pos - mTnL.Lights[l].Position).LengthSq();
+							if (pi < 1.0f) fCosT *= pi;
+							
+							result.x += mTnL.Lights[l].Colour.x * fCosT;
+							result.y += mTnL.Lights[l].Colour.y * fCosT;
+							result.z += mTnL.Lights[l].Colour.z * fCosT;
 						}
 					}
 				}   
 
-				light_intensity = norm.Dot( mTnL.Lights[l].Direction );	//DotProduct (Light vector, Model normal)
-
-				if (light_intensity > 0.0f) 
+				fCosT = norm.Dot( mTnL.Lights[l].Direction );
+				if (fCosT > 0.0f) 
 				{
-					result.x += mTnL.Lights[l].Colour.x * light_intensity;
-					result.y += mTnL.Lights[l].Colour.y * light_intensity;
-					result.z += mTnL.Lights[l].Colour.z * light_intensity;
+					result.x += mTnL.Lights[l].Colour.x * fCosT;
+					result.y += mTnL.Lights[l].Colour.y * fCosT;
+					result.z += mTnL.Lights[l].Colour.z * fCosT;
 				}
 			}
 			else
@@ -1273,22 +1275,17 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 				{
 					if ( mTnL.Lights[l].SkipIfZero )
 					{
-						f32 vx = (projected.x + mTnL.CoordMod[8]) * mTnL.CoordMod[12] - mTnL.Lights[l].Position.x;
-						f32 vy = (projected.y + mTnL.CoordMod[9]) * mTnL.CoordMod[13] - mTnL.Lights[l].Position.y;
-						f32 vz = (projected.z + mTnL.CoordMod[10])* mTnL.CoordMod[14] - mTnL.Lights[l].Position.z;
-						f32 vw = (projected.w + mTnL.CoordMod[11])* mTnL.CoordMod[15] - mTnL.Lights[l].Position.w;
-						
-						light_intensity = mTnL.Lights[l].Iscale / (vx*vx+vy*vy+vz*vz+vw*vw);
+						f32 pi = mTnL.Lights[l].Iscale / (Pos - mTnL.Lights[l].Position).LengthSq();
+						if (pi > 1.0f) pi = 1.0f;
 
-						if (light_intensity > 1.0f) light_intensity = 1.0f;
-
-						result.x += mTnL.Lights[l].Colour.x * light_intensity;
-						result.y += mTnL.Lights[l].Colour.y * light_intensity;
-						result.z += mTnL.Lights[l].Colour.z * light_intensity;
+						result.x += mTnL.Lights[l].Colour.x * pi;
+						result.y += mTnL.Lights[l].Colour.y * pi;
+						result.z += mTnL.Lights[l].Colour.z * pi;
 					}   
 				}
 			}
 
+			//Clamp to 1.0
 			if( result.x > 1.0f ) result.x = 1.0f;
 			if( result.y > 1.0f ) result.y = 1.0f;
 			if( result.z > 1.0f ) result.z = 1.0f;
@@ -1318,7 +1315,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 			}
 		}
 		else
-		{	//TEXTURE SCALE & COLOR
+		{	//TEXTURE SCALE
 			mVtxProjected[i].Texture.x = (f32)vert.tu * mTnL.TextureScaleX;
 			mVtxProjected[i].Texture.y = (f32)vert.tv * mTnL.TextureScaleY;
 		}
