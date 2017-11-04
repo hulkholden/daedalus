@@ -29,7 +29,7 @@ Copyright (C) 2001 StrmnNrmn
 
 #include "Graphics/NativePixelFormat.h"
 
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 #include "OSHLE/ultra_gbi.h"
 

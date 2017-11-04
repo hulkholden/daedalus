@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysPSP/Graphics/intraFont/intraFont.h"
 #endif
 
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 #include "Debug/DBGConsole.h"
 
@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/ROMFileCache.h"
 #include "Utility/ROMFileMemory.h"
 #include "Utility/Stream.h"
-#include "Utility/IO.h"
+#include "System/IO.h"
 
 #ifdef DAEDALUS_PSP
 extern bool PSP_IS_SLIM;

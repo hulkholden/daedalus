@@ -34,11 +34,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <pspaudio.h>
 
 #include "Config/ConfigOptions.h"
+#include "Core/FramerateLimiter.h"
 #include "Debug/DBGConsole.h"
 #include "HLEAudio/AudioBuffer.h"
 #include "SysPSP/Utility/CacheUtil.h"
 #include "SysPSP/Utility/JobManager.h"
-#include "Utility/FramerateLimiter.h"
 #include "Utility/Thread.h"
 
 extern u32 gSoundSync;

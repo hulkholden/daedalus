@@ -23,9 +23,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "ZlibWrapper.h"
 
 #include <string.h>
-#include <zlib.h>
+#include "third_party/zlib/zlib.h"
 
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 
 // NB: Latest zlib uses a new type for the file handle - it's no longer void *.

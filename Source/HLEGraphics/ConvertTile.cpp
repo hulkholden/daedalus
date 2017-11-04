@@ -8,7 +8,7 @@
 #include "Graphics/NativePixelFormat.h"
 
 #include "Utility/Endian.h"
-#include "Utility/Alignment.h"
+#include "Base/Alignment.h"
 
 #include <vector>
 

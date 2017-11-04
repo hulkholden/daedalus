@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEAUDIO_AUDIOHLE_H_
 #define HLEAUDIO_AUDIOHLE_H_
 
-#include "Utility/DaedalusTypes.h"
+#include "Base/Types.h"
 
 //
 //	N.B. This source code is derived from Azimer's Audio plugin (v0.55?)

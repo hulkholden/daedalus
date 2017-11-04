@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/SaveState.h"
 #include "Graphics/ColourValue.h"
 #include "Graphics/GraphicsContext.h"
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 #include "SysPSP/Graphics/DrawText.h"
 #include "System/System.h"
 #include "Utility/Preferences.h"

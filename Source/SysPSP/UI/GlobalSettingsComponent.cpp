@@ -32,18 +32,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Dialogs.h"
 
 #include "AdjustDeadzoneScreen.h"
-#include "SysPSP/Graphics/DrawText.h"
+#include "Core/FramerateLimiter.h"
 #include "Graphics/ColourValue.h"
-
+#include "Input/InputManager.h"
+#include "SysPSP/Graphics/DrawText.h"
 #include "SysPSP/Utility/Buttons.h"
 #include "SysPSP/Utility/PathsPSP.h"
-#include "Utility/Thread.h"
-#include "Utility/FramerateLimiter.h"
+#include "System/IO.h"
 #include "Utility/Preferences.h"
-#include "Utility/IO.h"
+#include "Utility/Thread.h"
 #include "Utility/Translate.h"
-
-#include "Input/InputManager.h"
 
 extern u32 HAVE_DVE;
 extern u32 PSP_TV_CABLE;

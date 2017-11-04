@@ -20,10 +20,10 @@
 
 #pragma once
 
-#ifndef DEBUG_DAEDALUSASSERT_H_
-#define DEBUG_DAEDALUSASSERT_H_
+#ifndef BASE_ASSERT_H_
+#define BASE_ASSERT_H_
 
-#include "Utility/Macros.h"
+#include "Base/Macros.h"
 
 // Ideas for the ignored assert taken from Game Programming Gems I
 
@@ -159,4 +159,4 @@ inline void SetAssertHook( DaedalusAssertHook hook )
 
 #endif // DAEDALUS_ENABLE_ASSERTS
 
-#endif // DEBUG_DAEDALUSASSERT_H_
+#endif // BASE_ASSERT_H_

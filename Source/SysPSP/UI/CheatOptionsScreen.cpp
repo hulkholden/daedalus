@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Graphics/ColourValue.h"
 #include "Input/InputManager.h"
 #include "SysPSP/Graphics/DrawText.h"
-#include "Utility/IO.h"
+#include "System/IO.h"
 #include "Utility/Preferences.h"
 #include "Utility/Stream.h"
 

@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define UTILITY_ATOMICPRIMITIVES_H_
 
 #include <stdlib.h>
-#include "Utility/DaedalusTypes.h"
+#include "Base/Types.h"
 
 #if defined( DAEDALUS_PSP )
 

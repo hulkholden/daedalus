@@ -13,8 +13,8 @@
 #include "OSHLE/ultra_gbi.h"
 #include "SysGL/GL.h"
 #include "System/Paths.h"
-#include "Utility/IO.h"
-#include "Utility/Macros.h"
+#include "System/IO.h"
+#include "Base/Macros.h"
 #include "Utility/Profiler.h"
 
 

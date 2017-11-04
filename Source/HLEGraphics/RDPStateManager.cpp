@@ -25,12 +25,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/ROM.h"
 #include "Debug/DBGConsole.h"
 #include "HLEGraphics/uCodes/UcodeDefs.h"
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 #include "OSHLE/ultra_gbi.h"
-#include "Utility/Alignment.h"
+#include "Base/Alignment.h"
 #include "Utility/Endian.h"
 #include "Utility/FastMemcpy.h"
-#include "Utility/Macros.h"
+#include "Base/Macros.h"
 
 extern SImageDescriptor g_TI;		//Texture data from Timg ucode
 

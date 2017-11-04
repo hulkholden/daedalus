@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Math/Math.h"	// VFPU Math
 #include "OSHLE/ultra_R4300.h"
 #include "Utility/AuxFunc.h"
-#include "Utility/Macros.h"
+#include "Base/Macros.h"
 
 #ifdef DAEDALUS_PSP
 #include <pspfpu.h>

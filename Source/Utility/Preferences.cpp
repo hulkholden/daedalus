@@ -29,14 +29,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <map>
 
 #include "IniFile.h"
-#include "FramerateLimiter.h"
 
 #include "Config/ConfigOptions.h"
+#include "Core/FramerateLimiter.h"
 #include "Core/ROM.h"
 #include "Input/InputManager.h"
 #include "Interface/RomDB.h"
 #include "System/Paths.h"
-#include "Utility/IO.h"
+#include "System/IO.h"
 
 #ifdef DAEDALUS_PSP
 #include "Utility/Translate.h"

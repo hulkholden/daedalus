@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Debug/DBGConsole.h"
 
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 #include "Utility/FastMemcpy.h"
 
 inline s32		FixedPointMul16( s32 a, s32 b )
@@ -710,18 +710,18 @@ void MP3( AudioHLECommand command );
 
 FFT = Fast Fourier Transform
 DCT = Discrete Cosine Transform
-MPEG-1 Layer 3 retains Layer 2’s 1152-sample window, as well as the FFT polyphase filter for
-backward compatibility, but adds a modified DCT filter. DCT’s advantages over DFTs (discrete
+MPEG-1 Layer 3 retains Layer 2's 1152-sample window, as well as the FFT polyphase filter for
+backward compatibility, but adds a modified DCT filter. DCT's advantages over DFTs (discrete
 Fourier transforms) include half as many multiply-accumulate operations and half the
 generated coefficients because the sinusoidal portion of the calculation is absent, and DCT
-generally involves simpler math. The finite lengths of a conventional DCTs’ bandpass impulse
+generally involves simpler math. The finite lengths of a conventional DCT's bandpass impulse
 responses, however, may result in block-boundary effects. MDCTs overlap the analysis blocks
 and lowpass-filter the decoded audio to remove aliases, eliminating these effects. MDCTs also
 have a higher transform coding gain than the standard DCT, and their basic functions
 correspond to better bandpass response.
 
-MPEG-1 Layer 3’s DCT sub-bands are unequally sized, and correspond to the human auditory
-system’s critical bands. In Layer 3 decoders must support both constant- and variable-bit-rate
+MPEG-1 Layer 3's DCT sub-bands are unequally sized, and correspond to the human auditory
+system's critical bands. In Layer 3 decoders must support both constant- and variable-bit-rate
 bit streams. (However, many Layer 1 and 2 decoders also handle variable bit rates). Finally,
 Layer 3 encoders Huffman-code the quantized coefficients before archiving or transmission for
 additional lossless compression. Bit streams range from 32 to 320 kbps, and 128-kbps rates

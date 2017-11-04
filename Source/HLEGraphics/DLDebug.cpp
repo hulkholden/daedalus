@@ -10,8 +10,8 @@
 #include "Debug/DBGConsole.h"
 #include "Debug/Dump.h"
 #include "OSHLE/ultra_gbi.h"
-#include "Utility/IO.h"
-#include "Utility/Macros.h"
+#include "System/IO.h"
+#include "Base/Macros.h"
 
 
 DLDebugOutput * gDLDebugOutput = NULL;

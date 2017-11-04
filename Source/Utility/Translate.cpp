@@ -30,8 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "VolatileMem.h"
 
 #include "System/Paths.h"
-#include "SysPSP/Utility/PathsPSP.h"
-#include "Utility/Macros.h"
+#include "Base/Macros.h"
 
 #define TRANSLATE_DUMP_VALUE 0xDAEDDAED
 //*****************************************************************************
@@ -120,7 +119,7 @@ void Translate_Unload()
 bool	Translate_Init()
 {
 	// Init translations if available
-	Translate_Load( DAEDALUS_PSP_PATH("Languages/") );
+	Translate_Load( "Languages/" );
 
 	return /*gLanguage.empty() == 0*/ true;
 }

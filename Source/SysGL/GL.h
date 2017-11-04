@@ -4,7 +4,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "Utility/DaedalusTypes.h"
+#include "Base/Types.h"
 
 extern GLFWwindow * gWindow;
 

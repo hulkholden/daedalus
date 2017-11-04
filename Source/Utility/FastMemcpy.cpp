@@ -10,7 +10,7 @@ homepage: http://wordpress.fx-world.org
 #include "stdafx.h"
 #include "FastMemcpy.h"
 
-#include "Utility/DaedalusTypes.h"
+#include "Base/Types.h"
 #include "Utility/Endian.h"
 #include "Utility/Timing.h"
 

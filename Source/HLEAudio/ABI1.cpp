@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "audiohle.h"
 #include "AudioHLEProcessor.h"
 
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 /******** DMEM Memory Map for ABI 1 ***************
 Address/Range		Description

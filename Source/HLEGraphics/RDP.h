@@ -24,7 +24,7 @@
 #ifndef HLEGRAPHICS_RDP_H_
 #define HLEGRAPHICS_RDP_H_
 
-#include "Utility/DaedalusTypes.h"
+#include "Base/Types.h"
 
 inline u32 pixels2bytes( u32 pixels, u32 size )
 {

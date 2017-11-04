@@ -19,19 +19,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stdafx.h"
 
+#include "Core/FramerateLimiter.h"
 #include "Debug/DBGConsole.h"
-
-#include "HLEGraphics/BaseRenderer.h"
-#include "HLEGraphics/TextureCache.h"
-#include "HLEGraphics/DLParser.h"
-#include "HLEGraphics/DisplayListDebugger.h"
-
 #include "Graphics/GraphicsContext.h"
+#include "HLEGraphics/BaseRenderer.h"
+#include "HLEGraphics/DisplayListDebugger.h"
+#include "HLEGraphics/DLParser.h"
+#include "HLEGraphics/TextureCache.h"
 #include "Plugins/GraphicsPlugin.h"
-
-#include "Utility/Profiler.h"
-#include "Utility/FramerateLimiter.h"
 #include "Utility/Preferences.h"
+#include "Utility/Profiler.h"
 #include "Utility/Timing.h"
 
 #include <pspdebug.h>

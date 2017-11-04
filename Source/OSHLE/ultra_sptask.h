@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef OSHLE_ULTRA_SPTASK_H_
 #define OSHLE_ULTRA_SPTASK_H_
 
-#include "Utility/DaedalusTypes.h"
+#include "Base/Types.h"
 
 typedef struct {
 	u32	type;

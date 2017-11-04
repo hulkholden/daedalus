@@ -24,10 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Utility/Singleton.h"
 
-// XXXX GCC
-//enum	ESaveType;
-//#include "ROM.h"
-
 class CController : public CSingleton< CController >
 {
 	public:

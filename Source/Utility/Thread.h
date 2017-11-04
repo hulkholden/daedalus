@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef UTILITY_THREAD_H_
 #define UTILITY_THREAD_H_
 
-#include "Utility/DaedalusTypes.h"
+#include "Base/Types.h"
 
 
 typedef u32 ( DAEDALUS_THREAD_CALL_TYPE * DaedThread )( void * arg );

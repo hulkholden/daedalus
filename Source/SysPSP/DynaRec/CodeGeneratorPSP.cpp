@@ -36,9 +36,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DBGConsole.h"
 #include "DynaRec/AssemblyUtils.h"
 #include "DynaRec/Trace.h"
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 #include "OSHLE/ultra_R4300.h"
-#include "Utility/Macros.h"
+#include "Base/Macros.h"
 #include "Utility/PrintOpCode.h"
 #include "Utility/Profiler.h"
 

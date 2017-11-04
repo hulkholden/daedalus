@@ -18,10 +18,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 
-#ifndef MATH_MATHUTIL_H_
-#define MATH_MATHUTIL_H_
-
-#include "Math/Math.h"
+#ifndef BASE_MATHUTIL_H_
+#define BASE_MATHUTIL_H_
 
 template< typename T >
 inline const T & Max( const T & a, const T & b )
@@ -134,4 +132,4 @@ inline u32 GetNextPowerOf2( u32 x )
 	return n;
 }
 
-#endif // MATH_MATHUTIL_H_
+#endif // BASE_MATHUTIL_H_

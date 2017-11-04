@@ -30,20 +30,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "ROMImage.h"
 #include "RomSettings.h"
 
+#include "Base/Macros.h"
+#include "Base/MathUtil.h"
 #include "Config/ConfigOptions.h"
+#include "Core/FramerateLimiter.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
 #include "Interface/RomDB.h"
-#include "Math/MathUtil.h"
-#include "OSHLE/patch.h"			// Patch_ApplyPatches
+#include "OSHLE/patch.h"		// Patch_ApplyPatches
 #include "OSHLE/ultra_os.h"		// System type
 #include "OSHLE/ultra_R4300.h"
 #include "Plugins/AudioPlugin.h"
 #include "Plugins/GraphicsPlugin.h"
 #include "Utility/CRC.h"
-#include "Utility/FramerateLimiter.h"
-#include "Utility/IO.h"
-#include "Utility/Macros.h"
+#include "System/IO.h"
 #include "Utility/Preferences.h"
 #include "Utility/ROMFile.h"
 #include "Utility/Stream.h"

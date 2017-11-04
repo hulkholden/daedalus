@@ -17,10 +17,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef UTILITY_FRAMERATELIMITER_H_
-#define UTILITY_FRAMERATELIMITER_H_
+#ifndef CORE_FRAMERATELIMITER_H_
+#define CORE_FRAMERATELIMITER_H_
 
-#include "Utility/DaedalusTypes.h"
+#include "Base/Types.h"
 
 extern u32		gSpeedSyncEnabled;
 
@@ -33,4 +33,4 @@ u32				FramerateLimiter_GetTvFrequencyHz();
 typedef void (*FramerateSyncFn)(void * arg);
 void			FramerateLimiter_SetAuxillarySyncFunction(FramerateSyncFn fn, void * arg);
 
-#endif // UTILITY_FRAMERATELIMITER_H_
+#endif // CORE_FRAMERATELIMITER_H_

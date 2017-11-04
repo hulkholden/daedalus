@@ -19,12 +19,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stdafx.h"
 
-#include "Core/Memory.h"
 #include "Core/CPU.h"
-#include "Core/Save.h"
+#include "Core/FramerateLimiter.h"
+#include "Core/Memory.h"
 #include "Core/PIF.h"
 #include "Core/ROMBuffer.h"
 #include "Core/RomSettings.h"
+#include "Core/Save.h"
 
 #include "Interface/RomDB.h"
 #ifdef DAEDALUS_PSP
@@ -43,9 +44,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysGL/Interface/UI.h"
 #endif
 
-#include "Utility/FramerateLimiter.h"
 #include "Utility/Synchroniser.h"
-#include "Utility/Macros.h"
+#include "Base/Macros.h"
 #include "Utility/Profiler.h"
 #include "Utility/Preferences.h"
 #ifdef DAEDALUS_PSP

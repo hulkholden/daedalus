@@ -39,13 +39,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DBGConsole.h"
 #include "Debug/Dump.h"
 #include "Graphics/GraphicsContext.h"
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 #include "OSHLE/ultra_gbi.h"
 #include "OSHLE/ultra_rcp.h"
 #include "OSHLE/ultra_sptask.h"
 #include "Plugins/GraphicsPlugin.h"
 #include "Test/BatchTest.h"
-#include "Utility/IO.h"
+#include "System/IO.h"
 #include "Utility/Profiler.h"
 
 //*****************************************************************************

@@ -26,8 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEAUDIO_AUDIOHLEPROCESSOR_H_
 #define HLEAUDIO_AUDIOHLEPROCESSOR_H_
 
-#include "Utility/Alignment.h"
-#include "Utility/DaedalusTypes.h"
+#include "Base/Alignment.h"
+#include "Base/Types.h"
 
 struct AudioHLEState
 {
