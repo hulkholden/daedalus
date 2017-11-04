@@ -3,6 +3,10 @@
 *.prx
 *.elf
 *.sublime-workspace
+bazel-bin/
+bazel-genfiles/
+bazel-out/
+bazel-source/
 EBOOT.PBP
 PARAM.SFO
 Makefile.cache
