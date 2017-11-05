@@ -20,10 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_UCODES_UCODE_S2DEX_H_
 #define HLEGRAPHICS_UCODES_UCODE_S2DEX_H_
 
-//*****************************************************************************
 // Needed by S2DEX
-//*****************************************************************************
-
 #define	G_GBI2_SELECT_DL		0x04
 #define	S2DEX_OBJLT_TXTRBLOCK	0x00001033
 #define	S2DEX_OBJLT_TXTRTILE	0x00fc1034
@@ -31,9 +28,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	S2DEX_BGLT_LOADBLOCK	0x0033
 #define	S2DEX_BGLT_LOADTILE		0xfff4
 
-//*****************************************************************************
-//
-//*****************************************************************************
 struct uObjBg
 {
 	u16 imageW;
@@ -60,9 +54,6 @@ struct uObjBg
 	u16 tmemSizeW;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 struct uObjMtx
 {
 	s32	  A, B, C, D;
@@ -74,9 +65,6 @@ struct uObjMtx
 	u16   BaseScaleX;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 struct uObjSubMtx
 {
 	short Y;
@@ -86,9 +74,6 @@ struct uObjSubMtx
 	u16   BaseScaleX;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 struct Matrix2D
 {
 	f32 A, B, C, D;
@@ -97,9 +82,6 @@ struct Matrix2D
 	f32 BaseScaleY;
 } mat2D = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 struct	uObjScaleBg
 {
 	u16	imageW;
@@ -130,9 +112,6 @@ struct	uObjScaleBg
 	u8	padding[4];
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 struct	uObjTxtrBlock //PSP Format
 {
 	  u32	type;
@@ -148,9 +127,6 @@ struct	uObjTxtrBlock //PSP Format
 	  u32	mask;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 struct uObjTxtrTile //PSP Format
 {
 	  u32	type;
@@ -166,9 +142,6 @@ struct uObjTxtrTile //PSP Format
 	  u32	mask;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 struct uObjTxtrTLUT // PSP Format
 {
 	u32	type;
@@ -184,9 +157,6 @@ struct uObjTxtrTLUT // PSP Format
 	u32	mask;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 union uObjTxtr
 {
 	uObjTxtrBlock	block;
@@ -194,9 +164,6 @@ union uObjTxtr
 	uObjTxtrTLUT	tlut;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 struct uObjSprite
 {
 	u16  scaleW;
@@ -220,18 +187,12 @@ struct uObjSprite
 	u8   imageFmt;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 struct	uObjTxSprite
 {
 	uObjTxtr	txtr;
 	uObjSprite	sprite;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 enum ESpriteMode
 {
 	FULL_ROTATION,
@@ -241,9 +202,7 @@ enum ESpriteMode
 
 static uObjTxtr *gObjTxtr = NULL;
 void DLParser_OB_YUV(const uObjSprite *sprite);
-//*****************************************************************************
-//
-//*****************************************************************************
+
 static inline CRefPtr<CNativeTexture> Load_ObjSprite( const uObjSprite *sprite, const uObjTxtr *txtr )
 {
 	TextureInfo ti;
@@ -293,9 +252,6 @@ static inline CRefPtr<CNativeTexture> Load_ObjSprite( const uObjSprite *sprite, 
 	return gRenderer->LoadTextureDirectly(ti);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 static inline void Draw_ObjSprite( const uObjSprite *sprite, ESpriteMode mode, const CNativeTexture * texture )
 {
 	f32 imageW = sprite->imageW / 32.0f;
@@ -357,9 +313,7 @@ static inline void Draw_ObjSprite( const uObjSprite *sprite, ESpriteMode mode, c
 		break;
 	}
 }
-//*****************************************************************************
-//
-//*****************************************************************************
+
 // Bomberman : Second Atatck uses this
 void DLParser_S2DEX_ObjSprite( MicroCodeCommand command )
 {
@@ -369,9 +323,6 @@ void DLParser_S2DEX_ObjSprite( MicroCodeCommand command )
 	Draw_ObjSprite( sprite, FULL_ROTATION, texture );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 // Pokemon Puzzle League uses this
 // Note : This cmd loads textures from both ObjTxtr and LoadBlock/LoadTile!!
 void DLParser_S2DEX_ObjRectangle( MicroCodeCommand command )
@@ -382,9 +333,6 @@ void DLParser_S2DEX_ObjRectangle( MicroCodeCommand command )
 	Draw_ObjSprite( sprite, NO_ROTATION, texture );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 // Untested.. I can't find any game that uses this.. but it should work fine
 void DLParser_S2DEX_ObjRectangleR( MicroCodeCommand command )
 {
@@ -402,9 +350,6 @@ void DLParser_S2DEX_ObjRectangleR( MicroCodeCommand command )
 	Draw_ObjSprite( sprite, PARTIAL_ROTATION, texture );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 // Nintendo logo, shade, items, enemies & foes, sun, and pretty much everything in Yoshi
 void DLParser_S2DEX_ObjLdtxSprite( MicroCodeCommand command )
 {
@@ -414,9 +359,6 @@ void DLParser_S2DEX_ObjLdtxSprite( MicroCodeCommand command )
 	Draw_ObjSprite( &sprite->sprite, FULL_ROTATION, texture );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 // No Rotation. Intro logo, Awesome command screens and HUD in game :)
 void DLParser_S2DEX_ObjLdtxRect( MicroCodeCommand command )
 {
@@ -426,9 +368,6 @@ void DLParser_S2DEX_ObjLdtxRect( MicroCodeCommand command )
 	Draw_ObjSprite( &sprite->sprite, NO_ROTATION, texture );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 // With Rotation. Text, smoke, and items in Yoshi
 void DLParser_S2DEX_ObjLdtxRectR( MicroCodeCommand command )
 {
@@ -438,9 +377,6 @@ void DLParser_S2DEX_ObjLdtxRectR( MicroCodeCommand command )
 	Draw_ObjSprite( &sprite->sprite, PARTIAL_ROTATION, texture );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 // Used for Sprite rotation
 void DLParser_S2DEX_ObjMoveMem( MicroCodeCommand command )
 {
@@ -469,9 +405,6 @@ void DLParser_S2DEX_ObjMoveMem( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 // Kirby uses this for proper palette loading
 void DLParser_S2DEX_ObjLoadTxtr( MicroCodeCommand command )
 {
@@ -491,9 +424,6 @@ void DLParser_S2DEX_ObjLoadTxtr( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 inline void DLParser_Yoshi_MemRect( MicroCodeCommand command )
 {
 	//
@@ -626,9 +556,6 @@ void DLParser_OB_YUV(const uObjSprite *sprite)
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_S2DEX_RDPHalf_0( MicroCodeCommand command )
 {
 	//RDP: RSP_S2DEX_RDPHALF_0 (0xe449c0a8 0x003b40a4)
@@ -642,25 +569,16 @@ void DLParser_S2DEX_RDPHalf_0( MicroCodeCommand command )
 		DLParser_TexRect( command );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_S2DEX_ObjRendermode( MicroCodeCommand command )
 {
 	DL_PF( "    S2DEX_ObjRendermode (Ignored)" );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_S2DEX_SelectDl( MicroCodeCommand command )
 {
 	DL_PF( "    S2DEX_SelectDl (Ignored)" );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_S2DEX_BgCopy( MicroCodeCommand command )
 {
 	DL_PF("    DLParser_S2DEX_BgCopy");
@@ -700,9 +618,6 @@ void DLParser_S2DEX_BgCopy( MicroCodeCommand command )
 							  texture );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_S2DEX_Bg1cyc( MicroCodeCommand command )
 {
 	if( g_ROM.GameHacks == ZELDA_MM )

@@ -20,11 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_UCODES_UCODE_GBI2_H_
 #define HLEGRAPHICS_UCODES_UCODE_GBI2_H_
 
-
-
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI2_Vtx( MicroCodeCommand command )
 {
 	u32 address = RDPSegAddr(command.vtx2.addr);
@@ -55,9 +50,6 @@ void DLParser_GBI2_Vtx( MicroCodeCommand command )
 
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI2_Mtx( MicroCodeCommand command )
 {
 	u32 address = RDPSegAddr(command.mtx2.addr);
@@ -78,9 +70,6 @@ void DLParser_GBI2_Mtx( MicroCodeCommand command )
 		gRenderer->SetWorldView(address, command.mtx2.nopush==0, command.mtx2.load);
 	}
 }
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI2_PopMtx( MicroCodeCommand command )
 {
 	DL_PF("    Command: (%s)",	command.inst.cmd1 ? "Projection" : "ModelView");
@@ -92,9 +81,6 @@ void DLParser_GBI2_PopMtx( MicroCodeCommand command )
 	gRenderer->PopWorldView(num);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 //0016A710: DB020000 00000018 CMD Zelda_MOVEWORD  Mem[2][00]=00000018 Lightnum=0
 //001889F0: DB020000 00000030 CMD Zelda_MOVEWORD  Mem[2][00]=00000030 Lightnum=2
 void DLParser_GBI2_MoveWord( MicroCodeCommand command )
@@ -198,9 +184,6 @@ void DLParser_GBI2_MoveWord( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 /*
 
 001889F8: DC08060A 80188708 CMD Zelda_MOVEMEM  Movemem[0806] <- 80188708
@@ -249,9 +232,6 @@ ZeldaMoveMem: 0xdc080008 0x8010e3c0 Type: 08 Len: 08 Off: 4000
 
 */
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI2_MoveMem( MicroCodeCommand command )
 {
 	u32 address	 = RDPSegAddr(command.inst.cmd1);
@@ -332,9 +312,7 @@ void DLParser_GBI2_MoveMem( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
 // Kirby 64, SSB and Cruisn' Exotica use this
-//*****************************************************************************
 void DLParser_GBI2_DL_Count( MicroCodeCommand command )
 {
 	u32 address  = RDPSegAddr(command.inst.cmd1);
@@ -356,9 +334,6 @@ void DLParser_GBI2_DL_Count( MicroCodeCommand command )
 	DL_PF("    ############################################");
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI2_GeometryMode( MicroCodeCommand command )
 {
 	gGeometryMode._u32 &= command.inst.arg0;
@@ -389,9 +364,6 @@ void DLParser_GBI2_GeometryMode( MicroCodeCommand command )
 	gRenderer->SetTnLMode( TnL._u32 );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI2_SetOtherModeL( MicroCodeCommand command )
 {
 	// Mask is constructed slightly differently
@@ -404,9 +376,6 @@ void DLParser_GBI2_SetOtherModeL( MicroCodeCommand command )
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI2_SetOtherModeH( MicroCodeCommand command )
 {
 	// Mask is constructed slightly differently
@@ -419,9 +388,6 @@ void DLParser_GBI2_SetOtherModeH( MicroCodeCommand command )
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI2_Texture( MicroCodeCommand command )
 {
 
@@ -437,17 +403,11 @@ void DLParser_GBI2_Texture( MicroCodeCommand command )
 	gRenderer->SetTextureScale( scale_s, scale_t );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI2_DMA_IO( MicroCodeCommand command )
 {
 	DL_UNIMPLEMENTED_ERROR( "G_DMA_IO" );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI2_Quad( MicroCodeCommand command )
 {
 	// While the next command pair is Tri2, add vertices
@@ -488,9 +448,6 @@ void DLParser_GBI2_Quad( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 // XXX SpiderMan uses this command.DLParser_GBI2_Tri2
 void DLParser_GBI2_Line3D( MicroCodeCommand command )
 {
@@ -529,9 +486,6 @@ void DLParser_GBI2_Line3D( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI2_Tri1( MicroCodeCommand command )
 {
 
@@ -564,9 +518,7 @@ void DLParser_GBI2_Tri1( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
 // While the next command pair is Tri2, add vertices
-//*****************************************************************************
 void DLParser_GBI2_Tri2( MicroCodeCommand command )
 {
 
@@ -605,9 +557,6 @@ void DLParser_GBI2_Tri2( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 /*
 void DLParser_GBI2_0x8( MicroCodeCommand command )
 {

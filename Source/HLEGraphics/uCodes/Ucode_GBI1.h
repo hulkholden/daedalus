@@ -20,15 +20,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_UCODES_UCODE_GBI1_H_
 #define HLEGRAPHICS_UCODES_UCODE_GBI1_H_
 
-
-//*****************************************************************************
 // The previous way of calculating was based on the assumption that
 // there was no "n" field. I didn't realise that the n/length fields shared the
 // lower 16 bits (in a 6:10 split).
 // u32 length    = (command.inst.cmd0)&0xFFFF;
 // u32 num_verts = (length + 1) / 0x210;                        // 528
 // u32 v0_idx    = ((command.inst.cmd0>>16)&0xFF)/gVertexStride;      // /5
-//*****************************************************************************
 void DLParser_GBI1_Vtx( MicroCodeCommand command )
 {
 	//u32 length    = (command.inst.cmd0)&0xFFFF;
@@ -57,9 +54,6 @@ void DLParser_GBI1_Vtx( MicroCodeCommand command )
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_ModifyVtx( MicroCodeCommand command )
 {
 	u32 offset = command.modifyvtx.offset;
@@ -76,9 +70,6 @@ void DLParser_GBI1_ModifyVtx( MicroCodeCommand command )
 	gRenderer->ModifyVertexInfo( offset, vert, value );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_Mtx( MicroCodeCommand command )
 {
 	u32 address = RDPSegAddr(command.mtx1.addr);
@@ -100,9 +91,6 @@ void DLParser_GBI1_Mtx( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_PopMtx( MicroCodeCommand command )
 {
 	DL_PF("    Command: (%s)",	command.inst.cmd1 ? "Projection" : "ModelView");
@@ -114,9 +102,6 @@ void DLParser_GBI1_PopMtx( MicroCodeCommand command )
 		gRenderer->PopWorldView();
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_MoveMem( MicroCodeCommand command )
 {
 	u32 type     = (command.inst.cmd0>>16)&0xFF;
@@ -181,9 +166,6 @@ void DLParser_GBI1_MoveMem( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_MoveWord( MicroCodeCommand command )
 {
 	// Type of movement is in low 8bits of cmd0.
@@ -284,9 +266,6 @@ void DLParser_GBI1_MoveWord( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_CullDL( MicroCodeCommand command )
 {
 	u32 first = command.culldl.first;
@@ -310,9 +289,6 @@ void DLParser_GBI1_CullDL( MicroCodeCommand command )
 	DLParser_PopDL();
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_DL( MicroCodeCommand command )
 {
 #if defined(DAEDALUS_DEBUG_DISPLAYLIST) || defined(DAEDALUS_ENABLE_ASSERTS)
@@ -332,17 +308,12 @@ void DLParser_GBI1_DL( MicroCodeCommand command )
 	gDlistStack.address[gDlistStackPointer] = RDPSegAddr(command.dlist.addr) & (MAX_RAM_ADDRESS-1);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_EndDL( MicroCodeCommand command )
 {
 	DLParser_PopDL();
 }
 
-//*****************************************************************************
 // When the depth is less than the z value provided, branch to given address
-//*****************************************************************************
 void DLParser_GBI1_BranchZ( MicroCodeCommand command )
 {
 	//Always branching will usually just waste a bit of fillrate (PSP got plenty)
@@ -367,9 +338,7 @@ void DLParser_GBI1_BranchZ( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
 // AST, Yoshi's World, Scooby Doo use this
-//*****************************************************************************
 void DLParser_GBI1_LoadUCode( MicroCodeCommand command )
 {
 	u32 code_base = (command.inst.cmd1 & 0x1fffffff);
@@ -380,9 +349,6 @@ void DLParser_GBI1_LoadUCode( MicroCodeCommand command )
 	DLParser_InitMicrocode( code_base, code_size, data_base, data_size );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_GeometryMode( MicroCodeCommand command )
 {
 	const u32 mask = command.inst.cmd1;
@@ -425,9 +391,6 @@ void DLParser_GBI1_GeometryMode( MicroCodeCommand command )
 	DL_PF("    LOD %s",				 (gGeometryMode.GBI1_Lod)			? "On" : "Off");
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_SetOtherModeL( MicroCodeCommand command )
 {
 	const u32 mask = ((1 << command.othermode.len) - 1) << command.othermode.sft;
@@ -439,9 +402,6 @@ void DLParser_GBI1_SetOtherModeL( MicroCodeCommand command )
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_SetOtherModeH( MicroCodeCommand command )
 {
 	const u32 mask = ((1 << command.othermode.len) - 1) << command.othermode.sft;
@@ -453,9 +413,6 @@ void DLParser_GBI1_SetOtherModeH( MicroCodeCommand command )
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_Texture( MicroCodeCommand command )
 {
 
@@ -471,56 +428,35 @@ void DLParser_GBI1_Texture( MicroCodeCommand command )
 	gRenderer->SetTextureScale( scale_s, scale_t );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_Reserved( MicroCodeCommand command )
 {
 	// Not implemented!
 	DL_UNIMPLEMENTED_ERROR( "RDP: Reserved" );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_Noop( MicroCodeCommand command )
 {
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_SpNoop( MicroCodeCommand command )
 {
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_RDPHalf_Cont( MicroCodeCommand command )
 {
 	//DBGConsole_Msg( 0, "Unexpected RDPHalf_Cont: %08x %08x", command.inst.cmd0, command.inst.cmd1 );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_RDPHalf_2( MicroCodeCommand command )
 {
 //	DBGConsole_Msg( 0, "Unexpected RDPHalf_2: %08x %08x", command.inst.cmd0, command.inst.cmd1 );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_RDPHalf_1( MicroCodeCommand command )
 {
 	gRDPHalf1 = command.inst.cmd1;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_Tri2( MicroCodeCommand command )
 {
 	// While the next command pair is Tri2, add vertices
@@ -559,9 +495,6 @@ void DLParser_GBI1_Tri2( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_Line3D( MicroCodeCommand command )
 {
 	if( command.gbi1line3d.v3 == 0 )
@@ -604,9 +537,6 @@ void DLParser_GBI1_Line3D( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_Tri1( MicroCodeCommand command )
 {
 	//DAEDALUS_PROFILE( "DLParser_GBI1_Tri1_T" );

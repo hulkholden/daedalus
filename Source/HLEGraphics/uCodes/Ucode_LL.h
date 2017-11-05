@@ -20,11 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_UCODES_UCODE_LL_H_
 #define HLEGRAPHICS_UCODES_UCODE_LL_H_
 
-//*****************************************************************************
+// IS called Last Legion, but is used for several other games like: Dark Rift, Toukon Road, Toukon Road 2.
 
-//IS called Last Legion, but is used for several other games like: Dark Rift, Toukon Road, Toukon Road 2.
-
-//*****************************************************************************
 // Only thing I can't figure out why are the characters on those games invisble?
 // Dark Rift runs properly without custom microcodes, and has the same symptoms...
 // We need Turbo3D ucode support, actually a modified version of it, thanks Gonetz for the info :D
@@ -35,9 +32,6 @@ void DLParser_Last_Legion_0x80( MicroCodeCommand command )
 	  DL_PF("    DLParser_RSP_Last_Legion_0x80");
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_Last_Legion_0x00( MicroCodeCommand command )
 {
 
@@ -91,9 +85,6 @@ void DLParser_Last_Legion_0x00( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_TexRect_Last_Legion( MicroCodeCommand command )
 {
 	MicroCodeCommand command2;

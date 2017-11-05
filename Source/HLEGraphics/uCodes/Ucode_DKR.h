@@ -26,9 +26,7 @@ bool gDKRBillBoard = false;
 
 // DKR verts are 10 bytes
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_DumpVtxInfoDKR(u32 address, u32 v0_idx, u32 num_verts)
 {
 	if (DLDebug_IsActive())
@@ -77,9 +75,6 @@ void DLParser_DumpVtxInfoDKR(u32 address, u32 v0_idx, u32 num_verts)
 }
 #endif
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI0_Vtx_DKR( MicroCodeCommand command )
 {
 	u32 address		= command.inst.cmd1 + gAuxAddr;
@@ -113,9 +108,6 @@ void DLParser_GBI0_Vtx_DKR( MicroCodeCommand command )
 
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_DLInMem( MicroCodeCommand command )
 {
 	gDlistStackPointer++;
@@ -127,9 +119,6 @@ void DLParser_DLInMem( MicroCodeCommand command )
 	DL_PF("    ############################################");
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_Mtx_DKR( MicroCodeCommand command )
 {
 	u32 address		= command.inst.cmd1 + RDPSegAddr(gDKRMatrixAddr);
@@ -153,9 +142,6 @@ void DLParser_Mtx_DKR( MicroCodeCommand command )
 	gRenderer->SetDKRMat(address, mul, mtx_command);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_MoveWord_DKR( MicroCodeCommand command )
 {
 	switch( command.inst.cmd0 & 0xFF )
@@ -178,9 +164,7 @@ void DLParser_MoveWord_DKR( MicroCodeCommand command )
 		break;
 	}
 }
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_Set_Addr_DKR( MicroCodeCommand command )
 {
 	gDKRMatrixAddr  = command.inst.cmd0 & 0x00FFFFFF;
@@ -188,9 +172,6 @@ void DLParser_Set_Addr_DKR( MicroCodeCommand command )
 	gDKRVtxCount	= 0;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_DMA_Tri_DKR( MicroCodeCommand command )
 {
 	u32 address = RDPSegAddr(command.inst.cmd1);
@@ -274,9 +255,6 @@ void DLParser_DMA_Tri_DKR( MicroCodeCommand command )
 	gDKRVtxCount = 0;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI1_Texture_DKR( MicroCodeCommand command )
 {
 	u32 tile    = command.texture.tile;

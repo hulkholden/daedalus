@@ -20,9 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_UCODES_UCODE_GBI0_H_
 #define HLEGRAPHICS_UCODES_UCODE_GBI0_H_
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_GBI0_Vtx( MicroCodeCommand command )
 {
 	u32 addr = RDPSegAddr(command.vtx0.addr);
@@ -41,11 +38,8 @@ void DLParser_GBI0_Vtx( MicroCodeCommand command )
 	gNumVertices += n;
 	DLParser_DumpVtxInfo( addr, v0, n );
 #endif
-
 }
-//*****************************************************************************
-//
-//*****************************************************************************
+
 // GE and PD have alot of empty tris...
 // Maybe not the best idea to inline nor have an extra jump or and extra branch in Addtri..
 inline bool AddTri4( u32 v0, u32 v1, u32 v2 )
@@ -61,9 +55,7 @@ inline bool AddTri4( u32 v0, u32 v1, u32 v2 )
 	}
 }
 
-//*****************************************************************************
 // It's used by Golden Eye and Perfect Dark
-//*****************************************************************************
 void DLParser_GBI0_Tri4( MicroCodeCommand command )
 {
 	// While the next command pair is Tri2, add vertices
@@ -116,9 +108,7 @@ void DLParser_GBI0_Tri4( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
 // Actually line3d, not supported I think.
-//*****************************************************************************
 /*
 void DLParser_GBI0_Quad( MicroCodeCommand command )
 {

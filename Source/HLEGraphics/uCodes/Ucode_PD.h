@@ -20,9 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_UCODES_UCODE_PD_H_
 #define HLEGRAPHICS_UCODES_UCODE_PD_H_
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_Vtx_PD( MicroCodeCommand command )
 {
 	u32 address = RDPSegAddr(command.inst.cmd1);
@@ -40,9 +37,6 @@ void DLParser_Vtx_PD( MicroCodeCommand command )
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void DLParser_Set_Vtx_CI_PD( MicroCodeCommand command )
 {
 	// PD Color index buf address

@@ -20,9 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_UCODES_UCODE_SOTE_H_
 #define HLEGRAPHICS_UCODES_UCODE_SOTE_H_
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_GBI0_Vtx_SOTE( MicroCodeCommand command )
 {
 	u32 address = RDPSegAddr(command.inst.cmd1);
@@ -41,9 +39,6 @@ void DLParser_GBI0_Vtx_SOTE( MicroCodeCommand command )
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 /*
 void DLParser_GBI0_Line3D_SOTE( MicroCodeCommand command )
 {
@@ -85,9 +80,7 @@ void DLParser_GBI0_Line3D_SOTE( MicroCodeCommand command )
 	}
 }
 */
-//*****************************************************************************
-//
-//*****************************************************************************
+
 /*
 void DLParser_GBI0_Tri1_SOTE( MicroCodeCommand command )
 {

@@ -23,9 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Alot cheaper than check mux
 // TODO: Should handle shadow eventually!
 #define CONKER_SHADOW 0x005049d8//0x00ffe9ffffd21f0fLL
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_Vtx_Conker( MicroCodeCommand command )
 {
 	if( g_CI.Format != G_IM_FMT_RGBA || (gRDPOtherMode.L == CONKER_SHADOW) )
@@ -50,9 +48,7 @@ void DLParser_Vtx_Conker( MicroCodeCommand command )
 
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_Tri1_Conker( MicroCodeCommand command )
 {
 
@@ -100,9 +96,7 @@ void DLParser_Tri1_Conker( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_Tri2_Conker( MicroCodeCommand command )
 {
 
@@ -156,9 +150,7 @@ void DLParser_Tri2_Conker( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_Tri4_Conker( MicroCodeCommand command )
 {
 	u32 pc = gDlistStack.address[gDlistStackPointer];		// This points to the next instruction
@@ -225,9 +217,7 @@ void DLParser_Tri4_Conker( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_MoveMem_Conker( MicroCodeCommand command )
 {
 	u32 type = command.inst.cmd0 & 0xFE;
@@ -270,9 +260,7 @@ void DLParser_MoveMem_Conker( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_MoveWord_Conker( MicroCodeCommand command )
 {
 #if 1

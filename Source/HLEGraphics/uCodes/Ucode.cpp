@@ -20,9 +20,7 @@
 #include "stdafx.h"
 
 #include "Ucode.h"
-//*************************************************************************************
-//
-//*************************************************************************************
+
 // This is the multiplier applied to vertex indices
 const u32 ucode_stride[] =
 {
@@ -40,9 +38,7 @@ const u32 ucode_stride[] =
 	10,		// Perfect Dark
 };
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 const MicroCodeInstruction gNormalInstruction[MAX_UCODE_TABLE][256] =
 {
 	// uCode 0 - RSP SW 2.0X
@@ -470,9 +466,6 @@ const MicroCodeInstruction gNormalInstruction[MAX_UCODE_TABLE][256] =
 	},
 };
 
-//*************************************************************************************
-//
-//*************************************************************************************
 #if defined(DAEDALUS_DEBUG_DISPLAYLIST) || defined(DAEDALUS_ENABLE_PROFILING)
 const char * gNormalInstructionName[MAX_UCODE_TABLE][256] =
 {
