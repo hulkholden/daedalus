@@ -29,8 +29,28 @@ cc_library(
         ],
         ":windows": [
             "//SysW32",
-        ]
+        ],
     }) + [
         "//Base",
+    ],
+)
+
+cc_binary(
+    name = "daedalus",
+    deps = select({
+        ":darwin": [
+           "//SysOSX:Main",
+           "//SysPosix:SysPosixCpp",
+        ],
+    }) + [
+        "//Base",
+        "//Core:CoreCpp",
+        "//System:SystemCpp",
+        "//Graphics:GraphicsCpp",
+        "//HLEAudio:HLEAudioCpp",
+        "//HLEGraphics:HLEGraphicsCpp",
+        "//SysGL:SysGLCpp",
+        "//Utility:UtilityCpp",
+        "//Interface:InterfaceCpp",
     ],
 )

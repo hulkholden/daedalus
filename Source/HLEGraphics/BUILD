@@ -11,7 +11,7 @@ cc_library(
 
 cc_library(
     name = "HLEGraphicsCpp",
-    srcs = glob(["*.cpp"]),
+    srcs = glob(["*.cpp", "uCodes/*.cpp"]),
     deps = [
         "//:stdafx",
         ":HLEGraphics",
