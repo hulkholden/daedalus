@@ -1,6 +1,6 @@
 cc_library(
     name = "HLEGraphics",
-    hdrs =glob(["*.h"]),
+    hdrs =glob(["*.h", "uCodes/*.h"]),
     deps = [
         "//:stdafx",
         "//Utility",
@@ -17,7 +17,10 @@ cc_library(
         ":HLEGraphics",
         "//Config",
         "//Core",
+        "//Debug",
         "//Graphics",
+        "//Plugins",
+        "//Test",
     ],
     visibility = ["//visibility:public"],
 )

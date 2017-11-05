@@ -5,6 +5,7 @@ cc_library(
         "//:stdafx",
         "//third_party/zlib",
         "//third_party/zlib/contrib/minizip",
+        "//Config",
         "//Debug:DebugConsole",
         "//Math",
         "//System",
@@ -17,8 +18,8 @@ cc_library(
     srcs = glob(["*.cpp"], exclude=["FastMemcpy_test.cpp"]),
     deps = [
         ":Utility",
-        "//third_party/zlib/contrib/minizip",        
-        "//third_party/gtest",        
+        "//third_party/zlib/contrib/minizip",
+        "//third_party/gtest",
         "//:stdafx",
         "//Config",
         "//Core",
