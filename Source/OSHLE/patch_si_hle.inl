@@ -183,7 +183,7 @@ u32 Patch___osSiRawStartDma_Mario()
 	}
 	*/
 
-	u32 PAddr = ConvertToPhysics(SIAddr);
+	u32 PAddr = ConvertToPhysical(SIAddr);
 
 	Memory_SI_SetRegister( SI_DRAM_ADDR_REG, PAddr);
 	if(RWflag == OS_READ)
@@ -220,7 +220,7 @@ u32 Patch___osSiRawStartDma_Rugrats()
 	}
 	*/
 
-	u32 PAddr = ConvertToPhysics(SIAddr);
+	u32 PAddr = ConvertToPhysical(SIAddr);
 
 	Memory_SI_SetRegister( SI_DRAM_ADDR_REG, PAddr);
 	if(RWflag == OS_READ)

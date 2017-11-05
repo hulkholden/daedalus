@@ -1,6 +1,6 @@
 cc_library(
     name = "OSHLE",
-    hdrs =glob(["*.h"]),
+    hdrs =glob(["*.h", "*.inl"]),
     deps = [
         "//:stdafx",
         "//Utility",
