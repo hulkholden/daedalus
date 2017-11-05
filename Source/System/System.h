@@ -34,4 +34,4 @@ void System_Close();
 // Finalize the whole system
 void System_Finalize();
 
-#endif // SYSTEM_SYSTEM_H_
+#endif  // SYSTEM_SYSTEM_H_

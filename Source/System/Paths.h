@@ -6,4 +6,4 @@
 
 extern IO::Filename gDaedalusExePath;
 
-#endif // SYSTEM_PATHS_H_
+#endif  // SYSTEM_PATHS_H_

@@ -26,64 +26,63 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 namespace IO
 {
-	namespace File
-	{
-		bool		Move( const char * p_existing, const char * p_new );
-		bool		Delete( const char * p_file );
-		bool		Exists( const char * p_path );
+namespace File
+{
+bool Move(const char* p_existing, const char* p_new);
+bool Delete(const char* p_file);
+bool Exists(const char* p_path);
+}
+namespace Directory
+{
+bool Create(const char* p_path);
+bool EnsureExists(const char* p_path);
+bool IsDirectory(const char* p_path);
+}
 
-	}
-	namespace Directory
-	{
-		bool		Create( const char * p_path );
-		bool		EnsureExists( const char * p_path );
-		bool		IsDirectory( const char * p_path );
-	}
+namespace Path
+{
+const u32 kMaxPathLen = 260;
 
-	namespace Path
-	{
-		const u32	kMaxPathLen = 260;
+inline void Assign(char* p_dest, const char* p_dir)
+{
+	strncpy(p_dest, p_dir, kMaxPathLen);
+	p_dest[kMaxPathLen - 1] = '\0';
+}
 
-		inline void Assign( char * p_dest, const char * p_dir )
-		{
-			strncpy(p_dest, p_dir, kMaxPathLen);
-			p_dest[kMaxPathLen-1] = '\0';
-		}
+char* Combine(char* p_dest, const char* p_dir, const char* p_file);
+bool Append(char* p_path, const char* p_more);
+const char* FindExtension(const char* p_path);
+const char* FindFileName(const char* p_path);
+char* RemoveBackslash(char* p_path);
+bool RemoveFileSpec(char* p_path);
+void RemoveExtension(char* p_path);
+void AddExtension(char* p_path, const char* p_ext);
 
-		char *				Combine( char * p_dest, const char * p_dir, const char * p_file );
-		bool				Append( char * p_path, const char * p_more );
-		const char *		FindExtension( const char * p_path );
-		const char *		FindFileName( const char * p_path );
-		char *				RemoveBackslash( char * p_path );
-		bool				RemoveFileSpec( char * p_path );
-		void				RemoveExtension( char * p_path );
-		void				AddExtension( char * p_path, const char * p_ext );
+inline void SetExtension(char* p_path, const char* p_extension)
+{
+	RemoveExtension(p_path);
+	AddExtension(p_path, p_extension);
+}
+}
 
-		inline void SetExtension( char * p_path, const char * p_extension)
-		{
-			RemoveExtension(p_path);
-			AddExtension(p_path, p_extension);
-		}
-	}
+typedef char Filename[IO::Path::kMaxPathLen + 1];
 
-	typedef char Filename[IO::Path::kMaxPathLen+1];
+struct FindDataT
+{
+	Filename Name;
+};
 
-	struct FindDataT
-	{
-		Filename	Name;
-	};
-
-#if defined( DAEDALUS_W32 )
-	typedef intptr_t FindHandleT;
-#elif defined( DAEDALUS_OSX ) || defined( DAEDALUS_LINUX )
-	typedef void * FindHandleT;
+#if defined(DAEDALUS_W32)
+typedef intptr_t FindHandleT;
+#elif defined(DAEDALUS_OSX) || defined(DAEDALUS_LINUX)
+typedef void* FindHandleT;
 #else
 #error Need to define FindHandleT for this platform
 #endif
 
-	bool	FindFileOpen( const char * path, FindHandleT * handle, FindDataT & data );
-	bool	FindFileNext( FindHandleT handle, FindDataT & data );
-	bool	FindFileClose( FindHandleT handle );
+bool FindFileOpen(const char* path, FindHandleT* handle, FindDataT& data);
+bool FindFileNext(FindHandleT handle, FindDataT& data);
+bool FindFileClose(FindHandleT handle);
 }
 
-#endif // SYSTEM_IO_H_
+#endif  // SYSTEM_IO_H_
