@@ -27,12 +27,19 @@
  * a hidden computer or VCR.
  *****************************************************************************/
 
+#if defined(_MSC_VER)
+ // Make MS math.h define M_PI
+ #define _USE_MATH_DEFINES
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
-#define GLFW_INCLUDE_GLU
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include <linmath.h>
 
 
 /*****************************************************************************
@@ -44,6 +51,8 @@ void init( void );
 void display( void );
 void reshape( GLFWwindow* window, int w, int h );
 void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods );
+void mouse_button_callback( GLFWwindow* window, int button, int action, int mods );
+void cursor_position_callback( GLFWwindow* window, double x, double y );
 void DrawBoingBall( void );
 void BounceBall( double dt );
 void DrawBoingBallBand( GLfloat long_lo, GLfloat long_hi );
@@ -80,8 +89,13 @@ typedef enum { DRAW_BALL, DRAW_BALL_SHADOW } DRAW_BALL_ENUM;
 typedef struct {float x; float y; float z;} vertex_t;
 
 /* Global vars */
+int windowed_xpos, windowed_ypos, windowed_width, windowed_height;
+int width, height;
 GLfloat deg_rot_y       = 0.f;
 GLfloat deg_rot_y_inc   = 2.f;
+int override_pos        = GLFW_FALSE;
+GLfloat cursor_x        = 0.f;
+GLfloat cursor_y        = 0.f;
 GLfloat ball_x          = -RADIUS;
 GLfloat ball_y          = -RADIUS;
 GLfloat ball_x_inc      = 1.f;
@@ -94,11 +108,6 @@ double  dt;
 /* Random number generator */
 #ifndef RAND_MAX
  #define RAND_MAX 4095
-#endif
-
-/* PI */
-#ifndef M_PI
- #define M_PI 3.1415926535897932384626433832795
 #endif
 
 
@@ -161,28 +170,6 @@ void CrossProduct( vertex_t a, vertex_t b, vertex_t c, vertex_t *n )
    n->z = u1 * v2 - v1 * u2;
 }
 
-/*****************************************************************************
- * Calculate the angle to be passed to gluPerspective() so that a scene
- * is visible.  This function originates from the OpenGL Red Book.
- *
- * Parms   : size
- *           The size of the segment when the angle is intersected at "dist"
- *           (ie at the outermost edge of the angle of vision).
- *
- *           dist
- *           Distance from viewpoint to scene.
- *****************************************************************************/
-GLfloat PerspectiveAngle( GLfloat size,
-                          GLfloat dist )
-{
-   GLfloat radTheta, degTheta;
-
-   radTheta = 2.f * (GLfloat) atan2( size / 2.f, dist );
-   degTheta = (180.f * radTheta) / (GLfloat) M_PI;
-   return degTheta;
-}
-
-
 
 #define BOING_DEBUG 0
 
@@ -227,28 +214,86 @@ void display(void)
  *****************************************************************************/
 void reshape( GLFWwindow* window, int w, int h )
 {
+   mat4x4 projection, view;
+
    glViewport( 0, 0, (GLsizei)w, (GLsizei)h );
 
    glMatrixMode( GL_PROJECTION );
-   glLoadIdentity();
-
-   gluPerspective( PerspectiveAngle( RADIUS * 2, 200 ),
-                   (GLfloat)w / (GLfloat)h,
-                   1.0,
-                   VIEW_SCENE_DIST );
+   mat4x4_perspective( projection,
+                       2.f * (float) atan2( RADIUS, 200.f ),
+                       (float)w / (float)h,
+                       1.f, VIEW_SCENE_DIST );
+   glLoadMatrixf((const GLfloat*) projection);
 
    glMatrixMode( GL_MODELVIEW );
-   glLoadIdentity();
-
-   gluLookAt( 0.0, 0.0, VIEW_SCENE_DIST,/* eye */
-              0.0, 0.0, 0.0,            /* center of vision */
-              0.0, -1.0, 0.0 );         /* up vector */
+   {
+      vec3 eye = { 0.f, 0.f, VIEW_SCENE_DIST };
+      vec3 center = { 0.f, 0.f, 0.f };
+      vec3 up = { 0.f, -1.f, 0.f };
+      mat4x4_look_at( view, eye, center, up );
+   }
+   glLoadMatrixf((const GLfloat*) view);
 }
 
 void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods )
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GL_TRUE);
+    if (action != GLFW_PRESS)
+        return;
+
+    if (key == GLFW_KEY_ESCAPE && mods == 0)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    if ((key == GLFW_KEY_ENTER && mods == GLFW_MOD_ALT) ||
+        (key == GLFW_KEY_F11 && mods == GLFW_MOD_ALT))
+    {
+        if (glfwGetWindowMonitor(window))
+        {
+            glfwSetWindowMonitor(window, NULL,
+                                 windowed_xpos, windowed_ypos,
+                                 windowed_width, windowed_height, 0);
+        }
+        else
+        {
+            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+            if (monitor)
+            {
+                const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+                glfwGetWindowPos(window, &windowed_xpos, &windowed_ypos);
+                glfwGetWindowSize(window, &windowed_width, &windowed_height);
+                glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+            }
+        }
+    }
+}
+
+static void set_ball_pos ( GLfloat x, GLfloat y )
+{
+   ball_x = (width / 2) - x;
+   ball_y = y - (height / 2);
+}
+
+void mouse_button_callback( GLFWwindow* window, int button, int action, int mods )
+{
+   if (button != GLFW_MOUSE_BUTTON_LEFT)
+      return;
+
+   if (action == GLFW_PRESS)
+   {
+      override_pos = GLFW_TRUE;
+      set_ball_pos(cursor_x, cursor_y);
+   }
+   else
+   {
+      override_pos = GLFW_FALSE;
+   }
+}
+
+void cursor_position_callback( GLFWwindow* window, double x, double y )
+{
+   cursor_x = (float) x;
+   cursor_y = (float) y;
+
+   if ( override_pos )
+      set_ball_pos(cursor_x, cursor_y);
 }
 
 /*****************************************************************************
@@ -340,6 +385,9 @@ void BounceBall( double delta_t )
 {
    GLfloat sign;
    GLfloat deg;
+
+   if ( override_pos )
+     return;
 
    /* Bounce on walls */
    if ( ball_x >  (BOUNCE_WIDTH/2 + WALL_R_OFFSET ) )
@@ -574,13 +622,10 @@ void DrawGrid( void )
 int main( void )
 {
    GLFWwindow* window;
-   int width, height;
 
    /* Init GLFW */
    if( !glfwInit() )
       exit( EXIT_FAILURE );
-
-   glfwWindowHint(GLFW_DEPTH_BITS, 16);
 
    window = glfwCreateWindow( 400, 400, "Boing (classic Amiga demo)", NULL, NULL );
    if (!window)
@@ -589,10 +634,15 @@ int main( void )
        exit( EXIT_FAILURE );
    }
 
+   glfwSetWindowAspectRatio(window, 1, 1);
+
    glfwSetFramebufferSizeCallback(window, reshape);
    glfwSetKeyCallback(window, key_callback);
+   glfwSetMouseButtonCallback(window, mouse_button_callback);
+   glfwSetCursorPosCallback(window, cursor_position_callback);
 
    glfwMakeContextCurrent(window);
+   gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
    glfwSwapInterval( 1 );
 
    glfwGetFramebufferSize(window, &width, &height);

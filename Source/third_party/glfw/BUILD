@@ -24,23 +24,22 @@ _DEFINES = [
 cc_library(
     name = "glfw",
     hdrs = glob(["include/GLFW/*.h"]) + glob(["src/*.h"]) + [
-        "deps/GL/glext.h",
+        #"deps/GL/glext.h",
     ],
     includes = ["include"],
     srcs = [
-        "src/clipboard.c",
         "src/context.c",
-        "src/gamma.c",
         "src/init.c",
         "src/input.c",
-        "src/joystick.c",
         "src/monitor.c",
-        "src/time.c",
+        "src/vulkan.c",
         "src/window.c",
     ] + select({
         ":darwin": [
-            "src/cocoa_gamma.c",
             "src/cocoa_time.c",
+            "src/posix_thread.c",
+            "src/egl_context.c",
+            "src/osmesa_context.c",
           ],
     }),
     defines = _DEFINES + select({
@@ -61,7 +60,7 @@ cc_library(
 objc_library(
     name = "osx_objc",
     hdrs = glob(["include/GLFW/*.h"]) + glob(["src/*.h"]) + [
-        "deps/GL/glext.h",
+        #"deps/GL/glext.h",
     ],
     includes = ["include"],
     defines = _DEFINES + [
@@ -69,14 +68,20 @@ objc_library(
         "_GLFW_NSGL=1",
     ],
     srcs = [
-        "src/nsgl_context.m",
-        "src/cocoa_clipboard.m",
         "src/cocoa_init.m",
         "src/cocoa_joystick.m",
         "src/cocoa_monitor.m",
         "src/cocoa_window.m",
+        "src/nsgl_context.m",
+    ],
+    copts = [
+        "-fno-objc-arc",
     ],
     sdk_frameworks = [
+        "Cocoa",
+        "CoreFoundation",
+        "CoreVideo",
+        "IOKit",
         "OpenGL",
     ],
 )

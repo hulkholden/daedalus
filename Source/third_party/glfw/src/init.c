@@ -1,8 +1,8 @@
 //========================================================================
-// GLFW 3.0 - www.glfw.org
+// GLFW 3.3 - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
-// Copyright (c) 2006-2010 Camilla Berglund <elmindreda@elmindreda.org>
+// Copyright (c) 2006-2016 Camilla Löwy <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -26,32 +26,45 @@
 //========================================================================
 
 #include "internal.h"
+#include "mappings.h"
 
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
 
+
+// The global variables below comprise all global data in GLFW.
+// Any other global variable is a bug.
 
 // Global state shared between compilation units of GLFW
-// These are documented in internal.h
 //
-GLboolean _glfwInitialized = GL_FALSE;
-_GLFWlibrary _glfw;
+_GLFWlibrary _glfw = { GLFW_FALSE };
 
-
-// The current error callback
-// This is outside of _glfw so it can be initialized and usable before
-// glfwInit is called, which lets that function report errors
+// These are outside of _glfw so they can be used before initialization and
+// after termination
 //
-static GLFWerrorfun _glfwErrorCallback = NULL;
-
+static _GLFWerror _glfwMainThreadError;
+static GLFWerrorfun _glfwErrorCallback;
+static _GLFWinitconfig _glfwInitHints =
+{
+    GLFW_TRUE,      // hat buttons
+    {
+        GLFW_TRUE,  // macOS menu bar
+        GLFW_TRUE   // macOS bundle chdir
+    },
+    {
+        "",         // X11 WM_CLASS name
+        ""          // X11 WM_CLASS class
+    }
+};
 
 // Returns a generic string representation of the specified error
 //
-static const char* getErrorString(int error)
+static const char* getErrorString(int code)
 {
-    switch (error)
+    switch (code)
     {
         case GLFW_NOT_INITIALIZED:
             return "The GLFW library is not initialized";
@@ -64,16 +77,67 @@ static const char* getErrorString(int error)
         case GLFW_OUT_OF_MEMORY:
             return "Out of memory";
         case GLFW_API_UNAVAILABLE:
-            return "The requested client API is unavailable";
+            return "The requested API is unavailable";
         case GLFW_VERSION_UNAVAILABLE:
-            return "The requested client API version is unavailable";
+            return "The requested API version is unavailable";
         case GLFW_PLATFORM_ERROR:
-            return "A platform-specific error occurred";
+            return "An undocumented platform-specific error occurred";
         case GLFW_FORMAT_UNAVAILABLE:
             return "The requested format is unavailable";
+        case GLFW_NO_WINDOW_CONTEXT:
+            return "The specified window has no context";
+        default:
+            return "ERROR: UNKNOWN GLFW ERROR";
+    }
+}
+
+// Terminate the library
+//
+static void terminate(void)
+{
+    int i;
+
+    memset(&_glfw.callbacks, 0, sizeof(_glfw.callbacks));
+
+    while (_glfw.windowListHead)
+        glfwDestroyWindow((GLFWwindow*) _glfw.windowListHead);
+
+    while (_glfw.cursorListHead)
+        glfwDestroyCursor((GLFWcursor*) _glfw.cursorListHead);
+
+    for (i = 0;  i < _glfw.monitorCount;  i++)
+    {
+        _GLFWmonitor* monitor = _glfw.monitors[i];
+        if (monitor->originalRamp.size)
+            _glfwPlatformSetGammaRamp(monitor, &monitor->originalRamp);
+        _glfwFreeMonitor(monitor);
     }
 
-    return "ERROR: UNKNOWN ERROR TOKEN PASSED TO glfwErrorString";
+    free(_glfw.monitors);
+    _glfw.monitors = NULL;
+    _glfw.monitorCount = 0;
+
+    free(_glfw.mappings);
+    _glfw.mappings = NULL;
+    _glfw.mappingCount = 0;
+
+    _glfwTerminateVulkan();
+    _glfwPlatformTerminate();
+
+    _glfw.initialized = GLFW_FALSE;
+
+    while (_glfw.errorListHead)
+    {
+        _GLFWerror* error = _glfw.errorListHead;
+        _glfw.errorListHead = error->next;
+        free(error);
+    }
+
+    _glfwPlatformDestroyTls(&_glfw.contextSlot);
+    _glfwPlatformDestroyTls(&_glfw.errorSlot);
+    _glfwPlatformDestroyMutex(&_glfw.errorLock);
+
+    memset(&_glfw, 0, sizeof(_glfw));
 }
 
 
@@ -81,32 +145,45 @@ static const char* getErrorString(int error)
 //////                         GLFW event API                       //////
 //////////////////////////////////////////////////////////////////////////
 
-void _glfwInputError(int error, const char* format, ...)
+void _glfwInputError(int code, const char* format, ...)
 {
-    if (_glfwErrorCallback)
+    _GLFWerror* error;
+    char description[_GLFW_MESSAGE_SIZE];
+
+    if (format)
     {
-        char buffer[16384];
-        const char* description;
+        va_list vl;
 
-        if (format)
-        {
-            int count;
-            va_list vl;
+        va_start(vl, format);
+        vsnprintf(description, sizeof(description), format, vl);
+        va_end(vl);
 
-            va_start(vl, format);
-            count = vsnprintf(buffer, sizeof(buffer), format, vl);
-            va_end(vl);
-
-            if (count < 0)
-                buffer[sizeof(buffer) - 1] = '\0';
-
-            description = buffer;
-        }
-        else
-            description = getErrorString(error);
-
-        _glfwErrorCallback(error, description);
+        description[sizeof(description) - 1] = '\0';
     }
+    else
+        strcpy(description, getErrorString(code));
+
+    if (_glfw.initialized)
+    {
+        error = _glfwPlatformGetTls(&_glfw.errorSlot);
+        if (!error)
+        {
+            error = calloc(1, sizeof(_GLFWerror));
+            _glfwPlatformSetTls(&_glfw.errorSlot, error);
+            _glfwPlatformLockMutex(&_glfw.errorLock);
+            error->next = _glfw.errorListHead;
+            _glfw.errorListHead = error;
+            _glfwPlatformUnlockMutex(&_glfw.errorLock);
+        }
+    }
+    else
+        error = &_glfwMainThreadError;
+
+    error->code = code;
+    strcpy(error->description, description);
+
+    if (_glfwErrorCallback)
+        _glfwErrorCallback(code, description);
 }
 
 
@@ -116,70 +193,89 @@ void _glfwInputError(int error, const char* format, ...)
 
 GLFWAPI int glfwInit(void)
 {
-    if (_glfwInitialized)
-        return GL_TRUE;
+    if (_glfw.initialized)
+        return GLFW_TRUE;
 
     memset(&_glfw, 0, sizeof(_glfw));
+    _glfw.hints.init = _glfwInitHints;
 
     if (!_glfwPlatformInit())
     {
-        _glfwPlatformTerminate();
-        return GL_FALSE;
+        terminate();
+        return GLFW_FALSE;
     }
 
-    _glfw.monitors = _glfwPlatformGetMonitors(&_glfw.monitorCount);
-    if (_glfw.monitors == NULL)
-    {
-        _glfwInputError(GLFW_PLATFORM_ERROR, "No monitors found");
-        _glfwPlatformTerminate();
-        return GL_FALSE;
-    }
+    if (!_glfwPlatformCreateMutex(&_glfw.errorLock))
+        return GLFW_FALSE;
+    if (!_glfwPlatformCreateTls(&_glfw.errorSlot))
+        return GLFW_FALSE;
+    if (!_glfwPlatformCreateTls(&_glfw.contextSlot))
+        return GLFW_FALSE;
 
-    _glfwInitialized = GL_TRUE;
+    _glfwPlatformSetTls(&_glfw.errorSlot, &_glfwMainThreadError);
 
-    // Not all window hints have zero as their default value
+    _glfw.initialized = GLFW_TRUE;
+    _glfw.timer.offset = _glfwPlatformGetTimerValue();
+
     glfwDefaultWindowHints();
+    glfwUpdateGamepadMappings(_glfwDefaultMappings);
 
-    return GL_TRUE;
+    return GLFW_TRUE;
 }
 
 GLFWAPI void glfwTerminate(void)
 {
-    int i;
-
-    if (!_glfwInitialized)
+    if (!_glfw.initialized)
         return;
 
-    memset(&_glfw.callbacks, 0, sizeof(_glfw.callbacks));
+    terminate();
+}
 
-    // Close all remaining windows
-    while (_glfw.windowListHead)
-        glfwDestroyWindow((GLFWwindow*) _glfw.windowListHead);
-
-    for (i = 0;  i < _glfw.monitorCount;  i++)
+GLFWAPI void glfwInitHint(int hint, int value)
+{
+    switch (hint)
     {
-        _GLFWmonitor* monitor = _glfw.monitors[i];
-        if (monitor->originalRamp.size)
-            _glfwPlatformSetGammaRamp(monitor, &monitor->originalRamp);
+        case GLFW_JOYSTICK_HAT_BUTTONS:
+            _glfwInitHints.hatButtons = value;
+            return;
+        case GLFW_COCOA_CHDIR_RESOURCES:
+            _glfwInitHints.ns.chdir = value;
+            return;
+        case GLFW_COCOA_MENUBAR:
+            _glfwInitHints.ns.menubar = value;
+            return;
     }
 
-    _glfwDestroyMonitors(_glfw.monitors, _glfw.monitorCount);
-    _glfw.monitors = NULL;
-    _glfw.monitorCount = 0;
+    _glfwInputError(GLFW_INVALID_ENUM,
+                    "Invalid integer type init hint 0x%08X", hint);
+}
 
-    _glfwPlatformTerminate();
+GLFWAPI void glfwInitHintString(int hint, const char* value)
+{
+    assert(value != NULL);
 
-    _glfwInitialized = GL_FALSE;
+    switch (hint)
+    {
+        case GLFW_X11_WM_CLASS_NAME:
+            strncpy(_glfwInitHints.x11.className, value,
+                    sizeof(_glfwInitHints.x11.className) - 1);
+            break;
+        case GLFW_X11_WM_CLASS_CLASS:
+            strncpy(_glfwInitHints.x11.classClass, value,
+                    sizeof(_glfwInitHints.x11.classClass) - 1);
+            break;
+    }
+
+    _glfwInputError(GLFW_INVALID_ENUM,
+                    "Invalid string type init hint 0x%08X", hint);
 }
 
 GLFWAPI void glfwGetVersion(int* major, int* minor, int* rev)
 {
     if (major != NULL)
         *major = GLFW_VERSION_MAJOR;
-
     if (minor != NULL)
         *minor = GLFW_VERSION_MINOR;
-
     if (rev != NULL)
         *rev = GLFW_VERSION_REVISION;
 }
@@ -187,6 +283,30 @@ GLFWAPI void glfwGetVersion(int* major, int* minor, int* rev)
 GLFWAPI const char* glfwGetVersionString(void)
 {
     return _glfwPlatformGetVersionString();
+}
+
+GLFWAPI int glfwGetError(const char** description)
+{
+    _GLFWerror* error;
+    int code = GLFW_NO_ERROR;
+
+    if (description)
+        *description = NULL;
+
+    if (_glfw.initialized)
+        error = _glfwPlatformGetTls(&_glfw.errorSlot);
+    else
+        error = &_glfwMainThreadError;
+
+    if (error)
+    {
+        code = error->code;
+        error->code = GLFW_NO_ERROR;
+        if (description && code)
+            *description = error->description;
+    }
+
+    return code;
 }
 
 GLFWAPI GLFWerrorfun glfwSetErrorCallback(GLFWerrorfun cbfun)
