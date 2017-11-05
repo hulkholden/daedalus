@@ -22,6 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef UTILITY_MEMORYPOOL_H_
 #define UTILITY_MEMORYPOOL_H_
 
+#include <stdlib.h>
+#include <stddef.h>
+
 //
 //	XXXX Work in progress - don't use!
 //

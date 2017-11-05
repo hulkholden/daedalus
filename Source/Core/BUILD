@@ -3,6 +3,7 @@ cc_library(
     hdrs =glob(["*.h", "*.inl"]),
     deps = [
         "//:stdafx",
+        "//OSHLE",
     ],
     visibility = ["//visibility:public"],
 )

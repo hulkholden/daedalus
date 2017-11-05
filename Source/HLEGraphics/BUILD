@@ -1,22 +1,23 @@
 cc_library(
-    name = "DynaRec",
+    name = "HLEGraphics",
     hdrs =glob(["*.h"]),
     deps = [
         "//:stdafx",
+        "//Utility",
+        "//third_party/glfw",
     ],
     visibility = ["//visibility:public"],
 )
 
 cc_library(
-    name = "DynaRecCpp",
+    name = "HLEGraphicsCpp",
     srcs = glob(["*.cpp"]),
     deps = [
         "//:stdafx",
-        "//Debug",
-        ":DynaRec",
+        ":HLEGraphics",
+        "//Config",
         "//Core",
-        "//System",
-        "//Utility",
+        "//Graphics",
     ],
     visibility = ["//visibility:public"],
 )

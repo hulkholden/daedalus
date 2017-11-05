@@ -3,6 +3,8 @@ cc_library(
     hdrs =glob(["*.h"]),
     deps = [
         "//:stdafx",
+        "//Utility",
+        "//SysGL",
     ],
     visibility = ["//visibility:public"],
 )
@@ -13,6 +15,7 @@ cc_library(
     deps = [
         "//:stdafx",
         "//third_party/libpng",
+        "//third_party/glfw",
         "//Graphics",
         "//Math",
     ],

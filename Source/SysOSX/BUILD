@@ -1,8 +1,6 @@
 cc_library(
     name = "SysOSX",
-    hdrs = [
-        "Include/Platform.h",
-    ],
+    hdrs = glob(["**/*.h"]),
     includes = ["Include"],
     visibility = ["//visibility:public"],
 )

@@ -3,6 +3,7 @@
 *.prx
 *.elf
 *.sublime-workspace
+.DS_Store
 EBOOT.PBP
 PARAM.SFO
 Makefile.cache

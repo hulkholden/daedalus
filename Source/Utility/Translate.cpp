@@ -25,12 +25,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <vector>
 #include <string>
 
-#include "IO.h"
-#include "StringUtil.h"
-#include "VolatileMem.h"
-
-#include "System/Paths.h"
 #include "Base/Macros.h"
+#include "StringUtil.h"
+#include "System/IO.h"
+#include "System/Paths.h"
+#include "VolatileMem.h"
 
 #define TRANSLATE_DUMP_VALUE 0xDAEDDAED
 //*****************************************************************************
