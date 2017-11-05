@@ -46,7 +46,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #undef  DAEDALUS_IS_LEGACY					// Old code, unused etc.. Kept for reference, undef to save space on the elf. Will remove soon.
 #undef	DAEDALUS_DIALOGS					// Enable this to show dialogs in the gui
 
-// This must be Enable, otherwise no gprof output.
-#define DAEDALUS_PSP_GPROF
-
 #endif // CONFIG_PROFILE_BUILDCONFIG_H_

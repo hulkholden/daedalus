@@ -40,7 +40,7 @@ TEST_DISABLE_UTIL_FUNCS
 		return PATCH_RET_JR_RA;
 
 #if 1	//1->Fast, 0->Old way
-	fast_memcpy_swizzle( (void *)ReadAddress(dst), (void *)ReadAddress(src), len);
+	memcpy_swizzle( (void *)ReadAddress(dst), (void *)ReadAddress(src), len);
 #else
 	//DBGConsole_Msg(0, "memcpy(0x%08x, 0x%08x, %d)", dst, src, len);
 	u8 *pdst = (u8*)ReadAddress(dst);
@@ -171,7 +171,7 @@ TEST_DISABLE_UTIL_FUNCS
 	else
 	{
 #if 1	// 1->Fast way, 0->Old way
-		fast_memcpy_swizzle( (void *)pdst, (const void *)psrc, len);
+		memcpy_swizzle( (void *)pdst, (const void *)psrc, len);
 #else
 		while(len--)
 		{

@@ -5,109 +5,11 @@
 #include "Math/Math.h"
 #include "Base/MathUtil.h" // Swap
 
-#ifdef DAEDALUS_PSP
-#include <pspvfpu.h>
-#endif
-
 // http://forums.ps2dev.org/viewtopic.php?t=5557
 // http://bradburn.net/mr.mr/vfpu.html
 
 // Many of these mtx funcs should be inline since they are simple enough and called frequently - Salvy
 
-#ifdef DAEDALUS_PSP_USE_VFPU
-/*
-inline void vsincosf(float angle, v4* result)
-{
-	__asm__ volatile (
-		"mtv %1, S000\n"
-		"vrot.q C010, S000, [s, c, 0, 0]\n"
-		"usv.q C010, 0 + %0\n"
-	: "+m"(*result) : "r"(angle));
-}
-*/
-void MatrixMultiplyUnaligned(Matrix4x4 * m_out, const Matrix4x4 *mat_a, const Matrix4x4 *mat_b)
-{
-	__asm__ volatile (
-
-		"ulv.q   R000, 0  + %1\n"
-		"ulv.q   R001, 16 + %1\n"
-		"ulv.q   R002, 32 + %1\n"
-		"ulv.q   R003, 48 + %1\n"
-
-		"ulv.q   R100, 0  + %2\n"
-		"ulv.q   R101, 16 + %2\n"
-		"ulv.q   R102, 32 + %2\n"
-		"ulv.q   R103, 48 + %2\n"
-
-		"vmmul.q   M200, M000, M100\n"
-
-		"usv.q   R200, 0  + %0\n"
-		"usv.q   R201, 16 + %0\n"
-		"usv.q   R202, 32 + %0\n"
-		"usv.q   R203, 48 + %0\n"
-
-		: "=m" (*m_out) : "m" (*mat_a) ,"m" (*mat_b) : "memory" );
-}
-
-void MatrixMultiplyAligned(Matrix4x4 * m_out, const Matrix4x4 *mat_a, const Matrix4x4 *mat_b)
-{
-	__asm__ volatile (
-
-		"lv.q   R000, 0  + %1\n"
-		"lv.q   R001, 16 + %1\n"
-		"lv.q   R002, 32 + %1\n"
-		"lv.q   R003, 48 + %1\n"
-
-		"lv.q   R100, 0  + %2\n"
-		"lv.q   R101, 16 + %2\n"
-		"lv.q   R102, 32 + %2\n"
-		"lv.q   R103, 48 + %2\n"
-
-		"vmmul.q   M200, M000, M100\n"
-
-		"sv.q   R200, 0  + %0\n"
-		"sv.q   R201, 16 + %0\n"
-		"sv.q   R202, 32 + %0\n"
-		"sv.q   R203, 48 + %0\n"
-
-		: "=m" (*m_out) : "m" (*mat_a) ,"m" (*mat_b) : "memory" );
-}
-
-/*
-void myCopyMatrix(Matrix4x4 *m_out, const Matrix4x4 *m_in)
-{
-	__asm__ volatile (
-		"lv.q   R000, 0x0(%1)\n"
-		"lv.q   R001, 0x10(%1)\n"
-		"lv.q   R002, 0x20(%1)\n"
-		"lv.q   R003, 0x30(%1)\n"
-
-		"sv.q   R000, 0x0(%0)\n"
-		"sv.q   R001, 0x10(%0)\n"
-		"sv.q   R002, 0x20(%0)\n"
-		"sv.q   R003, 0x30(%0)\n"
-	: : "r" (m_out) , "r" (m_in) );
-}
-*/
-
-/*
-void myApplyMatrix(v4 *v_out, const Matrix4x4 *mat, const v4 *v_in)
-{
-	__asm__ volatile (
-		"lv.q   R000, 0x0(%1)\n"
-		"lv.q   R001, 0x10(%1)\n"
-		"lv.q   R002, 0x20(%1)\n"
-		"lv.q   R003, 0x30(%1)\n"
-
-		"lv.q   R100, 0x0(%2)\n"
-
-		"vtfm4.q R200, E000, R100\n"
-		"sv.q   R200, 0x0(%0)\n"
-	: : "r" (v_out) , "r" (mat) ,"r" (v_in) );
-}*/
-#else // DAEDALUS_PSP_USE_VFPU
-
-
 void MatrixMultiplyUnaligned(Matrix4x4 * m_out, const Matrix4x4 *mat_a, const Matrix4x4 *mat_b)
 {
 	*m_out = *mat_a * *mat_b;
@@ -117,10 +19,6 @@ void MatrixMultiplyAligned(Matrix4x4 * m_out, const Matrix4x4 *mat_a, const Matr
 {
 	*m_out = *mat_a * *mat_b;
 }
-
-#endif // DAEDALUS_PSP_USE_VFPU
-
-
 
 Matrix4x4 & Matrix4x4::SetIdentity()
 {
@@ -336,11 +234,6 @@ Matrix4x4 Matrix4x4::operator*( const Matrix4x4 & rhs ) const
 {
 	Matrix4x4 r;
 
-//VFPU
-#ifdef DAEDALUS_PSP
-	MatrixMultiplyUnaligned( &r, this, &rhs );
-//CPU
-#else
 	for ( u32 i = 0; i < 4; ++i )
 	{
 		for ( u32 j = 0; j < 4; ++j )
@@ -351,7 +244,6 @@ Matrix4x4 Matrix4x4::operator*( const Matrix4x4 & rhs ) const
 							m[ i ][ 3 ] * rhs.m[ 3 ][ j ];
 		}
 	}
-#endif
 
 	return r;
 }

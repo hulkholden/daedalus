@@ -22,10 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Types.h"
 
-#ifdef DAEDALUS_PSP
-#include <pspiofilemgr.h>
-#endif
-
 #include <string.h>
 
 namespace IO
@@ -35,9 +31,6 @@ namespace IO
 		bool		Move( const char * p_existing, const char * p_new );
 		bool		Delete( const char * p_file );
 		bool		Exists( const char * p_path );
-#ifdef DAEDALUS_PSP
-		int			Stat( const char *p_file, SceIoStat *stat );
-#endif
 
 	}
 	namespace Directory
@@ -65,9 +58,6 @@ namespace IO
 		bool				RemoveFileSpec( char * p_path );
 		void				RemoveExtension( char * p_path );
 		void				AddExtension( char * p_path, const char * p_ext );
-#ifdef DAEDALUS_PSP
-		int					DeleteRecursive(const char* p_path, const char * p_extension);
-#endif
 
 		inline void SetExtension( char * p_path, const char * p_extension)
 		{
@@ -83,9 +73,7 @@ namespace IO
 		Filename	Name;
 	};
 
-#if defined( DAEDALUS_PSP )
-	typedef SceUID FindHandleT;
-#elif defined( DAEDALUS_W32 )
+#if defined( DAEDALUS_W32 )
 	typedef intptr_t FindHandleT;
 #elif defined( DAEDALUS_OSX ) || defined( DAEDALUS_LINUX )
 	typedef void * FindHandleT;

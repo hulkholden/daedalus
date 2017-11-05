@@ -30,11 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Graphics/ColourValue.h"
 #include "Utility/Preferences.h"
 
-#ifdef DAEDALUS_PSP
-#include <pspgu.h>
-#else
 #include "SysGL/GL.h"
-#endif
 
 #define HD_SCALE                          0.754166f
 
@@ -336,13 +332,8 @@ public:
 	CRefPtr<CNativeTexture> LoadTextureDirectly( const TextureInfo & ti );
 
 protected:
-#ifdef DAEDALUS_PSP
-	inline void			UpdateFogEnable()						{ if(gFogEnabled) mTnL.Flags.Fog ? sceGuEnable(GU_FOG) : sceGuDisable(GU_FOG); }
-	inline void			UpdateShadeModel()						{ sceGuShadeModel( mTnL.Flags.Shade ? GU_SMOOTH : GU_FLAT ); }
-#else
 	inline void			UpdateFogEnable()						{ if(gFogEnabled) mTnL.Flags.Fog ? glEnable(GL_FOG) : glDisable(GL_FOG); }
 	inline void			UpdateShadeModel()						{ glShadeModel( mTnL.Flags.Shade ? GL_SMOOTH : GL_FLAT ); }
-#endif
 	void				UpdateTileSnapshots( u32 tile_idx );
 	void				UpdateTileSnapshot( u32 index, u32 tile_idx );
 

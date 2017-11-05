@@ -90,10 +90,8 @@ void Dump_GetSaveDirectory(char * rootdir, const char * rom_filename, const char
 			// Default to rom path
 			IO::Path::Assign(g_DaedalusConfig.mSaveDir, rom_filename);
 			IO::Path::RemoveFileSpec(g_DaedalusConfig.mSaveDir);
-#ifndef DAEDALUS_PSP
 			// FIXME(strmnnrmn): for OSX I generate savegames in a subdir Save, to make it easier to clean up.
 			IO::Path::Append(g_DaedalusConfig.mSaveDir, "Save");
-#endif
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 			if(CDebugConsole::IsAvailable())

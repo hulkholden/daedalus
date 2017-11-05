@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdlib.h>
 
-extern bool PSP_IS_SLIM;
 //*****************************************************************************
 //
 //*****************************************************************************
@@ -38,17 +37,8 @@ CROMFileMemory::~CROMFileMemory()
 class IROMFileMemory : public CROMFileMemory
 {
 public:
-	IROMFileMemory();
-	~IROMFileMemory();
-
-//	virtual	bool	IsAvailable();
 	virtual void *	Alloc( u32 size );
 	virtual void	Free(void * ptr);
-
-private:
-#ifdef DAEDALUS_PSP
-	CMemoryHeap *	mRomMemoryHeap;
-#endif
 };
 
 
@@ -66,55 +56,9 @@ template<> bool CSingleton< CROMFileMemory >::Create()
 //*****************************************************************************
 //
 //*****************************************************************************
-IROMFileMemory::IROMFileMemory()
-{
-#ifdef DAEDALUS_PSP
-	//
-	// Allocate large memory heap for SLIM+ (32Mb) Used for ROM Buffer and ROM Cache
-	// Otherwise allocate small memory heap for PHAT (2Mb) Used for ROM cache only
-	//
-	if( PSP_IS_SLIM )
-	{
-		mRomMemoryHeap = CMemoryHeap::Create( 32 * 1024 * 1024 );
-	}
-	else
-	{
-		mRomMemoryHeap = CMemoryHeap::Create( 4 * 1024 * 1024 );
-	}
-#endif
-}
-
-//*****************************************************************************
-//
-//*****************************************************************************
-IROMFileMemory::~IROMFileMemory()
-{
-#ifdef DAEDALUS_PSP
-	delete mRomMemoryHeap;
-#endif
-}
-
-//*****************************************************************************
-//
-//*****************************************************************************
-/*
-bool IROMFileMemory::IsAvailable()
-{
-	DAEDALUS_ASSERT( mRomMemoryHeap != NULL, "This heap isn't available" );
-
-	return mRomMemoryHeap != NULL;
-}
-*/
-//*****************************************************************************
-//
-//*****************************************************************************
 void * IROMFileMemory::Alloc( u32 size )
 {
-#ifdef DAEDALUS_PSP
-	return mRomMemoryHeap->Alloc( size );
-#else
 	return malloc( size );
-#endif
 }
 
 //*****************************************************************************
@@ -122,9 +66,5 @@ void * IROMFileMemory::Alloc( u32 size )
 //*****************************************************************************
 void  IROMFileMemory::Free(void * ptr)
 {
-#ifdef DAEDALUS_PSP
-	mRomMemoryHeap->Free( ptr );
-#else
 	free( ptr );
-#endif
 }

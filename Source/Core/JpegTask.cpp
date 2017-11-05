@@ -630,7 +630,7 @@ static void RescaleUVSubBlock(s16 *dst, const s16 *src)
 /* FIXME: assume presence of expansion pack */
 #define MEMMASK 0x7fffff
 
-//ToDo: fast_memcpy_swizzle?
+//ToDo: memcpy_swizzle?
 static void rdram_read_many_u16(u16 *dst, u32 address, u32 count)
 {
 	const u8 *src = g_pu8RamBase + (address& MEMMASK);

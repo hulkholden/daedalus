@@ -23,31 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include "Base/Types.h"
 
-#if defined( DAEDALUS_PSP )
-
-extern "C"
-{
-	u32 _AtomicIncrement( volatile u32 * ptr );
-	u32 _AtomicDecrement( volatile u32 * ptr );
-	u32 _AtomicBitSet( volatile u32 * ptr, u32 and_bits, u32 or_bits );
-}
-
-inline u32 AtomicIncrement( volatile u32 * ptr )
-{
-	return _AtomicIncrement( ptr );
-}
-
-inline u32 AtomicDecrement( volatile u32 * ptr )
-{
-	return _AtomicDecrement( ptr );
-}
-
-inline u32 AtomicBitSet( volatile u32 * ptr, u32 and_bits, u32 or_bits )
-{
-	return _AtomicBitSet( ptr, and_bits, or_bits );
-}
-
-#elif defined( DAEDALUS_W32 )
+#if defined( DAEDALUS_W32 )
 
 #include <intrin.h>
 

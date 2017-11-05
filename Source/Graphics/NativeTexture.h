@@ -60,11 +60,6 @@ class CNativeTexture : public CRefCounted
 		inline const void *				GetData() const					{ return mpData; }
 		inline void *					GetData()						{ return mpData; }
 
-#ifdef DAEDALUS_PSP
-		inline f32						GetScaleX() const				{ return mScale.x; }
-		inline f32						GetScaleY() const				{ return mScale.y; }
-#endif
-
 		u32								GetBytesRequired() const;
 		bool							HasData() const;				// If we run out of texture memory, this will return true
 
@@ -82,16 +77,6 @@ class CNativeTexture : public CRefCounted
 #ifdef DAEDALUS_GL
 		GLuint				mTextureId;
 #endif
-
-#ifdef DAEDALUS_PSP
-		v2					mScale;
-		bool				mIsDataVidMem;
-		bool				mIsPaletteVidMem;
-		bool				mIsSwizzled;
-#ifdef DAEDALUS_ENABLE_ASSERTS
-		bool				mPaletteSet;
-#endif
-#endif // DAEDALUS_PSP
 };
 
 #endif // GRAPHICS_NATIVETEXTURE_H_

@@ -32,7 +32,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Paths.h"
 #include "System/IO.h"
 #include "Utility/StringUtil.h"
-#include "Utility/VolatileMem.h"
 
 //
 // Cheatcode routines and format based from 1964
@@ -233,7 +232,7 @@ static void CheatCodes_Clear()
 
 	if(codegrouplist != NULL)
 	{
-		free_volatile(codegrouplist);
+		free(codegrouplist);
 		codegrouplist = NULL;
 	}
 }
@@ -364,7 +363,7 @@ bool CheatCodes_Read(const char *rom_name, const char *file, u8 countryID)
 		// Allocate memory for groups
 		//
 //		printf("number of cheats loaded %d | %d kbs used of memory\n",numberofgroups,(numberofgroups *sizeof(CODEGROUP))/ 1024);
-		codegrouplist = (CODEGROUP *) malloc_volatile(numberofgroups *sizeof(CODEGROUP));
+		codegrouplist = (CODEGROUP *) malloc(numberofgroups *sizeof(CODEGROUP));
 		if(codegrouplist == NULL)
 		{
 			//printf("Cannot allocate memory to load cheat code");

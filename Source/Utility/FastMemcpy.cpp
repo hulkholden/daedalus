@@ -140,13 +140,13 @@ static inline u64 GetCurrent()
 }
 
 #define MEMCPY_TEST(d, s, n) {													\
-	u32 _fast_memcpy_swizzle = 0;												\
+	u32 _memcpy_swizzle = 0;													\
 	{																			\
 		u64 time;																\
 		NTiming::GetPreciseTime(&time);											\
 		for (u32 j=0; j<100; ++j)												\
-			fast_memcpy_swizzle(d, s, n);										\
-		_fast_memcpy_swizzle = (u32)(GetCurrent()-time);						\
+			memcpy_swizzle(d, s, n);											\
+		_memcpy_swizzle = (u32)(GetCurrent()-time);								\
 	}																			\
 	u32 _memcpy_byteswap = 0;													\
 	{																			\
@@ -155,7 +155,7 @@ static inline u64 GetCurrent()
 			memcpy_byteswap(d, s, n);											\
 		_memcpy_byteswap = (u32)(GetCurrent()-time);							\
 	}																			\
-	printf("%d bytes | SWIZZLE %d | FASTSWIZZLE %d\n", n, _memcpy_byteswap, _fast_memcpy_swizzle); \
+	printf("%d bytes | SWIZZLE %d | FASTSWIZZLE %d\n", n, _memcpy_byteswap, _memcpy_swizzle); \
 	}
 
 void memcpy_test( void * dst, const void * src, size_t size )

@@ -776,8 +776,6 @@ void	AudioHLEState::DmemMove( u32 dst, u32 src, u16 count )
 	count = (count + 3) & 0xfffc;
 
 #if 1	//1->fast, 0->slow
-
-	//Can't use fast_memcpy_swizzle, since this code can run on the ME, and VFPU is not accessible
 	memcpy_swizzle(Buffer + dst, Buffer + src, count);
 #else
 	for (u32 i = 0; i < count; i++)

@@ -28,9 +28,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/Save.h"
 
 #include "Interface/RomDB.h"
-#ifdef DAEDALUS_PSP
-#include "Graphics/VideoMemoryManager.h"
-#endif
 
 #include "Graphics/GraphicsContext.h"
 
@@ -163,9 +160,6 @@ static const SysEntityEntry gSysInitTable[] =
 	{"ROM Database",		CRomDB::Create,				CRomDB::Destroy},
 	{"ROM Settings",		CRomSettingsDB::Create,		CRomSettingsDB::Destroy},
 	{"InputManager",		CInputManager::Create,		CInputManager::Destroy},
-#ifdef DAEDALUS_PSP
-	{"VideoMemory",			CVideoMemoryManager::Create, NULL},
-#endif
 	{"GraphicsContext",		CGraphicsContext::Create,	CGraphicsContext::Destroy},
 #ifdef DAEDALUS_PSP
 	{"Language",			Translate_Init,				NULL},

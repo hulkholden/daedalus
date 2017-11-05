@@ -49,17 +49,6 @@ void DMA_SP_CopyFromRDRAM()
 	u32 rdram_address_reg = Memory_SP_GetRegister(SP_DRAM_ADDR_REG);
 	u32 rdlen_reg         = Memory_SP_GetRegister(SP_RD_LEN_REG);
 
-#ifdef DAEDALUS_PSP
-	// Ignore IMEM for speed (we don't do low-level RSP anyways on the PSP)
-	if((spmem_address_reg & 0x1000) == 0)
-	{
-		//FIXME(strmnnrmn): shouldn't this be using _swizzle?
-		//No swizzle is okay since alignment and size constrains are met //Salvy
-		fast_memcpy(&g_pu8SpMemBase[(spmem_address_reg & 0xFFF)],
-					&g_pu8RamBase[(rdram_address_reg & 0xFFFFFF)], (rdlen_reg & 0xFFF) + 1);
-	}
-#else
-
 	u32 rdram_address = (rdram_address_reg&0x00FFFFFF)	& ~7;	// Align to 8 byte boundary
 	u32 spmem_address = (spmem_address_reg&0x1FFF)		& ~7;	// Align to 8 byte boundary
 	u32 length = ((rdlen_reg    &0x0FFF) | 7)+1;					// Round up to 8 bytes
@@ -74,13 +63,11 @@ void DMA_SP_CopyFromRDRAM()
 			//DBGConsole_Msg( 0, "(0x%08x) (0x%08x)", spmem_address, rdram_address );
 			break;
 		}
-		fast_memcpy_swizzle( &g_pu8SpMemBase[spmem_address], &g_pu8RamBase[rdram_address], length );
+		memcpy_swizzle( &g_pu8SpMemBase[spmem_address], &g_pu8RamBase[rdram_address], length );
 
 		rdram_address += length + skip;
 		spmem_address += length;
 	}
-
-#endif
 
 	//Clear the DMA Busy
 	Memory_SP_SetRegister(SP_DMA_BUSY_REG, 0);
@@ -96,17 +83,6 @@ void DMA_SP_CopyToRDRAM()
 	u32 rdram_address_reg = Memory_SP_GetRegister(SP_DRAM_ADDR_REG);
 	u32 wrlen_reg         = Memory_SP_GetRegister(SP_WR_LEN_REG);
 
-#ifdef DAEDALUS_PSP
-	// Ignore IMEM for speed (we don't do low-level RSP anyways on the PSP)
-	if((spmem_address_reg & 0x1000) == 0)
-	{
-		//FIXME(strmnnrmn): shouldn't this be using _swizzle?
-		//No swizzle is okay since alignment and size constrains are met //Salvy
-		fast_memcpy(&g_pu8RamBase[(rdram_address_reg & 0xFFFFFF)],
-					&g_pu8SpMemBase[(spmem_address_reg & 0xFFF)], (wrlen_reg & 0xFFF) + 1);
-	}
-
-#else
 	u32 rdram_address = (rdram_address_reg&0x00FFFFFF)	& ~7;	// Align to 8 byte boundary
 	u32 spmem_address = (spmem_address_reg&0x1FFF)		& ~7;	// Align to 8 byte boundary
 	u32 length = ((wrlen_reg    &0x0FFF) | 7)+1;				// Round up to 8 bytes
@@ -120,12 +96,10 @@ void DMA_SP_CopyToRDRAM()
 			//DBGConsole_Msg( 0, "(0x%08x) (0x%08x)", spmem_address, rdram_address );
 			break;
 		}
-		fast_memcpy_swizzle( &g_pu8RamBase[rdram_address], &g_pu8SpMemBase[spmem_address], length );
+		memcpy_swizzle( &g_pu8RamBase[rdram_address], &g_pu8SpMemBase[spmem_address], length );
 		rdram_address += length + skip;
 		spmem_address += length;
 	}
-
-#endif
 
 	//Clear the DMA Busy
 	Memory_SP_SetRegister(SP_DMA_BUSY_REG, 0);
@@ -213,7 +187,7 @@ bool DMA_HandleTransfer( u8 * p_dst, u32 dst_offset, u32 dst_size, const u8 * p_
 		return false;
 	}
 
-	fast_memcpy_swizzle(&p_dst[dst_offset], &p_src[src_offset], length);
+	memcpy_swizzle(&p_dst[dst_offset], &p_src[src_offset], length);
 	return true;
 }
 

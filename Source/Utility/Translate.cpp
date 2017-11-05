@@ -30,7 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "StringUtil.h"
 #include "System/IO.h"
 #include "System/Paths.h"
-#include "VolatileMem.h"
 
 #define TRANSLATE_DUMP_VALUE 0xDAEDDAED
 //*****************************************************************************
@@ -108,7 +107,7 @@ void Translate_Unload()
 	{
 		if( text[i].translated != NULL )
 		{
-			free_volatile(text[i].translated);
+			free(text[i].translated);
 			text[i].translated = NULL;
 		}
 	}
@@ -302,7 +301,7 @@ bool Translate_Read(u32 idx, const char * dir)
 				text[count].hash = hash;
 				Translate_Dump( string, hash == TRANSLATE_DUMP_VALUE );
 
-				text[count].translated = (char*)malloc_volatile(len+1); // Leave space for terminator
+				text[count].translated = (char*)malloc(len+1); // Leave space for terminator
 				strcpy( text[count].translated, Restore( string, len ) );
 				count++;
 			}

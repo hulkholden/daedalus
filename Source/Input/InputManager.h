@@ -28,8 +28,4 @@ class CInputManager : public CSingleton< CInputManager >
 		static void Fini() { CInputManager::Get()->Finalise();}
 };
 
-#ifdef DAEDALUS_PSP
-v2	ApplyDeadzone( const v2 & in, f32 min_deadzone, f32 max_deadzone );
-#endif
-
 #endif // INPUT_INPUTMANAGER_H_

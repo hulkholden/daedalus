@@ -45,13 +45,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 	#endif
 
-#elif defined( DAEDALUS_PSP ) || defined( DAEDALUS_PS3 )
-
-#define ALIGNED_TYPE(type, type_name, alignval) type __attribute__((aligned(alignval))) type_name
-#define ALIGNED_GLOBAL(type, var, alignval) __attribute__((aligned(alignval))) type var
-#define ALIGNED_MEMBER(type, var, alignval) __attribute__((aligned(alignval))) type var
-#define ALIGNED_EXTERN(type, var, alignval) extern __attribute__((aligned(alignval))) type var
-
 #elif defined( DAEDALUS_OSX ) || defined( DAEDALUS_LINUX )
 
 #define ALIGNED_TYPE(type, type_name, alignval) type __attribute__((aligned(alignval))) type_name
@@ -76,19 +69,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #endif
 
-#ifdef DAEDALUS_PSP
-
-#define DATA_ALIGN	16
-#define CACHE_ALIGN	64
-#define PAGE_ALIGN	64
-
-#else
-
 // Pentium 4 has 64-byte cachelines
 #define DATA_ALIGN	16
 #define CACHE_ALIGN	64
 #define PAGE_ALIGN	4096
-
-#endif
 
 #endif // BASE_ALIGNMENT_H_

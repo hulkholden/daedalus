@@ -225,7 +225,7 @@ void DLParser_GBI1_MoveWord( MicroCodeCommand command )
 
 	case G_MW_FOG:	// WIP, only works for the PSP
 		{
-#ifdef DAEDALUS_PSP			
+#ifdef DAEDALUS_PSP
 			f32 mul = (f32)(s16)(value >> 16);	//Fog mult
 			f32 offs = (f32)(s16)(value & 0xFFFF);	//Fog Offset
 

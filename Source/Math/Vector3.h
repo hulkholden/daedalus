@@ -62,12 +62,6 @@ public:
 		return *this;
 	}
 
-#ifdef DAEDALUS_PSP//Corn
-	void Normalise()
-	{
-		vfpu_norm_3Dvec(&x, &y, &z);
-	}
-#else
 	void Normalise()
 	{
 		float	len_sq( LengthSq() );
@@ -79,7 +73,6 @@ public:
 			z *= r;
 		}
 	}
-#endif
 
 	float Length() const
 	{

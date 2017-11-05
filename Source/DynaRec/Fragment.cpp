@@ -679,17 +679,12 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 		}
 
 		CJumpLocation	branch_jump( NULL );
- //PSP, We handle exceptions directly with _ReturnFromDynaRecIfStuffToDo
-#ifdef DAEDALUS_PSP
-		p_generator->GenerateOpCode( ti, ti.BranchDelaySlot, p_branch, &branch_jump);
-#else
 		CJumpLocation	exception_handler_jump( p_generator->GenerateOpCode( ti, ti.BranchDelaySlot, p_branch, &branch_jump) );
 
 		if( exception_handler_jump.IsSet() )
 		{
 			exception_handler_jumps.push_back( exception_handler_jump );
 		}
-#endif
 
 		// Check whether we want to invert the status of this branch
 		if( p_branch != NULL )
@@ -750,17 +745,12 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 				//exception_handler_jumps.push_back( handler );
 			}
 			*/
- //PSP, We handle exceptions directly with _ReturnFromDynaRecIfStuffToDo
-#ifdef DAEDALUS_PSP
-			p_generator->GenerateOpCode( ti, true, NULL, NULL);
-#else
 			CJumpLocation	exception_handler_jump( p_generator->GenerateOpCode( ti, true, NULL, NULL) );
 
 			if( exception_handler_jump.IsSet() )
 			{
 				exception_handler_jumps.push_back( exception_handler_jump );
 			}
-#endif
 			num_instructions_executed++;
 		}
 
@@ -906,27 +896,6 @@ void DisassembleBuffer( const u8 * buf, int buf_size, FILE * fh )
 		strbuf = disasmx86((u8*)buf + pos, 0, &len);
 		fprintf( fh, "%08x: %s\n", buf + pos, Sanitise( strbuf ) );
 		pos += len;
-	}
-}
-
-#elif defined ( DAEDALUS_PSP )
-
-void DisassembleBuffer( const u8 * buf, int buf_size, FILE * fh )
-{
-	const int	STRBUF_LEN = 1024;
-	char		strbuf[STRBUF_LEN+1];
-
-	const OpCode *	p_op( reinterpret_cast< const OpCode * >( buf ) );
-	const OpCode *	p_op_end( reinterpret_cast< const OpCode * >( buf + buf_size ) );
-
-	while( p_op < p_op_end )
-	{
-		u32		address( reinterpret_cast< u32 >( p_op ) );
-		OpCode	op_code( *p_op );
-
-		SprintOpCodeInfo( strbuf, address, op_code );
-		fprintf( fh, "%08x: %08x %s\n", address, op_code._u32, Sanitise( strbuf ) );
-		p_op++;
 	}
 }
 

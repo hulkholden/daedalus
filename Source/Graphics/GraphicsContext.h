@@ -47,12 +47,6 @@ public:
 
 	virtual bool IsInitialised() const = 0;
 
-#ifdef DAEDALUS_PSP
-	virtual void SwitchToChosenDisplay() = 0;
-	virtual void SwitchToLcdDisplay() = 0;
-	virtual void StoreSaveScreenData() = 0;
-#endif
-
 	virtual void ClearAllSurfaces() = 0;
 	virtual void ClearToBlack() = 0;
 	virtual void ClearZBuffer() = 0;

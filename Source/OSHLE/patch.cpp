@@ -51,11 +51,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/FastMemcpy.h"
 #include "Utility/Profiler.h"
 
-#ifdef DAEDALUS_PSP
-#include "Graphics/GraphicsContext.h"
-#include "SysPSP/Graphics/intraFont/intraFont.h"
-#endif
-
 #ifdef DUMPOSFUNCTIONS
 #include "Debug/Dump.h"
 #include "System/IO.h"
@@ -500,12 +495,6 @@ void Patch_RecurseAndFind()
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 	CDebugConsole::Get()->MsgOverwriteStart();
-#else
-#ifdef DAEDALUS_PSP
-	// Load our font here, Intrafont used in UI is destroyed when emulation starts
-	intraFont* ltn8  = intraFontLoad( "flash0:/font/ltn8.pgf", INTRAFONT_CACHE_ASCII);
-	intraFontSetStyle( ltn8, 1.0f, 0xFF000000, 0xFFFFFFFF, INTRAFONT_ALIGN_CENTER );
-#endif
 #endif
 
 	// Loops through all symbols, until name is null
@@ -516,17 +505,6 @@ void Patch_RecurseAndFind()
 		CDebugConsole::Get()->MsgOverwrite(0, "OS HLE: %d / %d Looking for [G%s]",
 			i, nPatchSymbols, g_PatchSymbols[i]->Name);
 		fflush(stdout);
-#else
-#ifdef DAEDALUS_PSP
-		//Update patching progress on PSPscreen
-		CGraphicsContext::Get()->BeginFrame();
-		CGraphicsContext::Get()->ClearToBlack();
-		//intraFontPrintf( ltn8, 480/2, (272>>1)-50, "Searching for os functions. This may take several seconds...");
-		intraFontPrintf( ltn8, 480/2, (272>>1), "OS HLE Patching: %d%%", i * 100 / (nPatchSymbols-1));
-		intraFontPrintf( ltn8, 480/2, (272>>1)-50, "Searching for %s", g_PatchSymbols[i]->Name );
-		CGraphicsContext::Get()->EndFrame();
-		CGraphicsContext::Get()->UpdateFrame( true );
-#endif
 #endif //DAEDALUS_DEBUG_CONSOLE
 		// Skip symbol if already found, or if it is a variable
 		if (g_PatchSymbols[i]->Found)
@@ -609,16 +587,6 @@ void Patch_RecurseAndFind()
 #ifdef DAEDALUS_DEBUG_CONSOLE
 		DBGConsole_Msg(0, "%d/%d symbols identified, in range 0x%08x -> 0x%08x",
 		nFound, nPatchSymbols, first, last);
-#else
-#ifdef DAEDALUS_PSP
-		//Update patching progress on PSPscreen
-		CGraphicsContext::Get()->BeginFrame();
-		CGraphicsContext::Get()->ClearToBlack();
-		intraFontPrintf( ltn8, 480/2, (272>>1), "Symbols Identified: %d%%", 100 * nFound / (nPatchSymbols-1));
-		intraFontPrintf( ltn8, 480/2, (272>>1)+50, "Range 0x%08x -> 0x%08x", first, last );
-		CGraphicsContext::Get()->EndFrame();
-		CGraphicsContext::Get()->UpdateFrame( true );
-#endif
 #endif
 	}
 
@@ -650,25 +618,8 @@ void Patch_RecurseAndFind()
 		}
 #ifdef DAEDALUS_DEBUG_CONSOLE
 		DBGConsole_Msg(0, "%d/%d variables identified", nFound, nPatchVariables);
-#else
-#ifdef DAEDALUS_PSP
-		//Update patching progress on PSPscreen
-		CGraphicsContext::Get()->BeginFrame();
-		CGraphicsContext::Get()->ClearToBlack();
-		intraFontPrintf( ltn8, 480/2, 272>>1, "Variables Identified: %d%%", 100 * nFound / (nPatchVariables-1) );
-		CGraphicsContext::Get()->EndFrame();
-		CGraphicsContext::Get()->UpdateFrame( true );
-#endif
 #endif
 	}
-
-#ifndef DAEDALUS_DEBUG_CONSOLE
-#ifdef DAEDALUS_PSP
-	// Unload font after we done patching progress
-	intraFontUnload( ltn8 );
-#endif
-#endif
-
 }
 
 // Attempt to locate this symbol.

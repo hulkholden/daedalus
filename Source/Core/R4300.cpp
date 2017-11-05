@@ -34,12 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/AuxFunc.h"
 #include "Base/Macros.h"
 
-#ifdef DAEDALUS_PSP
-#include <pspfpu.h>
-#include <limits.h>
-#else
 #include <float.h>
-#endif
 
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_LINUX)
 #include <fenv.h>
@@ -49,17 +44,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define isnan _isnan
 #endif
 
-#ifdef DAEDALUS_PSP
-#define SIM_DOUBLES
-#else
 #undef SIM_DOUBLES
-#endif
 
-// Handles up to 128bit multiplication, have yet to see a game failing by just doing 64bit mult instead.. 
+// Handles up to 128bit multiplication, have yet to see a game failing by just doing 64bit mult instead..
 // So for performance reasons on the PSP we only handle up to 64bit mults
-#ifndef DAEDALUS_PSP
 #define DAEDALUS_128BIT_MULT
-#endif
 
 // Can we disable this for the PSP? doesn't seem to do anything when dynarec is enabled (trace is active) /Salvy
 #define SPEEDHACK_INTERPRETER
@@ -74,19 +63,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define R4300_Rand()		FastRand()
 
-#if defined(DAEDALUS_PSP) && defined(SIM_DOUBLES)
-#define R4300_IsNaN(x) 		isnanf((x))
-#define R4300_Sqrt(x)		sqrtf((x))
-#define R4300_SqrtD(x)		sqrtf((x))
-#define R4300_AbsS(x) 		fabsf((x))
-#define R4300_AbsD(x) 		fabsf((x))
-#else
 #define R4300_IsNaN(x)		isnan((x))
 #define R4300_Sqrt(x)		sqrtf((x))
 #define R4300_SqrtD(x)		sqrt((x))
 #define R4300_AbsS(x) 		fabsf((x))
 #define R4300_AbsD(x) 		fabs((x))
-#endif
 
 //Nothing todo, I'll remove this eventually..
 //Just log exceptions, so far the only games I obsereved that trow are DK64 and Blast Corps 
@@ -127,25 +108,7 @@ enum ERoundingMode
 };
 static ERoundingMode	gRoundingMode( RM_ROUND );
 
-#if defined(DAEDALUS_PSP)
-
-static const PspFpuRoundMode		gNativeRoundingModes[ RM_NUM_MODES ] =
-{
-	PSP_FPU_RN,	// RM_ROUND,
-	PSP_FPU_RZ,	// RM_TRUNC,
-	PSP_FPU_RP,	// RM_CEIL,
-	PSP_FPU_RM,	// RM_FLOOR,
-};
-
-inline void SET_ROUND_MODE( ERoundingMode mode )
-{
-	//This is very expensive on the PSP, so is disabled, also this is skipt in the dynarec as well.
-	//Note: Do not enable this, since it causes conflicts in the dynarec because we dont set rounding mode there. See Mario Party 3
-	//TODO: Map 1:1 N64 and PSP round mode? perphaps write this in asm and just fiddle with the PSP CTC1 opcode?
-	//pspFpuSetRoundmode( gNativeRoundingModes[ mode ] );
-}
-
-#elif defined(DAEDALUS_W32)
+#if defined(DAEDALUS_W32)
 
 static const int		gNativeRoundingModes[ RM_NUM_MODES ] =
 {
@@ -380,44 +343,6 @@ DAEDALUS_FORCEINLINE f32 d64_to_f32( d64 x )
 //	Float -> int conversion routines
 //
 //*****************************************************************************
-#ifdef DAEDALUS_PSP
-
-//These ASM routines convert float to int and puts the value in CPU to sign extend, rather than FPU since the PSP doesn't have 64bit instructions //Corn
-//These can be risky since the N64 is expecting float to int64 and thus float can be larger than int, this happens with trunc_w_s on the 4th level of DK64..
-inline s32 cvt_w_s( f32 x )							{ DAEDALUS_ASSERT( x >= LONG_MIN && x <= LONG_MAX, "Float too large, can't convert with 32bit PSP instruction" );s32 r; asm volatile ( "cvt.w.s %1, %1\nmfc1 %0,%1\n" : "=r"(r) : "f"(x) ); return r; }
-inline s32 trunc_w_s( f32 x )						{ DAEDALUS_ASSERT( x >= LONG_MIN && x <= LONG_MAX, "Float too large, can't convert with 32bit PSP instruction" );s32 r; asm volatile ( "trunc.w.s %1, %1\nmfc1 %0,%1\n" : "=r"(r) : "f"(x) ); return r; }
-inline s32 round_w_s( f32 x )						{ DAEDALUS_ASSERT( x >= LONG_MIN && x <= LONG_MAX, "Float too large, can't convert with 32bit PSP instruction" );s32 r; asm volatile ( "round.w.s %1, %1\nmfc1 %0,%1\n" : "=r"(r) : "f"(x) ); return r; }
-inline s32 ceil_w_s( f32 x )						{ DAEDALUS_ASSERT( x >= LONG_MIN && x <= LONG_MAX, "Float too large, can't convert with 32bit PSP instruction" );s32 r; asm volatile ( "ceil.w.s  %1, %1\nmfc1 %0,%1\n" : "=r"(r) : "f"(x) ); return r; }
-inline s32 floor_w_s( f32 x )						{ DAEDALUS_ASSERT( x >= LONG_MIN && x <= LONG_MAX, "Float too large, can't convert with 32bit PSP instruction" );s32 r; asm volatile ( "floor.w.s %1, %1\nmfc1 %0,%1\n" : "=r"(r) : "f"(x) ); return r; }
-
-
-inline s32 f32_to_s32_trunc( f32 x )				{ return pspFpuTrunc(x); }
-inline s32 f32_to_s32_round( f32 x )				{ return pspFpuRound(x); }
-inline s32 f32_to_s32_ceil( f32 x )					{ return pspFpuCeil(x); }
-inline s32 f32_to_s32_floor( f32 x )				{ return pspFpuFloor(x); }
-inline s32 f32_to_s32( f32 x )						{ pspFpuSetRoundmode( gNativeRoundingModes[ gRoundingMode ] ); return cvt_w_s( x ); }
-
-//inline s64 f32_to_s64_trunc( f32 x )				{ return (s64)trunc_w_s( x ); }
-inline s64 f32_to_s64_trunc( f32 x )				{ return (s64)truncf( x ); }
-inline s64 f32_to_s64_round( f32 x )				{ return (s64)round_w_s( x ); }
-inline s64 f32_to_s64_ceil( f32 x )					{ return (s64)ceil_w_s( x ); }
-inline s64 f32_to_s64_floor( f32 x )				{ return (s64)floor_w_s( x ); }
-inline s64 f32_to_s64( f32 x )						{ pspFpuSetRoundmode( gNativeRoundingModes[ gRoundingMode ] ); return (s64)x; }	// XXXX Need to do a cvt really
-
-inline s32 d64_to_s32_trunc( d64 x )				{ return pspFpuTrunc( (f32)x ); }
-inline s32 d64_to_s32_round( d64 x )				{ return pspFpuRound( (f32)x ); }
-inline s32 d64_to_s32_ceil( d64 x )					{ return pspFpuCeil( (f32)x ); }
-inline s32 d64_to_s32_floor( d64 x )				{ return pspFpuFloor( (f32)x ); }
-inline s32 d64_to_s32( d64 x )						{ pspFpuSetRoundmode( gNativeRoundingModes[ gRoundingMode ] ); return cvt_w_s( (f32)x ); }
-
-inline s64 d64_to_s64_trunc( d64 x )				{ return (s64)x; }
-inline s64 d64_to_s64_round( d64 x )				{ return (s64)( x + 0.5f ); }
-inline s64 d64_to_s64_ceil( d64 x )					{ return (s64)ceilf( x ); }
-inline s64 d64_to_s64_floor( d64 x )				{ return (s64)floorf( x ); }
-inline s64 d64_to_s64( d64 x )						{ pspFpuSetRoundmode( gNativeRoundingModes[ gRoundingMode ] ); return (s64)x; }	// XXXX Need to do a cvt really
-
-#else
-
 DAEDALUS_FORCEINLINE s32 f32_to_s32_trunc( f32 x )	{ SET_ROUND_MODE( RM_TRUNC ); return (s32)truncf(x); }
 DAEDALUS_FORCEINLINE s32 f32_to_s32_round( f32 x )	{ SET_ROUND_MODE( RM_ROUND ); return (s32)roundf(x); }
 DAEDALUS_FORCEINLINE s32 f32_to_s32_ceil( f32 x )	{ SET_ROUND_MODE( RM_CEIL ); return (s32)ceilf(x); }
@@ -498,7 +423,6 @@ DAEDALUS_FORCEINLINE s64 d64_to_s64( d64 x )
 	return (s64)x; 
 #endif
 }
-#endif
 
 static void R4300_CALL_TYPE R4300_Cop1_BCInstr( R4300_CALL_SIGNATURE );
 static void R4300_CALL_TYPE R4300_Cop1_SInstr( R4300_CALL_SIGNATURE );
