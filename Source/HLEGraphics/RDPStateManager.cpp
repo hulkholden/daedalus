@@ -42,8 +42,8 @@ RDP_OtherMode		gRDPOtherMode;
 
 #define MAX_TMEM_ADDRESS 4096
 
-//Granularity down to 24bytes is good enuff also only need to address the upper half of TMEM for palettes//Corn
-u32* gTlutLoadAddresses[ MAX_TMEM_ADDRESS >> 6 ];
+// Granularity down to 24bytes is good enuff also only need to address the upper half of TMEM for palettes//Corn
+u32 gTlutLoadAddresses[ MAX_TMEM_ADDRESS >> 6 ];
 
 
 #ifdef DAEDALUS_ACCURATE_TMEM
@@ -563,7 +563,7 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 	DAEDALUS_USE(lrt);
 
 	//Store address of PAL (assuming PAL is only stored in upper half of TMEM) //Corn
-	gTlutLoadAddresses[ (rdp_tile.tmem>>2) & 0x3F ] = (u32*)address;
+	gTlutLoadAddresses[ (rdp_tile.tmem>>2) & 0x3F ] = ram_offset;
 
 	DL_PF("    TLut Addr[0x%08x] TMEM[0x%03x] Tile[%d] Count[%d] Format[%s] (%d,%d)->(%d,%d)",
 		address, rdp_tile.tmem, tile_idx, count, kTLUTTypeName[gRDPOtherMode.text_tlut], uls >> 2, ult >> 2, lrs >> 2, lrt >> 2);
@@ -644,15 +644,15 @@ const TextureInfo & CRDPStateManager::GetUpdatedTextureDescriptor( u32 idx )
 		ti.SetTlutAddress( TLUT_BASE );
 #else
 		//
-		//If indexed TMEM PAL address is NULL then assume that the base address is stored in
-		//TMEM address 0x100 (gTlutLoadAddresses[ 0 ]) and calculate offset from there with TLutIndex(palette index)
-		//This trick saves us from the need to copy the real palette to TMEM and we just pass the pointer //Corn
+		// If indexed TMEM PAL address is NULL then assume that the base address is stored in
+		// TMEM address 0x100 (gTlutLoadAddresses[ 0 ]) and calculate offset from there with TLutIndex(palette index)
+		// This trick saves us from the need to copy the real palette to TMEM and we just pass the pointer //Corn
 		//
-		u32	tlut= TLUT_BASE;
+		u32	tlut = TLUT_BASE;
 		if(rdp_tile.size == G_IM_SIZ_4b)
 		{
 			u32 tlut_idx0 = g_ROM.TLUT_HACK << 1;
-			u32 tlut_idx1 = (u32)gTlutLoadAddresses[ rdp_tile.palette << tlut_idx0 ];
+			u32 tlut_idx1 = gTlutLoadAddresses[ rdp_tile.palette << tlut_idx0 ];
 
 			//If pointer == NULL(=invalid entry) add offset to base address (TMEM[0] + offset)
 			if(tlut_idx1 == 0)

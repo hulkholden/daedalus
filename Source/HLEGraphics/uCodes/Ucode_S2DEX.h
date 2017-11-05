@@ -481,7 +481,7 @@ void DLParser_S2DEX_ObjLoadTxtr( MicroCodeCommand command )
 		uObjTxtrTLUT *ObjTlut = (uObjTxtrTLUT*)ObjTxtr;
 
 		// Store TLUT pointer
-		gTlutLoadAddresses[ (ObjTxtr->tlut.phead>>2) & 0x3F ] = (u32*)(g_pu8RamBase + RDPSegAddr(ObjTlut->image));
+		gTlutLoadAddresses[ (ObjTxtr->tlut.phead>>2) & 0x3F ] = RDPSegAddr(ObjTlut->image);
 		gObjTxtr = NULL;
 	}
 	else // (TXTRBLOCK, TXTRTILE)

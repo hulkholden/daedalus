@@ -563,12 +563,10 @@ static void ConvertI8(const TextureDestInfo & dsti, const TextureInfo & ti)
 
 static void ConvertCI8(const TextureDestInfo & dsti, const TextureInfo & ti)
 {
-	DAEDALUS_ASSERT(ti.GetTlutAddress(), "No TLUT address");
-
 	NativePf8888 temp_palette[256];
 
 	NativePf8888 *	dst_palette = dsti.Palette ? reinterpret_cast< NativePf8888 * >( dsti.Palette ) : temp_palette;
-	const void * 	src_palette = reinterpret_cast< const void * >( ti.GetTlutAddress() );
+	const void * 	src_palette = g_pu8RamBase + ti.GetTlutAddress();
 
 	ConvertPalette(ti.GetTLutFormat(), dst_palette, src_palette, 256);
 
@@ -594,12 +592,10 @@ static void ConvertCI8(const TextureDestInfo & dsti, const TextureInfo & ti)
 
 static void ConvertCI4(const TextureDestInfo & dsti, const TextureInfo & ti)
 {
-	DAEDALUS_ASSERT(ti.GetTlutAddress(), "No TLUT address");
-
 	NativePf8888 temp_palette[16];
 
 	NativePf8888 *	dst_palette = dsti.Palette ? reinterpret_cast< NativePf8888 * >( dsti.Palette ) : temp_palette;
-	const void * 	src_palette = reinterpret_cast< const void * >( ti.GetTlutAddress() );
+	const void * 	src_palette = g_pu8RamBase + ti.GetTlutAddress();
 
 	ConvertPalette(ti.GetTLutFormat(), dst_palette, src_palette, 16);
 
@@ -645,9 +641,11 @@ bool ConvertTexture(const TextureInfo & ti,
 					ETextureFormat texture_format,
 					u32 pitch)
 {
-	//Do nothing if palette address is NULL or close to NULL in a palette texture //Corn
-	//Loading a SaveState (OOT -> SSV) dont bring back our TMEM data which causes issues for the first rendered frame.
-	//Checking if the palette pointer is less than 0x1000 (rather than just NULL) fixes it.
+	// TODO(strmnnrmn): Check this - it's probably because we were storing addresses in
+	// system memory here rather than offsets into n64 ram.
+	// Do nothing if palette address is NULL or close to NULL in a palette texture //Corn
+	// Loading a SaveState (OOT -> SSV) dont bring back our TMEM data which causes issues for the first rendered frame.
+	// Checking if the palette pointer is less than 0x1000 (rather than just NULL) fixes it.
 	// Seems to happen on the first frame of Goldeneye too?
 	if( (ti.GetFormat() == G_IM_FMT_CI) && (ti.GetTlutAddress() < 0x1000) ) return false;
 
