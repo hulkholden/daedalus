@@ -26,33 +26,32 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Dark Rift runs properly without custom microcodes, and has the same symptoms...
 // We need Turbo3D ucode support, actually a modified version of it, thanks Gonetz for the info :D
 
-void DLParser_Last_Legion_0x80( MicroCodeCommand command )
+void DLParser_Last_Legion_0x80(MicroCodeCommand command)
 {
-     gDlistStack.address[gDlistStackPointer] += 16;
-	  DL_PF("    DLParser_RSP_Last_Legion_0x80");
+	gDlistStack.address[gDlistStackPointer] += 16;
+	DL_PF("    DLParser_RSP_Last_Legion_0x80");
 }
 
-void DLParser_Last_Legion_0x00( MicroCodeCommand command )
+void DLParser_Last_Legion_0x00(MicroCodeCommand command)
 {
-
 	gDlistStack.address[gDlistStackPointer] += 16;
 	DL_PF("    DLParser_RSP_Last_Legion_0x00");
 
-	if( (command.inst.cmd0) == 0 && (command.inst.cmd1) )
+	if ((command.inst.cmd0) == 0 && (command.inst.cmd1))
 	{
 		u32 newaddr = RDPSegAddr((command.inst.cmd1));
-		if( newaddr >= MAX_RAM_ADDRESS )
+		if (newaddr >= MAX_RAM_ADDRESS)
 		{
 			DLParser_PopDL();
 			return;
 		}
 
-		u32 pc1 = *(u32 *)(g_pu8RamBase + newaddr+8*1+4);
-		u32 pc2 = *(u32 *)(g_pu8RamBase + newaddr+8*4+4);
+		u32 pc1 = *(u32*)(g_pu8RamBase + newaddr + 8 * 1 + 4);
+		u32 pc2 = *(u32*)(g_pu8RamBase + newaddr + 8 * 4 + 4);
 		pc1 = RDPSegAddr(pc1);
 		pc2 = RDPSegAddr(pc2);
 
-		if( pc1 && pc1 != 0xffffff && pc1 < MAX_RAM_ADDRESS)
+		if (pc1 && pc1 != 0xffffff && pc1 < MAX_RAM_ADDRESS)
 		{
 			// Need to call both DL
 			gDlistStackPointer++;
@@ -63,7 +62,7 @@ void DLParser_Last_Legion_0x00( MicroCodeCommand command )
 			DL_PF("    ############################################");
 		}
 
-		if( pc2 && pc2 != 0xffffff && pc2 < MAX_RAM_ADDRESS )
+		if (pc2 && pc2 != 0xffffff && pc2 < MAX_RAM_ADDRESS)
 		{
 			// Need to call both DL
 			gDlistStackPointer++;
@@ -74,18 +73,18 @@ void DLParser_Last_Legion_0x00( MicroCodeCommand command )
 			DL_PF("    ############################################");
 		}
 	}
-	else if( (command.inst.cmd1) == 0 )
+	else if ((command.inst.cmd1) == 0)
 	{
 		DLParser_PopDL();
 	}
 	else
 	{
-		DLParser_Nothing( command );
+		DLParser_Nothing(command);
 		DLParser_PopDL();
 	}
 }
 
-void DLParser_TexRect_Last_Legion( MicroCodeCommand command )
+void DLParser_TexRect_Last_Legion(MicroCodeCommand command)
 {
 	MicroCodeCommand command2;
 	MicroCodeCommand command3;
@@ -93,8 +92,8 @@ void DLParser_TexRect_Last_Legion( MicroCodeCommand command )
 	//
 	// Fetch the next two instructions
 	//
-	DLParser_FetchNextCommand( &command2 );
-	DLParser_FetchNextCommand( &command3 );
+	DLParser_FetchNextCommand(&command2);
+	DLParser_FetchNextCommand(&command3);
 
 	RDP_TexRect tex_rect;
 	tex_rect.cmd0 = command.inst.cmd0;
@@ -104,7 +103,7 @@ void DLParser_TexRect_Last_Legion( MicroCodeCommand command )
 	tex_rect.cmd2 = command3.inst.cmd1;
 	tex_rect.cmd3 = command2.inst.cmd1;
 
-	//Keep integers for as long as possible //Corn
+	// Keep integers for as long as possible //Corn
 	s32 rect_x0 = tex_rect.x0;
 	s32 rect_y0 = tex_rect.y0;
 	s32 rect_x1 = tex_rect.x1;
@@ -116,16 +115,16 @@ void DLParser_TexRect_Last_Legion( MicroCodeCommand command )
 	s32 rect_dsdx = tex_rect.dsdx;
 	s32 rect_dtdy = tex_rect.dtdy;
 
-	//rect_s0 += (((u32)rect_dsdx >> 31) << 5);	//Fixes California Speed
-	//rect_t0 += (((u32)rect_dtdy >> 31) << 5);
+	// rect_s0 += (((u32)rect_dsdx >> 31) << 5);	//Fixes California Speed
+	// rect_t0 += (((u32)rect_dtdy >> 31) << 5);
 
 	// In Fill/Copy mode the coordinates are inclusive (i.e. add 1<<2 to the w/h)
 	//
-	switch ( gRDPOtherMode.cycle_type )
+	switch (gRDPOtherMode.cycle_type)
 	{
 		case CYCLE_COPY:
-			rect_dsdx = rect_dsdx >> 2;	// In copy mode 4 pixels are copied at once.
-			// NB! Fall through!
+			rect_dsdx = rect_dsdx >> 2;  // In copy mode 4 pixels are copied at once.
+										 // NB! Fall through!
 		case CYCLE_FILL:
 			rect_x1 += 4;
 			rect_y1 += 4;
@@ -134,15 +133,15 @@ void DLParser_TexRect_Last_Legion( MicroCodeCommand command )
 			break;
 	}
 
-	s16 rect_s1 = rect_s0 + (rect_dsdx * ( rect_x1 - rect_x0 ) >> 7);
-	s16 rect_t1 = rect_t0 + (rect_dtdy * ( rect_y1 - rect_y0 ) >> 7);
+	s16 rect_s1 = rect_s0 + (rect_dsdx * (rect_x1 - rect_x0) >> 7);
+	s16 rect_t1 = rect_t0 + (rect_dtdy * (rect_y1 - rect_y0) >> 7);
 
-	TexCoord st0( rect_s0, rect_t0 );
-	TexCoord st1( rect_s1, rect_t1 );
-	v2 xy0( tex_rect.x0 / 4.0f, tex_rect.y0 / 4.0f );
-	v2 xy1( tex_rect.x1 / 4.0f, tex_rect.y1 / 4.0f );
+	TexCoord st0(rect_s0, rect_t0);
+	TexCoord st1(rect_s1, rect_t1);
+	v2 xy0(tex_rect.x0 / 4.0f, tex_rect.y0 / 4.0f);
+	v2 xy1(tex_rect.x1 / 4.0f, tex_rect.y1 / 4.0f);
 
-	gRenderer->TexRect( tex_rect.tile_idx, xy0, xy1, st0, st1 );
+	gRenderer->TexRect(tex_rect.tile_idx, xy0, xy1, st0, st1);
 }
 
-#endif // HLEGRAPHICS_UCODES_UCODE_LL_H_
+#endif  // HLEGRAPHICS_UCODES_UCODE_LL_H_

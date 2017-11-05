@@ -20,45 +20,43 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_UCODES_UCODE_GBI2_H_
 #define HLEGRAPHICS_UCODES_UCODE_GBI2_H_
 
-void DLParser_GBI2_Vtx( MicroCodeCommand command )
+void DLParser_GBI2_Vtx(MicroCodeCommand command)
 {
 	u32 address = RDPSegAddr(command.vtx2.addr);
 
-	u32 vend   = command.vtx2.vend >> 1;
-	u32 n      = command.vtx2.n;
-	u32 v0	   = vend - n;
+	u32 vend = command.vtx2.vend >> 1;
+	u32 n = command.vtx2.n;
+	u32 v0 = vend - n;
 
-	DL_PF( "    Address[0x%08x] vEnd[%d] v0[%d] Num[%d]", address, vend, v0, n );
+	DL_PF("    Address[0x%08x] vEnd[%d] v0[%d] Num[%d]", address, vend, v0, n);
 
-	if ( vend > 64 )
+	if (vend > 64)
 	{
-		DL_PF( "    *Warning, attempting to load into invalid vertex positions" );
-		DBGConsole_Msg( 0, "DLParser_GBI2_Vtx: Warning, attempting to load into invalid vertex positions: %d -> %d", v0, v0+n );
+		DL_PF("    *Warning, attempting to load into invalid vertex positions");
+		DBGConsole_Msg(0, "DLParser_GBI2_Vtx: Warning, attempting to load into invalid vertex positions: %d -> %d", v0,
+					   v0 + n);
 		return;
 	}
 
 	// Check that address is valid...
-	// Only games I seen that set this are Mario Golf/Tennis, but it looks like is caused by a dynarec issue, anyways they crash eventually
-	DAEDALUS_ASSERT( (address + (n*16) ) < MAX_RAM_ADDRESS, "Address out of range (0x%08x)", address );
+	// Only games I seen that set this are Mario Golf/Tennis, but it looks like is caused by a dynarec issue, anyways
+	// they crash eventually
+	DAEDALUS_ASSERT((address + (n * 16)) < MAX_RAM_ADDRESS, "Address out of range (0x%08x)", address);
 
-	gRenderer->SetNewVertexInfo( address, v0, n );
+	gRenderer->SetNewVertexInfo(address, v0, n);
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	gNumVertices += n;
-	DLParser_DumpVtxInfo( address, v0, n );
+	DLParser_DumpVtxInfo(address, v0, n);
 #endif
-
 }
 
-void DLParser_GBI2_Mtx( MicroCodeCommand command )
+void DLParser_GBI2_Mtx(MicroCodeCommand command)
 {
 	u32 address = RDPSegAddr(command.mtx2.addr);
 
-	DL_PF("    Command: %s %s %s Length %d Address 0x%08x",
-		command.mtx2.projection ? "Projection" : "ModelView",
-		command.mtx2.load ? "Load" : "Mul",
-		command.mtx2.nopush == 0 ? "Push" : "No Push",
-		command.mtx2.len, address);
+	DL_PF("    Command: %s %s %s Length %d Address 0x%08x", command.mtx2.projection ? "Projection" : "ModelView",
+		  command.mtx2.load ? "Load" : "Mul", command.mtx2.nopush == 0 ? "Push" : "No Push", command.mtx2.len, address);
 
 	// Load matrix from address
 	if (command.mtx2.projection)
@@ -67,35 +65,34 @@ void DLParser_GBI2_Mtx( MicroCodeCommand command )
 	}
 	else
 	{
-		gRenderer->SetWorldView(address, command.mtx2.nopush==0, command.mtx2.load);
+		gRenderer->SetWorldView(address, command.mtx2.nopush == 0, command.mtx2.load);
 	}
 }
-void DLParser_GBI2_PopMtx( MicroCodeCommand command )
+void DLParser_GBI2_PopMtx(MicroCodeCommand command)
 {
-	DL_PF("    Command: (%s)",	command.inst.cmd1 ? "Projection" : "ModelView");
+	DL_PF("    Command: (%s)", command.inst.cmd1 ? "Projection" : "ModelView");
 
 	// Banjo Tooie, pops more than one matrix
-	u32 num = command.inst.cmd1>>6;
+	u32 num = command.inst.cmd1 >> 6;
 
 	// Just pop the worldview matrix
 	gRenderer->PopWorldView(num);
 }
 
-//0016A710: DB020000 00000018 CMD Zelda_MOVEWORD  Mem[2][00]=00000018 Lightnum=0
-//001889F0: DB020000 00000030 CMD Zelda_MOVEWORD  Mem[2][00]=00000030 Lightnum=2
-void DLParser_GBI2_MoveWord( MicroCodeCommand command )
+// 0016A710: DB020000 00000018 CMD Zelda_MOVEWORD  Mem[2][00]=00000018 Lightnum=0
+// 001889F0: DB020000 00000030 CMD Zelda_MOVEWORD  Mem[2][00]=00000030 Lightnum=2
+void DLParser_GBI2_MoveWord(MicroCodeCommand command)
 {
-
 	switch (command.mw2.type)
 	{
-	case G_MW_MATRIX:
+		case G_MW_MATRIX:
 		{
 			DL_PF("    G_MW_MATRIX(2)");
 			gRenderer->InsertMatrix(command.inst.cmd0, command.inst.cmd1);
 		}
 		break;
 
-	case G_MW_NUMLIGHT:
+		case G_MW_NUMLIGHT:
 		{
 			// Lightnum
 			// command->cmd1:
@@ -108,33 +105,33 @@ void DLParser_GBI2_MoveWord( MicroCodeCommand command )
 			gRenderer->SetNumLights(num_lights);
 		}
 		break;
-/*
-	case G_MW_CLIP:	// Seems to be unused?
-		{
-			DL_PF("     G_MW_CLIP");
-		}
-		break;
-*/
-	case G_MW_SEGMENT:
+		/*
+			case G_MW_CLIP:	// Seems to be unused?
+				{
+					DL_PF("     G_MW_CLIP");
+				}
+				break;
+		*/
+		case G_MW_SEGMENT:
 		{
 			u32 segment = command.mw2.offset >> 2;
-			u32 address	= command.mw2.value;
+			u32 address = command.mw2.value;
 
-			DL_PF( "    G_MW_SEGMENT Segment[%d] = 0x%08x", segment, address );
+			DL_PF("    G_MW_SEGMENT Segment[%d] = 0x%08x", segment, address);
 
 			gSegments[segment] = address;
 		}
 		break;
 
-	case G_MW_FOG: // WIP, only works for the PSP
+		case G_MW_FOG:  // WIP, only works for the PSP
 		{
-#ifdef DAEDALUS_PSP			
-			f32 mul = (f32)(s16)(command.mw2.value >> 16);	//Fog mult
-			f32 offs = (f32)(s16)(command.mw2.value & 0xFFFF);	//Fog Offset
+#ifdef DAEDALUS_PSP
+			f32 mul = (f32)(s16)(command.mw2.value >> 16);		// Fog mult
+			f32 offs = (f32)(s16)(command.mw2.value & 0xFFFF);  // Fog Offset
 
 			gRenderer->SetFogMultOffs(mul, offs);
 
-			// HW fog, only works for a few games
+// HW fog, only works for a few games
 #if 0
 			f32 a = (f32)(command.mw2.value >> 16);
 			f32 b = (f32)(command.mw2.value & 0xFFFF);
@@ -144,13 +141,13 @@ void DLParser_GBI2_MoveWord( MicroCodeCommand command )
 
 			gRenderer->SetFogMinMax(fog_near, fog_far);
 #endif
-			//DL_PF(" G_MW_FOG. Mult = 0x%04x (%f), Off = 0x%04x (%f)", wMult, 255.0f * fMult, wOff, 255.0f * fOff );
-			//printf("1Fog %.0f | %.0f || %.0f | %.0f\n", min, max, a, b);
+// DL_PF(" G_MW_FOG. Mult = 0x%04x (%f), Off = 0x%04x (%f)", wMult, 255.0f * fMult, wOff, 255.0f * fOff );
+// printf("1Fog %.0f | %.0f || %.0f | %.0f\n", min, max, a, b);
 #endif
 		}
 		break;
 
-	case G_MW_LIGHTCOL:
+		case G_MW_LIGHTCOL:
 		{
 			u32 light_idx = command.mw2.offset / 0x18;
 			u32 field_offset = (command.mw2.offset & 0x7);
@@ -159,26 +156,25 @@ void DLParser_GBI2_MoveWord( MicroCodeCommand command )
 
 			if (field_offset == 0)
 			{
-				u8 r = ((command.mw2.value>>24)&0xFF);
-				u8 g = ((command.mw2.value>>16)&0xFF);
-				u8 b = ((command.mw2.value>>8)&0xFF);
+				u8 r = ((command.mw2.value >> 24) & 0xFF);
+				u8 g = ((command.mw2.value >> 16) & 0xFF);
+				u8 b = ((command.mw2.value >> 8) & 0xFF);
 				gRenderer->SetLightCol(light_idx, r, g, b);
 			}
 		}
 		break;
-/*
-	case G_MW_PERSPNORM:
-		DL_PF("     G_MW_PERSPNORM 0x%04x", (s16)command.inst.cmd1);
-		break;
+		/*
+			case G_MW_PERSPNORM:
+				DL_PF("     G_MW_PERSPNORM 0x%04x", (s16)command.inst.cmd1);
+				break;
 
-	case G_MW_POINTS:
-		DL_PF("     G_MW_POINTS : Ignored");
-		break;
-*/
-	default:
+			case G_MW_POINTS:
+				DL_PF("     G_MW_POINTS : Ignored");
+				break;
+		*/
+		default:
 		{
 			DL_PF("    Ignored!!");
-
 		}
 		break;
 	}
@@ -232,33 +228,33 @@ ZeldaMoveMem: 0xdc080008 0x8010e3c0 Type: 08 Len: 08 Off: 4000
 
 */
 
-void DLParser_GBI2_MoveMem( MicroCodeCommand command )
+void DLParser_GBI2_MoveMem(MicroCodeCommand command)
 {
-	u32 address	 = RDPSegAddr(command.inst.cmd1);
-	//u32 offset = (command.inst.cmd0 >> 8) & 0xFFFF;
-	u32 type	 = (command.inst.cmd0     ) & 0xFE;
-	//u32 length  = (command.inst.cmd0 >> 16) & 0xFF;
+	u32 address = RDPSegAddr(command.inst.cmd1);
+	// u32 offset = (command.inst.cmd0 >> 8) & 0xFFFF;
+	u32 type = (command.inst.cmd0) & 0xFE;
+	// u32 length  = (command.inst.cmd0 >> 16) & 0xFF;
 
 	switch (type)
 	{
-	case G_GBI2_MV_VIEWPORT:
+		case G_GBI2_MV_VIEWPORT:
 		{
-			RDP_MoveMemViewport( address );
+			RDP_MoveMemViewport(address);
 		}
 		break;
 
-	case G_GBI2_MV_LIGHT:
+		case G_GBI2_MV_LIGHT:
 		{
 			u32 offset2 = (command.inst.cmd0 >> 5) & 0x7F8;
 			u32 light_idx = offset2 / 24;
 			if (light_idx < 2)
 			{
-				DL_PF("    G_MV_LOOKAT" );
+				DL_PF("    G_MV_LOOKAT");
 				return;
 			}
 
 			light_idx -= 2;
-			N64Light *light = (N64Light*)(g_pu8RamBase + address);
+			N64Light* light = (N64Light*)(g_pu8RamBase + address);
 			RDP_MoveMemLight(light_idx, light);
 
 			gRenderer->SetLightPosition(light_idx, light->x1, light->y1, light->z1, 1.0f);
@@ -266,57 +262,57 @@ void DLParser_GBI2_MoveMem( MicroCodeCommand command )
 		}
 		break;
 
-	case G_GBI2_MV_MATRIX:
+		case G_GBI2_MV_MATRIX:
 		{
 			DL_PF("    Force Matrix(2): addr=%08X", address);
 			// Rayman 2, Donald Duck, Tarzan, all wrestling games use this
-			gRenderer->ForceMatrix( address );
+			gRenderer->ForceMatrix(address);
 			// ForceMatrix takes two cmds
 			gDlistStack.address[gDlistStackPointer] += 8;
 		}
 		break;
-/*
-	case G_GBI2_MVO_L0:
-	case G_GBI2_MVO_L1:
-	case G_GBI2_MVO_L2:
-	case G_GBI2_MVO_L3:
-	case G_GBI2_MVO_L4:
-	case G_GBI2_MVO_L5:
-	case G_GBI2_MVO_L6:
-	case G_GBI2_MVO_L7:
-		DL_PF("MoveMem Light(2)");
-		break;
-	case G_GBI2_MV_POINT:
-		DL_PF("MoveMem Point(2)");
-		break;
+		/*
+			case G_GBI2_MVO_L0:
+			case G_GBI2_MVO_L1:
+			case G_GBI2_MVO_L2:
+			case G_GBI2_MVO_L3:
+			case G_GBI2_MVO_L4:
+			case G_GBI2_MVO_L5:
+			case G_GBI2_MVO_L6:
+			case G_GBI2_MVO_L7:
+				DL_PF("MoveMem Light(2)");
+				break;
+			case G_GBI2_MV_POINT:
+				DL_PF("MoveMem Point(2)");
+				break;
 
-	case G_GBI2_MVO_LOOKATY:
-		DL_PF("MoveMem LOOKATY(2)");
-		break;
-*/
+			case G_GBI2_MVO_LOOKATY:
+				DL_PF("MoveMem LOOKATY(2)");
+				break;
+		*/
 
-	case 0x00:
-	case 0x02:
+		case 0x00:
+		case 0x02:
 		{
 			// Ucode for Evangelion.v64
 			// 0 ObjMtx
 			// 2 SubMtx
-			DLParser_S2DEX_ObjMoveMem( command );
+			DLParser_S2DEX_ObjMoveMem(command);
 		}
 		break;
 
-	default:
-		DL_PF("    GBI2 MoveMem Type: Unknown");
-		DBGConsole_Msg(0, "GBI2 MoveMem: Unknown Type. 0x%08x 0x%08x", command.inst.cmd0, command.inst.cmd1);
-		break;
+		default:
+			DL_PF("    GBI2 MoveMem Type: Unknown");
+			DBGConsole_Msg(0, "GBI2 MoveMem: Unknown Type. 0x%08x 0x%08x", command.inst.cmd0, command.inst.cmd1);
+			break;
 	}
 }
 
 // Kirby 64, SSB and Cruisn' Exotica use this
-void DLParser_GBI2_DL_Count( MicroCodeCommand command )
+void DLParser_GBI2_DL_Count(MicroCodeCommand command)
 {
-	u32 address  = RDPSegAddr(command.inst.cmd1);
-	//u32 count	 = command.inst.cmd0 & 0xFFFF;
+	u32 address = RDPSegAddr(command.inst.cmd1);
+	// u32 count	 = command.inst.cmd0 & 0xFFFF;
 
 	// For SSB and Kirby, otherwise we'll end up scrapping the pc
 	if (address == 0)
@@ -329,19 +325,22 @@ void DLParser_GBI2_DL_Count( MicroCodeCommand command )
 	gDlistStack.address[gDlistStackPointer] = address;
 	gDlistStack.limit = (command.inst.cmd0) & 0xFFFF;
 
-	DL_PF("    Address=0x%08x %s", address, (command.dlist.param==G_DL_NOPUSH)? "Jump" : (command.dlist.param==G_DL_PUSH)? "Push" : "?");
+	DL_PF("    Address=0x%08x %s", address,
+		  (command.dlist.param == G_DL_NOPUSH) ? "Jump" : (command.dlist.param == G_DL_PUSH) ? "Push" : "?");
 	DL_PF("    \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/");
 	DL_PF("    ############################################");
 }
 
-void DLParser_GBI2_GeometryMode( MicroCodeCommand command )
+void DLParser_GBI2_GeometryMode(MicroCodeCommand command)
 {
 	gGeometryMode._u32 &= command.inst.arg0;
 	gGeometryMode._u32 |= command.inst.arg1;
 
-	DL_PF("    0x%08x 0x%08x =(x & 0x%08x) | 0x%08x", command.inst.cmd0, command.inst.cmd1, command.inst.arg0, command.inst.arg1);
+	DL_PF("    0x%08x 0x%08x =(x & 0x%08x) | 0x%08x", command.inst.cmd0, command.inst.cmd1, command.inst.arg0,
+		  command.inst.arg1);
 	DL_PF("    ZBuffer %s", (gGeometryMode.GBI2_Zbuffer) ? "On" : "Off");
-	DL_PF("    Culling %s", (gGeometryMode.GBI2_CullBack) ? "Back face" : (gGeometryMode.GBI2_CullFront) ? "Front face" : "Off");
+	DL_PF("    Culling %s",
+		  (gGeometryMode.GBI2_CullBack) ? "Back face" : (gGeometryMode.GBI2_CullFront) ? "Front face" : "Off");
 	DL_PF("    Smooth Shading %s", (gGeometryMode.GBI2_ShadingSmooth) ? "On" : "Off");
 	DL_PF("    Lighting %s", (gGeometryMode.GBI2_Lighting) ? "On" : "Off");
 	DL_PF("    Texture Gen %s", (gGeometryMode.GBI2_TexGen) ? "On" : "Off");
@@ -351,20 +350,21 @@ void DLParser_GBI2_GeometryMode( MicroCodeCommand command )
 
 	TnLMode TnL;
 
-	TnL.Light		= gGeometryMode.GBI2_Lighting;
-	TnL.TexGen		= gGeometryMode.GBI2_TexGen;
-	TnL.TexGenLin	= gGeometryMode.GBI2_TexGenLin;
-	TnL.Fog			= gGeometryMode.GBI2_Fog & gFogEnabled;// && (gRDPOtherMode.c1_m1a==3 || gRDPOtherMode.c1_m2a==3 || gRDPOtherMode.c2_m1a==3 || gRDPOtherMode.c2_m2a==3);
-	TnL.Shade		= !(gGeometryMode.GBI2_TexGenLin/* & (g_ROM.GameHacks != TIGERS_HONEY_HUNT)*/);
-	TnL.Zbuffer		= gGeometryMode.GBI2_Zbuffer;
-	TnL.TriCull		= gGeometryMode.GBI2_CullFront | gGeometryMode.GBI2_CullBack;
-	TnL.CullBack	= gGeometryMode.GBI2_CullBack;
-	TnL.PointLight	= gGeometryMode.GBI2_PointLight;
+	TnL.Light = gGeometryMode.GBI2_Lighting;
+	TnL.TexGen = gGeometryMode.GBI2_TexGen;
+	TnL.TexGenLin = gGeometryMode.GBI2_TexGenLin;
+	TnL.Fog = gGeometryMode.GBI2_Fog & gFogEnabled;  // && (gRDPOtherMode.c1_m1a==3 || gRDPOtherMode.c1_m2a==3 ||
+													 // gRDPOtherMode.c2_m1a==3 || gRDPOtherMode.c2_m2a==3);
+	TnL.Shade = !(gGeometryMode.GBI2_TexGenLin /* & (g_ROM.GameHacks != TIGERS_HONEY_HUNT)*/);
+	TnL.Zbuffer = gGeometryMode.GBI2_Zbuffer;
+	TnL.TriCull = gGeometryMode.GBI2_CullFront | gGeometryMode.GBI2_CullBack;
+	TnL.CullBack = gGeometryMode.GBI2_CullBack;
+	TnL.PointLight = gGeometryMode.GBI2_PointLight;
 
-	gRenderer->SetTnLMode( TnL._u32 );
+	gRenderer->SetTnLMode(TnL._u32);
 }
 
-void DLParser_GBI2_SetOtherModeL( MicroCodeCommand command )
+void DLParser_GBI2_SetOtherModeL(MicroCodeCommand command)
 {
 	// Mask is constructed slightly differently
 	const u32 mask = (u32)((s32)(0x80000000) >> command.othermode.len) >> command.othermode.sft;
@@ -376,7 +376,7 @@ void DLParser_GBI2_SetOtherModeL( MicroCodeCommand command )
 #endif
 }
 
-void DLParser_GBI2_SetOtherModeH( MicroCodeCommand command )
+void DLParser_GBI2_SetOtherModeH(MicroCodeCommand command)
 {
 	// Mask is constructed slightly differently
 	const u32 mask = (u32)((s32)(0x80000000) >> command.othermode.len) >> command.othermode.sft;
@@ -388,37 +388,34 @@ void DLParser_GBI2_SetOtherModeH( MicroCodeCommand command )
 #endif
 }
 
-void DLParser_GBI2_Texture( MicroCodeCommand command )
+void DLParser_GBI2_Texture(MicroCodeCommand command)
 {
+	DL_PF("    Level[%d] Tile[%d] %s", command.texture.level, command.texture.tile,
+		  command.texture.enable_gbi2 ? "enable" : "disable");
 
-	DL_PF("    Level[%d] Tile[%d] %s", command.texture.level, command.texture.tile, command.texture.enable_gbi2 ? "enable":"disable");
-
-	gRenderer->SetTextureTile( command.texture.tile );
-	gRenderer->SetTextureEnable( command.texture.enable_gbi2 );
+	gRenderer->SetTextureTile(command.texture.tile);
+	gRenderer->SetTextureEnable(command.texture.enable_gbi2);
 
 	f32 scale_s = f32(command.texture.scaleS) / (65535.0f * 32.0f);
-	f32 scale_t = f32(command.texture.scaleT)  / (65535.0f * 32.0f);
+	f32 scale_t = f32(command.texture.scaleT) / (65535.0f * 32.0f);
 
-	DL_PF("    ScaleS[%0.4f], ScaleT[%0.4f]", scale_s*32.0f, scale_t*32.0f);
-	gRenderer->SetTextureScale( scale_s, scale_t );
+	DL_PF("    ScaleS[%0.4f], ScaleT[%0.4f]", scale_s * 32.0f, scale_t * 32.0f);
+	gRenderer->SetTextureScale(scale_s, scale_t);
 }
 
-void DLParser_GBI2_DMA_IO( MicroCodeCommand command )
-{
-	DL_UNIMPLEMENTED_ERROR( "G_DMA_IO" );
-}
+void DLParser_GBI2_DMA_IO(MicroCodeCommand command) { DL_UNIMPLEMENTED_ERROR("G_DMA_IO"); }
 
-void DLParser_GBI2_Quad( MicroCodeCommand command )
+void DLParser_GBI2_Quad(MicroCodeCommand command)
 {
 	// While the next command pair is Tri2, add vertices
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32* pCmdBase = (u32*)(g_pu8RamBase + pc);
 
 	bool tris_added = false;
 
 	do
 	{
-		//DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_QUAD");
+		// DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_QUAD");
 
 		// Vertex indices are multiplied by 2
 		u32 v0_idx = command.gbi2line3d.v0 >> 1;
@@ -433,14 +430,14 @@ void DLParser_GBI2_Quad( MicroCodeCommand command )
 
 		tris_added |= gRenderer->AddTri(v3_idx, v4_idx, v5_idx);
 
-		//printf("Q 0x%08x: %08x %08x %d\n", pc-8, command.inst.cmd0, command.inst.cmd1, tris_added);
+		// printf("Q 0x%08x: %08x %08x %d\n", pc-8, command.inst.cmd0, command.inst.cmd1, tris_added);
 
 		command.inst.cmd0 = *pCmdBase++;
 		command.inst.cmd1 = *pCmdBase++;
 		pc += 8;
-	} while ( command.inst.cmd == G_GBI2_QUAD );
+	} while (command.inst.cmd == G_GBI2_QUAD);
 
-	gDlistStack.address[gDlistStackPointer] = pc-8;
+	gDlistStack.address[gDlistStackPointer] = pc - 8;
 
 	if (tris_added)
 	{
@@ -449,17 +446,17 @@ void DLParser_GBI2_Quad( MicroCodeCommand command )
 }
 
 // XXX SpiderMan uses this command.DLParser_GBI2_Tri2
-void DLParser_GBI2_Line3D( MicroCodeCommand command )
+void DLParser_GBI2_Line3D(MicroCodeCommand command)
 {
 	// While the next command pair is Tri2, add vertices
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32* pCmdBase = (u32*)(g_pu8RamBase + pc);
 
 	bool tris_added = false;
 
 	do
 	{
-		//DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_LINE3D");
+		// DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_LINE3D");
 
 		u32 v0_idx = command.gbi2line3d.v0 >> 1;
 		u32 v1_idx = command.gbi2line3d.v1 >> 1;
@@ -476,9 +473,9 @@ void DLParser_GBI2_Line3D( MicroCodeCommand command )
 		command.inst.cmd0 = *pCmdBase++;
 		command.inst.cmd1 = *pCmdBase++;
 		pc += 8;
-	} while ( command.inst.cmd == G_GBI2_LINE3D );
+	} while (command.inst.cmd == G_GBI2_LINE3D);
 
-	gDlistStack.address[gDlistStackPointer] = pc-8;
+	gDlistStack.address[gDlistStackPointer] = pc - 8;
 
 	if (tris_added)
 	{
@@ -486,18 +483,17 @@ void DLParser_GBI2_Line3D( MicroCodeCommand command )
 	}
 }
 
-void DLParser_GBI2_Tri1( MicroCodeCommand command )
+void DLParser_GBI2_Tri1(MicroCodeCommand command)
 {
-
 	// While the next command pair is Tri1, add vertices
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32* pCmdBase = (u32*)(g_pu8RamBase + pc);
 
 	bool tris_added = false;
 
 	do
 	{
-		//DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_TRI1");
+		// DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_TRI1");
 
 		u32 v0_idx = command.gbi2tri1.v0 >> 1;
 		u32 v1_idx = command.gbi2tri1.v1 >> 1;
@@ -508,9 +504,9 @@ void DLParser_GBI2_Tri1( MicroCodeCommand command )
 		command.inst.cmd0 = *pCmdBase++;
 		command.inst.cmd1 = *pCmdBase++;
 		pc += 8;
-	} while ( command.inst.cmd == G_GBI2_TRI1 );
+	} while (command.inst.cmd == G_GBI2_TRI1);
 
-	gDlistStack.address[gDlistStackPointer] = pc-8;
+	gDlistStack.address[gDlistStackPointer] = pc - 8;
 
 	if (tris_added)
 	{
@@ -519,17 +515,16 @@ void DLParser_GBI2_Tri1( MicroCodeCommand command )
 }
 
 // While the next command pair is Tri2, add vertices
-void DLParser_GBI2_Tri2( MicroCodeCommand command )
+void DLParser_GBI2_Tri2(MicroCodeCommand command)
 {
-
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32* pCmdBase = (u32*)(g_pu8RamBase + pc);
 
 	bool tris_added = false;
 
 	do
 	{
-		//DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_TRI2");
+		// DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_TRI2");
 
 		// Vertex indices already divided in ucodedef
 		u32 v0_idx = command.gbi2tri2.v0;
@@ -547,9 +542,9 @@ void DLParser_GBI2_Tri2( MicroCodeCommand command )
 		command.inst.cmd0 = *pCmdBase++;
 		command.inst.cmd1 = *pCmdBase++;
 		pc += 8;
-	} while ( command.inst.cmd == G_GBI2_TRI2 );
+	} while (command.inst.cmd == G_GBI2_TRI2);
 
-	gDlistStack.address[gDlistStackPointer] = pc-8;
+	gDlistStack.address[gDlistStackPointer] = pc - 8;
 
 	if (tris_added)
 	{
@@ -572,4 +567,4 @@ void DLParser_GBI2_0x8( MicroCodeCommand command )
 }
 */
 
-#endif // HLEGRAPHICS_UCODES_UCODE_GBI2_H_
+#endif  // HLEGRAPHICS_UCODES_UCODE_GBI2_H_

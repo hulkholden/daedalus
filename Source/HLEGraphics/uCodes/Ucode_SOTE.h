@@ -20,22 +20,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_UCODES_UCODE_SOTE_H_
 #define HLEGRAPHICS_UCODES_UCODE_SOTE_H_
 
-
-void DLParser_GBI0_Vtx_SOTE( MicroCodeCommand command )
+void DLParser_GBI0_Vtx_SOTE(MicroCodeCommand command)
 {
 	u32 address = RDPSegAddr(command.inst.cmd1);
-	u32 n		= ((command.inst.cmd0 >> 4) & 0xfff) / 33 + 1;
-	u32 v0		= 0;
+	u32 n = ((command.inst.cmd0 >> 4) & 0xfff) / 33 + 1;
+	u32 v0 = 0;
 
 	DL_PF("    Address[0x%08x] v0[%d] Num[%d]", address, v0, n);
 
-	DAEDALUS_ASSERT( n < 32, "Warning, attempting to load into invalid vertex positions" );
+	DAEDALUS_ASSERT(n < 32, "Warning, attempting to load into invalid vertex positions");
 
-	gRenderer->SetNewVertexInfo( address, v0, n );
+	gRenderer->SetNewVertexInfo(address, v0, n);
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	gNumVertices += n;
-	DLParser_DumpVtxInfo( address, v0, n );
+	DLParser_DumpVtxInfo(address, v0, n);
 #endif
 }
 
@@ -68,7 +67,8 @@ void DLParser_GBI0_Line3D_SOTE( MicroCodeCommand command )
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 		if ( command.inst.cmd == G_GBI1_LINE3D )
 		{
-				DL_PF("0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, gInstructionName[ command.inst.cmd ]);
+				DL_PF("0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, gInstructionName[
+command.inst.cmd ]);
 		}
 #endif
 	}
@@ -105,7 +105,8 @@ void DLParser_GBI0_Tri1_SOTE( MicroCodeCommand command )
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 		if ( command.inst.cmd == G_GBI1_TRI1 )
 		{
-//				DL_PF("0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, gInstructionName[ command.inst.cmd ]);
+//				DL_PF("0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, gInstructionName[
+command.inst.cmd ]);
 		}
 #endif
 	}
@@ -119,6 +120,4 @@ void DLParser_GBI0_Tri1_SOTE( MicroCodeCommand command )
 }
 */
 
-
-
-#endif // HLEGRAPHICS_UCODES_UCODE_SOTE_H_
+#endif  // HLEGRAPHICS_UCODES_UCODE_SOTE_H_
