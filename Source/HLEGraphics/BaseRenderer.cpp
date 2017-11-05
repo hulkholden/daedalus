@@ -1078,9 +1078,9 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 			{//NORMAL LIGHT
 				col = LightVert(vecTransformedNormal);
 			}
-			mVtxProjected[i].Colour.x = col.x; 
-			mVtxProjected[i].Colour.y = col.y; 
-			mVtxProjected[i].Colour.z = col.z; 
+			mVtxProjected[i].Colour.x = col.x;
+			mVtxProjected[i].Colour.y = col.y;
+			mVtxProjected[i].Colour.z = col.z;
 			mVtxProjected[i].Colour.w = vert.rgba_a * (1.0f / 255.0f);
 
 			// ENV MAPPING
@@ -1119,7 +1119,7 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 		}
 		else
 		{
-			//if( mTnL.Flags.Shade )	
+			//if( mTnL.Flags.Shade )
 			{// FLAT shade
 				mVtxProjected[i].Colour = v4( vert.rgba_r * (1.0f / 255.0f), vert.rgba_g * (1.0f / 255.0f), vert.rgba_b * (1.0f / 255.0f), vert.rgba_a * (1.0f / 255.0f) );
 			}
@@ -1138,7 +1138,7 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 		//Fog
 		if ( mTnL.Flags.Fog )
 		{
-			if(projected.w > 0.0f)	//checking for positive w fixes near plane fog errors //Corn 
+			if(projected.w > 0.0f)	//checking for positive w fixes near plane fog errors //Corn
 			{
 				f32 eye_z = projected.z / projected.w;
 				f32 fog_alpha = eye_z * mTnL.FogMult + mTnL.FogOffs;
@@ -1222,7 +1222,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 		mVtxProjected[i].Colour.y = (f32)vert.rgba_g * (1.0f / 255.0f);
 		mVtxProjected[i].Colour.z = (f32)vert.rgba_b * (1.0f / 255.0f);
 		mVtxProjected[i].Colour.w = (f32)vert.rgba_a * (1.0f / 255.0f);	//Pass alpha channel unmodified
-			
+
 		// LIGHTING OR COLOR
 		//
 		if ( mTnL.Flags.Light )
@@ -1254,16 +1254,16 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 						{
 							f32 pi = mTnL.Lights[l].Iscale / (Pos - mTnL.Lights[l].Position).LengthSq();
 							if (pi < 1.0f) fCosT *= pi;
-							
+
 							result.x += mTnL.Lights[l].Colour.x * fCosT;
 							result.y += mTnL.Lights[l].Colour.y * fCosT;
 							result.z += mTnL.Lights[l].Colour.z * fCosT;
 						}
 					}
-				}   
+				}
 
 				fCosT = norm.Dot( mTnL.Lights[l].Direction );
-				if (fCosT > 0.0f) 
+				if (fCosT > 0.0f)
 				{
 					result.x += mTnL.Lights[l].Colour.x * fCosT;
 					result.y += mTnL.Lights[l].Colour.y * fCosT;
@@ -1282,7 +1282,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 						result.x += mTnL.Lights[l].Colour.x * pi;
 						result.y += mTnL.Lights[l].Colour.y * pi;
 						result.z += mTnL.Lights[l].Colour.z * pi;
-					}   
+					}
 				}
 			}
 
@@ -1502,9 +1502,9 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 			vecTransformedNormal.Normalise();
 
 			const v3 col = LightVert(vecTransformedNormal);
-			mVtxProjected[i].Colour.x = col.x; 
-			mVtxProjected[i].Colour.y = col.y; 
-			mVtxProjected[i].Colour.z = col.z; 
+			mVtxProjected[i].Colour.x = col.x;
+			mVtxProjected[i].Colour.y = col.y;
+			mVtxProjected[i].Colour.z = col.z;
 			mVtxProjected[i].Colour.w = (f32)mn[vert.cidx+0] * (1.0f / 255.0f);
 
 			if ( mTnL.Flags.TexGen )
