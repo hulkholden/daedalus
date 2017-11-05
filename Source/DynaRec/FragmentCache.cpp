@@ -41,9 +41,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 using namespace AssemblyUtils;
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 CFragmentCache::CFragmentCache()
 :	mMemoryUsage( 0 )
 ,	mInputLength( 0 )
@@ -62,9 +60,7 @@ CFragmentCache::CFragmentCache()
 	}
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 CFragmentCache::~CFragmentCache()
 {
 	Clear();
@@ -73,9 +69,7 @@ CFragmentCache::~CFragmentCache()
 	delete mpCodeBufferManager;
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 #ifdef DAEDALUS_DEBUG_DYNAREC
 CFragment * CFragmentCache::LookupFragment( u32 address ) const
 {
@@ -118,9 +112,7 @@ CFragment * CFragmentCache::LookupFragment( u32 address ) const
 	return p;
 }
 #endif
-//*************************************************************************************
-//
-//*************************************************************************************
+
 CFragment * CFragmentCache::LookupFragmentQ( u32 address ) const
 {
 	DAEDALUS_PROFILE( "CFragmentCache::LookupFragmentQ" );
@@ -174,9 +166,7 @@ CFragment * CFragmentCache::LookupFragmentQ( u32 address ) const
 	return mpCachedFragment;
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 void CFragmentCache::InsertFragment( CFragment * p_fragment )
 {
 	u32		fragment_address( p_fragment->GetEntryAddress() );
@@ -261,9 +251,6 @@ void CFragmentCache::InsertFragment( CFragment * p_fragment )
 #endif
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
 void CFragmentCache::Clear()
 {
 #ifdef DAEDALUS_DEBUG_CONSOLE
@@ -292,18 +279,14 @@ void CFragmentCache::Clear()
 	mpCodeBufferManager->Reset();
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 bool CFragmentCache::ShouldInvalidateOnWrite( u32 address, u32 length ) const
 {
 	return mCacheCoverage.IsCovered( address, length );
 }
 
 #ifdef DAEDALUS_DEBUG_DYNAREC
-//*************************************************************************************
-//
-//*************************************************************************************
+
 struct SDescendingCyclesSort
 {
      bool operator()(CFragment* const & a, CFragment* const & b)
@@ -312,9 +295,6 @@ struct SDescendingCyclesSort
      }
 };
 
-//*************************************************************************************
-//
-//*************************************************************************************
 void CFragmentCache::DumpStats( const char * outputdir ) const
 {
 	typedef std::vector< CFragment * >		FragmentList;
@@ -396,15 +376,8 @@ void CFragmentCache::DumpStats( const char * outputdir ) const
 }
 #endif // DAEDALUS_DEBUG_DYNAREC
 
-
-//*************************************************************************************
-//
-//*************************************************************************************
 #define AddressToIndex( addr ) ((addr - BASE_ADDRESS) >> MEM_USAGE_SHIFT)
 
-//*************************************************************************************
-//
-//*************************************************************************************
 void CFragmentCacheCoverage::ExtendCoverage( u32 address, u32 len )
 {
 	u32 first_entry( AddressToIndex( address ) );
@@ -417,9 +390,6 @@ void CFragmentCacheCoverage::ExtendCoverage( u32 address, u32 len )
 	}
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
 bool CFragmentCacheCoverage::IsCovered( u32 address, u32 len ) const
 {
 	if((address - BASE_ADDRESS) == 0)
@@ -441,9 +411,6 @@ bool CFragmentCacheCoverage::IsCovered( u32 address, u32 len ) const
 	return false;
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
 void CFragmentCacheCoverage::Reset( )
 {
 	memset( mCacheCoverage, 0, sizeof( mCacheCoverage ) );

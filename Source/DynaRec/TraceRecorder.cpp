@@ -41,9 +41,6 @@ namespace
 }
 CTraceRecorder				gTraceRecorder;
 
-//*************************************************************************************
-//
-//*************************************************************************************
 CTraceRecorder::CTraceRecorder()
 :	mTracing( false )
 ,	mStartTraceAddress( 0 )
@@ -54,9 +51,6 @@ CTraceRecorder::CTraceRecorder()
 {
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
 void	CTraceRecorder::StartTrace( u32 address )
 {
 	DAEDALUS_PROFILE( "CTraceRecorder::StartTrace" );
@@ -73,9 +67,6 @@ void	CTraceRecorder::StartTrace( u32 address )
 	mExpectedExitTraceAddress = address + 4;
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
 CTraceRecorder::EUpdateTraceStatus	CTraceRecorder::UpdateTrace( u32 address,
 																 bool branch_delay_slot,
 																 bool branch_taken,
@@ -265,9 +256,6 @@ CTraceRecorder::EUpdateTraceStatus	CTraceRecorder::UpdateTrace( u32 address,
 	return UTS_CONTINUE_TRACE;
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
 void	CTraceRecorder::StopTrace( u32 exit_address )
 {
 	DAEDALUS_ASSERT( mTracing, "We're not tracing" );
@@ -277,9 +265,6 @@ void	CTraceRecorder::StopTrace( u32 exit_address )
 	mExpectedExitTraceAddress = exit_address;
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
 CFragment *		CTraceRecorder::CreateFragment( CCodeBufferManager * p_manager )
 {
 	DAEDALUS_PROFILE( "CTraceRecorder::CreateFragment" );
@@ -306,9 +291,6 @@ CFragment *		CTraceRecorder::CreateFragment( CCodeBufferManager * p_manager )
 	return p_frament;
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
 void	CTraceRecorder::AbortTrace()
 {
 	DAEDALUS_PROFILE( "CTraceRecorder::AbortTrace" );
@@ -365,9 +347,6 @@ void	CTraceRecorder::AbortTrace()
 
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
 void CTraceRecorder::Analyse( SRegisterUsageInfo & register_usage )
 {
 	DAEDALUS_PROFILE( "CTraceRecorder::Analyse" );

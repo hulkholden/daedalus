@@ -27,18 +27,18 @@ class CFragment;
 #ifdef DAEDALUS_ENABLE_DYNAREC_PROFILE
 namespace DynarecProfile
 {
-	void LogLookup( u32 address, CFragment * fragment );
-	void LogEnterExit( u32 enter_address, u32 exit_address, u32 instruction_count );
+void LogLookup(u32 address, CFragment* fragment);
+void LogEnterExit(u32 enter_address, u32 exit_address, u32 instruction_count);
 }
 
-#define DYNAREC_PROFILE_LOGLOOKUP( a, f )					DynarecProfile::LogLookup( a, f )
-#define DYNAREC_PROFILE_ENTEREXIT( enter, exit, cnt )		DynarecProfile::LogEnterExit( enter, exit, cnt )
+#define DYNAREC_PROFILE_LOGLOOKUP(a, f) DynarecProfile::LogLookup(a, f)
+#define DYNAREC_PROFILE_ENTEREXIT(enter, exit, cnt) DynarecProfile::LogEnterExit(enter, exit, cnt)
 
 #else
 
-#define DYNAREC_PROFILE_LOGLOOKUP( a, f )
-#define DYNAREC_PROFILE_ENTEREXIT( enter, exit, cnt )
+#define DYNAREC_PROFILE_LOGLOOKUP(a, f)
+#define DYNAREC_PROFILE_ENTEREXIT(enter, exit, cnt)
 
 #endif
 
-#endif // DYNAREC_DYNARECPROFILE_H_
+#endif  // DYNAREC_DYNARECPROFILE_H_

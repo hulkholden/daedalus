@@ -24,9 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <vector>
 
-//*************************************************************************************
-//
-//*************************************************************************************
 struct SRegisterSpan
 {
 	SRegisterSpan( EN64Reg reg, u32 start, u32 end )
@@ -43,10 +40,6 @@ struct SRegisterSpan
 };
 typedef std::vector<SRegisterSpan>		RegisterSpanList;
 
-
-//*************************************************************************************
-//
-//*************************************************************************************
 struct SAscendingSpanStartSort
 {
      bool operator()(const SRegisterSpan & a, const SRegisterSpan & b)
@@ -55,9 +48,6 @@ struct SAscendingSpanStartSort
      }
 };
 
-//*************************************************************************************
-//
-//*************************************************************************************
 struct SAscendingSpanEndSort
 {
      bool operator()(const SRegisterSpan & a, const SRegisterSpan & b)
@@ -66,9 +56,6 @@ struct SAscendingSpanEndSort
      }
 };
 
-//*************************************************************************************
-//
-//*************************************************************************************
 struct SRegisterUsageInfo
 {
 	RegisterSpanList		SpanList;

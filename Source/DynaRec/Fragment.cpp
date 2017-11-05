@@ -51,9 +51,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //#define IMMEDIATE_COUNTER_UPDATE
 //#define UPDATE_COUNTER_ON_EXCEPTION
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 namespace
 {
 
@@ -73,9 +71,7 @@ namespace
 
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 CFragment::CFragment( CCodeBufferManager * p_manager,
 					  u32 entry_address,
 					  u32 exit_address,
@@ -107,9 +103,7 @@ CFragment::CFragment( CCodeBufferManager * p_manager,
 }
 
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-//*************************************************************************************
 // Create a Fragement for Patch Function
-//*************************************************************************************
 CFragment::CFragment(CCodeBufferManager * p_manager, u32 entry_address,
 						u32 function_length, void* function_Ptr)
 	:	mEntryAddress( entry_address )
@@ -130,17 +124,13 @@ CFragment::CFragment(CCodeBufferManager * p_manager, u32 entry_address,
 	Assemble(p_manager, CCodeLabel(function_Ptr));
 }
 #endif
-//*************************************************************************************
-//
-//*************************************************************************************
+
 CFragment::~CFragment()
 {
 	delete mpIndirectExitMap;
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 void	CFragment::SetCache( const CFragmentCache * p_cache )
 {
 #ifdef FRAGMENT_SIMULATE_EXECUTION
@@ -153,9 +143,7 @@ void	CFragment::SetCache( const CFragmentCache * p_cache )
 	}
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 // This is the second place where most of the CPU time is spent
 //  %   cumulative   self              self     total
 // time   seconds   seconds    calls   s/call   s/call  name
@@ -196,9 +184,7 @@ void CFragment::Execute()
 	// We have to do this when we exit to make sure the cached read pointer is updated correctly
 	CPU_SetPC( gCPUState.CurrentPC );
 }
-//*************************************************************************************
-//
-//*************************************************************************************
+
 namespace
 {
 	void HandleException()
@@ -243,9 +229,7 @@ namespace
 #endif // FRAGMENT_SIMULATE_EXECUTION
 }
 #ifdef FRAGMENT_SIMULATE_EXECUTION
-//*************************************************************************************
-//
-//*************************************************************************************
+
 CFragment * CFragment::Simulate()
 {
 	DAEDALUS_ASSERT( gCPUState.GetStuffToDo() == 0, "Entering when there is stuff to do?" );
@@ -500,9 +484,7 @@ CFragment * CFragment::Simulate()
 }
 #endif // FRAGMENT_SIMULATE_EXECUTION
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 u32	CFragment::GetMemoryUsage() const
 {
 	// Ignore the 'additional info' when computing this
@@ -511,9 +493,7 @@ u32	CFragment::GetMemoryUsage() const
 		   mPatchList.size() * sizeof( SFragmentPatchDetails );
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 namespace
 {
 	struct SBranchHandlerInfo
@@ -531,9 +511,7 @@ namespace
 	};
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 void	CFragment::AddPatch( u32 address, CJumpLocation jump_location )
 {
 	if( jump_location.IsSet() )
@@ -548,9 +526,7 @@ void	CFragment::AddPatch( u32 address, CJumpLocation jump_location )
 }
 
 
-//*************************************************************************************
-//
-//*************************************************************************************
+
 void CFragment::Assemble( CCodeBufferManager * p_manager,
 						  u32 exit_address,
 						  const std::vector< STraceEntry > & trace,
@@ -805,9 +781,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 }
 
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-//*************************************************************************************
-//
-//*************************************************************************************
+
 void CFragment::Assemble( CCodeBufferManager * p_manager, CCodeLabel function_ptr)
 {
 	std::vector< CJumpLocation >		exception_handler_jumps;
@@ -835,9 +809,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager, CCodeLabel function_pt
 	delete p_generator;
 }
 #endif
-//*************************************************************************************
-//
-//*************************************************************************************
+
 #ifdef DAEDALUS_DEBUG_DYNAREC
 
 #include <string>
@@ -904,9 +876,7 @@ void DisassembleBuffer( const u8 * buf, int buf_size, FILE * fh )
 #endif // defined( DAEDALUS_DEBUG_DYNAREC )
 
 #ifdef DAEDALUS_DEBUG_DYNAREC
-//*************************************************************************************
-//
-//*************************************************************************************
+
 void CFragment::DumpFragmentInfoHtml( FILE * fh, u64 total_cycles ) const
 {
 	float	pc_total_cycles( 0.0f );
@@ -1071,9 +1041,7 @@ void CFragment::DumpFragmentInfoHtml( FILE * fh, u64 total_cycles ) const
 			output_begin = output_end;
 		}
 
-		//
 		//	Epilogue
-		//
 		const u8 * output_end( buffer_end );
 		fputs( "<tr valign=top><td colspan=2><pre>(Epilogue)</pre></td><td><pre>", fh );
 		DisassembleBuffer( output_begin, output_end-output_begin, fh );

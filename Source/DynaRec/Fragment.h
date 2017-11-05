@@ -29,9 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <vector>
 
-//*************************************************************************************
-//	Enable this to allow simulation of the buffer rather than direct execution
-//*************************************************************************************
+// Enable this to allow simulation of the buffer rather than direct execution
 //#define FRAGMENT_SIMULATE_EXECUTION
 
 //
@@ -41,9 +39,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#define FRAGMENT_RETAIN_ADDITIONAL_INFO
 #endif
 
-//*************************************************************************************
-//
-//*************************************************************************************
 class CFragmentCache;
 class CCodeGenerator;
 class CCodeBufferManager;
@@ -56,9 +51,6 @@ struct SFragmentPatchDetails
 };
 typedef std::vector<SFragmentPatchDetails>	FragmentPatchList;
 
-//*************************************************************************************
-//
-//*************************************************************************************
 class CFragment
 {
 	typedef std::vector<STraceEntry>		TraceBuffer;
