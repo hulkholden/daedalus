@@ -9,12 +9,16 @@ cc_library(
 )
 
 cc_library(
-    name = "CoreDeps",
-    srcs =glob(["*.cpp"]),    
+    name = "OSHLECpp",
+    srcs = glob(["*.cpp"]),
     deps = [
         "//:stdafx",
+        "//Config",
         "//Core",
+        "//Debug",
+        "//DynaRec",
         "//OSHLE",
+        "//Plugins",
         "//Utility",
     ],
     visibility = ["//visibility:public"],

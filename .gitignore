@@ -3,13 +3,10 @@
 *.prx
 *.elf
 *.sublime-workspace
-bazel-bin/
-bazel-genfiles/
-bazel-out/
-bazel-source/
 EBOOT.PBP
 PARAM.SFO
 Makefile.cache
+/Source/bazel-*
 Source/SysPSP/DveMgr/pspDveManager.S
 Source/SysPSP/DveMgr/pspDveManager_driver.S
 Source/SysPSP/KernelButtonsPrx/imposectrl.S

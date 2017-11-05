@@ -83,4 +83,4 @@ struct SGlobalPreferences
 
 extern SGlobalPreferences	gGlobalPreferences;
 
-#endif UTILITY_GLOBAL_PREFERENCES_H_
+#endif // UTILITY_GLOBAL_PREFERENCES_H_

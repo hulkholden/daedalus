@@ -1,22 +1,20 @@
 cc_library(
-    name = "Interface",
+    name = "Graphics",
     hdrs =glob(["*.h"]),
     deps = [
         "//:stdafx",
-        "//Debug:DebugConsole",
-        "//System",
-        "//Utility",
     ],
     visibility = ["//visibility:public"],
 )
 
 cc_library(
-    name = "InterfaceCpp",
-    srcs =glob(["*.cpp"]),
+    name = "GraphicsCpp",
+    srcs = glob(["*.cpp"]),
     deps = [
         "//:stdafx",
-        ":Interface",
-        "//Core",
+        "//third_party/libpng",
+        "//Graphics",
+        "//Math",
     ],
     visibility = ["//visibility:public"],
 )

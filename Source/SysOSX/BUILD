@@ -1,5 +1,5 @@
 cc_library(
-    name = "SysW32",
+    name = "SysOSX",
     hdrs = [
         "Include/Platform.h",
     ],

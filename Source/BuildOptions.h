@@ -78,6 +78,6 @@
 //
 //	Configuration options. These are not really platform-specific, but control various features
 //
-#include "BuildConfig.h"
+#include "Base/Release/BuildConfig.h"
 
 #endif // BUILDOPTIONS_H_

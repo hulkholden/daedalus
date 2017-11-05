@@ -15,6 +15,7 @@ cc_library(
         ":System",
         "//Core",
         "//Debug",
+        "//Graphics",
         "//Interface",
         "//Input",
         "//OSHLE",

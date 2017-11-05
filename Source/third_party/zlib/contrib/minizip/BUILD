@@ -2,7 +2,10 @@ licenses(["notice"])  #  BSD/MIT-like license
 
 cc_library(
     name = "minizip",
-    srcs = glob(["*.c"]),
+    srcs = [
+        "unzip.c",
+        "zip.c",
+    ],
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
     deps = [

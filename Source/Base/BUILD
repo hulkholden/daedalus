@@ -2,7 +2,11 @@
 cc_library(
     name = "Base",
     srcs = glob(["*.cpp"]),
-    hdrs = glob(["*.h"]),
+    hdrs = glob(["*.h"] + [
+        "Dev/BuildConfig.h",
+        "Profile/BuildConfig.h",
+        "Release/BuildConfig.h",
+    ]),
     deps = [
     ],
     visibility = ["//visibility:public"],
