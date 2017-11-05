@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 enum EGuiColor
 {
-	BLACK=0, // Default..
+	BLACK = 0,  // Default..
 	RED,
 	GREEN,
 	MAGENTA,
@@ -34,7 +34,7 @@ enum EGuiColor
 	PURPLE,
 	GREY,
 };
-const u32 NUM_COLOR_TYPES = GREY+1;
+const u32 NUM_COLOR_TYPES = GREY + 1;
 
 enum EViewportType
 {
@@ -43,7 +43,7 @@ enum EViewportType
 	VT_FULLSCREEN,
 	VT_FULLSCREEN_HD,
 };
-const u32 NUM_VIEWPORT_TYPES = VT_FULLSCREEN_HD+1;
+const u32 NUM_VIEWPORT_TYPES = VT_FULLSCREEN_HD + 1;
 
 enum ETVType
 {
@@ -53,34 +53,34 @@ enum ETVType
 
 struct SGlobalPreferences
 {
-	u32							DisplayFramerate;
+	u32 DisplayFramerate;
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	bool						HighlightInexactBlendModes;
-	bool						CustomBlendModes;
+	bool HighlightInexactBlendModes;
+	bool CustomBlendModes;
 #endif
-	bool						BatteryWarning;
-	bool						LargeROMBuffer;
-	bool						ForceLinearFilter;
-	bool						RumblePak;
+	bool BatteryWarning;
+	bool LargeROMBuffer;
+	bool ForceLinearFilter;
+	bool RumblePak;
 
-	EGuiColor					GuiColor;
+	EGuiColor GuiColor;
 
-	float						StickMinDeadzone;
-	float						StickMaxDeadzone;
+	float StickMinDeadzone;
+	float StickMaxDeadzone;
 
-	u32							Language;
+	u32 Language;
 
-	EViewportType				ViewportType;
+	EViewportType ViewportType;
 
-	bool						TVEnable;
-	bool						TVLaced;
-	ETVType						TVType;
+	bool TVEnable;
+	bool TVLaced;
+	ETVType TVType;
 
 	SGlobalPreferences();
 
-	void		Apply() const;
+	void Apply() const;
 };
 
-extern SGlobalPreferences	gGlobalPreferences;
+extern SGlobalPreferences gGlobalPreferences;
 
-#endif // UTILITY_GLOBAL_PREFERENCES_H_
+#endif  // UTILITY_GLOBAL_PREFERENCES_H_

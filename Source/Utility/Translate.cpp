@@ -32,53 +32,45 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Paths.h"
 
 #define TRANSLATE_DUMP_VALUE 0xDAEDDAED
-//*****************************************************************************
-//
-//*****************************************************************************
+
 struct pTranslate
 {
-	u32		hash;			// hash that corresponds to string
-//	u32		len;			// lenght of the translated string
-	char	*translated;	// Translated string
+	u32 hash;		   // hash that corresponds to string
+					   //	u32		len;			// lenght of the translated string
+	char* translated;  // Translated string
 };
 
-pTranslate				 text[180];
+pTranslate text[180];
 std::vector<std::string> gLanguage;
-//
-// Hash was taken from http://stackoverflow.com/questions/98153/whats-the-best-hashing-algorithm-to-use-on-a-stl-string-when-using-hash-map
-//
-//*****************************************************************************
-//
-//*****************************************************************************
+
+// Hash was taken from
+// http://stackoverflow.com/questions/98153/whats-the-best-hashing-algorithm-to-use-on-a-stl-string-when-using-hash-map
+
 u32 HashString(const char* s)
 {
-    u32 hash = 0;
-    while (*s)
-    {
-        hash = hash * 101  +  *s++;
-    }
-    return hash;
+	u32 hash = 0;
+	while (*s)
+	{
+		hash = hash * 101 + *s++;
+	}
+	return hash;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-const char * Translate_Strings(const char *original, u32 & len)
+const char* Translate_Strings(const char* original, u32& len)
 {
 	u32 hash = HashString(original);
-	if( hash == 0 )
-		return original;
+	if (hash == 0) return original;
 
-	for( u32 i=0; i < ARRAYSIZE(text); i++ )
+	for (u32 i = 0; i < ARRAYSIZE(text); i++)
 	{
 		// ToDo..
-		//DAEDALUS_ASSERT( text[i].translated != original, " String already translated" );
+		// DAEDALUS_ASSERT( text[i].translated != original, " String already translated" );
 
-		if( text[i].hash == hash )
+		if (text[i].hash == hash)
 		{
-			if( text[i].translated )
+			if (text[i].translated)
 			{
-				len =  strlen( text[i].translated );
+				len = strlen(text[i].translated);
 				return text[i].translated;
 			}
 			else
@@ -88,103 +80,78 @@ const char * Translate_Strings(const char *original, u32 & len)
 	return original;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-const char * Translate_String(const char *original)
+const char* Translate_String(const char* original)
 {
 	u32 dummy;
-	return Translate_Strings( original, dummy );
+	return Translate_Strings(original, dummy);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void Translate_Unload()
 {
 	// Clear translations
-	for( u32 i = 0; i < ARRAYSIZE(text); ++i )
+	for (u32 i = 0; i < ARRAYSIZE(text); ++i)
 	{
-		if( text[i].translated != NULL )
+		if (text[i].translated != NULL)
 		{
 			free(text[i].translated);
 			text[i].translated = NULL;
 		}
 	}
 }
-//*****************************************************************************
-//
-//*****************************************************************************
-bool	Translate_Init()
+
+bool Translate_Init()
 {
 	// Init translations if available
-	Translate_Load( "Languages/" );
+	Translate_Load("Languages/");
 
 	return /*gLanguage.empty() == 0*/ true;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void	Translate_Load( const char * p_dir )
+void Translate_Load(const char* p_dir)
 {
 	// Set default language
 	gLanguage.push_back("English");
 
-	IO::FindHandleT		find_handle;
-	IO::FindDataT		find_data;
+	IO::FindHandleT find_handle;
+	IO::FindDataT find_data;
 
-	if(IO::FindFileOpen( p_dir, &find_handle, find_data ))
+	if (IO::FindFileOpen(p_dir, &find_handle, find_data))
 	{
 		do
 		{
-			char * filename( find_data.Name );
-			char * last_period( strrchr( filename, '.' ) );
-			if(last_period != NULL)
+			char* filename(find_data.Name);
+			char* last_period(strrchr(filename, '.'));
+			if (last_period != NULL)
 			{
-				if( _strcmpi(last_period, ".lng") == 0 )
+				if (_strcmpi(last_period, ".lng") == 0)
 				{
-					IO::Path::RemoveExtension( filename );
-					gLanguage.push_back( filename );
-
+					IO::Path::RemoveExtension(filename);
+					gLanguage.push_back(filename);
 				}
 			}
-		}
-		while(IO::FindFileNext( find_handle, find_data ));
+		} while (IO::FindFileNext(find_handle, find_data));
 
-		IO::FindFileClose( find_handle );
+		IO::FindFileClose(find_handle);
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-const char * Translate_Name(u32 idx)
+const char* Translate_Name(u32 idx)
 {
-	if( idx < gLanguage.size())
+	if (idx < gLanguage.size())
 	{
-		return gLanguage[ idx ].c_str();
+		return gLanguage[idx].c_str();
 	}
 
 	return "?";
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-u32 Translate_Number()
-{
-	return gLanguage.size()-1;
-}
+u32 Translate_Number() { return gLanguage.size() - 1; }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-u32	Translate_IndexFromName( const char * name )
+u32 Translate_IndexFromName(const char* name)
 {
-	for( u32 i = 0; i < gLanguage.size(); ++i )
+	for (u32 i = 0; i < gLanguage.size(); ++i)
 	{
-		if( _strcmpi(  gLanguage[ i ].c_str(), name ) == 0 )
+		if (_strcmpi(gLanguage[i].c_str(), name) == 0)
 		{
 			return i;
 		}
@@ -194,37 +161,34 @@ u32	Translate_IndexFromName( const char * name )
 	return 0;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-const char * Translate_NameFromIndex( u32 idx )
+const char* Translate_NameFromIndex(u32 idx)
 {
-	if( idx < gLanguage.size())
+	if (idx < gLanguage.size())
 	{
-		return gLanguage[ idx ].c_str();
+		return gLanguage[idx].c_str();
 	}
 
 	return "?";
 }
 
-//*****************************************************************************
 // Restores escape characters which were removed when parsing
 // Which are needed by line-breaking and back-slash
-//*****************************************************************************
-const char * Restore(char *s, u32 len)
+const char* Restore(char* s, u32 len)
 {
 	for (u32 i = 0; i < len; i++)
 	{
 		if (s[i] == '\\')
 		{
-			if( s[i+1] == 'n' )
+			if (s[i + 1] == 'n')
 			{
-				s[i+1] = '\b';	s[i] = '\n';
+				s[i + 1] = '\b';
+				s[i] = '\n';
 				i++;
 			}
-			else if( s[i+1] == '\\' )
+			else if (s[i + 1] == '\\')
 			{
-				s[i+1] = '\b';	s[i] = '\\';
+				s[i + 1] = '\b';
+				s[i] = '\\';
 				i++;
 			}
 		}
@@ -232,77 +196,69 @@ const char * Restore(char *s, u32 len)
 	return s;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void Translate_Dump(const char *string, bool dump)
+void Translate_Dump(const char* string, bool dump)
 {
-	if(dump)
+	if (dump)
 	{
-		FILE * fh = fopen( "hash.txt", "a" );
-		if(fh)
+		FILE* fh = fopen("hash.txt", "a");
+		if (fh)
 		{
-			fprintf( fh,  "%08x,%s\n", HashString(string), string );
+			fprintf(fh, "%08x,%s\n", HashString(string), string);
 			fclose(fh);
 		}
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-bool Translate_Read(u32 idx, const char * dir)
+bool Translate_Read(u32 idx, const char* dir)
 {
 	/// Always unload previous language file if available
 	Translate_Unload();
 
-	if( idx > gLanguage.size() )
-		return false;
+	if (idx > gLanguage.size()) return false;
 
-	const char * ext( ".lng" );
+	const char* ext(".lng");
 	char line[1024];
 	IO::Filename path;
-	char *string;
-	FILE *stream;
+	char* string;
+	FILE* stream;
 
 	u32 count = 0;
-	u32 hash  = 0;
-	u32	len   = 0;
+	u32 hash = 0;
+	u32 len = 0;
 
 	// Build path where we'll load the translation file(s)
 	strcpy(path, dir);
-	strcat(path, gLanguage[ idx ].c_str());
+	strcat(path, gLanguage[idx].c_str());
 	strcat(path, ext);
 
-	stream = fopen(path,"r");
-	if( stream == NULL )
+	stream = fopen(path, "r");
+	if (stream == NULL)
 	{
 		return false;
 	}
 
-	while( fgets(line, 1023, stream) )
+	while (fgets(line, 1023, stream))
 	{
 		// Strip spaces from end of lines
 		Tidy(line);
 
 		// Handle comments
-		if (line[0] == '/')
-			continue;
+		if (line[0] == '/') continue;
 
-		string = strchr(line,',');
-		if( string != NULL )
+		string = strchr(line, ',');
+		if (string != NULL)
 		{
 			string++;
-			len = strlen( string );
-			sscanf( line,"%08x", &hash );
-			if( count < ARRAYSIZE(text) )
+			len = strlen(string);
+			sscanf(line, "%08x", &hash);
+			if (count < ARRAYSIZE(text))
 			{
 				// Write translated string and hash to array
 				text[count].hash = hash;
-				Translate_Dump( string, hash == TRANSLATE_DUMP_VALUE );
+				Translate_Dump(string, hash == TRANSLATE_DUMP_VALUE);
 
-				text[count].translated = (char*)malloc(len+1); // Leave space for terminator
-				strcpy( text[count].translated, Restore( string, len ) );
+				text[count].translated = (char*)malloc(len + 1);  // Leave space for terminator
+				strcpy(text[count].translated, Restore(string, len));
 				count++;
 			}
 		}

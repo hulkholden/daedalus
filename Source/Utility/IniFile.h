@@ -1,4 +1,4 @@
-/******************************************************************************
+/*
  * Copyright (C) 2001 CyRUS64 (http://www.boob.co.uk)
  * Copyright (C) 2006 StrmnNrmn
  *
@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- ******************************************************************************/
+ */
 
 #pragma once
 
@@ -25,51 +25,41 @@
 
 #include "Base/Types.h"
 
-//*****************************************************************************
-//
-//*****************************************************************************
 class CIniFileProperty
 {
-	public:
-		virtual								~CIniFileProperty();
+   public:
+	virtual ~CIniFileProperty();
 
-		virtual const char *				GetName() const = 0;
-		virtual const char *				GetValue() const = 0;
+	virtual const char* GetName() const = 0;
+	virtual const char* GetValue() const = 0;
 
-		virtual bool						GetBooleanValue( bool default_value ) const = 0;
-		virtual int							GetIntValue( int default_value ) const = 0;
-		virtual float						GetFloatValue( float default_value ) const = 0;
+	virtual bool GetBooleanValue(bool default_value) const = 0;
+	virtual int GetIntValue(int default_value) const = 0;
+	virtual float GetFloatValue(float default_value) const = 0;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 class CIniFileSection
 {
-	public:
-		virtual								~CIniFileSection();
+   public:
+	virtual ~CIniFileSection();
 
-		virtual const char *				GetName() const = 0;
-		virtual bool						FindProperty( const char * p_name, const CIniFileProperty ** p_property ) const = 0;
-
+	virtual const char* GetName() const = 0;
+	virtual bool FindProperty(const char* p_name, const CIniFileProperty** p_property) const = 0;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
 class CIniFile
 {
-	public:
-		virtual								~CIniFile();
+   public:
+	virtual ~CIniFile();
 
-		static CIniFile *					Create( const char * filename );
+	static CIniFile* Create(const char* filename);
 
-		virtual const CIniFileSection *		GetDefaultSection() const = 0;
+	virtual const CIniFileSection* GetDefaultSection() const = 0;
 
-		virtual u32							GetNumSections() const = 0;
-		virtual const CIniFileSection *		GetSection( u32 section_idx ) const = 0;
+	virtual u32 GetNumSections() const = 0;
+	virtual const CIniFileSection* GetSection(u32 section_idx) const = 0;
 
-		virtual const CIniFileSection *		GetSectionByName( const char * section_name ) const = 0;
+	virtual const CIniFileSection* GetSectionByName(const char* section_name) const = 0;
 };
 
-#endif // UTILITY_INIFILE_H_
+#endif  // UTILITY_INIFILE_H_

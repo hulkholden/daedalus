@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 struct OpCode;
 
-void SprintOpCodeInfo( char *str, u32 address, OpCode op );
-void SprintRSPOpCodeInfo( char *str, u32 address, OpCode op );
+void SprintOpCodeInfo(char* str, u32 address, OpCode op);
+void SprintRSPOpCodeInfo(char* str, u32 address, OpCode op);
 
-#endif // UTILITY_PRINTOPCODE_H_
+#endif  // UTILITY_PRINTOPCODE_H_

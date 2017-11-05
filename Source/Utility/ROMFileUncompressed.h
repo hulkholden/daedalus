@@ -28,21 +28,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class ROMFileUncompressed : public ROMFile
 {
-public:
-	ROMFileUncompressed( const char * filename );
+   public:
+	ROMFileUncompressed(const char* filename);
 	virtual ~ROMFileUncompressed();
 
-	virtual bool		Open( COutputStream & messages );
+	virtual bool Open(COutputStream& messages);
 
-	virtual bool		IsCompressed() const			{ return false; }
-	virtual u32			GetRomSize() const				{ return mRomSize; }
-	virtual bool		LoadRawData( u32 bytes_to_read, u8 *p_bytes, COutputStream & messages );
+	virtual bool IsCompressed() const { return false; }
+	virtual u32 GetRomSize() const { return mRomSize; }
+	virtual bool LoadRawData(u32 bytes_to_read, u8* p_bytes, COutputStream& messages);
 
-	virtual bool		ReadChunk( u32 offset, u8 * p_dst, u32 length );
+	virtual bool ReadChunk(u32 offset, u8* p_dst, u32 length);
 
-private:
-	FILE *				mFH;
-	u32					mRomSize;
+   private:
+	FILE* mFH;
+	u32 mRomSize;
 };
 
-#endif // UTILITY_ROMFILEUNCOMPRESSED_H_
+#endif  // UTILITY_ROMFILEUNCOMPRESSED_H_

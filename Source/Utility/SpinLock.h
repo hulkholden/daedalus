@@ -26,24 +26,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CSpinLock
 {
-public:
-	inline explicit CSpinLock( volatile u32 * var ) : Var( var )
+   public:
+	inline explicit CSpinLock(volatile u32* var) : Var(var)
 	{
 		// N.B. - this probably needs to use a CAS to prevent race conditions
-		while( *Var != 0 )
+		while (*Var != 0)
 		{
 			ThreadYield();
 		}
 		*Var = 1;
 	}
 
-	inline ~CSpinLock()
-	{
-		*Var = 0;
-	}
+	inline ~CSpinLock() { *Var = 0; }
 
-private:
-	volatile u32 * Var;
+   private:
+	volatile u32* Var;
 };
 
-#endif // UTILITY_SPINLOCK_H_
+#endif  // UTILITY_SPINLOCK_H_

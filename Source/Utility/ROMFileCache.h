@@ -29,34 +29,34 @@ struct SChunkInfo;
 
 class ROMFileCache
 {
-		typedef u16			CacheIdx;
+	typedef u16 CacheIdx;
 
-	public:
-		ROMFileCache();
-		~ROMFileCache();
+   public:
+	ROMFileCache();
+	~ROMFileCache();
 
-		bool				Open( ROMFile * p_rom_file );
-		void				Close();
+	bool Open(ROMFile* p_rom_file);
+	void Close();
 
-		bool				GetChunk( u32 rom_offset, u8 ** p_p_chunk_base, u32 * p_chunk_offset, u32 * p_chunk_size );
+	bool GetChunk(u32 rom_offset, u8** p_p_chunk_base, u32* p_chunk_offset, u32* p_chunk_size);
 
-	private:
-		void				PurgeChunk( CacheIdx cache_idx );
+   private:
+	void PurgeChunk(CacheIdx cache_idx);
 
-		CacheIdx			GetCacheIndex( u32 address );
+	CacheIdx GetCacheIndex(u32 address);
 
-	private:
-		ROMFile *			mpROMFile;
+   private:
+	ROMFile* mpROMFile;
 
-		u8 *				mpStorage;			// Underlying storage. This is carved up between different chunks
-		SChunkInfo *		mpChunkInfo;		// Info about which region a chunk is allocated to
+	u8* mpStorage;			  // Underlying storage. This is carved up between different chunks
+	SChunkInfo* mpChunkInfo;  // Info about which region a chunk is allocated to
 
-		u32					mChunkMapEntries;	// i.e. Number of chunks in the rom
-		CacheIdx *			mpChunkMap;			// Map allowing quick lookups from address -> chunkidx
+	u32 mChunkMapEntries;  // i.e. Number of chunks in the rom
+	CacheIdx* mpChunkMap;  // Map allowing quick lookups from address -> chunkidx
 
-		u32					mMRUIdx;			// Most recently used index
+	u32 mMRUIdx;  // Most recently used index
 
-		static const CacheIdx	INVALID_IDX = CacheIdx(-1);
+	static const CacheIdx INVALID_IDX = CacheIdx(-1);
 };
 
-#endif // UTILITY_ROMFILECACHE_H_
+#endif  // UTILITY_ROMFILECACHE_H_

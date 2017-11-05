@@ -23,26 +23,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include "Base/Types.h"
 
-#if defined( DAEDALUS_W32 )
+#if defined(DAEDALUS_W32)
 
 #include <intrin.h>
 
-#pragma intrinsic (_InterlockedIncrement)
-#pragma intrinsic (_InterlockedDecrement)
-#pragma intrinsic (_InterlockedIncrement)
+#pragma intrinsic(_InterlockedIncrement)
+#pragma intrinsic(_InterlockedDecrement)
+#pragma intrinsic(_InterlockedIncrement)
 
+inline u32 AtomicIncrement(volatile u32* ptr) { return _InterlockedIncrement(reinterpret_cast<volatile LONG*>(ptr)); }
 
-inline u32 AtomicIncrement( volatile u32 * ptr )
-{
-	return _InterlockedIncrement( reinterpret_cast< volatile LONG * >( ptr ) );
-}
+inline u32 AtomicDecrement(volatile u32* ptr) { return _InterlockedDecrement(reinterpret_cast<volatile LONG*>(ptr)); }
 
-inline u32 AtomicDecrement( volatile u32 * ptr )
-{
-	return _InterlockedDecrement( reinterpret_cast< volatile LONG * >( ptr ) );
-}
-
-inline u32 AtomicBitSet( volatile u32 * ptr, u32 and_bits, u32 or_bits )
+inline u32 AtomicBitSet(volatile u32* ptr, u32 and_bits, u32 or_bits)
 {
 	u32 new_value;
 	u32 orig_value;
@@ -50,27 +43,26 @@ inline u32 AtomicBitSet( volatile u32 * ptr, u32 and_bits, u32 or_bits )
 	{
 		orig_value = *ptr;
 		new_value = (orig_value & and_bits) | or_bits;
-	}
-	while ( _InterlockedCompareExchange( reinterpret_cast< volatile LONG * >( ptr ), new_value, orig_value ) != orig_value );
+	} while (_InterlockedCompareExchange(reinterpret_cast<volatile LONG*>(ptr), new_value, orig_value) != orig_value);
 
 	return new_value;
 }
 
-#elif defined( DAEDALUS_OSX ) || defined( DAEDALUS_LINUX )
+#elif defined(DAEDALUS_OSX) || defined(DAEDALUS_LINUX)
 
-inline u32 AtomicIncrement( volatile u32 * ptr )
+inline u32 AtomicIncrement(volatile u32* ptr)
 {
 	DAEDALUS_ASSERT(false, "FIXME");
 	return *ptr++;
 }
 
-inline u32 AtomicDecrement( volatile u32 * ptr )
+inline u32 AtomicDecrement(volatile u32* ptr)
 {
 	DAEDALUS_ASSERT(false, "FIXME");
 	return *ptr--;
 }
 
-inline u32 AtomicBitSet( volatile u32 * ptr, u32 and_bits, u32 or_bits )
+inline u32 AtomicBitSet(volatile u32* ptr, u32 and_bits, u32 or_bits)
 {
 	u32 r = *ptr;
 	r &= and_bits;
@@ -79,12 +71,10 @@ inline u32 AtomicBitSet( volatile u32 * ptr, u32 and_bits, u32 or_bits )
 	return r;
 }
 
-
 #else
 
 #error Unhandled platform
 
 #endif
 
-#endif // UTILITY_ATOMICPRIMITIVES_H_
-
+#endif  // UTILITY_ATOMICPRIMITIVES_H_

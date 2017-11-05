@@ -33,30 +33,28 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class ROMFileCompressed : public ROMFile
 {
-public:
-	ROMFileCompressed( const char * filename );
+   public:
+	ROMFileCompressed(const char* filename);
 
 	virtual ~ROMFileCompressed();
 
-	virtual bool		Open( COutputStream & messages );
+	virtual bool Open(COutputStream& messages);
 
-	virtual bool		IsCompressed() const			{ return true; }
-	virtual u32			GetRomSize() const				{ return mRomSize; }
-	virtual bool		LoadRawData( u32 bytes_to_read, u8 *p_bytes, COutputStream & messages );
+	virtual bool IsCompressed() const { return true; }
+	virtual u32 GetRomSize() const { return mRomSize; }
+	virtual bool LoadRawData(u32 bytes_to_read, u8* p_bytes, COutputStream& messages);
 
-	virtual bool		ReadChunk( u32 offset, u8 * p_dst, u32 length );
+	virtual bool ReadChunk(u32 offset, u8* p_dst, u32 length);
 
-private:
-			bool		Seek( u32 offset, u8 * p_scratch_block, u32 block_size );
+   private:
+	bool Seek(u32 offset, u8* p_scratch_block, u32 block_size);
 
-
-private:
-	unzFile				mZipFile;
-	bool				mFoundRom;
-	u32					mRomSize;
-
+   private:
+	unzFile mZipFile;
+	bool mFoundRom;
+	u32 mRomSize;
 };
 
-#endif // DAEDALUS_COMPRESSED_ROM_SUPPORT
+#endif  // DAEDALUS_COMPRESSED_ROM_SUPPORT
 
-#endif // UTILITY_ROMFILECOMPRESSED_H_
+#endif  // UTILITY_ROMFILECOMPRESSED_H_

@@ -1,12 +1,11 @@
 #include "stdafx.h"
 #include "StringUtil.h"
 
-char * Tidy(char * s)
+char* Tidy(char* s)
 {
-	if (s == NULL || *s == '\0')
-		return s;
+	if (s == NULL || *s == '\0') return s;
 
-	char * p = s + strlen(s);
+	char* p = s + strlen(s);
 
 	p--;
 	while (p >= s && (*p == ' ' || *p == '\r' || *p == '\n'))
@@ -17,17 +16,17 @@ char * Tidy(char * s)
 	return s;
 }
 
-void Split(ConstStringRef str, char split_char, std::vector<ConstStringRef> * pieces)
+void Split(ConstStringRef str, char split_char, std::vector<ConstStringRef>* pieces)
 {
 	ConstStringRef cur = str;
 
-	for (const char * p = str.Begin; p < str.End; ++p)
+	for (const char* p = str.Begin; p < str.End; ++p)
 	{
 		if (*p == split_char)
 		{
 			cur.End = p;
 			pieces->push_back(cur);
-			cur.Begin = p+1;
+			cur.Begin = p + 1;
 		}
 	}
 
@@ -38,15 +37,15 @@ void Split(ConstStringRef str, char split_char, std::vector<ConstStringRef> * pi
 	}
 }
 
-void SplitAt(ConstStringRef str, char split_char, ConstStringRef * left, ConstStringRef * right)
+void SplitAt(ConstStringRef str, char split_char, ConstStringRef* left, ConstStringRef* right)
 {
-	for (const char * p = str.Begin; p < str.End; ++p)
+	for (const char* p = str.Begin; p < str.End; ++p)
 	{
 		if (*p == split_char)
 		{
 			left->Begin = str.Begin;
 			left->End = p;
-			right->Begin = p+1;
+			right->Begin = p + 1;
 			right->End = str.End;
 			return;
 		}
@@ -60,7 +59,7 @@ void SplitAt(ConstStringRef str, char split_char, ConstStringRef * left, ConstSt
 u32 ParseU32(ConstStringRef str, u32 base)
 {
 	u32 val = 0;
-	for (const char * p = str.Begin; p < str.End; ++p)
+	for (const char* p = str.Begin; p < str.End; ++p)
 	{
 		char c = *p;
 
@@ -73,8 +72,7 @@ u32 ParseU32(ConstStringRef str, u32 base)
 		else if (c >= 'A' && c <= 'Z')
 			digit = 10 + (c - 'A');
 
-		if (digit >= base)
-			break;
+		if (digit >= base) break;
 
 		val *= base;
 		val += c - '0';

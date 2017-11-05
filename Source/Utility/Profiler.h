@@ -1,6 +1,5 @@
 // Profiler.h: interface for the CProfiler class.
-//
-//////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #ifndef UTILITY_PROFILER_H_
@@ -12,75 +11,56 @@
 
 struct SProfileItemHandle;
 
-class CProfiler : public CSingleton< CProfiler >
+class CProfiler : public CSingleton<CProfiler>
 {
-	protected:
-		friend class CSingleton< CProfiler >;
-		CProfiler();
-	public:
-		virtual ~CProfiler();
+   protected:
+	friend class CSingleton<CProfiler>;
+	CProfiler();
 
-		void					Display();
-		void					Update();
+   public:
+	virtual ~CProfiler();
 
-		SProfileItemHandle		AddItem( const char * p_str );
+	void Display();
+	void Update();
 
-		void					Enter( SProfileItemHandle handle );
-		void					Exit( SProfileItemHandle handle );
+	SProfileItemHandle AddItem(const char* p_str);
 
-	protected:
-		class CProfilerImpl * mpImpl;
+	void Enter(SProfileItemHandle handle);
+	void Exit(SProfileItemHandle handle);
+
+   protected:
+	class CProfilerImpl* mpImpl;
 };
 
-//*************************************************************************************
-//
-//*************************************************************************************
 struct SProfileItemHandle
 {
-	explicit SProfileItemHandle( u32 handle )
-		:	Handle( handle )
-	{
-	}
+	explicit SProfileItemHandle(u32 handle) : Handle(handle) {}
 
-	u32		Handle;
+	u32 Handle;
 };
 
-//*************************************************************************************
-//
-//*************************************************************************************
 class CAutoProfile
 {
-public:
-	CAutoProfile( SProfileItemHandle handle )
-		:	mHandle( handle )
-	{
-		CProfiler::Get()->Enter( mHandle );
-	}
+   public:
+	CAutoProfile(SProfileItemHandle handle) : mHandle(handle) { CProfiler::Get()->Enter(mHandle); }
 
-	~CAutoProfile()
-	{
-		CProfiler::Get()->Exit( mHandle );
-	}
+	~CAutoProfile() { CProfiler::Get()->Exit(mHandle); }
 
-private:
-	SProfileItemHandle		mHandle;
+   private:
+	SProfileItemHandle mHandle;
 };
 #endif
-
-//*************************************************************************************
-//
-//*************************************************************************************
 
 #ifdef DAEDALUS_ENABLE_PROFILING
 
-#define DAEDALUS_PROFILE( x )											\
-	static	SProfileItemHandle		_profile_item( CProfiler::Get()->AddItem( x ) );	\
-	CAutoProfile					_auto_profile( _profile_item );
+#define DAEDALUS_PROFILE(x)                                                \
+	static SProfileItemHandle _profile_item(CProfiler::Get()->AddItem(x)); \
+	CAutoProfile _auto_profile(_profile_item);
 
 #else
 
-#define DAEDALUS_PROFILE( x )
+#define DAEDALUS_PROFILE(x)
 
 #endif
 
-#endif // UTILITY_PROFILER_H_
+#endif  // UTILITY_PROFILER_H_

@@ -59,31 +59,31 @@ enum EFrameskipValue
 
 struct SRomPreferences
 {
-	bool						PatchesEnabled;
-	bool						DynarecEnabled;				// Requires DynarceSupported in RomSettings
-	bool						DynarecLoopOptimisation;
-	bool						DynarecDoublesOptimisation;
-	bool						DoubleDisplayEnabled;
-	bool						CleanSceneEnabled;
-	bool						ClearDepthFrameBuffer;
-	bool						AudioRateMatch;
-	bool						VideoRateMatch;
-	bool						FogEnabled;
-	bool                        MemoryAccessOptimisation;
-	bool						CheatsEnabled;
-//	bool						AudioAdaptFrequency;
-	ETextureHashFrequency		CheckTextureHashFrequency;
-	EFrameskipValue				Frameskip;
-	EAudioPluginMode			AudioEnabled;
-	f32							ZoomX;
-	u32							SpeedSyncEnabled;
-	u32							ControllerIndex;
-//	u32							PAD1;	//Some Bug in GCC that require to pad the struct some times...(?)
+	bool PatchesEnabled;
+	bool DynarecEnabled;  // Requires DynarceSupported in RomSettings
+	bool DynarecLoopOptimisation;
+	bool DynarecDoublesOptimisation;
+	bool DoubleDisplayEnabled;
+	bool CleanSceneEnabled;
+	bool ClearDepthFrameBuffer;
+	bool AudioRateMatch;
+	bool VideoRateMatch;
+	bool FogEnabled;
+	bool MemoryAccessOptimisation;
+	bool CheatsEnabled;
+	//	bool						AudioAdaptFrequency;
+	ETextureHashFrequency CheckTextureHashFrequency;
+	EFrameskipValue Frameskip;
+	EAudioPluginMode AudioEnabled;
+	f32 ZoomX;
+	u32 SpeedSyncEnabled;
+	u32 ControllerIndex;
+	//	u32							PAD1;	//Some Bug in GCC that require to pad the struct some times...(?)
 
 	SRomPreferences();
 
-	void		Reset();
-	void		Apply() const;
+	void Reset();
+	void Apply() const;
 };
 
-#endif // UTILITY_ROM_PREFERENCES_H_
+#endif  // UTILITY_ROM_PREFERENCES_H_

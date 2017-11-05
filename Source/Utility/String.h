@@ -26,457 +26,405 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CConstString
 {
-	public:
-		CConstString()
-		:	mpString( "" )
+   public:
+	CConstString() : mpString("") {}
+
+	CConstString(const char* string) : mpString(string) {}
+
+	inline operator const char*() const { return mpString; }
+	inline const char* c_str() const { return mpString; }
+
+	CConstString& operator=(const char* string)
+	{
+		mpString = string;
+		return *this;
+	}
+
+	bool operator==(const char* string) { return Equals(string); }
+
+	//
+	// Case sensitive compare
+	//
+	bool Equals(const char* string) const
+	{
+		if (mpString == string)
 		{
+			return true;
 		}
-
-		CConstString( const char * string )
-		:	mpString( string )
+		else if (string == NULL)
 		{
+			return strlen(mpString) == 0;
 		}
-
-		inline operator const char * () const	{ return mpString; }
-		inline const char * c_str() const		{ return mpString; }
-
-		CConstString & operator=( const char * string )
+		else if (mpString == NULL)
 		{
-			mpString = string;
-			return *this;
+			return strlen(string) == 0;
 		}
-
-		bool operator==( const char * string )
+		else
 		{
-			return Equals( string );
+			return strcmp(mpString, string) == 0;
 		}
+	}
 
-		//
-		// Case sensitive compare
-		//
-		bool Equals( const char * string ) const
+	//
+	// Case insensitive compare
+	//
+	bool IEquals(const char* string) const
+	{
+		if (mpString == string)
 		{
-			if ( mpString == string )
-			{
-				return true;
-			}
-			else if ( string == NULL )
-			{
-				return strlen( mpString ) == 0;
-			}
-			else if ( mpString == NULL )
-			{
-				return strlen( string ) == 0;
-			}
-			else
-			{
-				return strcmp( mpString, string ) == 0;
-			}
+			return true;
 		}
-
-		//
-		// Case insensitive compare
-		//
-		bool IEquals( const char * string ) const
+		else if (string == NULL)
 		{
-			if ( mpString == string )
-			{
-				return true;
-			}
-			else if ( string == NULL )
-			{
-				return strlen( mpString ) == 0;
-			}
-			else if ( mpString == NULL )
-			{
-				return strlen( string ) == 0;
-			}
-			else
-			{
-				return _strcmpi( mpString, string ) == 0;
-			}
+			return strlen(mpString) == 0;
 		}
-
-		u32 Length() const
+		else if (mpString == NULL)
 		{
-			if ( mpString == NULL )
-			{
-				return 0;
-			}
-			else
-			{
-				return strlen( mpString );
-			}
+			return strlen(string) == 0;
 		}
-
-		bool IsNull() const
+		else
 		{
-			return mpString == NULL;
+			return _strcmpi(mpString, string) == 0;
 		}
+	}
 
-		bool IsEmpty() const
+	u32 Length() const
+	{
+		if (mpString == NULL)
 		{
-			return Length() == 0;
+			return 0;
 		}
+		else
+		{
+			return strlen(mpString);
+		}
+	}
 
+	bool IsNull() const { return mpString == NULL; }
 
-	private:
-		const char *		mpString;
+	bool IsEmpty() const { return Length() == 0; }
+
+   private:
+	const char* mpString;
 };
 
 // Was CStaticString, conflicts with ATL :(
-template< u32 MAX_LENGTH > class CFixedString
+template <u32 MAX_LENGTH>
+class CFixedString
 {
-	public:
-		CFixedString()
+   public:
+	CFixedString() { strcpy(mpString, ""); }
+
+	CFixedString(CConstString string) { Copy(string); }
+
+	CFixedString& operator=(CConstString string)
+	{
+		Copy(string);
+		return *this;
+	}
+
+	inline operator const char*() const { return mpString; }
+	inline const char* c_str() const { return mpString; }
+
+	bool operator==(CConstString string) { return Equals(string); }
+
+	CFixedString& operator+=(CConstString string)
+	{
+		Append(string);
+		return *this;
+	}
+
+	//
+	// Case sensitive compare
+	//
+	bool Equals(CConstString string) const
+	{
+		if (string == NULL)
 		{
-			strcpy( mpString, "" );
+			return strlen(mpString) == 0;
 		}
-
-		CFixedString( CConstString string )
+		else
 		{
-			Copy( string );
+			return strcmp(mpString, string) == 0;
 		}
+	}
 
-		CFixedString & operator=( CConstString string )
+	//
+	// Case insensitive compare
+	//
+	bool IEquals(const char* string) const
+	{
+		if (string == NULL)
 		{
-			Copy( string );
-			return *this;
+			return strlen(mpString) == 0;
 		}
-
-		inline operator const char * () const	{ return mpString; }
-		inline const char * c_str() const		{ return mpString; }
-
-		bool operator==( CConstString string )
+		else
 		{
-			return Equals( string );
+			return _strcmpi(mpString, string) == 0;
 		}
+	}
 
-		CFixedString & operator+=( CConstString string )
-		{
-			Append( string );
-			return *this;
-		}
+	inline u32 Length() const { return strlen(mpString); }
+	inline u32 MaxLength() const { return MAX_LENGTH; }
 
-		//
-		// Case sensitive compare
-		//
-		bool Equals( CConstString string ) const
-		{
-			if ( string == NULL )
-			{
-				return strlen( mpString ) == 0;
-			}
-			else
-			{
-				return strcmp( mpString, string ) == 0;
-			}
-		}
+	inline bool empty() const { return Length() == 0; }
 
-		//
-		// Case insensitive compare
-		//
-		bool IEquals( const char * string ) const
-		{
-			if ( string == NULL )
-			{
-				return strlen( mpString ) == 0;
-			}
-			else
-			{
-				return _strcmpi( mpString, string ) == 0;
-			}
-		}
+	//
+	// Access for functions which need to write to our buffer. Should try to avoid these!
+	//
+	inline char* GetUnsafePtr() { return mpString; }
 
+   private:
+	void Copy(CConstString string)
+	{
+		DAEDALUS_ASSERT(string.Length() <= MAX_LENGTH, "String '%s' is too long for copy, truncation will occur",
+						string.c_str());
+		strncpy(mpString, string, MAX_LENGTH);
+		mpString[MAX_LENGTH] = '\0';
+	}
 
-		inline u32 Length() const		{ return strlen( mpString ); }
-		inline u32 MaxLength() const	{ return MAX_LENGTH; }
+	void Append(CConstString string)
+	{
+		DAEDALUS_ASSERT(Length() + string.Length() < MAX_LENGTH,
+						"String '%s' is too long append, truncation will occur", string.c_str());
+		strncat(mpString, string, MAX_LENGTH);
+		mpString[MAX_LENGTH] = '\0';
+	}
 
-		inline bool empty() const		{ return Length() == 0; }
-
-		//
-		// Access for functions which need to write to our buffer. Should try to avoid these!
-		//
-		inline char * GetUnsafePtr()	{ return mpString; }
-
-
-	private:
-
-		void Copy( CConstString string )
-		{
-			DAEDALUS_ASSERT( string.Length() <= MAX_LENGTH, "String '%s' is too long for copy, truncation will occur", string.c_str() );
-			strncpy( mpString, string, MAX_LENGTH );
-			mpString[ MAX_LENGTH ] = '\0';
-		}
-
-		void Append( CConstString string )
-		{
-			DAEDALUS_ASSERT( Length() + string.Length() < MAX_LENGTH, "String '%s' is too long append, truncation will occur", string.c_str() );
-			strncat( mpString, string, MAX_LENGTH );
-			mpString[ MAX_LENGTH ] = '\0';
-		}
-
-	private:
-		char			mpString[ MAX_LENGTH + 1 ];
+   private:
+	char mpString[MAX_LENGTH + 1];
 };
 
 class CString
 {
-	public:
-		CString()
-		:	mpString( NULL )
-		,	mMaxLength( 0 )
+   public:
+	CString() : mpString(NULL), mMaxLength(0) {}
+
+	CString(CConstString string)
+	{
+		mMaxLength = string.Length();
+		mpString = new char[mMaxLength + 1];
+		strcpy(mpString, string);
+	}
+
+	CString(const CString& string)
+	{
+		mMaxLength = string.MaxLength();
+		mpString = new char[mMaxLength + 1];
+		strcpy(mpString, string);
+	}
+
+	CString& operator=(CConstString string)
+	{
+		Copy(string);
+		return *this;
+	}
+
+	CString& operator+=(CConstString string)
+	{
+		Append(string);
+		return *this;
+	}
+
+	CString& operator=(const CString& string)
+	{
+		// Check for a = a
+		if (this != &string)
 		{
+			Copy(string);
+		}
+		return *this;
+	}
+
+	CString& operator+=(const CString& string)
+	{
+		// Check for a += a
+		DAEDALUS_ASSERT(this != &string, "Appending self - unhandled");
+
+		Append(string);
+		return *this;
+	}
+
+	CString operator+(CConstString string) const
+	{
+		CString ret(*this);
+		ret.Append(string);
+		return ret;
+	}
+
+	CString operator+(const CString& string) const
+	{
+		CString ret(*this);
+		ret.Append(string);
+		return ret;
+	}
+
+	inline operator const char*() const { return mpString; }
+	inline const char* c_str() const { return mpString; }
+
+	bool operator==(CConstString string) { return Equals(string); }
+
+	//
+	// Case sensitive compare
+	//
+	bool Equals(CConstString string) const
+	{
+		if (mpString == string)
+		{
+			return true;
+		}
+		else if (string == NULL)
+		{
+			return strlen(mpString) == 0;
+		}
+		else if (mpString == NULL)
+		{
+			return strlen(string) == 0;
+		}
+		else
+		{
+			return strcmp(mpString, string) == 0;
+		}
+	}
+
+	//
+	// Case insensitive compare
+	//
+	bool IEquals(CConstString string) const
+	{
+		if (mpString == string)
+		{
+			return true;
+		}
+		else if (string == NULL)
+		{
+			return strlen(mpString) == 0;
+		}
+		else if (mpString == NULL)
+		{
+			return strlen(string) == 0;
+		}
+		else
+		{
+			return _strcmpi(mpString, string) == 0;
+		}
+	}
+
+	u32 Length() const
+	{
+		if (mpString == NULL)
+		{
+			return 0;
+		}
+		else
+		{
+			return strlen(mpString);
+		}
+	}
+
+	bool IsNull() const { return mpString == NULL; }
+
+	bool IsEmpty() const { return Length() == 0; }
+
+	u32 MaxLength() const { return mMaxLength; }
+
+	//
+	// Access for functions which need to write to our buffer. Should try to avoid these!
+	//
+	char* GetUnsafePtr() { return mpString; }
+
+   private:
+	void Size(u32 length)
+	{
+		delete[] mpString;
+		mMaxLength = length;
+		mpString = new char[length + 1];
+	}
+
+	void Resize(u32 length)
+	{
+		DAEDALUS_ASSERT(length > Length(), "Resize should always increase buffer length");
+
+		char* p_new = new char[length + 1];
+
+		if (mpString == NULL)
+		{
+			strcpy(p_new, "");
+		}
+		else
+		{
+			strcpy(p_new, mpString);
+			delete[] mpString;
 		}
 
-		CString( CConstString string )
+		mMaxLength = length;
+		mpString = p_new;
+	}
+
+	void Copy(const char* string)
+	{
+		if (string == NULL)
 		{
-			mMaxLength = string.Length();
-			mpString = new char[ mMaxLength + 1 ];
-			strcpy( mpString, string );
-		}
-
-		CString( const CString & string )
-		{
-			mMaxLength = string.MaxLength();
-			mpString = new char[ mMaxLength + 1 ];
-			strcpy( mpString, string );
-		}
-
-
-		CString & operator=( CConstString string )
-		{
-			Copy( string );
-			return *this;
-		}
-
-		CString & operator+=( CConstString string )
-		{
-			Append( string );
-			return *this;
-		}
-
-
-		CString & operator=( const CString & string )
-		{
-			// Check for a = a
-			if ( this != &string )
+			if (mMaxLength == 0)
 			{
-				Copy( string );
-			}
-			return *this;
-		}
-
-		CString & operator+=( const CString & string )
-		{
-			// Check for a += a
-			DAEDALUS_ASSERT( this != &string, "Appending self - unhandled" );
-
-			Append( string );
-			return *this;
-		}
-
-		CString operator+( CConstString string ) const
-		{
-			CString	ret( *this );
-			ret.Append( string );
-			return ret;
-		}
-
-
-		CString operator+( const CString & string ) const
-		{
-			CString	ret( *this );
-			ret.Append( string );
-			return ret;
-		}
-
-		inline operator const char * () const	{ return mpString; }
-		inline const char * c_str() const		{ return mpString; }
-
-		bool operator==( CConstString string )
-		{
-			return Equals( string );
-		}
-
-		//
-		// Case sensitive compare
-		//
-		bool Equals( CConstString string ) const
-		{
-			if ( mpString == string )
-			{
-				return true;
-			}
-			else if ( string == NULL )
-			{
-				return strlen( mpString ) == 0;
-			}
-			else if ( mpString == NULL )
-			{
-				return strlen( string ) == 0;
-			}
-			else
-			{
-				return strcmp( mpString, string ) == 0;
-			}
-		}
-
-		//
-		// Case insensitive compare
-		//
-		bool IEquals( CConstString string ) const
-		{
-			if ( mpString == string )
-			{
-				return true;
-			}
-			else if ( string == NULL )
-			{
-				return strlen( mpString ) == 0;
-			}
-			else if ( mpString == NULL )
-			{
-				return strlen( string ) == 0;
-			}
-			else
-			{
-				return _strcmpi( mpString, string ) == 0;
-			}
-		}
-
-		u32 Length() const
-		{
-			if ( mpString == NULL )
-			{
-				return 0;
-			}
-			else
-			{
-				return strlen( mpString );
-			}
-		}
-
-		bool IsNull() const
-		{
-			return mpString == NULL;
-		}
-
-		bool IsEmpty() const
-		{
-			return Length() == 0;
-		}
-
-		u32 MaxLength() const
-		{
-			return mMaxLength;
-		}
-
-		//
-		// Access for functions which need to write to our buffer. Should try to avoid these!
-		//
-		char * GetUnsafePtr()
-		{
-			return mpString;
-		}
-
-	private:
-
-		void Size( u32 length )
-		{
-			delete [] mpString;
-			mMaxLength = length;
-			mpString = new char[ length + 1 ];
-		}
-
-		void Resize( u32 length )
-		{
-			DAEDALUS_ASSERT( length > Length(), "Resize should always increase buffer length" );
-
-			char * p_new = new char[ length + 1 ];
-
-			if ( mpString == NULL )
-			{
-				strcpy( p_new, "" );
-			}
-			else
-			{
-				strcpy( p_new, mpString );
-				delete [] mpString;
+				Size(0);
 			}
 
-			mMaxLength = length;
-			mpString = p_new;
+			strcpy(mpString, "");
 		}
-
-		void Copy( const char * string )
+		else
 		{
-			if ( string == NULL )
+			u32 length(strlen(string));
+
+			if (length > mMaxLength)
 			{
-				if ( mMaxLength == 0 )
-				{
-					Size( 0 );
-				}
-
-				strcpy( mpString, "" );
+				Size(length);
 			}
-			else
-			{
-				u32 length( strlen( string ) );
 
-				if ( length > mMaxLength )
-				{
-					Size( length );
-				}
-
-				strcpy( mpString, string );
-			}
+			strcpy(mpString, string);
 		}
+	}
 
-		void Append( const char * string )
+	void Append(const char* string)
+	{
+		if (string == NULL)
 		{
-			if ( string == NULL )
-			{
-				// Nothing to do
-			}
-			else
-			{
-				u32 length( Length() + strlen( string ) );
-
-				if ( length > mMaxLength || mMaxLength == 0 )
-				{
-					Resize( length );
-				}
-
-				strcat( mpString, string );
-			}
-
+			// Nothing to do
 		}
+		else
+		{
+			u32 length(Length() + strlen(string));
 
+			if (length > mMaxLength || mMaxLength == 0)
+			{
+				Resize(length);
+			}
 
-	private:
-		char *			mpString;
-		u32				mMaxLength;
+			strcat(mpString, string);
+		}
+	}
+
+   private:
+	char* mpString;
+	u32 mMaxLength;
 };
-
 
 struct ConstStringRef
 {
 	ConstStringRef() : Begin(NULL), End(NULL) {}
-	/*explicit */ConstStringRef(const char * str) : Begin(str), End(str+strlen(str)) {}
-	explicit ConstStringRef(const char * b, const char * e) : Begin(b), End(e) {}
+	/*explicit */ ConstStringRef(const char* str) : Begin(str), End(str + strlen(str)) {}
+	explicit ConstStringRef(const char* b, const char* e) : Begin(b), End(e) {}
 
 	size_t size() const { return End - Begin; }
 
-	bool operator==(const char * rhs) const	{ return operator==(ConstStringRef(rhs)); }
-	bool operator==(const ConstStringRef & rhs) const
+	bool operator==(const char* rhs) const { return operator==(ConstStringRef(rhs)); }
+	bool operator==(const ConstStringRef& rhs) const
 	{
 		return size() == rhs.size() && memcmp(Begin, rhs.Begin, size()) == 0;
 	}
 
-	const char *	Begin;
-	const char *	End;
+	const char* Begin;
+	const char* End;
 };
 
-
-#endif // UTILITY_STRING_H_
+#endif  // UTILITY_STRING_H_

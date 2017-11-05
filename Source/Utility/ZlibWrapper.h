@@ -25,41 +25,41 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 class COutStream
 {
-	public:
-		COutStream( const char * filename );
-		~COutStream();
+   public:
+	COutStream(const char* filename);
+	~COutStream();
 
-		bool					IsOpen() const;
-		bool					Flush();
-		bool					WriteData( const void * data, u32 length );
-		void					Reset();
+	bool IsOpen() const;
+	bool Flush();
+	bool WriteData(const void* data, u32 length);
+	void Reset();
 
-	private:
-		static const u32		BUFFER_SIZE = 4096;
-		u8						mBuffer[ BUFFER_SIZE ];
-		u32						mBufferCount;
-		void * const			mFile;
+   private:
+	static const u32 BUFFER_SIZE = 4096;
+	u8 mBuffer[BUFFER_SIZE];
+	u32 mBufferCount;
+	void* const mFile;
 };
 
 class CInStream
 {
-	public:
-		CInStream( const char * filename );
-		~CInStream();
+   public:
+	CInStream(const char* filename);
+	~CInStream();
 
-		bool					IsOpen() const;
-		bool					ReadData( void * data, u32 length );
-		void					Reset();
+	bool IsOpen() const;
+	bool ReadData(void* data, u32 length);
+	void Reset();
 
-	private:
-		bool					Fill();
+   private:
+	bool Fill();
 
-	private:
-		static const u32		BUFFER_SIZE = 4096;
-		u8						mBuffer[ BUFFER_SIZE ];
-		u32						mBufferOffset;
-		s32						mBytesAvailable;
-		void * const			mFile;
+   private:
+	static const u32 BUFFER_SIZE = 4096;
+	u8 mBuffer[BUFFER_SIZE];
+	u32 mBufferOffset;
+	s32 mBytesAvailable;
+	void* const mFile;
 };
 
-#endif // UTILITY_ZLIBWRAPPER_H_
+#endif  // UTILITY_ZLIBWRAPPER_H_

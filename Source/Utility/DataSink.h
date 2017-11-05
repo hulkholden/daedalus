@@ -5,25 +5,25 @@
 
 class DataSink
 {
-public:
+   public:
 	virtual ~DataSink();
-	virtual size_t Write(const void * p, size_t len) = 0;
+	virtual size_t Write(const void* p, size_t len) = 0;
 	virtual void Flush() = 0;
 };
 
 class FileSink : public DataSink
 {
-public:
+   public:
 	FileSink();
 	~FileSink();
 
-	bool Open(const char * filename, const char * mode);
+	bool Open(const char* filename, const char* mode);
 
-	virtual size_t Write(const void * p, size_t len);
+	virtual size_t Write(const void* p, size_t len);
 	virtual void Flush();
 
-private:
-	FILE * 		Handle;
+   private:
+	FILE* Handle;
 };
 
-#endif // UTILITY_DATASINK_H_
+#endif  // UTILITY_DATASINK_H_

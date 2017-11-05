@@ -41,47 +41,44 @@
 //
 //
 
-template < class T > class CSingleton
+template <class T>
+class CSingleton
 {
-	public:
-		//CSingleton();
-		virtual ~CSingleton() {}
+   public:
+	// CSingleton();
+	virtual ~CSingleton() {}
 
-		inline static T * Get()
-		{
-			DAEDALUS_ASSERT(mpInstance != NULL, "%s", __PRETTY_FUNCTION__ );
+	inline static T* Get()
+	{
+		DAEDALUS_ASSERT(mpInstance != NULL, "%s", __PRETTY_FUNCTION__);
 
-			return mpInstance;
-		}
+		return mpInstance;
+	}
 
+	static bool Create();
 
-		static bool Create();
+	static void Destroy()
+	{
+		DAEDALUS_ASSERT_Q(mpInstance != NULL);
 
+		delete mpInstance;
+		mpInstance = NULL;
+	}
 
-		static void Destroy()
-		{
-			DAEDALUS_ASSERT_Q(mpInstance != NULL);
+	inline static bool IsAvailable() { return (mpInstance != NULL); }
 
-			delete mpInstance;
-			mpInstance = NULL;
-		}
+	static void Attach(T* p)
+	{
+		DAEDALUS_ASSERT_Q(mpInstance == NULL);
 
-		inline static bool IsAvailable()
-		{
-			return (mpInstance != NULL);
-		}
+		mpInstance = p;
+	}
 
-		static void Attach( T * p )
-		{
-			DAEDALUS_ASSERT_Q(mpInstance == NULL);
-
-			mpInstance = p;
-		}
-
-	protected:
-		static T * mpInstance;
+   protected:
+	static T* mpInstance;
 };
 
-template < class T > T * CSingleton< T >::mpInstance = NULL;
+template <class T>
+T* CSingleton<T>::mpInstance = NULL;
 
-#endif // UTILITY_SINGLETON_H_
+#endif  // UTILITY_SINGLETON_H_

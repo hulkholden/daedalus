@@ -26,20 +26,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CMemoryHeap
 {
-public:
-	static CMemoryHeap * Create( u32 size );						// Allocate and manage a new region of this size
-	static CMemoryHeap * Create( void * base_ptr, u32 size );		// Manage this region of pre-allocated memory
+   public:
+	static CMemoryHeap* Create(u32 size);				   // Allocate and manage a new region of this size
+	static CMemoryHeap* Create(void* base_ptr, u32 size);  // Manage this region of pre-allocated memory
 
 	virtual ~CMemoryHeap();
 
-	virtual void *		Alloc( u32 size ) = 0;
-	virtual void		Free( void * ptr ) = 0;
+	virtual void* Alloc(u32 size) = 0;
+	virtual void Free(void* ptr) = 0;
 
-	virtual bool		IsFromHeap( void * ptr ) const = 0;			// Does this chunk of memory belong to this heap?
+	virtual bool IsFromHeap(void* ptr) const = 0;  // Does this chunk of memory belong to this heap?
 #ifdef DAEDALUS_DEBUG_MEMORY
-	//virtual u32		GetAvailableMemory() const = 0;
-	virtual void		DisplayDebugInfo() const = 0;
+	// virtual u32		GetAvailableMemory() const = 0;
+	virtual void DisplayDebugInfo() const = 0;
 #endif
 };
 
-#endif // UTILITY_MEMORYHEAP_H_
+#endif  // UTILITY_MEMORYHEAP_H_

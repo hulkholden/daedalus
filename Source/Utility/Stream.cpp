@@ -24,91 +24,49 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string>
 
-//*****************************************************************************
-//
-//*****************************************************************************
 class COutputStringStreamImpl
 {
-public:
-	std::string			mString;
+   public:
+	std::string mString;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
-COutputStringStream::COutputStringStream()
-:	mpImpl( new COutputStringStreamImpl )
-{
-}
+COutputStringStream::COutputStringStream() : mpImpl(new COutputStringStreamImpl) {}
 
-//*****************************************************************************
-//
-//*****************************************************************************
-COutputStringStream::~COutputStringStream()
-{
-	delete mpImpl;
-}
+COutputStringStream::~COutputStringStream() { delete mpImpl; }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void	COutputStringStream::Clear()
-{
-	mpImpl->mString.clear();
-}
+void COutputStringStream::Clear() { mpImpl->mString.clear(); }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-COutputStream & COutputStringStream::operator<<( const char * p_str )
+COutputStream& COutputStringStream::operator<<(const char* p_str)
 {
 	mpImpl->mString += p_str;
 	return *this;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-COutputStream & COutputStringStream::operator<<( char val )
+COutputStream& COutputStringStream::operator<<(char val)
 {
 	mpImpl->mString += val;
 	return *this;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-COutputStream & COutputStringStream::operator<<( s32 val )
+COutputStream& COutputStringStream::operator<<(s32 val)
 {
-	char	buffer[ 32+1 ];
-	sprintf( buffer, "%d", val );
+	char buffer[32 + 1];
+	sprintf(buffer, "%d", val);
 	mpImpl->mString += buffer;
 	return *this;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-COutputStream & COutputStringStream::operator<<( u32 val )
+COutputStream& COutputStringStream::operator<<(u32 val)
 {
-	char	buffer[ 32+1 ];
-	sprintf( buffer, "%d", val );
+	char buffer[32 + 1];
+	sprintf(buffer, "%d", val);
 	mpImpl->mString += buffer;
 	return *this;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-const char *	COutputStringStream::c_str() const
-{
-	return mpImpl->mString.c_str();
-}
+const char* COutputStringStream::c_str() const { return mpImpl->mString.c_str(); }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-COutputStream & operator<<( COutputStream & str, COutputStringStream & rhs )
+COutputStream& operator<<(COutputStream& str, COutputStringStream& rhs)
 {
 	str << rhs.c_str();
 	return str;

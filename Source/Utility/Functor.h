@@ -24,17 +24,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CFunctor
 {
-public:
+   public:
 	virtual ~CFunctor() {}
 	virtual void operator()() = 0;
 };
 
-template< typename T >
+template <typename T>
 class CFunctor1
 {
-public:
+   public:
 	virtual ~CFunctor1() {}
-	virtual void operator()( T v ) = 0;
+	virtual void operator()(T v) = 0;
 };
 
 //
@@ -42,56 +42,56 @@ public:
 //
 class CStaticFunctor : public CFunctor
 {
-public:
-	CStaticFunctor( void (*function)() ) : mpFunction( function )					{}
-	virtual void operator()()			{ (*mpFunction)(); }
+   public:
+	CStaticFunctor(void (*function)()) : mpFunction(function) {}
+	virtual void operator()() { (*mpFunction)(); }
 
-private:
+   private:
 	void (*mpFunction)();
 };
 
 //
 //	Invoke member functions with varying number of arguments
 //
-template< class B >
+template <class B>
 class CMemberFunctor : public CFunctor
 {
-public:
-	CMemberFunctor( B * object, void (B::*function)() ) : mpObject( object ), mpFunction( function )	{}
-	virtual void operator()()			{ (*mpObject.*mpFunction)(); }
+   public:
+	CMemberFunctor(B* object, void (B::*function)()) : mpObject(object), mpFunction(function) {}
+	virtual void operator()() { (*mpObject.*mpFunction)(); }
 
-private:
-	B *		mpObject;
+   private:
+	B* mpObject;
 	void (B::*mpFunction)();
 };
 
-template< class B, typename T >
-class CMemberFunctor1 : public CFunctor1< T >
+template <class B, typename T>
+class CMemberFunctor1 : public CFunctor1<T>
 {
-public:
-	CMemberFunctor1( B * object, void (B::*function)( T ) ) : mpObject( object ), mpFunction( function )	{}
-	virtual void operator()( T v )		{ (*mpObject.*mpFunction)( v ); }
+   public:
+	CMemberFunctor1(B* object, void (B::*function)(T)) : mpObject(object), mpFunction(function) {}
+	virtual void operator()(T v) { (*mpObject.*mpFunction)(v); }
 
-private:
-	B *		mpObject;
-	void (B::*mpFunction)( T );
+   private:
+	B* mpObject;
+	void (B::*mpFunction)(T);
 };
 
 //
 // Invoke a Functor1 with a fixed argument
 //
-template< typename T >
+template <typename T>
 class CCurriedFunctor : public CFunctor
 {
-public:
-	CCurriedFunctor( CFunctor1< T > * functor, T value ) : mpFunctor( functor ), Value( value ) {}
-	~CCurriedFunctor()					{ delete mpFunctor; }
+   public:
+	CCurriedFunctor(CFunctor1<T>* functor, T value) : mpFunctor(functor), Value(value) {}
+	~CCurriedFunctor() { delete mpFunctor; }
 
-	virtual void operator()()			{ (*mpFunctor)( Value ); }
+	virtual void operator()() { (*mpFunctor)(Value); }
 
-private:
-	CFunctor1< T > *		mpFunctor;
-	T						Value;
+   private:
+	CFunctor1<T>* mpFunctor;
+	T Value;
 };
 
-#endif // UTILITY_FUNCTOR_H_
+#endif  // UTILITY_FUNCTOR_H_

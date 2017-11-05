@@ -24,51 +24,49 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class COutputStream
 {
-public:
+   public:
 	virtual ~COutputStream() {}
 
-	virtual	COutputStream & operator<<( const char * p_str ) = 0;
-	virtual	COutputStream & operator<<( char val ) = 0;
-	virtual	COutputStream & operator<<( s32 val ) = 0;
-	virtual	COutputStream & operator<<( u32 val ) = 0;
+	virtual COutputStream& operator<<(const char* p_str) = 0;
+	virtual COutputStream& operator<<(char val) = 0;
+	virtual COutputStream& operator<<(s32 val) = 0;
+	virtual COutputStream& operator<<(u32 val) = 0;
 };
 
 class CNullOutputStream : public COutputStream
 {
-public:
+   public:
 	virtual ~CNullOutputStream() {}
 
-	virtual	COutputStream & operator<<( const char * p_str ) { return *this; }
-	virtual	COutputStream & operator<<( char val ) { return *this; }
-	virtual	COutputStream & operator<<( s32 val ) { return *this; }
-	virtual	COutputStream & operator<<( u32 val ) { return *this; }
+	virtual COutputStream& operator<<(const char* p_str) { return *this; }
+	virtual COutputStream& operator<<(char val) { return *this; }
+	virtual COutputStream& operator<<(s32 val) { return *this; }
+	virtual COutputStream& operator<<(u32 val) { return *this; }
 
-	const char *		c_str() const { return ""; }
+	const char* c_str() const { return ""; }
 };
 
 class COutputStringStream : public COutputStream
 {
-public:
+   public:
 	COutputStringStream();
 	~COutputStringStream();
 
-	void				Clear();
+	void Clear();
 
-	COutputStream & operator<<( const char * p_str );
-	COutputStream & operator<<( char val );
-	COutputStream & operator<<( s32 val );
-	COutputStream & operator<<( u32 val );
+	COutputStream& operator<<(const char* p_str);
+	COutputStream& operator<<(char val);
+	COutputStream& operator<<(s32 val);
+	COutputStream& operator<<(u32 val);
 
-	const char *		c_str() const;
-private:
-	class COutputStringStreamImpl *		mpImpl;
+	const char* c_str() const;
+
+   private:
+	class COutputStringStreamImpl* mpImpl;
 };
 
-inline COutputStream & operator<<( COutputStream & str, CNullOutputStream & rhs )
-{
-	return str;
-}
+inline COutputStream& operator<<(COutputStream& str, CNullOutputStream& rhs) { return str; }
 
-COutputStream & operator<<( COutputStream & str, COutputStringStream & rhs );
+COutputStream& operator<<(COutputStream& str, COutputStringStream& rhs);
 
-#endif // UTILITY_STREAM_H_
+#endif  // UTILITY_STREAM_H_

@@ -15,15 +15,12 @@ TEST(memcpy_byteswap, WorksWithZeroLength)
 
 class MemcpyByteSwapTest : public ::testing::TestWithParam< ::std::tr1::tuple<u32, u32, u32> >
 {
-protected:
+   protected:
 	virtual void SetUp()
 	{
-		for (u32 i = 0; i < 64; ++i)
-			mSrc[i] = i;
-	memset(mDst, 0, sizeof(mDst));
-	memset(mExpected, 0, sizeof(mExpected));
-
-
+		for (u32 i = 0; i < 64; ++i) mSrc[i] = i;
+		memset(mDst, 0, sizeof(mDst));
+		memset(mExpected, 0, sizeof(mExpected));
 	}
 
 	ALIGNED_MEMBER(u8, mSrc[64], 64);
@@ -31,7 +28,7 @@ protected:
 	ALIGNED_MEMBER(u8, mExpected[64], 64);
 };
 
-static void memcpy_byteswap_reference( void * dst, u32 dst_off, const void * src, u32 src_off, size_t size )
+static void memcpy_byteswap_reference(void* dst, u32 dst_off, const void* src, u32 src_off, size_t size)
 {
 	const u8* src8 = (const u8*)src;
 	u8* dst8 = (u8*)dst;
@@ -50,10 +47,10 @@ TEST_P(MemcpyByteSwapTest, WorksWithSmallCopies)
 
 	memcpy_byteswap(&mDst[dst_off], &mSrc[src_off], len);
 	memcpy_byteswap_reference(mExpected, dst_off, mSrc, src_off, len);
-	for (u32 i = 0; i < 64; ++i)
-		EXPECT_EQ(mExpected[i], mDst[i]);
+	for (u32 i = 0; i < 64; ++i) EXPECT_EQ(mExpected[i], mDst[i]);
 }
 
-INSTANTIATE_TEST_CASE_P(X, MemcpyByteSwapTest, ::testing::Combine(::testing::Values(0,1,2,3),
-																  ::testing::Values(0,1,2,3), 
-																  ::testing::Values(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16)));
+INSTANTIATE_TEST_CASE_P(X, MemcpyByteSwapTest,
+						::testing::Combine(::testing::Values(0, 1, 2, 3), ::testing::Values(0, 1, 2, 3),
+										   ::testing::Values(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+															 16)));

@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //    machines.
 //-----------------------------------------------------------------------------
 
-unsigned int murmur2_hash ( const void * key, int len, unsigned int seed )
+unsigned int murmur2_hash(const void* key, int len, unsigned int seed)
 {
 	// 'm' and 'r' are mixing constants generated offline.
 	// They're not really 'magic', they just happen to work well.
@@ -47,11 +47,11 @@ unsigned int murmur2_hash ( const void * key, int len, unsigned int seed )
 
 	// Mix 4 bytes at a time into the hash
 
-	const unsigned char * data = (const unsigned char *)key;
+	const unsigned char* data = (const unsigned char*)key;
 
-	while(len >= 4)
+	while (len >= 4)
 	{
-		unsigned int k = *(unsigned int *)data;
+		unsigned int k = *(unsigned int*)data;
 
 		k *= m;
 		k ^= k >> r;
@@ -66,12 +66,15 @@ unsigned int murmur2_hash ( const void * key, int len, unsigned int seed )
 
 	// Handle the last few bytes of the input array
 
-	switch(len)
+	switch (len)
 	{
-	case 3: h ^= data[2] << 16;
-	case 2: h ^= data[1] << 8;
-	case 1: h ^= data[0];
-	        h *= m;
+		case 3:
+			h ^= data[2] << 16;
+		case 2:
+			h ^= data[1] << 8;
+		case 1:
+			h ^= data[0];
+			h *= m;
 	};
 
 	// Do a few final mixes of the hash to ensure the last few
@@ -89,20 +92,20 @@ unsigned int murmur2_hash ( const void * key, int len, unsigned int seed )
 // Same as MurmurHash2, but endian- and alignment-neutral.
 // Half the speed though, alas.
 
-unsigned int murmur2_neutral_hash ( const void * key, int len, unsigned int seed )
+unsigned int murmur2_neutral_hash(const void* key, int len, unsigned int seed)
 {
 	const unsigned int m = 0x5bd1e995;
 	const int r = 24;
 
 	unsigned int h = seed ^ len;
 
-	const unsigned char * data = (const unsigned char *)key;
+	const unsigned char* data = (const unsigned char*)key;
 
-	while(len >= 4)
+	while (len >= 4)
 	{
 		unsigned int k;
 
-		k  = data[0];
+		k = data[0];
 		k |= data[1] << 8;
 		k |= data[2] << 16;
 		k |= data[3] << 24;
@@ -118,12 +121,15 @@ unsigned int murmur2_neutral_hash ( const void * key, int len, unsigned int seed
 		len -= 4;
 	}
 
-	switch(len)
+	switch (len)
 	{
-	case 3: h ^= data[2] << 16;
-	case 2: h ^= data[1] << 8;
-	case 1: h ^= data[0];
-	        h *= m;
+		case 3:
+			h ^= data[2] << 16;
+		case 2:
+			h ^= data[1] << 8;
+		case 1:
+			h ^= data[0];
+			h *= m;
 	};
 
 	h ^= h >> 13;

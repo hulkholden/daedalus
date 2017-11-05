@@ -24,28 +24,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdlib.h>
 
-//*****************************************************************************
-//
-//*****************************************************************************
-CROMFileMemory::~CROMFileMemory()
-{
-}
+CROMFileMemory::~CROMFileMemory() {}
 
-//*****************************************************************************
-//
-//*****************************************************************************
 class IROMFileMemory : public CROMFileMemory
 {
-public:
-	virtual void *	Alloc( u32 size );
-	virtual void	Free(void * ptr);
+   public:
+	virtual void* Alloc(u32 size);
+	virtual void Free(void* ptr);
 };
 
-
-//*****************************************************************************
-//
-//*****************************************************************************
-template<> bool CSingleton< CROMFileMemory >::Create()
+template <>
+bool CSingleton<CROMFileMemory>::Create()
 {
 	DAEDALUS_ASSERT_Q(mpInstance == NULL);
 
@@ -53,18 +42,6 @@ template<> bool CSingleton< CROMFileMemory >::Create()
 	return mpInstance != NULL;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void * IROMFileMemory::Alloc( u32 size )
-{
-	return malloc( size );
-}
+void* IROMFileMemory::Alloc(u32 size) { return malloc(size); }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void  IROMFileMemory::Free(void * ptr)
-{
-	free( ptr );
-}
+void IROMFileMemory::Free(void* ptr) { free(ptr); }

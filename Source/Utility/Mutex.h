@@ -30,34 +30,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class Mutex
 {
-public:
+   public:
+	Mutex() { InitializeCriticalSection(&cs); }
 
-	Mutex()
-	{
-		InitializeCriticalSection(&cs);
-	}
+	explicit Mutex(const char* name) { InitializeCriticalSection(&cs); };
 
-	explicit Mutex( const char * name )
-	{
-		InitializeCriticalSection(&cs);
-	};
+	~Mutex() { DeleteCriticalSection(&cs); }
 
-	~Mutex()
-	{
-		DeleteCriticalSection(&cs);
-	}
+	void Lock() { EnterCriticalSection(&cs); }
 
-	void Lock()
-	{
-		EnterCriticalSection(&cs);
-	}
+	void Unlock() { LeaveCriticalSection(&cs); }
 
-	void Unlock()
-	{
-		LeaveCriticalSection(&cs);
-	}
-
-public:
+   public:
 	CRITICAL_SECTION cs;
 };
 
@@ -65,37 +49,20 @@ public:
 
 class Mutex
 {
-public:
+   public:
+	Mutex() { pthread_mutex_init(&mMutex, NULL); }
 
-	Mutex()
-	{
-		pthread_mutex_init(&mMutex, NULL);
-	}
+	explicit Mutex(const char* name) { pthread_mutex_init(&mMutex, NULL); }
 
-	explicit Mutex( const char * name )
-	{
-		pthread_mutex_init(&mMutex, NULL);
-	}
+	~Mutex() { pthread_mutex_destroy(&mMutex); }
 
-	~Mutex()
-	{
-		pthread_mutex_destroy(&mMutex);
-	}
+	void Lock() { pthread_mutex_lock(&mMutex); }
 
-	void Lock()
-	{
-		pthread_mutex_lock(&mMutex);
-	}
+	void Unlock() { pthread_mutex_unlock(&mMutex); }
 
-	void Unlock()
-	{
-		pthread_mutex_unlock(&mMutex);
-	}
-
-public:
-	pthread_mutex_t  mMutex;
+   public:
+	pthread_mutex_t mMutex;
 };
-
 
 #else
 
@@ -103,41 +70,31 @@ public:
 
 #endif
 
-
 class MutexLock
 {
-public:
-	explicit MutexLock( Mutex * mutex )
-	:	mOwnedMutex( mutex )
+   public:
+	explicit MutexLock(Mutex* mutex) : mOwnedMutex(mutex)
 	{
-		if (mOwnedMutex)
-			mOwnedMutex->Lock();
+		if (mOwnedMutex) mOwnedMutex->Lock();
 	}
 	~MutexLock()
 	{
-		if (mOwnedMutex)
-			mOwnedMutex->Unlock();
+		if (mOwnedMutex) mOwnedMutex->Unlock();
 	}
 
-	void Set(Mutex * mutex)
+	void Set(Mutex* mutex)
 	{
-		if (mOwnedMutex)
-			mOwnedMutex->Unlock();
+		if (mOwnedMutex) mOwnedMutex->Unlock();
 		mOwnedMutex = mutex;
-		if (mOwnedMutex)
-			mOwnedMutex->Lock();
+		if (mOwnedMutex) mOwnedMutex->Lock();
 	}
 
-	bool HasLock(const Mutex & mutex) const
-	{
-		return mOwnedMutex == &mutex;
-	}
+	bool HasLock(const Mutex& mutex) const { return mOwnedMutex == &mutex; }
 
-private:
-	Mutex *	mOwnedMutex;
+   private:
+	Mutex* mOwnedMutex;
 };
 
-#define AUTO_CRIT_SECT( x )		MutexLock daed_auto_crit_sect( &x )
+#define AUTO_CRIT_SECT(x) MutexLock daed_auto_crit_sect(&x)
 
-
-#endif // UTILITY_MUTEX_H_
+#endif  // UTILITY_MUTEX_H_

@@ -26,21 +26,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/RomPreferences.h"
 #include "Utility/Singleton.h"
 
-class	RomID;
+class RomID;
 
-class CPreferences : public CSingleton< CPreferences >
+class CPreferences : public CSingleton<CPreferences>
 {
-public:
-	virtual				~CPreferences();
+   public:
+	virtual ~CPreferences();
 
-	virtual bool		OpenPreferencesFile( const char * filename ) = 0;
-	virtual void		Commit() = 0;
+	virtual bool OpenPreferencesFile(const char* filename) = 0;
+	virtual void Commit() = 0;
 
-	virtual bool		GetRomPreferences( const RomID & id, SRomPreferences * preferences ) const = 0;
-	virtual void		SetRomPreferences( const RomID & id, const SRomPreferences & preferences ) = 0;
+	virtual bool GetRomPreferences(const RomID& id, SRomPreferences* preferences) const = 0;
+	virtual void SetRomPreferences(const RomID& id, const SRomPreferences& preferences) = 0;
 };
 
-const char *	Preferences_GetTextureHashFrequencyDescription( ETextureHashFrequency thf );
-const char *	Preferences_GetFrameskipDescription( EFrameskipValue value );
+const char* Preferences_GetTextureHashFrequencyDescription(ETextureHashFrequency thf);
+const char* Preferences_GetFrameskipDescription(EFrameskipValue value);
 
-#endif // UTILITY_PREFERENCES_H_
+#endif  // UTILITY_PREFERENCES_H_

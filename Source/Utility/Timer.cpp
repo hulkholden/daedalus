@@ -22,53 +22,40 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Utility/Timing.h"
 
-//*************************************************************************************
-//
-//*************************************************************************************
 CTimer::CTimer()
 {
-	u64		freq;
-	NTiming::GetPreciseFrequency( &freq );
-	mFreqInv = 1.0f / f32( freq );
+	u64 freq;
+	NTiming::GetPreciseFrequency(&freq);
+	mFreqInv = 1.0f / f32(freq);
 
-	NTiming::GetPreciseTime( &mResetTime );
+	NTiming::GetPreciseTime(&mResetTime);
 	mLastTime = mResetTime;
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
-float	CTimer::GetElapsedSecondsSinceReset()
+float CTimer::GetElapsedSecondsSinceReset()
 {
-	u64			now;
-	NTiming::GetPreciseTime( &now );
+	u64 now;
+	NTiming::GetPreciseTime(&now);
 
-	u64			elapsed_ticks( now - mResetTime );
+	u64 elapsed_ticks(now - mResetTime);
 	return f32(elapsed_ticks) * mFreqInv;
 }
 
-
-//*************************************************************************************
-//
-//*************************************************************************************
-float	CTimer::GetElapsedSeconds()
+float CTimer::GetElapsedSeconds()
 {
-	u64			now;
-	NTiming::GetPreciseTime( &now );
+	u64 now;
+	NTiming::GetPreciseTime(&now);
 
-	u64			elapsed_ticks( now - mLastTime );
+	u64 elapsed_ticks(now - mLastTime);
 	mLastTime = now;
 
 	return f32(elapsed_ticks) * mFreqInv;
 }
 
-//*************************************************************************************
-//
-//*************************************************************************************
 void CTimer::Reset()
 {
-	u64			now;
-	NTiming::GetPreciseTime( &now );
+	u64 now;
+	NTiming::GetPreciseTime(&now);
 
 	mResetTime = now;
 	mLastTime = now;

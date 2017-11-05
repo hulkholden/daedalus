@@ -30,69 +30,47 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // NB: Latest zlib uses a new type for the file handle - it's no longer void *.
 #define toGzipFile(fh) ((gzFile_s*)fh)
 
-//*****************************************************************************
-//
-//*****************************************************************************
-COutStream::COutStream( const char * filename )
-:	mBufferCount( 0 )
-,	mFile( gzopen( filename, "wb" ) )
-{
-}
+COutStream::COutStream(const char* filename) : mBufferCount(0), mFile(gzopen(filename, "wb")) {}
 
-//*****************************************************************************
-//
-//*****************************************************************************
 COutStream::~COutStream()
 {
-	if ( mFile != NULL )
+	if (mFile != NULL)
 	{
 		Flush();
-		gzclose( toGzipFile(mFile) );
+		gzclose(toGzipFile(mFile));
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-bool	COutStream::IsOpen() const
-{
-	return mFile != NULL;
-}
+bool COutStream::IsOpen() const { return mFile != NULL; }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-bool	COutStream::Flush()
+bool COutStream::Flush()
 {
-	DAEDALUS_ASSERT( mBufferCount <= BUFFER_SIZE, "How come the buffer has overflowed?" );
+	DAEDALUS_ASSERT(mBufferCount <= BUFFER_SIZE, "How come the buffer has overflowed?");
 
-	const s32	count( mBufferCount );
+	const s32 count(mBufferCount);
 
 	mBufferCount = 0;
 
-	return gzwrite( toGzipFile(mFile), mBuffer, count ) == count;
+	return gzwrite(toGzipFile(mFile), mBuffer, count) == count;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-bool	COutStream::WriteData( const void * data, u32 length )
+bool COutStream::WriteData(const void* data, u32 length)
 {
-	if ( mFile != NULL )
+	if (mFile != NULL)
 	{
-		const u8 *	current_ptr( reinterpret_cast< const u8 * >( data ) );
-		u32			bytes_remaining( length );
-		while( bytes_remaining > 0 )
+		const u8* current_ptr(reinterpret_cast<const u8*>(data));
+		u32 bytes_remaining(length);
+		while (bytes_remaining > 0)
 		{
-			u32		buffer_bytes_remaining( BUFFER_SIZE - mBufferCount );
-			u32		bytes_to_process( Min( bytes_remaining, buffer_bytes_remaining ) );
+			u32 buffer_bytes_remaining(BUFFER_SIZE - mBufferCount);
+			u32 bytes_to_process(Min(bytes_remaining, buffer_bytes_remaining));
 
 			//
 			// Append as many bytes as possible
 			//
-			if( bytes_to_process > 0 )
+			if (bytes_to_process > 0)
 			{
-				memcpy( mBuffer + mBufferCount, current_ptr, bytes_to_process );
+				memcpy(mBuffer + mBufferCount, current_ptr, bytes_to_process);
 
 				current_ptr += bytes_to_process;
 				bytes_remaining -= bytes_to_process;
@@ -102,9 +80,9 @@ bool	COutStream::WriteData( const void * data, u32 length )
 			//
 			// Flush the buffer if full
 			//
-			if( mBufferCount >= BUFFER_SIZE )
+			if (mBufferCount >= BUFFER_SIZE)
 			{
-				if( !Flush() )
+				if (!Flush())
 				{
 					return false;
 				}
@@ -116,10 +94,7 @@ bool	COutStream::WriteData( const void * data, u32 length )
 	return false;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void	COutStream::Reset()
+void COutStream::Reset()
 {
 	Flush();
 
@@ -128,46 +103,26 @@ void	COutStream::Reset()
 	gzseek(toGzipFile(mFile), 0, SEEK_SET);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-CInStream::CInStream( const char * filename )
-:	mBufferOffset( 0 )
-,	mBytesAvailable( 0 )
-,	mFile( gzopen( filename, "rb" ) )
-{
-}
+CInStream::CInStream(const char* filename) : mBufferOffset(0), mBytesAvailable(0), mFile(gzopen(filename, "rb")) {}
 
-//*****************************************************************************
-//
-//*****************************************************************************
 CInStream::~CInStream()
 {
-	if ( mFile != NULL )
+	if (mFile != NULL)
 	{
-		gzclose( toGzipFile(mFile) );
+		gzclose(toGzipFile(mFile));
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-bool	CInStream::IsOpen() const
-{
-	return mFile != NULL;
-}
+bool CInStream::IsOpen() const { return mFile != NULL; }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-bool	CInStream::Fill()
+bool CInStream::Fill()
 {
-	DAEDALUS_ASSERT( mBytesAvailable == 0, "How come we're refilling with a non-empty buffer?" );
+	DAEDALUS_ASSERT(mBytesAvailable == 0, "How come we're refilling with a non-empty buffer?");
 
 	mBufferOffset = 0;
 
-	s32	bytes_read( gzread( toGzipFile(mFile), mBuffer, BUFFER_SIZE ) );
-	if( bytes_read > 0 )
+	s32 bytes_read(gzread(toGzipFile(mFile), mBuffer, BUFFER_SIZE));
+	if (bytes_read > 0)
 	{
 		mBytesAvailable = bytes_read;
 	}
@@ -180,25 +135,22 @@ bool	CInStream::Fill()
 	return mBytesAvailable > 0;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-bool	CInStream::ReadData( void * data, u32 length )
+bool CInStream::ReadData(void* data, u32 length)
 {
-	if ( mFile != NULL )
+	if (mFile != NULL)
 	{
-		u8 *		current_ptr( reinterpret_cast< u8 * >( data ) );
-		u32			bytes_remaining( length );
+		u8* current_ptr(reinterpret_cast<u8*>(data));
+		u32 bytes_remaining(length);
 
-		while( bytes_remaining > 0 )
+		while (bytes_remaining > 0)
 		{
-			u32		bytes_to_process( Min( bytes_remaining, u32(mBytesAvailable) ) );
+			u32 bytes_to_process(Min(bytes_remaining, u32(mBytesAvailable)));
 
-			if( bytes_to_process > 0 )
+			if (bytes_to_process > 0)
 			{
-				DAEDALUS_ASSERT( mBufferOffset + bytes_to_process <= u32(BUFFER_SIZE), "Reading too many bytes" );
+				DAEDALUS_ASSERT(mBufferOffset + bytes_to_process <= u32(BUFFER_SIZE), "Reading too many bytes");
 
-				memcpy( current_ptr, mBuffer + mBufferOffset, bytes_to_process );
+				memcpy(current_ptr, mBuffer + mBufferOffset, bytes_to_process);
 
 				current_ptr += bytes_to_process;
 				bytes_remaining -= bytes_to_process;
@@ -206,9 +158,9 @@ bool	CInStream::ReadData( void * data, u32 length )
 				mBytesAvailable -= bytes_to_process;
 			}
 
-			if( mBytesAvailable == 0 )
+			if (mBytesAvailable == 0)
 			{
-				if( !Fill() )
+				if (!Fill())
 				{
 					return false;
 				}
@@ -221,14 +173,10 @@ bool	CInStream::ReadData( void * data, u32 length )
 	return false;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void	CInStream::Reset()
+void CInStream::Reset()
 {
 	mBufferOffset = 0;
 	mBytesAvailable = 0;
 
 	gzseek(toGzipFile(mFile), 0, SEEK_SET);
 }
-
