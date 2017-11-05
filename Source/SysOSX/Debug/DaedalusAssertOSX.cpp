@@ -29,36 +29,41 @@
 
 DaedalusAssertHook gAssertHook = NULL;
 
-EAssertResult DaedalusAssert( const char * expression, const char * file, unsigned int line, const char * msg, ... )
+EAssertResult DaedalusAssert(const char* expression, const char* file, unsigned int line, const char* msg, ...)
 {
-	char buffer[ 1024 ];
+	char buffer[1024];
 	va_list va;
 	va_start(va, msg);
-	vsnprintf( buffer, 1024, msg, va );
+	vsnprintf(buffer, 1024, msg, va);
 	buffer[1023] = 0;
 	va_end(va);
 
-	printf( "************************************************************\n" );
-	printf( "Assert Failed: %s\n", expression );
-	printf( "Location: %s(%d)\n", file, line );
-	printf( "\n" );
-	printf( "%s\n", buffer );
-	printf( "\n" );
+	printf("************************************************************\n");
+	printf("Assert Failed: %s\n", expression);
+	printf("Location: %s(%d)\n", file, line);
+	printf("\n");
+	printf("%s\n", buffer);
+	printf("\n");
 
 	bool done = false;
 	while (!done)
 	{
-		printf( "a: abort, b: break, c: continue, i: ignore\n" );
+		printf("a: abort, b: break, c: continue, i: ignore\n");
 		switch (getchar())
 		{
-			case 'a': abort(); return AR_BREAK;		// Should be unreachable.
-			case 'b': return AR_BREAK;
-			case 'c': return AR_IGNORE_ONCE;
-			case 'i': return AR_IGNORE;
+			case 'a':
+				abort();
+				return AR_BREAK;  // Should be unreachable.
+			case 'b':
+				return AR_BREAK;
+			case 'c':
+				return AR_IGNORE_ONCE;
+			case 'i':
+				return AR_IGNORE;
 		}
 	}
 
 	return AR_IGNORE;
 }
 
-#endif //DAEDALUS_ENABLE_ASSERTS
+#endif  // DAEDALUS_ENABLE_ASSERTS

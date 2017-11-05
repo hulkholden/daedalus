@@ -24,23 +24,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CCodeBufferManagerOSX : public CCodeBufferManager
 {
-public:
-	CCodeBufferManagerOSX()
-	{
-	}
+   public:
+	CCodeBufferManagerOSX() {}
 
-	virtual bool			Initialise();
-	virtual void			Reset();
-	virtual void			Finalise();
+	virtual bool Initialise();
+	virtual void Reset();
+	virtual void Finalise();
 
 	virtual CCodeGenerator *StartNewBlock();
-	virtual u32				FinaliseCurrentBlock();
+	virtual u32 FinaliseCurrentBlock();
 };
 
-CCodeBufferManager * CCodeBufferManager::Create()
-{
-	return new CCodeBufferManagerOSX;
-}
+CCodeBufferManager *CCodeBufferManager::Create() { return new CCodeBufferManagerOSX; }
 
 bool CCodeBufferManagerOSX::Initialise()
 {
@@ -48,17 +43,11 @@ bool CCodeBufferManagerOSX::Initialise()
 	return true;
 }
 
-void CCodeBufferManagerOSX::Reset()
-{
-	DAEDALUS_ASSERT(false, "Unimplemented");
-}
+void CCodeBufferManagerOSX::Reset() { DAEDALUS_ASSERT(false, "Unimplemented"); }
 
-void CCodeBufferManagerOSX::Finalise()
-{
-	DAEDALUS_ASSERT(false, "Unimplemented");
-}
+void CCodeBufferManagerOSX::Finalise() { DAEDALUS_ASSERT(false, "Unimplemented"); }
 
-CCodeGenerator * CCodeBufferManagerOSX::StartNewBlock()
+CCodeGenerator *CCodeBufferManagerOSX::StartNewBlock()
 {
 	DAEDALUS_ASSERT(false, "Unimplemented");
 	return NULL;

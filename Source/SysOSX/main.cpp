@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	//ReadConfiguration();
+	// ReadConfiguration();
 
 	if (!System_Init())
 	{
@@ -60,33 +60,33 @@ int main(int argc, char **argv)
 	//
 	// Create the console if it's enabled. Don't care about failures
 	//
-	//DisplayDisclaimer();
-	//DisplayConfig();
+	// DisplayDisclaimer();
+	// DisplayConfig();
 
 	if (argc > 1)
 	{
-		bool 			batch_test = false;
-		const char *	filename   = NULL;
+		bool batch_test = false;
+		const char *filename = NULL;
 
 		for (int i = 1; i < argc; ++i)
 		{
-			const char * arg = argv[i];
+			const char *arg = argv[i];
 			if (*arg == '-')
 			{
 				++arg;
-				if( strcmp( arg, "-batch" ) == 0 )
+				if (strcmp(arg, "-batch") == 0)
 				{
 					batch_test = true;
 					break;
 				}
-				else if (strcmp( arg, "-roms" ) == 0 )
+				else if (strcmp(arg, "-roms") == 0)
 				{
-					if (i+1 < argc)
+					if (i + 1 < argc)
 					{
-						const char * relative_path = argv[i+1];
+						const char *relative_path = argv[i + 1];
 						++i;
 
-						IO::Filename	dir;
+						IO::Filename dir;
 						realpath(relative_path, dir);
 
 						CRomDB::Get()->AddRomDirectory(dir);
@@ -101,15 +101,15 @@ int main(int argc, char **argv)
 
 		if (batch_test)
 		{
-			#ifdef DAEDALUS_BATCH_TEST_ENABLED
-				BatchTestMain(argc, argv);
-			#else
-				fprintf(stderr, "BatchTest mode is not present in this build.\n");
-			#endif
+#ifdef DAEDALUS_BATCH_TEST_ENABLED
+			BatchTestMain(argc, argv);
+#else
+			fprintf(stderr, "BatchTest mode is not present in this build.\n");
+#endif
 		}
 		else if (filename)
 		{
-			if (!System_Open( filename ))
+			if (!System_Open(filename))
 			{
 				fprintf(stderr, "System_Open failed\n");
 			}
@@ -121,34 +121,25 @@ int main(int argc, char **argv)
 	{
 		fprintf(stderr, "Usage: daedalus [rom]\n");
 		return 1;
-//		result = RunMain();
+		//		result = RunMain();
 	}
 
 	//
 	// Write current config out to the registry
 	//
-	//WriteConfiguration();
+	// WriteConfiguration();
 
 	System_Finalize();
 
 	return result;
 }
 
-//FIXME: All this stuff needs tidying
+// FIXME: All this stuff needs tidying
 
-void Dynarec_ClearedCPUStuffToDo()
-{
-}
+void Dynarec_ClearedCPUStuffToDo() {}
 
-void Dynarec_SetCPUStuffToDo()
-{
-}
-
+void Dynarec_SetCPUStuffToDo() {}
 
 extern "C" {
-void _EnterDynaRec()
-{
-	DAEDALUS_ASSERT(false, "Unimplemented");
+void _EnterDynaRec() { DAEDALUS_ASSERT(false, "Unimplemented"); }
 }
-}
-

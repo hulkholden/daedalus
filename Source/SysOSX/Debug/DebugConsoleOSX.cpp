@@ -30,25 +30,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class IDebugConsole : public CDebugConsole
 {
-	public:
-		IDebugConsole();
-		virtual ~IDebugConsole()	{ }
+   public:
+	IDebugConsole();
+	virtual ~IDebugConsole() {}
 
-		void Msg(u32 type, const char * format, ...);
+	void Msg(u32 type, const char *format, ...);
 
-		void MsgOverwriteStart() {}
-		void MsgOverwrite(u32 type, const char * format, ...)
-		{
-			va_list marker;
-			va_start( marker, format );
-			vprintf( format, marker );
-			va_end( marker );
-			printf("\n");
-		}
-		void MsgOverwriteEnd() {}
+	void MsgOverwriteStart() {}
+	void MsgOverwrite(u32 type, const char *format, ...)
+	{
+		va_list marker;
+		va_start(marker, format);
+		vprintf(format, marker);
+		va_end(marker);
+		printf("\n");
+	}
+	void MsgOverwriteEnd() {}
 };
 
-template<> bool CSingleton< CDebugConsole >::Create()
+template <>
+bool CSingleton<CDebugConsole>::Create()
 {
 	DAEDALUS_ASSERT(mpInstance == NULL, "Already initialised");
 
@@ -57,22 +58,16 @@ template<> bool CSingleton< CDebugConsole >::Create()
 	return mpInstance ? true : false;
 }
 
-CDebugConsole::~CDebugConsole()
-{
+CDebugConsole::~CDebugConsole() {}
 
-}
+IDebugConsole::IDebugConsole() {}
 
-IDebugConsole::IDebugConsole()
-{
-}
-
-
-static size_t ParseFormatString(const char * format, char * out, size_t out_len)
+static size_t ParseFormatString(const char *format, char *out, size_t out_len)
 {
 	ETerminalColour tc = TC_DEFAULT;
 
-	const char * p = format;
-	char * o = out;
+	const char *p = format;
+	char *o = out;
 
 	size_t len = 0;
 	while (*p)
@@ -81,9 +76,9 @@ static size_t ParseFormatString(const char * format, char * out, size_t out_len)
 		{
 			++p;
 
-			tc = GetTerminalColour( *p );
-			const char *	str 	= GetTerminalColourString(tc);
-			size_t 			str_len = strlen(str);
+			tc = GetTerminalColour(*p);
+			const char *str = GetTerminalColourString(tc);
+			size_t str_len = strlen(str);
 
 			len += str_len;
 			if (o)
@@ -95,8 +90,8 @@ static size_t ParseFormatString(const char * format, char * out, size_t out_len)
 		else if (*p == ']')
 		{
 			tc = TC_DEFAULT;
-			const char * 	str 	= GetTerminalColourString(tc);
-			size_t 			str_len = strlen(str);
+			const char *str = GetTerminalColourString(tc);
+			size_t str_len = strlen(str);
 			len += str_len;
 			if (o)
 			{
@@ -120,8 +115,8 @@ static size_t ParseFormatString(const char * format, char * out, size_t out_len)
 	if (tc != TC_DEFAULT)
 	{
 		tc = TC_DEFAULT;
-		const char * 	str 	= GetTerminalColourString(tc);
-		size_t 			str_len = strlen(str);
+		const char *str = GetTerminalColourString(tc);
+		size_t str_len = strlen(str);
 		len += str_len;
 		if (o)
 		{
@@ -134,35 +129,33 @@ static size_t ParseFormatString(const char * format, char * out, size_t out_len)
 	{
 		*o = '\0';
 		++o;
-		DAEDALUS_ASSERT( o == out+len+1, "Oops" );
+		DAEDALUS_ASSERT(o == out + len + 1, "Oops");
 	}
 
 	return len;
 }
 
-void IDebugConsole::Msg(u32 type, const char * format, ...)
+void IDebugConsole::Msg(u32 type, const char *format, ...)
 {
-	char * temp = NULL;
+	char *temp = NULL;
 
 	if (strchr(format, '[') != NULL)
 	{
 		size_t len = ParseFormatString(format, NULL, 0);
 
-		temp = (char *)malloc(len+1);
+		temp = (char *)malloc(len + 1);
 
 		ParseFormatString(format, temp, len);
 
 		format = temp;
 	}
 
-
 	va_list marker;
-	va_start( marker, format );
-	vprintf( format, marker );
-	va_end( marker );
+	va_start(marker, format);
+	vprintf(format, marker);
+	va_end(marker);
 	printf("\n");
 
-	if (temp)
-		free(temp);
+	if (temp) free(temp);
 }
 #endif
