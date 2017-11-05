@@ -52,7 +52,10 @@ int main(int argc, char **argv)
 	//ReadConfiguration();
 
 	if (!System_Init())
+	{
+		fprintf(stderr, "System_Init failed\n");
 		return 1;
+	}
 
 	//
 	// Create the console if it's enabled. Don't care about failures
@@ -106,13 +109,18 @@ int main(int argc, char **argv)
 		}
 		else if (filename)
 		{
-			System_Open( filename );
+			if (!System_Open( filename ))
+			{
+				fprintf(stderr, "System_Open failed\n");
+			}
 			CPU_Run();
 			System_Close();
 		}
 	}
 	else
 	{
+		fprintf(stderr, "Usage: daedalus [rom]\n");
+		return 1;
 //		result = RunMain();
 	}
 
