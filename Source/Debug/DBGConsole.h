@@ -28,25 +28,28 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 
-class CDebugConsole : public CSingleton< CDebugConsole >
+class CDebugConsole : public CSingleton<CDebugConsole>
 {
-	public:
-		virtual ~CDebugConsole();
+   public:
+	virtual ~CDebugConsole();
 
-		virtual void DAEDALUS_VARARG_CALL_TYPE	Msg( u32 type, const char * format, ... ) = 0;
+	virtual void DAEDALUS_VARARG_CALL_TYPE Msg(u32 type, const char* format, ...) = 0;
 
-		virtual void							MsgOverwriteStart() = 0;
-		virtual void DAEDALUS_VARARG_CALL_TYPE	MsgOverwrite( u32 type, const char * format, ... ) = 0;
-		virtual void							MsgOverwriteEnd() = 0;
+	virtual void MsgOverwriteStart() = 0;
+	virtual void DAEDALUS_VARARG_CALL_TYPE MsgOverwrite(u32 type, const char* format, ...) = 0;
+	virtual void MsgOverwriteEnd() = 0;
 };
 
-#define DBGConsole_Msg( type, ... )			CDebugConsole::Get()->Msg( type, __VA_ARGS__ )
+#define DBGConsole_Msg(type, ...) CDebugConsole::Get()->Msg(type, __VA_ARGS__)
 
 #else
 
-#define DBGConsole_Msg(...)					do { DAEDALUS_USE(__VA_ARGS__); } while(0)
+#define DBGConsole_Msg(...)        \
+	do                             \
+	{                              \
+		DAEDALUS_USE(__VA_ARGS__); \
+	} while (0)
 
-#endif // DAEDALUS_DEBUG_CONSOLE
+#endif  // DAEDALUS_DEBUG_CONSOLE
 
-#endif // DEBUG_DBGCONSOLE_H_
-
+#endif  // DEBUG_DBGCONSOLE_H_

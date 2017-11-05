@@ -19,15 +19,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-
-enum	ETerminalColour
+enum ETerminalColour
 {
 	TC_DEFAULT = 0,
-	TC_r, TC_g, TC_y, TC_b, TC_m, TC_c, TC_w,
-	TC_R, TC_G, TC_Y, TC_B, TC_M, TC_C, TC_W,
+	TC_r,
+	TC_g,
+	TC_y,
+	TC_b,
+	TC_m,
+	TC_c,
+	TC_w,
+	TC_R,
+	TC_G,
+	TC_Y,
+	TC_B,
+	TC_M,
+	TC_C,
+	TC_W,
 	TC_INVALID,
 	NUM_TERMINAL_COLOURS,
 };
 
 ETerminalColour GetTerminalColour(char c);
-const char * GetTerminalColourString(ETerminalColour tc);
+const char* GetTerminalColourString(ETerminalColour tc);

@@ -26,19 +26,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 struct OpCode;
 
-void Dump_GetDumpDirectory(char * rootdir, const char * subdir);
-void Dump_GetSaveDirectory(char * rootdir, const char * rom_filename, const char * extension);
+void Dump_GetDumpDirectory(char* rootdir, const char* subdir);
+void Dump_GetSaveDirectory(char* rootdir, const char* rom_filename, const char* extension);
 
 #ifndef DAEDALUS_SILENT
 
-void Dump_MemoryRange(FILE * fh, u32 address_offset, const u32 * b, const u32 * e);
-void Dump_DisassembleRSPRange(FILE * fh, u32 address_offset, const OpCode * b, const OpCode * e);
+void Dump_MemoryRange(FILE* fh, u32 address_offset, const u32* b, const u32* e);
+void Dump_DisassembleRSPRange(FILE* fh, u32 address_offset, const OpCode* b, const OpCode* e);
 
-void Dump_DisassembleMIPSRange(FILE * fh, u32 address_offset, const OpCode * b, const OpCode * e);
-void Dump_Disassemble(u32 start, u32 end, const char * p_file_name);
-void Dump_RSPDisassemble(const char * p_file_name);
-void Dump_Strings(const char * p_file_name);
+void Dump_DisassembleMIPSRange(FILE* fh, u32 address_offset, const OpCode* b, const OpCode* e);
+void Dump_Disassemble(u32 start, u32 end, const char* p_file_name);
+void Dump_RSPDisassemble(const char* p_file_name);
+void Dump_Strings(const char* p_file_name);
 
 #endif
 
-#endif // DEBUG_DUMP_H_
+#endif  // DEBUG_DUMP_H_
