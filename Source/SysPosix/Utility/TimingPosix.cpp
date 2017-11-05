@@ -23,17 +23,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <sys/time.h>
 
-namespace NTiming {
-bool GetPreciseFrequency( u64 * p_freq )
+namespace NTiming
+{
+bool GetPreciseFrequency(u64* p_freq)
 {
 	*p_freq = 1 * 1000 * 1000;  // Microseconds
 	return true;
 }
 
-bool GetPreciseTime( u64 * p_time )
+bool GetPreciseTime(u64* p_time)
 {
-	timeval		tv;
-	if(::gettimeofday( &tv, NULL ) == 0)
+	timeval tv;
+	if (::gettimeofday(&tv, NULL) == 0)
 	{
 		*p_time = u64(tv.tv_sec) * 1000000LL + u64(tv.tv_usec);
 		return true;
@@ -43,10 +44,6 @@ bool GetPreciseTime( u64 * p_time )
 	return false;
 }
 
-u64 ToMilliseconds( u64 ticks )
-{
-	return (ticks*1000LL) / 1000000LL;
-}
+u64 ToMilliseconds(u64 ticks) { return (ticks * 1000LL) / 1000000LL; }
 
-} // NTiming
-
+}  // namespace NTiming

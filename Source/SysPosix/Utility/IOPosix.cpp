@@ -27,206 +27,179 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 namespace IO
 {
-	const char kPathSeparator = '/';
+const char kPathSeparator = '/';
 
-	namespace File
+namespace File
+{
+bool Move(const char* p_existing, const char* p_new) { return rename(p_existing, p_new) >= 0; }
+
+bool Delete(const char* p_file) { return remove(p_file) == 0; }
+
+bool Exists(const char* p_path)
+{
+	FILE* fh = fopen(p_path, "rb");
+	if (fh)
 	{
-		bool	Move( const char * p_existing, const char * p_new )
-		{
-			return rename( p_existing, p_new ) >= 0;
-		}
-
-		bool	Delete( const char * p_file )
-		{
-			return remove( p_file ) == 0;
-		}
-
-		bool	Exists( const char * p_path )
-		{
-			FILE * fh = fopen( p_path, "rb" );
-			if ( fh )
-			{
-				fclose( fh );
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
+		fclose(fh);
+		return true;
 	}
-	namespace Directory
+	return false;
+}
+}
+namespace Directory
+{
+bool Create(const char* p_path) { return mkdir(p_path, 0777) == 0; }
+
+bool EnsureExists(const char* p_path)
+{
+	if (IsDirectory(p_path)) return true;
+
+	// Make sure parent exists,
+	IO::Filename p_path_parent;
+	IO::Path::Assign(p_path_parent, p_path);
+	IO::Path::RemoveBackslash(p_path_parent);
+	if (IO::Path::RemoveFileSpec(p_path_parent))
 	{
-		bool	Create( const char * p_path )
-		{
-			return mkdir( p_path, 0777 ) == 0;
-		}
-
-		bool	EnsureExists( const char * p_path )
-		{
-			if ( IsDirectory(p_path) )
-				return true;
-
-			// Make sure parent exists,
-			IO::Filename	p_path_parent;
-			IO::Path::Assign( p_path_parent, p_path );
-			IO::Path::RemoveBackslash( p_path_parent );
-			if( IO::Path::RemoveFileSpec( p_path_parent ) )
-			{
-				//	Recursively create parents. Need to be careful of stack overflow
-				if( !EnsureExists( p_path_parent ) )
-					return false;
-			}
-
-			return Create( p_path );
-		}
-
-		bool	IsDirectory( const char * p_path )
-		{
-			struct stat		s;
-
-			if(stat( p_path, &s ) == 0)
-			{
-				if(s.st_mode & S_IFDIR)
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
+		//	Recursively create parents. Need to be careful of stack overflow
+		if (!EnsureExists(p_path_parent)) return false;
 	}
 
-	namespace Path
+	return Create(p_path);
+}
+
+bool IsDirectory(const char* p_path)
+{
+	struct stat s;
+
+	if (stat(p_path, &s) == 0)
 	{
-		char *	Combine( char * p_dest, const char * p_dir, const char * p_file )
+		if (s.st_mode & S_IFDIR)
 		{
-			strcpy( p_dest, p_dir );
-			Append( p_dest, p_file );
-			return p_dest;
-		}
-
-		bool	Append( char * p_path, const char * p_more )
-		{
-			u32		len( strlen(p_path) );
-
-			if(len > 0)
-			{
-				if(p_path[len-1] != kPathSeparator)
-				{
-					p_path[len] = kPathSeparator;
-					p_path[len+1] = '\0';
-					len++;
-				}
-			}
-			strcat( p_path, p_more );
 			return true;
 		}
-
-		const char *  FindExtension( const char * p_path )
-		{
-			return strrchr( p_path, '.' );
-		}
-
-		const char *	FindFileName( const char * p_path )
-		{
-			const char * p_last_slash = strrchr( p_path, kPathSeparator );
-			if ( p_last_slash )
-			{
-				return p_last_slash + 1;
-			}
-			else
-			{
-				return NULL;
-			}
-		}
-
-		char *	RemoveBackslash( char * p_path )
-		{
-			u32 len = strlen( p_path );
-			if ( len > 0 )
-			{
-				char * p_last_char( &p_path[ len - 1 ] );
-				if ( *p_last_char == kPathSeparator )
-				{
-					*p_last_char = '\0';
-				}
-				return p_last_char;
-			}
-			return NULL;
-		}
-
-		bool	RemoveFileSpec( char * p_path )
-		{
-			char * last_slash = strrchr( p_path, kPathSeparator );
-			if ( last_slash )
-			{
-				*last_slash = '\0';
-				return true;
-			}
-			return false;
-		}
-
-		void	RemoveExtension( char * p_path )
-		{
-			char * ext = const_cast< char * >( FindExtension( p_path ) );
-			if ( ext )
-			{
-				*ext = '\0';
-			}
-		}
-
-		void	AddExtension( char * p_path, const char * p_ext )
-		{
-			strcat( p_path, p_ext );
-		}
 	}
 
+	return false;
+}
+}  // namespace File
 
+namespace Path
+{
+char* Combine(char* p_dest, const char* p_dir, const char* p_file)
+{
+	strcpy(p_dest, p_dir);
+	Append(p_dest, p_file);
+	return p_dest;
+}
 
+bool Append(char* p_path, const char* p_more)
+{
+	u32 len(strlen(p_path));
 
-	bool	FindFileOpen( const char * path, FindHandleT * handle, FindDataT & data )
+	if (len > 0)
 	{
-		DIR * d = opendir( path );
-		if( d != NULL )
+		if (p_path[len - 1] != kPathSeparator)
 		{
-			// To support findfirstfile() API we must return the first result immediately
-			if( FindFileNext( d, data ) )
-			{
-				*handle = d;
-				return true;
-			}
-
-			// Clean up
-			closedir( d );
+			p_path[len] = kPathSeparator;
+			p_path[len + 1] = '\0';
+			len++;
 		}
-
-		return false;
 	}
+	strcat(p_path, p_more);
+	return true;
+}
 
-	bool	FindFileNext( FindHandleT handle, FindDataT & data )
+const char* FindExtension(const char* p_path) { return strrchr(p_path, '.'); }
+
+const char* FindFileName(const char* p_path)
+{
+	const char* p_last_slash = strrchr(p_path, kPathSeparator);
+	if (p_last_slash)
 	{
-		DAEDALUS_ASSERT( handle != NULL, "Cannot search with invalid directory handle" );
-
-		while (dirent * ep = readdir( static_cast< DIR * >( handle ) ) )
-		{
-			// Ignore hidden files (and '.' and '..')
-			if (ep->d_name[0] == '.')
-				continue;
-
-			IO::Path::Assign( data.Name, ep->d_name );
-			return true;
-		}
-
-		return false;
+		return p_last_slash + 1;
 	}
-
-	bool	FindFileClose( FindHandleT handle )
+	else
 	{
-		DAEDALUS_ASSERT( handle != NULL, "Trying to close an invalid directory handle" );
-
-		return closedir( static_cast< DIR * >( handle ) ) >= 0;
+		return NULL;
 	}
 }
 
+char* RemoveBackslash(char* p_path)
+{
+	u32 len = strlen(p_path);
+	if (len > 0)
+	{
+		char* p_last_char(&p_path[len - 1]);
+		if (*p_last_char == kPathSeparator)
+		{
+			*p_last_char = '\0';
+		}
+		return p_last_char;
+	}
+	return NULL;
+}
 
+bool RemoveFileSpec(char* p_path)
+{
+	char* last_slash = strrchr(p_path, kPathSeparator);
+	if (last_slash)
+	{
+		*last_slash = '\0';
+		return true;
+	}
+	return false;
+}
+
+void RemoveExtension(char* p_path)
+{
+	char* ext = const_cast<char*>(FindExtension(p_path));
+	if (ext)
+	{
+		*ext = '\0';
+	}
+}
+
+void AddExtension(char* p_path, const char* p_ext) { strcat(p_path, p_ext); }
+}  // namespace Path
+
+bool FindFileOpen(const char* path, FindHandleT* handle, FindDataT& data)
+{
+	DIR* d = opendir(path);
+	if (d != NULL)
+	{
+		// To support findfirstfile() API we must return the first result immediately
+		if (FindFileNext(d, data))
+		{
+			*handle = d;
+			return true;
+		}
+
+		closedir(d);
+	}
+
+	return false;
+}
+
+bool FindFileNext(FindHandleT handle, FindDataT& data)
+{
+	DAEDALUS_ASSERT(handle != NULL, "Cannot search with invalid directory handle");
+
+	while (dirent* ep = readdir(static_cast<DIR*>(handle)))
+	{
+		// Ignore hidden files (and '.' and '..')
+		if (ep->d_name[0] == '.') continue;
+
+		IO::Path::Assign(data.Name, ep->d_name);
+		return true;
+	}
+
+	return false;
+}
+
+bool FindFileClose(FindHandleT handle)
+{
+	DAEDALUS_ASSERT(handle != NULL, "Trying to close an invalid directory handle");
+
+	return closedir(static_cast<DIR*>(handle)) >= 0;
+}
+}  // namespace IO
