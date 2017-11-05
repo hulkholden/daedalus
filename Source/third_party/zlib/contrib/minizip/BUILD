@@ -3,6 +3,7 @@ licenses(["notice"])  #  BSD/MIT-like license
 cc_library(
     name = "minizip",
     srcs = [
+        "ioapi.c",
         "unzip.c",
         "zip.c",
     ],
