@@ -4,6 +4,7 @@ cc_library(
     deps = [
         "//:stdafx",
         "//OSHLE",
+        "@com_google_absl//absl/strings",
     ],
     visibility = ["//visibility:public"],
 )

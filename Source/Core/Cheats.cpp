@@ -31,20 +31,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "OSHLE/ultra_R4300.h"
 #include "System/Paths.h"
 #include "System/IO.h"
-#include "Utility/StringUtil.h"
 
-//
+#include "absl/strings/string_view.h"
+#include "absl/strings/strip.h"
+#include "absl/strings/numbers.h"
+
 // Cheatcode routines and format based from 1964
-//
-
 
 #define CHEAT_CODE_MAGIC_VALUE 0xDEAD
 
 CODEGROUP *codegrouplist;
 u32		codegroupcount		= 0;
-//*****************************************************************************
-//
-//*****************************************************************************
+
 
 // Apply game shark code
 
@@ -64,9 +62,7 @@ u32		codegroupcount		= 0;
 //D3-XXXXXX YYYY 16-Bit If Not Equal To
 //04-XXXXXX ---- Write directly to Audio Interface (Daedalus only)
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 static void CheatCodes_Apply(u32 index, u32 mode)
 {
 	CHEATCODENODE *code = (CHEATCODENODE*)codegrouplist[index].codelist;
@@ -190,9 +186,6 @@ static void CheatCodes_Apply(u32 index, u32 mode)
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void CheatCodes_Activate( CHEAT_MODE mode )
 {
 	for(u32 i = 0; i < codegroupcount; i++)
@@ -208,9 +201,6 @@ void CheatCodes_Activate( CHEAT_MODE mode )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void CheatCodes_Disable( u32 index )
 {
 	if(codegrouplist[index].enable)
@@ -223,9 +213,6 @@ void CheatCodes_Disable( u32 index )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 static void CheatCodes_Clear()
 {
 	codegroupcount = 0;
@@ -237,9 +224,6 @@ static void CheatCodes_Clear()
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 // Works, but unused ATM
 /*
 void CheatCodes_Delete(u32 index)
@@ -255,15 +239,12 @@ void CheatCodes_Delete(u32 index)
 }
 */
 
-//*****************************************************************************
-//
-//*****************************************************************************
 bool CheatCodes_Read(const char *rom_name, const char *file, u8 countryID)
 {
 	char			current_rom_name[128];
 	static char		last_rom_name[128];
 
-	char			line[2048], romname[256]/*, errormessage[400]*/;	//changed line length to 2048 previous was 256
+	char			buffer[2048], romname[256]/*, errormessage[400]*/;
 	bool			bfound;
 	u32				c1, c2;
 	FILE			*stream;
@@ -311,12 +292,11 @@ bool CheatCodes_Read(const char *rom_name, const char *file, u8 countryID)
 
 	bfound = false;
 
-	while(fgets(line, 256, stream))
+	while(fgets(buffer, 256, stream))
 	{
-		// Remove any extra character that is added at the end of the string
-		Tidy(line);
-
-		if(strcmp(line, romname) == 0)
+		absl::string_view line(buffer);
+		line = absl::StripTrailingAsciiWhitespace(line);
+		if(line == romname)
 		{
 			// Found cheatcode entry
 			bfound = true;
@@ -331,38 +311,33 @@ bool CheatCodes_Read(const char *rom_name, const char *file, u8 countryID)
 
 	if( bfound )
 	{
-		u32 numberofgroups;
-
 		// First step, read the number of (cheat) groups for the current rom
 		//
-		if(fgets(line, 256, stream))
-		{
-			Tidy(line);
-			if(strncmp(line, "NumberOfGroups=", 15) == 0)
-			{
-				numberofgroups = atoi(line + 15);
-
-				// Remove any excess of cheats to avoid wasting memory
-				if( numberofgroups > MAX_CHEATCODE_PER_LOAD )
-				{
-					numberofgroups = MAX_CHEATCODE_PER_LOAD;
-				}
-			}
-			else
-			{
-				// If for some reason NumberOfGroups is incorrect or invalid, just set the max of cheatcodes we allow
-				numberofgroups = MAX_CHEATCODE_PER_LOAD;
-			}
-		}
-		else
-		{
+		if(!fgets(buffer, 256, stream)) {
 			// Auch no number of groups? Cheat must be formated incorrectly
 			return false;
 		}
 
+		// If for some reason NumberOfGroups is incorrect or invalid, just set the max of cheatcodes we allow
+		u32 numberofgroups = MAX_CHEATCODE_PER_LOAD;
+
+		absl::string_view line(buffer);
+		line = StripTrailingAsciiWhitespace(line);
+		if(absl::ConsumePrefix(&line, "NumberOfGroups="))
+		{
+			if (!absl::SimpleAtoi(line, &numberofgroups)) {
+				return false;
+			}
+			// Remove any excess of cheats to avoid wasting memory
+			if( numberofgroups > MAX_CHEATCODE_PER_LOAD )
+			{
+				numberofgroups = MAX_CHEATCODE_PER_LOAD;
+			}
+		}
+
 		// Allocate memory for groups
 		//
-//		printf("number of cheats loaded %d | %d kbs used of memory\n",numberofgroups,(numberofgroups *sizeof(CODEGROUP))/ 1024);
+// printf("number of cheats loaded %d | %d kbs used of memory\n",numberofgroups,(numberofgroups *sizeof(CODEGROUP))/ 1024);
 		codegrouplist = (CODEGROUP *) malloc(numberofgroups *sizeof(CODEGROUP));
 		if(codegrouplist == NULL)
 		{
@@ -371,10 +346,10 @@ bool CheatCodes_Read(const char *rom_name, const char *file, u8 countryID)
 		}
 
 		codegroupcount = 0;
-		while(codegroupcount < numberofgroups && fgets(line, 32767, stream) && strlen(line) > 8)	// 32767 makes sure the entire line is read
+		while(codegroupcount < numberofgroups && fgets(buffer, 32767, stream) && strlen(buffer) > 8)	// 32767 makes sure the entire line is read
 		{
-			// Codes for the group are in the string line[]
-			for(c1 = 0; line[c1] != '=' && line[c1] != '\0'; c1++) codegrouplist[codegroupcount].name[c1] = line[c1];
+			// Codes for the group are in the string buffer[]
+			for(c1 = 0; buffer[c1] != '=' && buffer[c1] != '\0'; c1++) codegrouplist[codegroupcount].name[c1] = buffer[c1];
 
 			// FIXME: xocde reckons this is dodgy - if c1 is 0 (first char is '='), this will index [-1]!
 			if(codegrouplist[codegroupcount].name[c1 - 1] != ',')
@@ -386,14 +361,14 @@ bool CheatCodes_Read(const char *rom_name, const char *file, u8 countryID)
 				codegrouplist[codegroupcount].name[c1 - 1] = '\0';
 			}
 
-			if(line[c1 + 1] == '"')
+			if(buffer[c1 + 1] == '"')
 			{
 				// we have a note for this cheat code group
 				u32 c3;
 
-				for(c3 = 0; line[c3 + c1 + 2] != '"' && line[c3 + c1 + 2] != '\0'; c3++)
+				for(c3 = 0; buffer[c3 + c1 + 2] != '"' && buffer[c3 + c1 + 2] != '\0'; c3++)
 				{
-					codegrouplist[codegroupcount].note[c3] = line[c3 + c1 + 2];
+					codegrouplist[codegroupcount].note[c3] = buffer[c3 + c1 + 2];
 				}
 
 				codegrouplist[codegroupcount].note[c3] = '\0';
@@ -405,17 +380,17 @@ bool CheatCodes_Read(const char *rom_name, const char *file, u8 countryID)
 			}
 
 			u32 addr, value;
-			codegrouplist[codegroupcount].active = (line[c1 + 1] - '0') ? true : false;
+			codegrouplist[codegroupcount].active = (buffer[c1 + 1] - '0') ? true : false;
 			codegrouplist[codegroupcount].enable = false;
 			codegrouplist[codegroupcount].codecount = 0;
 
 			c1 += 2;
 
-			for(c2 = 0; c2 < (strlen(line) - c1 - 1) / 14; c2++, codegrouplist[codegroupcount].codecount++)
+			for(c2 = 0; c2 < (strlen(buffer) - c1 - 1) / 14; c2++, codegrouplist[codegroupcount].codecount++)
 			{
 				if (c2 < MAX_CHEATCODE_PER_ENTRY)
 				{
-					sscanf( line + c1 + 1 + c2 * 14,"%08x-%04x", &addr, &value );
+					sscanf( buffer + c1 + 1 + c2 * 14,"%08x-%04x", &addr, &value );
 					if( c2 > 0 && ((codegrouplist[codegroupcount].codelist[c2-1].addr >> 24) & 0xFF) == 0x50 )
 					{
 						//ToDO: Uncompress Serial Repeater cheat code; ex addr = (temp + offset) ^ U8_TWIDDLE
