@@ -11,7 +11,6 @@ cc_library(
         "DataSink.h",
         "Endian.h",
         "FastMemcpy.h",
-        "Functor.h",
         "GlobalPreferences.h",
         "Hash.h",
         "Mutex.h",
