@@ -55,7 +55,6 @@ cc_library(
         "ROMFileCache.cpp",
         "ROMFileCompressed.cpp",
         "ROMFileUncompressed.cpp",
-        "Stream.cpp",
         "Synchroniser.cpp",
         "Timer.cpp",
         "ZLibWrapper.cpp",

@@ -46,27 +46,6 @@ class CNullOutputStream : public COutputStream
 	const char* c_str() const { return ""; }
 };
 
-class COutputStringStream : public COutputStream
-{
-   public:
-	COutputStringStream();
-	~COutputStringStream();
-
-	void Clear();
-
-	COutputStream& operator<<(const char* p_str);
-	COutputStream& operator<<(char val);
-	COutputStream& operator<<(s32 val);
-	COutputStream& operator<<(u32 val);
-
-	const char* c_str() const;
-
-   private:
-	class COutputStringStreamImpl* mpImpl;
-};
-
 inline COutputStream& operator<<(COutputStream& str, CNullOutputStream& rhs) { return str; }
-
-COutputStream& operator<<(COutputStream& str, COutputStringStream& rhs);
 
 #endif  // UTILITY_STREAM_H_
