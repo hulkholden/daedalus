@@ -17,30 +17,29 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-// Stuff to handle Processor
 #include "stdafx.h"
-#include "CPU.h"
+#include "Core/CPU.h"
 
 #include <algorithm>
 #include <string>
 #include <vector>
 
-#include "Cheats.h"
-#include "Dynamo.h"
-#include "Interpret.h"
-#include "Interrupt.h"
-#include "Memory.h"
-#include "R4300.h"
-#include "Registers.h"  // For REG_?? defines
-#include "ROM.h"
-#include "ROMBuffer.h"
-#include "RSP_HLE.h"
-#include "Save.h"
-#include "SaveState.h"
-
 #include "Base/Macros.h"
 #include "Config/ConfigOptions.h"
+#include "Core/Cheats.h"
+#include "Core/Dynamo.h"
 #include "Core/FramerateLimiter.h"
+#include "Core/Interpret.h"
+#include "Core/Interrupt.h"
+#include "Core/Memory.h"
+#include "Core/PrintOpCode.h"
+#include "Core/R4300.h"
+#include "Core/Registers.h"
+#include "Core/ROM.h"
+#include "Core/ROMBuffer.h"
+#include "Core/RSP_HLE.h"
+#include "Core/Save.h"
+#include "Core/SaveState.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
 #include "OSHLE/ultra_R4300.h"
@@ -48,7 +47,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/AtomicPrimitives.h"
 #include "Utility/Hash.h"
 #include "Utility/Mutex.h"
-#include "Utility/PrintOpCode.h"
 #include "Utility/Synchroniser.h"
 #include "Utility/Thread.h"
 

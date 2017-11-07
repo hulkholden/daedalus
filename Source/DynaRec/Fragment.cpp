@@ -18,39 +18,32 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "Fragment.h"
+#include "DynaRec/Fragment.h"
 
 #include <stdio.h>
 
 #include <algorithm>
 
-#include "FragmentCache.h"
-#include "BranchType.h"
-#include "StaticAnalysis.h"
-#include "IndirectExitMap.h"
-
-#include "Core/Registers.h"
+#include "Base/Macros.h"
 #include "Core/CPU.h"			// Try to remove this cyclic dependency
-#include "Core/R4300.h"
 #include "Core/Interrupt.h"
-
+#include "Core/PrintOpCode.h"
+#include "Core/R4300.h"
+#include "Core/Registers.h"
 #include "Debug/DBGConsole.h"
-
+#include "DynaRec/BranchType.h"
 #include "DynaRec/CodeBufferManager.h"
 #include "DynaRec/CodeGenerator.h"
-
-#include "Base/Macros.h"
-#include "Utility/PrintOpCode.h"
+#include "DynaRec/FragmentCache.h"
+#include "DynaRec/IndirectExitMap.h"
+#include "DynaRec/StaticAnalysis.h"
+#include "OSHLE/patch.h"
+#include "OSHLE/ultra_R4300.h"
 #include "Utility/Profiler.h"
 #include "Utility/Synchroniser.h"
 
-#include "OSHLE/ultra_R4300.h"
-#include "OSHLE/patch.h"
-
-
 //#define IMMEDIATE_COUNTER_UPDATE
 //#define UPDATE_COUNTER_ON_EXCEPTION
-
 
 namespace
 {

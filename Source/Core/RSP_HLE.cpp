@@ -18,23 +18,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
+#include "Core/RSP_HLE.h"
 
-#include "RSP_HLE.h"
-
-#include "Interrupt.h"
-#include "Memory.h"
+#include "Base/MathUtil.h"
+#include "Core/Interrupt.h"
+#include "Core/Memory.h"
+#include "Core/PrintOpCode.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
-#include "Debug/Dump.h"			// For Dump_GetDumpDirectory()
-#include "Base/MathUtil.h"
+#include "Debug/Dump.h"
 #include "OSHLE/ultra_mbi.h"
 #include "OSHLE/ultra_rcp.h"
 #include "OSHLE/ultra_sptask.h"
 #include "Plugins/AudioPlugin.h"
 #include "Plugins/GraphicsPlugin.h"
-#include "Test/BatchTest.h"
 #include "System/IO.h"
-#include "Utility/PrintOpCode.h"
+#include "Test/BatchTest.h"
 #include "Utility/Profiler.h"
 
 static const bool	gGraphicsEnabled = true;
