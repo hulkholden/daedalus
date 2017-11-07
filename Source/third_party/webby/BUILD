@@ -3,11 +3,12 @@ licenses(["notice"])
 cc_library(
     name = "webby",
     srcs = [
-    	"webby.c"
+        "webby.c"
     ],
     hdrs = [
-    	"webby.h",
+        "webby.h",
+        "webby_unix.h",
+        "webby_win32.h",
     ],
-    #includes = ["."],
     visibility = ["//visibility:public"],
 )
