@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
+#include "absl/strings/numbers.h"
+
 #include "HLEGraphics/DisplayListDebugger.h"
 
 #include "SysOSX/Debug/WebDebug.h"
@@ -337,7 +339,7 @@ static void DLDebugHandler(void *arg, WebDebugConnection *connection)
 			}
 			else if (params[i].Key == "scrub")
 			{
-				gInstructionCountLimit = ParseU32(params[i].Value, 10);
+				absl::SimpleAtoi(params[i].Value, &gInstructionCountLimit);
 				DoTask(connection, kTaskScrub);
 				return;
 			}
