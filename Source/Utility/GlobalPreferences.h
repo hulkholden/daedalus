@@ -68,8 +68,6 @@ struct SGlobalPreferences
 	float StickMinDeadzone;
 	float StickMaxDeadzone;
 
-	u32 Language;
-
 	EViewportType ViewportType;
 
 	bool TVEnable;

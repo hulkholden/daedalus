@@ -37,7 +37,6 @@ cc_library(
         "Thread.h",
         "Timer.h",
         "Timing.h",
-        "Translate.h",
         "ZlibWrapper.h",
     ],
     deps = [
@@ -72,7 +71,6 @@ cc_library(
         "StringUtil.cpp",
         "Synchroniser.cpp",
         "Timer.cpp",
-        "Translate.cpp",
         "ZLibWrapper.cpp",
     ],
     deps = [
