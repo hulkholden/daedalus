@@ -1,8 +1,9 @@
 #include "stdafx.h"
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 #include "WebDebug.h"
 #include "WebDebugTemplate.h"
+
+#include "absl/strings/str_split.h"
 #include "third_party/webby/webby.h"
 
 #ifdef DAEDALUS_W32
@@ -21,7 +22,6 @@
 #include "System/Paths.h"
 #include "System/IO.h"
 #include "Base/Macros.h"
-#include "Utility/StringUtil.h"
 #include "Utility/Thread.h"
 
 enum
@@ -76,15 +76,15 @@ WebDebugConnection::WebDebugConnection(WebbyConnection *connection)
 {
 	if (const char *params = connection->request.query_params)
 	{
-		std::vector<ConstStringRef> args;
-		Split(params, '&', &args);
+		std::vector<std::string> args = absl::StrSplit(params, '&');
 
 		mQueryParams.reserve(args.size());
 		for (size_t i = 0; i < args.size(); ++i)
 		{
+			std::pair<std::string, std::string> kv = absl::StrSplit(args[i], absl::MaxSplits('=', 1));
 			Param param;
-			SplitAt(args[i], '=', &param.Key, &param.Value);
-
+			param.Key = kv.first;
+			param.Value = kv.second;
 			mQueryParams.push_back(param);
 		}
 	}
@@ -476,4 +476,3 @@ void WebDebug_Fini()
 	WSACleanup();
 #endif
 }
-#endif  // DAEDALUS_DEBUG_DISPLAYLIST

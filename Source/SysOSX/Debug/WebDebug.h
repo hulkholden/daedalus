@@ -1,11 +1,11 @@
 #ifndef SYSOSX_DEBUG_WEBDEBUG_H_
 #define SYSOSX_DEBUG_WEBDEBUG_H_
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-#include "Utility/DataSink.h"
-#include "Utility/String.h"
-
+#include <string>
 #include <vector>
+
+#include "absl/strings/str_split.h"
+#include "Utility/DataSink.h"
 
 struct WebbyConnection;
 
@@ -23,8 +23,8 @@ class WebDebugConnection : public DataSink
 
 	struct Param
 	{
-		ConstStringRef Key;
-		ConstStringRef Value;
+		std::string Key;
+		std::string Value;
 	};
 
 	typedef std::vector<Param> QueryParams;
@@ -70,5 +70,5 @@ void WebDebug_Register(const char* request, WebDebugHandler handler, void* arg);
 
 bool WebDebug_Init();
 void WebDebug_Fini();
-#endif  // DAEDALUS_DEBUG_DISPLAYLIST
+
 #endif  // SYSOSX_DEBUG_WEBDEBUG_H_
