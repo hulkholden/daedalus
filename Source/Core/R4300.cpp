@@ -18,21 +18,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "R4300.h"
+#include "Core/R4300.h"
 
-#include "CPU.h"
-#include "Interrupt.h"
-#include "ROM.h"
-
+#include "Base/Macros.h"
 #include "Config/ConfigOptions.h"
-#include "Core/Registers.h"			// For REG_?? defines
+#include "Core/CPU.h"
+#include "Core/Interrupt.h"
+#include "Core/Registers.h"
+#include "Core/ROM.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
 #include "DynaRec/TraceRecorder.h"
-#include "Math/Math.h"	// VFPU Math
+#include "Math/Math.h"
 #include "OSHLE/ultra_R4300.h"
-#include "Utility/AuxFunc.h"
-#include "Base/Macros.h"
 
 #include <float.h>
 

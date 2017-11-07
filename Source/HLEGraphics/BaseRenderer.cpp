@@ -18,31 +18,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-
-#include "BaseRenderer.h"
-#include "TextureCache.h"
-#include "RDPStateManager.h"
-#include "DLDebug.h"
-
-#include "Graphics/NativeTexture.h"
-#include "Graphics/GraphicsContext.h"
-
-#include "Base/MathUtil.h"
-
-#include "Debug/Dump.h"
-#include "Debug/DBGConsole.h"
-
-#include "Core/Memory.h"		// We access the memory buffers
-#include "Core/ROM.h"
-
-#include "OSHLE/ultra_gbi.h"
-
-#include "Math/Math.h"			// VFPU Math
-
-#include "Utility/Profiler.h"
-#include "Utility/AuxFunc.h"
+#include "HLEGraphics/BaseRenderer.h"
 
 #include <vector>
+
+#include "Base/MathUtil.h"
+#include "Core/Memory.h"
+#include "Core/ROM.h"
+#include "Debug/DBGConsole.h"
+#include "Debug/Dump.h"
+#include "Graphics/GraphicsContext.h"
+#include "Graphics/NativeTexture.h"
+#include "HLEGraphics/DLDebug.h"
+#include "HLEGraphics/RDPStateManager.h"
+#include "HLEGraphics/TextureCache.h"
+#include "Math/Math.h"
+#include "OSHLE/ultra_gbi.h"
+#include "Utility/Profiler.h"
 
 // Vertex allocation.
 // AllocVerts/FreeVerts:

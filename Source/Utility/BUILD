@@ -6,7 +6,6 @@ cc_library(
     name = "Utility",
     hdrs = [
         "AtomicPrimitives.h",
-        "AuxFunc.h",
         "CRC.h",
         "Cond.h",
         "DataSink.h",
