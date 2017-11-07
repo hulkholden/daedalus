@@ -31,7 +31,6 @@ cc_library(
         "Singleton.h",
         "SpinLock.h",
         "Stream.h",
-        "String.h",
         "Synchroniser.h",
         "Thread.h",
         "Timer.h",
