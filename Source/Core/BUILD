@@ -25,6 +25,7 @@ cc_library(
         "//System",
         "//Test",
         "//Utility",
+        "//Utility:IniFile",
     ],
     visibility = ["//visibility:public"],
 )

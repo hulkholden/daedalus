@@ -36,17 +36,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 namespace
 {
-
-//*****************************************************************************
-//
-//*****************************************************************************
-EExpansionPakUsage	ExpansionPakUsageFromString( const char * str )
+EExpansionPakUsage ExpansionPakUsageFromString(const char* str)
 {
-	for( u32 i = 0; i < NUM_EXPANSIONPAK_USAGE_TYPES; ++i )
+	for (u32 i = 0; i < NUM_EXPANSIONPAK_USAGE_TYPES; ++i)
 	{
-		EExpansionPakUsage	pak_usage = EExpansionPakUsage( i );
+		EExpansionPakUsage pak_usage = EExpansionPakUsage(i);
 
-		if( _strcmpi( str, ROM_GetExpansionPakUsageName( pak_usage ) ) == 0 )
+		if (_strcmpi(str, ROM_GetExpansionPakUsageName(pak_usage)) == 0)
 		{
 			return pak_usage;
 		}
@@ -55,13 +51,13 @@ EExpansionPakUsage	ExpansionPakUsageFromString( const char * str )
 	return PAK_STATUS_UNKNOWN;
 }
 
-ESaveType	SaveTypeFromString( const char * str )
+ESaveType SaveTypeFromString(const char* str)
 {
-	for( u32 i = 0; i < NUM_SAVE_TYPES; ++i )
+	for (u32 i = 0; i < NUM_SAVE_TYPES; ++i)
 	{
-		ESaveType	save_type = ESaveType( i );
+		ESaveType save_type = ESaveType(i);
 
-		if( _strcmpi( str, ROM_GetSaveTypeName( save_type ) ) == 0 )
+		if (_strcmpi(str, ROM_GetSaveTypeName(save_type)) == 0)
 		{
 			return save_type;
 		}
@@ -69,130 +65,113 @@ ESaveType	SaveTypeFromString( const char * str )
 
 	return SAVE_TYPE_UNKNOWN;
 }
-
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-const char * ROM_GetExpansionPakUsageName( EExpansionPakUsage pak_usage )
+const char* ROM_GetExpansionPakUsageName(EExpansionPakUsage pak_usage)
 {
-	switch( pak_usage )
+	switch (pak_usage)
 	{
-		case PAK_STATUS_UNKNOWN:	return "Unknown";
-		case PAK_UNUSED:			return "Unused";
-		case PAK_USED:				return "Used";
-		case PAK_REQUIRED:			return "Required";
+		case PAK_STATUS_UNKNOWN:
+			return "Unknown";
+		case PAK_UNUSED:
+			return "Unused";
+		case PAK_USED:
+			return "Used";
+		case PAK_REQUIRED:
+			return "Required";
 	}
 
-	DAEDALUS_ERROR( "Unknown expansion pak type" );
+	DAEDALUS_ERROR("Unknown expansion pak type");
 	return "?";
 }
 
-//*****************************************************************************
 // Get the name of a save type from an ESaveType enum
-//*****************************************************************************
-const char * ROM_GetSaveTypeName( ESaveType save_type )
+const char* ROM_GetSaveTypeName(ESaveType save_type)
 {
-	switch ( save_type )
+	switch (save_type)
 	{
-		case SAVE_TYPE_UNKNOWN:		return "Unknown";
-		case SAVE_TYPE_EEP4K:		return "Eeprom4k";
-		case SAVE_TYPE_EEP16K:		return "Eeprom16k";
-		case SAVE_TYPE_SRAM:		return "SRAM";
-		case SAVE_TYPE_FLASH:		return "FlashRam";
+		case SAVE_TYPE_UNKNOWN:
+			return "Unknown";
+		case SAVE_TYPE_EEP4K:
+			return "Eeprom4k";
+		case SAVE_TYPE_EEP16K:
+			return "Eeprom16k";
+		case SAVE_TYPE_SRAM:
+			return "SRAM";
+		case SAVE_TYPE_FLASH:
+			return "FlashRam";
 	}
 
-	DAEDALUS_ERROR( "Unknown save type" );
+	DAEDALUS_ERROR("Unknown save type");
 	return "?";
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 class IRomSettingsDB : public CRomSettingsDB
 {
-	public:
-		IRomSettingsDB();
-		virtual ~IRomSettingsDB();
+   public:
+	IRomSettingsDB();
+	virtual ~IRomSettingsDB();
 
-		//
-		// CRomSettingsDB implementation
-		//
-		bool			OpenSettingsFile( const char * filename );
-		void			Commit();												// (STRMNNRMN - Write ini back out to disk?)
+	//
+	// CRomSettingsDB implementation
+	//
+	bool OpenSettingsFile(const char* filename);
+	void Commit();  // (STRMNNRMN - Write ini back out to disk?)
 
-		bool			GetSettings( const RomID & id, RomSettings * p_settings ) const;
-		void			SetSettings( const RomID & id, const RomSettings & settings );
+	bool GetSettings(const RomID& id, RomSettings* p_settings) const;
+	void SetSettings(const RomID& id, const RomSettings& settings);
 
-	private:
+   private:
+	void OutputSectionDetails(const RomID& id, const RomSettings& settings, FILE* fh);
 
-		void			OutputSectionDetails( const RomID & id, const RomSettings & settings, FILE * fh );
+   private:
+	typedef std::map<RomID, RomSettings> SettingsMap;
 
-	private:
-		typedef std::map<RomID, RomSettings>		SettingsMap;
+	SettingsMap mSettings;
 
-		SettingsMap				mSettings;
-
-		bool					mDirty;				// (STRMNNRMN - Changed since read from disk?)
-		IO::Filename			mFilename;
+	bool mDirty;  // (STRMNNRMN - Changed since read from disk?)
+	IO::Filename mFilename;
 };
 
-
-
-//*****************************************************************************
-// Singleton creator
-//*****************************************************************************
-template<> bool	CSingleton< CRomSettingsDB >::Create()
+template <>
+bool CSingleton<CRomSettingsDB>::Create()
 {
 	DAEDALUS_ASSERT_Q(mpInstance == NULL);
 
 	mpInstance = new IRomSettingsDB();
 
-	IO::Filename	ini_filename;
-	IO::Path::Combine( ini_filename, gDaedalusExePath, "roms.ini" );
-	mpInstance->OpenSettingsFile( ini_filename );
+	IO::Filename ini_filename;
+	IO::Path::Combine(ini_filename, gDaedalusExePath, "roms.ini");
+	mpInstance->OpenSettingsFile(ini_filename);
 
 	return true;
 }
 
+IRomSettingsDB::IRomSettingsDB() : mDirty(false) {}
 
-//*****************************************************************************
-// Constructor
-//*****************************************************************************
-IRomSettingsDB::IRomSettingsDB()
-:	mDirty( false )
-{
-}
-
-//*****************************************************************************
-//
-//*****************************************************************************
 IRomSettingsDB::~IRomSettingsDB()
 {
-	if ( mDirty )
+	if (mDirty)
 	{
 		Commit();
 	}
 }
 
-//*****************************************************************************
-//	Remove the specified characters from p_string
-//*****************************************************************************
-static bool	trim( char * p_string, const char * p_trim_chars )
+// Remove the specified characters from p_string
+static bool trim(char* p_string, const char* p_trim_chars)
 {
-	u32 num_trims = strlen( p_trim_chars );
-	char * pin = p_string;
-	char * pout = p_string;
+	u32 num_trims = strlen(p_trim_chars);
+	char* pin = p_string;
+	char* pout = p_string;
 	bool found;
-	while ( *pin )
+	while (*pin)
 	{
 		char c = *pin;
 
 		found = false;
-		for ( u32 i = 0; i < num_trims; i++ )
+		for (u32 i = 0; i < num_trims; i++)
 		{
-			if ( p_trim_chars[ i ] == c )
+			if (p_trim_chars[i] == c)
 			{
 				// Skip
 				found = true;
@@ -200,7 +179,7 @@ static bool	trim( char * p_string, const char * p_trim_chars )
 			}
 		}
 
-		if ( found )
+		if (found)
 		{
 			pin++;
 		}
@@ -214,129 +193,69 @@ static bool	trim( char * p_string, const char * p_trim_chars )
 	return true;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-static RomID	RomIDFromString( const char * str )
+static RomID RomIDFromString(const char* str)
 {
 	u32 crc1, crc2, country;
-	sscanf( str, "%08x%08x-%02x", &crc1, &crc2, &country );
-	return RomID( crc1, crc2, (u8)country );
+	sscanf(str, "%08x%08x-%02x", &crc1, &crc2, &country);
+	return RomID(crc1, crc2, (u8)country);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-bool IRomSettingsDB::OpenSettingsFile( const char * filename )
+bool IRomSettingsDB::OpenSettingsFile(const char* filename)
 {
 	//
 	// Remember the filename
 	//
 	strcpy(mFilename, filename);
 
-	CIniFile * p_ini_file( CIniFile::Create( filename ) );
-	if( p_ini_file == NULL )
+	IniFile* inifile = IniFile::Create(filename);
+	if (inifile == NULL)
 	{
-		DBGConsole_Msg( 0, "Failed to open RomDB from %s\n", filename );
+		DBGConsole_Msg(0, "Failed to open RomDB from %s\n", filename);
 		return false;
 	}
 
-	for( u32 section_idx = 0; section_idx < p_ini_file->GetNumSections(); ++section_idx )
+	for (u32 section_idx = 0; section_idx < inifile->GetNumSections(); ++section_idx)
 	{
-		const CIniFileSection * p_section( p_ini_file->GetSection( section_idx ) );
+		const IniFileSection* section = inifile->GetSection(section_idx);
+		RomID id(RomIDFromString(section->name().c_str()));
+		RomSettings settings;
 
-		RomID			id( RomIDFromString( p_section->GetName() ) );
-		RomSettings	settings;
-
-		const CIniFileProperty * p_property;
-		if( p_section->FindProperty( "Comment", &p_property ) )
+		std::string str_value;
+		section->GetProperty("Comment", &settings.Comment);
+		section->GetProperty("Info", &settings.Info);
+		section->GetProperty("Name", &settings.GameName);
+		section->GetProperty("Preview", &settings.Preview);
+		if (section->GetProperty("ExpansionPakUsage", &str_value))
 		{
-			settings.Comment = p_property->GetValue();
+			settings.ExpansionPakUsage = ExpansionPakUsageFromString(str_value.c_str());
 		}
-		if( p_section->FindProperty( "Info", &p_property ) )
+		if (section->GetProperty("SaveType", &str_value))
 		{
-			settings.Info = p_property->GetValue();
+			settings.SaveType = SaveTypeFromString(str_value.c_str());
 		}
-		if( p_section->FindProperty( "Name", &p_property ) )
-		{
-			settings.GameName = p_property->GetValue();
-		}
-		if( p_section->FindProperty( "Preview", &p_property ) )
-		{
-			settings.Preview = p_property->GetValue();
-		}
-		if( p_section->FindProperty( "ExpansionPakUsage", &p_property ) )
-		{
-			settings.ExpansionPakUsage = ExpansionPakUsageFromString( p_property->GetValue() );
-		}
-		if( p_section->FindProperty( "SaveType", &p_property ) )
-		{
-			settings.SaveType = SaveTypeFromString( p_property->GetValue() );
-		}
-		if( p_section->FindProperty( "PatchesEnabled", &p_property ) )
-		{
-			settings.PatchesEnabled = p_property->GetBooleanValue( true );
-		}
-		if( p_section->FindProperty( "SpeedSyncEnabled", &p_property ) )
-		{
-			settings.SpeedSyncEnabled = atoi( p_property->GetValue() );
-		}
-		if( p_section->FindProperty( "DynarecSupported", &p_property ) )
-		{
-			settings.DynarecSupported = p_property->GetBooleanValue( true );
-		}
-		if( p_section->FindProperty( "DynarecLoopOptimisation", &p_property ) )
-		{
-			settings.DynarecLoopOptimisation = p_property->GetBooleanValue( false );
-		}
-		if( p_section->FindProperty( "DynarecDoublesOptimisation", &p_property ) )
-		{
-			settings.DynarecDoublesOptimisation = p_property->GetBooleanValue( false );
-		}
-		if( p_section->FindProperty( "DoubleDisplayEnabled", &p_property ) )
-		{
-			settings.DoubleDisplayEnabled = p_property->GetBooleanValue( true );
-		}
-		if( p_section->FindProperty( "CleanSceneEnabled", &p_property ) )
-		{
-			settings.CleanSceneEnabled = p_property->GetBooleanValue( false );
-		}
-		if( p_section->FindProperty( "ClearDepthFrameBuffer", &p_property ) )
-		{
-			settings.ClearDepthFrameBuffer = p_property->GetBooleanValue( false );
-		}
-		if( p_section->FindProperty( "AudioRateMatch", &p_property ) )
-		{
-			settings.AudioRateMatch = p_property->GetBooleanValue( false );
-		}
-		if( p_section->FindProperty( "VideoRateMatch", &p_property ) )
-		{
-			settings.VideoRateMatch = p_property->GetBooleanValue( false );
-		}
-		if( p_section->FindProperty( "FogEnabled", &p_property ) )
-		{
-			settings.FogEnabled = p_property->GetBooleanValue( false );
-		}
-		if( p_section->FindProperty( "MemoryAccessOptimisation", &p_property ) )
-		{
-			settings.MemoryAccessOptimisation = p_property->GetBooleanValue( false );
-		}
-		if( p_section->FindProperty( "CheatsEnabled", &p_property ) )
-		{
-			settings.CheatsEnabled = p_property->GetBooleanValue( false );
-		}
-		SetSettings( id, settings );
+		section->GetProperty("PatchesEnabled", &settings.PatchesEnabled);
+		section->GetProperty("SpeedSyncEnabled", &settings.SpeedSyncEnabled);
+		section->GetProperty("DynarecSupported", &settings.DynarecSupported);
+		section->GetProperty("DynarecLoopOptimisation", &settings.DynarecLoopOptimisation);
+		section->GetProperty("DynarecDoublesOptimisation", &settings.DynarecDoublesOptimisation);
+		section->GetProperty("DoubleDisplayEnabled", &settings.DoubleDisplayEnabled);
+		section->GetProperty("CleanSceneEnabled", &settings.CleanSceneEnabled);
+		section->GetProperty("ClearDepthFrameBuffer", &settings.ClearDepthFrameBuffer);
+		section->GetProperty("AudioRateMatch", &settings.AudioRateMatch);
+		section->GetProperty("VideoRateMatch", &settings.VideoRateMatch);
+		section->GetProperty("FogEnabled", &settings.FogEnabled);
+		section->GetProperty("MemoryAccessOptimisation", &settings.MemoryAccessOptimisation);
+		section->GetProperty("CheatsEnabled", &settings.CheatsEnabled);
+		SetSettings(id, settings);
 	}
 
 	mDirty = false;
 
-	delete p_ini_file;
+	delete inifile;
 	return true;
 }
 
-//*****************************************************************************
-//	Write out the .ini file, keeping the original comments intact
-//*****************************************************************************
+// Write out the .ini file, keeping the original comments intact
 void IRomSettingsDB::Commit()
 {
 	IO::Filename filename_tmp;
@@ -345,47 +264,44 @@ void IRomSettingsDB::Commit()
 	sprintf(filename_tmp, "%s.tmp", mFilename);
 	sprintf(filename_del, "%s.del", mFilename);
 
-	FILE * fh_src = fopen(mFilename, "r");
+	FILE* fh_src = fopen(mFilename, "r");
 	if (fh_src == NULL)
 	{
 		return;
 	}
 
-	FILE * fh_dst = fopen(filename_tmp, "w");
+	FILE* fh_dst = fopen(filename_tmp, "w");
 	if (fh_dst == NULL)
 	{
 		fclose(fh_src);
 		return;
 	}
 
-	//
-	//	Keep track of visited sections in a set
-	//
-	std::set<RomID>		visited;
+	// Keep track of visited sections in a set
+	std::set<RomID> visited;
 
-	char buffer[1024+1];
+	char buffer[1024 + 1];
 	while (fgets(buffer, 1024, fh_src))
 	{
 		if (buffer[0] == '{')
 		{
-			const char * const trim_chars = "{}\n\r"; //remove first and last character
+			const char* const trim_chars = "{}\n\r";  // remove first and last character
 
 			// Start of section
-			trim( buffer, trim_chars );
+			trim(buffer, trim_chars);
 
-			RomID id( RomIDFromString( buffer ) );
+			RomID id(RomIDFromString(buffer));
 
 			// Avoid duplicated entries for this id
-			if ( visited.find( id ) != visited.end() )
-				continue;
+			if (visited.find(id) != visited.end()) continue;
 
-			visited.insert( id );
+			visited.insert(id);
 
-			SettingsMap::const_iterator	it( mSettings.find( id ) );
-			if( it != mSettings.end() )
+			SettingsMap::const_iterator it(mSettings.find(id));
+			if (it != mSettings.end())
 			{
 				// Output this CRC
-				OutputSectionDetails( id, it->second, fh_dst );
+				OutputSectionDetails(id, it->second, fh_dst);
 			}
 			else
 			{
@@ -399,71 +315,66 @@ void IRomSettingsDB::Commit()
 			fputs(buffer, fh_dst);
 			continue;
 		}
-
 	}
 
 	// Input buffer done-  process any new entries!
-	for ( SettingsMap::const_iterator it = mSettings.begin(); it != mSettings.end(); ++it )
+	for (SettingsMap::const_iterator it = mSettings.begin(); it != mSettings.end(); ++it)
 	{
 		// Skip any that have not been done.
-		if ( visited.find( it->first ) == visited.end() )
+		if (visited.find(it->first) == visited.end())
 		{
-			OutputSectionDetails( it->first, it->second, fh_dst );
+			OutputSectionDetails(it->first, it->second, fh_dst);
 		}
 	}
 
-	fclose( fh_dst );
-	fclose( fh_src );
+	fclose(fh_dst);
+	fclose(fh_src);
 
 	// Create the new file
-	IO::File::Move( mFilename, filename_del );
-	IO::File::Move( filename_tmp, mFilename );
-	IO::File::Delete( filename_del );
+	IO::File::Move(mFilename, filename_del);
+	IO::File::Move(filename_tmp, mFilename);
+	IO::File::Delete(filename_del);
 
 	mDirty = false;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void IRomSettingsDB::OutputSectionDetails( const RomID & id, const RomSettings & settings, FILE * fh )
+void IRomSettingsDB::OutputSectionDetails(const RomID& id, const RomSettings& settings, FILE* fh)
 {
 	// Generate the CRC-ID for this rom:
-	fprintf(fh, "{%08x%08x-%02x}\n", id.CRC[0], id.CRC[1], id.CountryID );
+	fprintf(fh, "{%08x%08x-%02x}\n", id.CRC[0], id.CRC[1], id.CountryID);
 
 	fprintf(fh, "Name=%s\n", settings.GameName.c_str());
 
-	if( !settings.Comment.empty() )				fprintf(fh, "Comment=%s\n", settings.Comment.c_str());
-	if( !settings.Info.empty() )				fprintf(fh, "Info=%s\n", settings.Info.c_str());
-	if( !settings.Preview.empty() )				fprintf(fh, "Preview=%s\n", settings.Preview.c_str());
-	if( !settings.PatchesEnabled )				fprintf(fh, "PatchesEnabled=no\n");
-	if( !settings.SpeedSyncEnabled )			fprintf(fh, "SpeedSyncEnabled=%d\n", settings.SpeedSyncEnabled);
-	if( !settings.DynarecSupported )			fprintf(fh, "DynarecSupported=no\n");
-	if( !settings.DynarecLoopOptimisation )		fprintf(fh, "DynarecLoopOptimisation=yes\n");
-	if( !settings.DynarecDoublesOptimisation )	fprintf(fh, "DynarecDoublesOptimisation=yes\n");
-	if( !settings.DoubleDisplayEnabled )		fprintf(fh, "DoubleDisplayEnabled=no\n");
-	if( settings.CleanSceneEnabled )			fprintf(fh, "CleanSceneEnabled=yes\n");
-	if( settings.ClearDepthFrameBuffer )		fprintf(fh, "ClearDepthFrameBuffer=yes\n");
-	if( settings.AudioRateMatch )				fprintf(fh, "AudioRateMatch=yes\n");
-	if( settings.VideoRateMatch )				fprintf(fh, "VideoRateMatch=yes\n");
-	if( settings.FogEnabled )					fprintf(fh, "FogEnabled=yes\n");
-	if( settings.MemoryAccessOptimisation )		fprintf(fh, "MemoryAccessOptimisation=yes\n");
-	if( settings.CheatsEnabled )				fprintf(fh, "CheatsEnabled=yes\n");
+	if (!settings.Comment.empty()) fprintf(fh, "Comment=%s\n", settings.Comment.c_str());
+	if (!settings.Info.empty()) fprintf(fh, "Info=%s\n", settings.Info.c_str());
+	if (!settings.Preview.empty()) fprintf(fh, "Preview=%s\n", settings.Preview.c_str());
+	if (!settings.PatchesEnabled) fprintf(fh, "PatchesEnabled=no\n");
+	if (!settings.SpeedSyncEnabled) fprintf(fh, "SpeedSyncEnabled=%d\n", settings.SpeedSyncEnabled);
+	if (!settings.DynarecSupported) fprintf(fh, "DynarecSupported=no\n");
+	if (!settings.DynarecLoopOptimisation) fprintf(fh, "DynarecLoopOptimisation=yes\n");
+	if (!settings.DynarecDoublesOptimisation) fprintf(fh, "DynarecDoublesOptimisation=yes\n");
+	if (!settings.DoubleDisplayEnabled) fprintf(fh, "DoubleDisplayEnabled=no\n");
+	if (settings.CleanSceneEnabled) fprintf(fh, "CleanSceneEnabled=yes\n");
+	if (settings.ClearDepthFrameBuffer) fprintf(fh, "ClearDepthFrameBuffer=yes\n");
+	if (settings.AudioRateMatch) fprintf(fh, "AudioRateMatch=yes\n");
+	if (settings.VideoRateMatch) fprintf(fh, "VideoRateMatch=yes\n");
+	if (settings.FogEnabled) fprintf(fh, "FogEnabled=yes\n");
+	if (settings.MemoryAccessOptimisation) fprintf(fh, "MemoryAccessOptimisation=yes\n");
+	if (settings.CheatsEnabled) fprintf(fh, "CheatsEnabled=yes\n");
 
-	if ( settings.ExpansionPakUsage != PAK_STATUS_UNKNOWN )	fprintf(fh, "ExpansionPakUsage=%s\n", ROM_GetExpansionPakUsageName( settings.ExpansionPakUsage ) );
-	if ( settings.SaveType != SAVE_TYPE_UNKNOWN )			fprintf(fh, "SaveType=%s\n", ROM_GetSaveTypeName( settings.SaveType ) );
+	if (settings.ExpansionPakUsage != PAK_STATUS_UNKNOWN)
+		fprintf(fh, "ExpansionPakUsage=%s\n", ROM_GetExpansionPakUsageName(settings.ExpansionPakUsage));
+	if (settings.SaveType != SAVE_TYPE_UNKNOWN) fprintf(fh, "SaveType=%s\n", ROM_GetSaveTypeName(settings.SaveType));
 
-	fprintf(fh, "\n");			// Spacer
+	fprintf(fh, "\n");  // Spacer
 }
 
-//*****************************************************************************
 // Retreive the settings for the specified rom. Returns false if the rom is
 // not in the database
-//*****************************************************************************
-bool	IRomSettingsDB::GetSettings( const RomID & id, RomSettings * p_settings ) const
+bool IRomSettingsDB::GetSettings(const RomID& id, RomSettings* p_settings) const
 {
-	SettingsMap::const_iterator	it( mSettings.find( id ) );
-	if ( it != mSettings.end() )
+	SettingsMap::const_iterator it(mSettings.find(id));
+	if (it != mSettings.end())
 	{
 		*p_settings = it->second;
 		return true;
@@ -474,57 +385,23 @@ bool	IRomSettingsDB::GetSettings( const RomID & id, RomSettings * p_settings ) c
 	}
 }
 
-//*****************************************************************************
 // Update the settings for the specified rom - creates a new entry if necessary
-//*****************************************************************************
-void	IRomSettingsDB::SetSettings( const RomID & id, const RomSettings & settings )
+void IRomSettingsDB::SetSettings(const RomID& id, const RomSettings& settings)
 {
-	SettingsMap::iterator	it( mSettings.find( id ) );
-	if ( it != mSettings.end() )
+	SettingsMap::iterator it(mSettings.find(id));
+	if (it != mSettings.end())
 	{
 		it->second = settings;
 	}
 	else
 	{
-		mSettings[ id ] = settings;
+		mSettings[id] = settings;
 	}
 
 	mDirty = true;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-RomSettings::RomSettings()
-:	ExpansionPakUsage( PAK_STATUS_UNKNOWN )
-,	SaveType( SAVE_TYPE_UNKNOWN )
-,	PatchesEnabled( true )
-,	SpeedSyncEnabled( 0 )
-,	DynarecSupported( true )
-,	DynarecLoopOptimisation( false )
-,	DynarecDoublesOptimisation( false )
-,	DoubleDisplayEnabled( true )
-,	CleanSceneEnabled( false )
-,	ClearDepthFrameBuffer( false )
-,	AudioRateMatch( false )
-,	VideoRateMatch( false )
-,	FogEnabled( false )
-,   MemoryAccessOptimisation( false )
-,   CheatsEnabled( false )
-{
-}
-
-//*****************************************************************************
-//
-//*****************************************************************************
-RomSettings::~RomSettings()
-{
-}
-
-//*****************************************************************************
-//
-//*****************************************************************************
-void	RomSettings::Reset()
+void RomSettings::Reset()
 {
 	GameName = "";
 	Comment = "";
@@ -542,6 +419,6 @@ void	RomSettings::Reset()
 	AudioRateMatch = false;
 	VideoRateMatch = false;
 	FogEnabled = false;
-	CheatsEnabled = false;
 	MemoryAccessOptimisation = false;
+	CheatsEnabled = false;
 }

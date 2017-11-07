@@ -42,15 +42,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Translate.h"
 #endif
 
-// Audio is disabled on the PSP by default, but enabled on other platforms.
-#ifdef DAEDALUS_PSP
-static const EAudioPluginMode kDefaultAudioPluginMode = APM_DISABLED;
-static const ETextureHashFrequency kDefaultTextureHashFrequency = THF_DISABLED;
-#else
-static const EAudioPluginMode kDefaultAudioPluginMode = APM_ENABLED_SYNC;
-static const ETextureHashFrequency kDefaultTextureHashFrequency = THF_EVERY_FRAME;
-#endif
-
 static u32 GetTexureHashFrequencyAsFrames(ETextureHashFrequency thf);
 static ETextureHashFrequency GetTextureHashFrequencyFromFrames(u32 frames);
 
@@ -124,180 +115,104 @@ bool IPreferences::OpenPreferencesFile(const char* filename)
 {
 	mFilename = filename;
 
-	CIniFile* p_ini_file(CIniFile::Create(filename));
-	if (p_ini_file == NULL)
+	IniFile* inifile = IniFile::Create(filename);
+	if (inifile == nullptr)
 	{
 		return false;
 	}
 
-	const CIniFileSection* section(p_ini_file->GetDefaultSection());
-	if (section != NULL)
+	const IniFileSection* section = inifile->GetDefaultSection();
+	if (section != nullptr)
 	{
-		const CIniFileProperty* property;
-
-#define BOOL_SETTING(b, nm, def)                  \
-	if (section->FindProperty(#nm, &property))    \
-	{                                             \
-		b.nm = property->GetBooleanValue(def.nm); \
-	}
-#define INT_SETTING(b, nm, def)                \
-	if (section->FindProperty(#nm, &property)) \
-	{                                          \
-		b.nm = property->GetIntValue(def.nm);  \
-	}
-#define FLOAT_SETTING(b, nm, def)               \
-	if (section->FindProperty(#nm, &property))  \
-	{                                           \
-		b.nm = property->GetFloatValue(def.nm); \
-	}
-
-		const SGlobalPreferences defaults;
-
-		INT_SETTING(gGlobalPreferences, DisplayFramerate, defaults);
-		BOOL_SETTING(gGlobalPreferences, ForceLinearFilter, defaults);
-		BOOL_SETTING(gGlobalPreferences, RumblePak, defaults);
+		std::string str_value;
+		section->GetProperty("DisplayFramerate", &gGlobalPreferences.DisplayFramerate);
+		section->GetProperty("ForceLinearFilter", &gGlobalPreferences.ForceLinearFilter);
+		section->GetProperty("RumblePak", &gGlobalPreferences.RumblePak);
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-		BOOL_SETTING(gGlobalPreferences, HighlightInexactBlendModes, defaults);
-		BOOL_SETTING(gGlobalPreferences, CustomBlendModes, defaults);
+		section->GetProperty("HighlightInexactBlendModes", &gGlobalPreferences.HighlightInexactBlendModes);
+		section->GetProperty("CustomBlendModes", &gGlobalPreferences.CustomBlendModes);
 #endif
-		BOOL_SETTING(gGlobalPreferences, BatteryWarning, defaults);
-		BOOL_SETTING(gGlobalPreferences, LargeROMBuffer, defaults);
-		FLOAT_SETTING(gGlobalPreferences, StickMinDeadzone, defaults);
-		FLOAT_SETTING(gGlobalPreferences, StickMaxDeadzone, defaults);
-//		INT_SETTING( gGlobalPreferences, Language, defaults );
+		section->GetProperty("BatteryWarning", &gGlobalPreferences.BatteryWarning);
+		section->GetProperty("LargeROMBuffer", &gGlobalPreferences.LargeROMBuffer);
+		section->GetProperty("StickMinDeadzone", &gGlobalPreferences.StickMinDeadzone);
+		section->GetProperty("StickMaxDeadzone", &gGlobalPreferences.StickMaxDeadzone);
 #ifdef DAEDALUS_PSP
-		if (section->FindProperty("Language", &property))
+		if (section->GetProperty("Language", &str_value))
 		{
-			gGlobalPreferences.Language = Translate_IndexFromName(property->GetValue());
+			gGlobalPreferences.Language = Translate_IndexFromName(str_value);
 		}
 #endif
-		if (section->FindProperty("GuiColor", &property))
+		int int_value;
+		if (section->GetProperty("GuiColor", &int_value))
 		{
-			u32 value(property->GetIntValue(defaults.GuiColor));
-			if (value < NUM_COLOR_TYPES)  // value >= 0 && not needed as it's always True
+			if (int_value >= 0 && int_value < NUM_COLOR_TYPES)
 			{
-				gGlobalPreferences.GuiColor = EGuiColor(value);
+				gGlobalPreferences.GuiColor = EGuiColor(int_value);
 			}
 		}
 
-		if (section->FindProperty("ViewportType", &property))
+		if (section->GetProperty("ViewportType", &int_value))
 		{
-			u32 value(property->GetIntValue(defaults.ViewportType));
-			if (value < NUM_VIEWPORT_TYPES)  // value >= 0 && Not need as it's always True
+			if (int_value >= 0 && int_value < NUM_VIEWPORT_TYPES)
 			{
-				gGlobalPreferences.ViewportType = EViewportType(value);
+				gGlobalPreferences.ViewportType = EViewportType(int_value);
 			}
 		}
 
-		BOOL_SETTING(gGlobalPreferences, TVEnable, defaults);
-		BOOL_SETTING(gGlobalPreferences, TVLaced, defaults);
-		if (section->FindProperty("TVType", &property))
+		section->GetProperty("TVEnable", &gGlobalPreferences.TVEnable);
+		section->GetProperty("TVLaced", &gGlobalPreferences.TVLaced);
+		if (section->GetProperty("TVType", &int_value))
 		{
-			u32 value(property->GetIntValue(defaults.TVType));
-			if (value < 2)  // value >= 0 && not needed as it's always True
+			if (int_value >= 0 && int_value < 2)
 			{
-				gGlobalPreferences.TVType = ETVType(value);
+				gGlobalPreferences.TVType = ETVType(int_value);
 			}
 		}
 	}
 
-	for (u32 section_idx = 0; section_idx < p_ini_file->GetNumSections(); ++section_idx)
+	for (u32 section_idx = 0; section_idx < inifile->GetNumSections(); ++section_idx)
 	{
-		const CIniFileSection* section(p_ini_file->GetSection(section_idx));
+		const IniFileSection* section = inifile->GetSection(section_idx);
 
-		RomID id(RomIDFromString(section->GetName()));
+		RomID id = RomIDFromString(section->name().c_str());
 		SRomPreferences preferences;
 
-		const CIniFileProperty* property;
-		if (section->FindProperty("PatchesEnabled", &property))
+		int int_value;
+		section->GetProperty("PatchesEnabled", &preferences.PatchesEnabled);
+		section->GetProperty("SpeedSyncEnabled", &preferences.SpeedSyncEnabled);
+		section->GetProperty("DynarecEnabled", &preferences.DynarecEnabled);
+		section->GetProperty("DynarecLoopOptimisation", &preferences.DynarecLoopOptimisation);
+		section->GetProperty("DynarecDoublesOptimisation", &preferences.DynarecDoublesOptimisation);
+		section->GetProperty("DoubleDisplayEnabled", &preferences.DoubleDisplayEnabled);
+		section->GetProperty("CleanSceneEnabled", &preferences.CleanSceneEnabled);
+		section->GetProperty("ClearDepthFrameBuffer", &preferences.ClearDepthFrameBuffer);
+		section->GetProperty("AudioRateMatch", &preferences.AudioRateMatch);
+		section->GetProperty("VideoRateMatch", &preferences.VideoRateMatch);
+		section->GetProperty("FogEnabled", &preferences.FogEnabled);
+		if (section->GetProperty("CheckTextureHashFrequency", &int_value))
 		{
-			preferences.PatchesEnabled = property->GetBooleanValue(true);
+			preferences.CheckTextureHashFrequency = GetTextureHashFrequencyFromFrames(int_value);
 		}
-		if (section->FindProperty("SpeedSyncEnabled", &property))
+		if (section->GetProperty("Frameskip", &int_value))
 		{
-			preferences.SpeedSyncEnabled = atoi(property->GetValue());
+			preferences.Frameskip = GetFrameskipValueFromInt(int_value);
 		}
-		if (section->FindProperty("DynarecEnabled", &property))
+		if (section->GetProperty("AudioEnabled", &int_value))
 		{
-			preferences.DynarecEnabled = property->GetBooleanValue(true);
+			if (int_value >= APM_DISABLED && int_value <= APM_ENABLED_SYNC)
+			{
+				preferences.AudioEnabled = static_cast<EAudioPluginMode>(int_value);
+			}
 		}
-		if (section->FindProperty("DynarecLoopOptimisation", &property))
-		{
-			preferences.DynarecLoopOptimisation = property->GetBooleanValue(false);
-		}
-		if (section->FindProperty("DynarecDoublesOptimisation", &property))
-		{
-			preferences.DynarecDoublesOptimisation = property->GetBooleanValue(false);
-		}
-		if (section->FindProperty("DoubleDisplayEnabled", &property))
-		{
-			preferences.DoubleDisplayEnabled = property->GetBooleanValue(true);
-		}
-		if (section->FindProperty("CleanSceneEnabled", &property))
-		{
-			preferences.CleanSceneEnabled = property->GetBooleanValue(false);
-		}
-		if (section->FindProperty("ClearDepthFrameBuffer", &property))
-		{
-			preferences.ClearDepthFrameBuffer = property->GetBooleanValue(false);
-		}
-		if (section->FindProperty("AudioRateMatch", &property))
-		{
-			preferences.AudioRateMatch = property->GetBooleanValue(false);
-		}
-		if (section->FindProperty("VideoRateMatch", &property))
-		{
-			preferences.VideoRateMatch = property->GetBooleanValue(false);
-		}
-		if (section->FindProperty("FogEnabled", &property))
-		{
-			preferences.FogEnabled = property->GetBooleanValue(false);
-		}
-		if (section->FindProperty("CheckTextureHashFrequency", &property))
-		{
-			preferences.CheckTextureHashFrequency = GetTextureHashFrequencyFromFrames(atoi(property->GetValue()));
-		}
-		if (section->FindProperty("Frameskip", &property))
-		{
-			preferences.Frameskip = GetFrameskipValueFromInt(atoi(property->GetValue()));
-		}
-		if (section->FindProperty("AudioEnabled", &property))
-		{
-			int audio_enabled = atoi(property->GetValue());
-
-			if (audio_enabled >= APM_DISABLED && audio_enabled <= APM_ENABLED_SYNC)
-				preferences.AudioEnabled = static_cast<EAudioPluginMode>(audio_enabled);
-			else
-				preferences.AudioEnabled = APM_DISABLED;
-		}
-		//		if( section->FindProperty( "AudioAdaptFrequency", &property ) )
-		//		{
-		//			preferences.AudioAdaptFrequency = property->GetBooleanValue( false );
-		//		}
-		if (section->FindProperty("ZoomX", &property))
-		{
-			preferences.ZoomX = (f32)atof(property->GetValue());
-		}
-#ifdef DAEDALUS_PSP
-		if (section->FindProperty("Controller", &property))
-		{
-			preferences.ControllerIndex = CInputManager::Get()->GetConfigurationFromName(property->GetValue());
-		}
-#endif
-		if (section->FindProperty("MemoryAccessOptimisation", &property))
-		{
-			preferences.MemoryAccessOptimisation = property->GetBooleanValue(false);
-		}
-		if (section->FindProperty("CheatsEnabled", &property))
-		{
-			preferences.CheatsEnabled = property->GetBooleanValue(false);
-		}
+		section->GetProperty("ZoomX", &preferences.ZoomX);
+		section->GetProperty("MemoryAccessOptimisation", &preferences.MemoryAccessOptimisation);
+		section->GetProperty("CheatsEnabled", &preferences.CheatsEnabled);
 		mPreferences[id] = preferences;
 	}
 
 	mDirty = false;
 
-	delete p_ini_file;
+	delete inifile;
 	return true;
 }
 
@@ -326,9 +241,6 @@ void IPreferences::OutputSectionDetails(const RomID& id, const SRomPreferences& 
 	fprintf(fh, "ZoomX=%f\n", preferences.ZoomX);
 	fprintf(fh, "MemoryAccessOptimisation=%d\n", preferences.MemoryAccessOptimisation);
 	fprintf(fh, "CheatsEnabled=%d\n", preferences.CheatsEnabled);
-#ifdef DAEDALUS_PSP
-	fprintf(fh, "Controller=%s\n", CInputManager::Get()->GetConfigurationName(preferences.ControllerIndex));
-#endif
 	fprintf(fh, "\n");  // Spacer
 }
 
@@ -434,34 +346,9 @@ SGlobalPreferences::SGlobalPreferences()
 
 void SGlobalPreferences::Apply() const {}
 
-SRomPreferences::SRomPreferences()
-	: PatchesEnabled(true),
-	  DynarecEnabled(true),
-	  DynarecLoopOptimisation(false),
-	  DynarecDoublesOptimisation(false),
-	  DoubleDisplayEnabled(true),
-	  CleanSceneEnabled(false),
-	  ClearDepthFrameBuffer(false),
-	  AudioRateMatch(false),
-	  VideoRateMatch(false),
-	  FogEnabled(false),
-	  MemoryAccessOptimisation(false),
-	  CheatsEnabled(false)
-	  //	,	AudioAdaptFrequency( false )
-	  ,
-	  CheckTextureHashFrequency(kDefaultTextureHashFrequency),
-	  Frameskip(FV_DISABLED),
-	  AudioEnabled(kDefaultAudioPluginMode),
-	  ZoomX(1.0f),
-	  SpeedSyncEnabled(0),
-	  ControllerIndex(0)
-{
-}
-
 void SRomPreferences::Reset()
 {
 	PatchesEnabled = true;
-	SpeedSyncEnabled = 0;
 	DynarecEnabled = true;
 	DynarecLoopOptimisation = false;
 	DynarecDoublesOptimisation = false;
@@ -472,13 +359,12 @@ void SRomPreferences::Reset()
 	VideoRateMatch = false;
 	FogEnabled = false;
 	MemoryAccessOptimisation = false;
-	CheckTextureHashFrequency = kDefaultTextureHashFrequency;
-	Frameskip = FV_DISABLED;
-	AudioEnabled = kDefaultAudioPluginMode;
-	// AudioAdaptFrequency      = false;
-	ZoomX = 1.0f;
 	CheatsEnabled = false;
-	ControllerIndex = 0;
+	CheckTextureHashFrequency = THF_EVERY_FRAME;
+	Frameskip = FV_DISABLED;
+	AudioEnabled = APM_ENABLED_SYNC;
+	ZoomX = 1.0f;
+	SpeedSyncEnabled = 0;
 }
 
 void SRomPreferences::Apply() const
@@ -501,11 +387,6 @@ void SRomPreferences::Apply() const
 	gZoomX = ZoomX;
 	gCheatsEnabled = g_ROM.settings.CheatsEnabled || CheatsEnabled;
 	gAudioPluginEnabled = AudioEnabled;
-	//	gAdaptFrequency             = AudioAdaptFrequency;
-	gControllerIndex = ControllerIndex;  // Used during ROM initialization
-#ifdef DAEDALUS_PSP
-	CInputManager::Get()->SetConfiguration(ControllerIndex);  // Used after initialization
-#endif
 }
 
 static const u32 gTextureHashFreqeuncies[] = {

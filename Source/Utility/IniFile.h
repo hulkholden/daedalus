@@ -23,43 +23,55 @@
 #ifndef UTILITY_INIFILE_H_
 #define UTILITY_INIFILE_H_
 
+#include <string>
+#include <map>
+#include <vector>
+
+#include "absl/strings/string_view.h"
+
 #include "Base/Types.h"
 
-class CIniFileProperty
+class IniFileSection
 {
    public:
-	virtual ~CIniFileProperty();
+	IniFileSection(absl::string_view name) : mName(name) {}
 
-	virtual const char* GetName() const = 0;
-	virtual const char* GetValue() const = 0;
+	const std::string& name() const { return mName; }
 
-	virtual bool GetBooleanValue(bool default_value) const = 0;
-	virtual int GetIntValue(int default_value) const = 0;
-	virtual float GetFloatValue(float default_value) const = 0;
+	void AddProperty(const std::string& key, const std::string& value) { mProperties[key] = value; }
+
+	bool GetProperty(const std::string& name, std::string* value) const;
+	bool GetProperty(const std::string& name, bool* value) const;
+	bool GetProperty(const std::string& name, int* value) const;
+	bool GetProperty(const std::string& name, u32* value) const;
+	bool GetProperty(const std::string& name, float* value) const;
+
+   private:
+	std::string mName;
+	std::map<std::string, std::string> mProperties;
 };
 
-class CIniFileSection
+class IniFile
 {
+   private:
+	IniFile() : mpDefaultSection(nullptr) {}
+	bool Open(const char* filename);
+
    public:
-	virtual ~CIniFileSection();
+	~IniFile();
 
-	virtual const char* GetName() const = 0;
-	virtual bool FindProperty(const char* p_name, const CIniFileProperty** p_property) const = 0;
-};
+	static IniFile* Create(const char* filename);
 
-class CIniFile
-{
-   public:
-	virtual ~CIniFile();
+	const IniFileSection* GetDefaultSection() const { return mpDefaultSection; }
 
-	static CIniFile* Create(const char* filename);
+	u32 GetNumSections() const { return mSections.size(); }
+	const IniFileSection* GetSection(u32 section_idx) const;
 
-	virtual const CIniFileSection* GetDefaultSection() const = 0;
+	const IniFileSection* GetSectionByName(const char* section_name) const;
 
-	virtual u32 GetNumSections() const = 0;
-	virtual const CIniFileSection* GetSection(u32 section_idx) const = 0;
-
-	virtual const CIniFileSection* GetSectionByName(const char* section_name) const = 0;
+   private:
+	IniFileSection* mpDefaultSection;
+	std::vector<IniFileSection*> mSections;
 };
 
 #endif  // UTILITY_INIFILE_H_

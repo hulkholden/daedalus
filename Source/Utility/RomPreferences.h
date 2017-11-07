@@ -71,16 +71,14 @@ struct SRomPreferences
 	bool FogEnabled;
 	bool MemoryAccessOptimisation;
 	bool CheatsEnabled;
-	//	bool						AudioAdaptFrequency;
 	ETextureHashFrequency CheckTextureHashFrequency;
 	EFrameskipValue Frameskip;
 	EAudioPluginMode AudioEnabled;
 	f32 ZoomX;
 	u32 SpeedSyncEnabled;
 	u32 ControllerIndex;
-	//	u32							PAD1;	//Some Bug in GCC that require to pad the struct some times...(?)
 
-	SRomPreferences();
+	SRomPreferences() { Reset(); }
 
 	void Reset();
 	void Apply() const;

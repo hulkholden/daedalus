@@ -22,11 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef CORE_ROMSETTINGS_H_
 #define CORE_ROMSETTINGS_H_
 
-#include "Utility/String.h"
-
-//*****************************************************************************
-// Configurable settings for a rom
-//*****************************************************************************
+#include <string>
 
 enum ESaveType
 {
@@ -47,62 +43,52 @@ enum EExpansionPakUsage
 };
 const u32 NUM_EXPANSIONPAK_USAGE_TYPES = PAK_REQUIRED + 1;
 
-
 struct RomSettings
 {
-	CFixedString<64>	GameName;
-	CFixedString<64>	Comment;
-	CFixedString<64>	Info;
-	CFixedString<64>	Preview;
+	std::string GameName;
+	std::string Comment;
+	std::string Info;
+	std::string Preview;
 
-	EExpansionPakUsage	ExpansionPakUsage;
-	ESaveType			SaveType;
+	EExpansionPakUsage ExpansionPakUsage;
+	ESaveType SaveType;
 
-	bool				PatchesEnabled;
-	u32					SpeedSyncEnabled;
-	bool				DynarecSupported;
-	bool				DynarecLoopOptimisation;
-	bool				DynarecDoublesOptimisation;
-	bool				DoubleDisplayEnabled;
-	bool				CleanSceneEnabled;
-	bool				ClearDepthFrameBuffer;
-	bool				AudioRateMatch;
-	bool				VideoRateMatch;
-	bool				FogEnabled;
-	bool                MemoryAccessOptimisation;
-	bool				CheatsEnabled;
+	bool PatchesEnabled;
+	u32 SpeedSyncEnabled;
+	bool DynarecSupported;
+	bool DynarecLoopOptimisation;
+	bool DynarecDoublesOptimisation;
+	bool DoubleDisplayEnabled;
+	bool CleanSceneEnabled;
+	bool ClearDepthFrameBuffer;
+	bool AudioRateMatch;
+	bool VideoRateMatch;
+	bool FogEnabled;
+	bool MemoryAccessOptimisation;
+	bool CheatsEnabled;
 
-	RomSettings();
+	RomSettings() { Reset(); }
 
-	~RomSettings();
-
-	void	Reset();
+	void Reset();
 };
 
 #include "Utility/Singleton.h"
 
-//*****************************************************************************
-//
-//*****************************************************************************
-class	RomID;
+class RomID;
 
-//*****************************************************************************
-//
-//*****************************************************************************
-class CRomSettingsDB : public CSingleton< CRomSettingsDB >
+class CRomSettingsDB : public CSingleton<CRomSettingsDB>
 {
-	public:
-		virtual					~CRomSettingsDB() {}
+   public:
+	virtual ~CRomSettingsDB() {}
 
-		virtual bool			OpenSettingsFile( const char * filename ) = 0;
-		virtual void			Commit() = 0;
+	virtual bool OpenSettingsFile(const char* filename) = 0;
+	virtual void Commit() = 0;
 
-		virtual bool			GetSettings( const RomID & id, RomSettings * settings ) const = 0;
-		virtual void			SetSettings( const RomID & id, const RomSettings & settings ) = 0;
+	virtual bool GetSettings(const RomID& id, RomSettings* settings) const = 0;
+	virtual void SetSettings(const RomID& id, const RomSettings& settings) = 0;
 };
 
-const char * ROM_GetExpansionPakUsageName( EExpansionPakUsage pak_usage );
-const char *	ROM_GetSaveTypeName( ESaveType save_type );
+const char* ROM_GetExpansionPakUsageName(EExpansionPakUsage pak_usage);
+const char* ROM_GetSaveTypeName(ESaveType save_type);
 
-
-#endif // CORE_ROMSETTINGS_H_
+#endif  // CORE_ROMSETTINGS_H_

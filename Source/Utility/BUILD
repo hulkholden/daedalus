@@ -1,6 +1,45 @@
+package(
+    default_visibility = ["//visibility:public"],
+)
+
 cc_library(
     name = "Utility",
-    hdrs = glob(["*.h"]),
+    hdrs = [
+        "AtomicPrimitives.h",
+        "AuxFunc.h",
+        "CRC.h",
+        "Cond.h",
+        "DataSink.h",
+        "Endian.h",
+        "FastMemcpy.h",
+        "Functor.h",
+        "GlobalPreferences.h",
+        "Hash.h",
+        "MemoryHeap.h",
+        "MemoryPool.h",
+        "Mutex.h",
+        "Preferences.h",
+        "PrintOpCode.h",
+        "Profiler.h",
+        "ROMFile.h",
+        "ROMFileCache.h",
+        "ROMFileCompressed.h",
+        "ROMFileMemory.h",
+        "ROMFileUncompressed.h",
+        "RefCounted.h",
+        "RomPreferences.h",
+        "Singleton.h",
+        "SpinLock.h",
+        "Stream.h",
+        "String.h",
+        "StringUtil.h",
+        "Synchroniser.h",
+        "Thread.h",
+        "Timer.h",
+        "Timing.h",
+        "Translate.h",
+        "ZlibWrapper.h",
+    ],
     deps = [
         "//:stdafx",
         "//third_party/zlib",
@@ -10,13 +49,34 @@ cc_library(
         "//Math",
         "//System",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "UtilityCpp",
-    srcs = glob(["*.cpp"], exclude=["FastMemcpy_test.cpp"]),
+    srcs = [
+        "CRC.cpp",
+        "DataSink.cpp",
+        "FastMemcpy.cpp",
+        "Hash.cpp",
+        "MemoryHeap.cpp",
+        "MemoryPool.cpp",
+        "Preferences.cpp",
+        "PrintOpCode.cpp",
+        "Profiler.cpp",
+        "ROMFile.cpp",
+        "ROMFileCache.cpp",
+        "ROMFileCompressed.cpp",
+        "ROMFileMemory.cpp",
+        "ROMFileUncompressed.cpp",
+        "Stream.cpp",
+        "StringUtil.cpp",
+        "Synchroniser.cpp",
+        "Timer.cpp",
+        "Translate.cpp",
+        "ZLibWrapper.cpp",
+    ],
     deps = [
+        ":IniFile",
         ":Utility",
         "//third_party/zlib/contrib/minizip",
         "//third_party/gtest",
@@ -28,5 +88,27 @@ cc_library(
         "//Math",
         "//OSHLE",
     ],
-    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "IniFile",
+    srcs = ["IniFile.cpp"],
+    hdrs = ["IniFile.h"],
+    deps = [
+        "//:stdafx",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_test(
+    name = "IniFile_test",
+    size = "small",
+    srcs = [
+        "IniFile_test.cpp",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":IniFile",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
