@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Registers.h"					// For REG_?? defines
 #include "Memory.h"
 #include "Interrupt.h"
-#include "ROMBuffer.h"
 #include "R4300.h"
 #include "Interpret.h"
 
