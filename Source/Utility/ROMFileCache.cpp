@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "ROMFileCache.h"
 
 #include "ROMFile.h"
-#include "ROMFileMemory.h"
 
 #include "Base/MathUtil.h"
 
@@ -56,13 +55,13 @@ ROMFileCache::ROMFileCache() : mpROMFile(NULL), mChunkMapEntries(0), mpChunkMap(
 	DAEDALUS_ASSERT((1 << (sizeof(CacheIdx) * 8)) > CACHE_SIZE,
 					"Need to increase size of CacheIdx typedef to allow sufficient entries to be indexed");
 
-	mpStorage = (u8*)CROMFileMemory::Get()->Alloc(STORAGE_BYTES);
+	mpStorage = (u8*)malloc(STORAGE_BYTES);
 	mpChunkInfo = new SChunkInfo[CACHE_SIZE];
 }
 
 ROMFileCache::~ROMFileCache()
 {
-	CROMFileMemory::Get()->Free(mpStorage);
+	free(mpStorage);
 
 	delete[] mpChunkInfo;
 }

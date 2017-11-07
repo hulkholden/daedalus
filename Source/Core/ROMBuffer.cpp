@@ -30,7 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Preferences.h"
 #include "Utility/ROMFile.h"
 #include "Utility/ROMFileCache.h"
-#include "Utility/ROMFileMemory.h"
 #include "Utility/Stream.h"
 #include "System/IO.h"
 
@@ -147,9 +146,6 @@ namespace
 //*****************************************************************************
 bool RomBuffer::Create()
 {
-	// Create memory heap used for either ROM Cache or ROM buffer
-	// We do this to avoid memory fragmentation
-	CROMFileMemory::Create();
 	return true;
 }
 
@@ -188,12 +184,12 @@ bool RomBuffer::Open()
 	{
 		// Now, allocate memory for rom - round up to a 4 byte boundry
 		u32		size_aligned( AlignPow2( sRomSize, 4 ) );
-		u8 *	p_bytes( (u8*)CROMFileMemory::Get()->Alloc( size_aligned ) );
+		u8 *	p_bytes = (u8*)malloc( size_aligned ) ;
 
 		if( !p_rom_file->LoadData( sRomSize, p_bytes, messages ) )
 		{
 			DBGConsole_Msg(0, "Failed to load [C%s]\n", filename);
-			CROMFileMemory::Get()->Free( p_bytes );
+			free( p_bytes );
 			delete p_rom_file;
 			return false;
 		}
@@ -264,7 +260,7 @@ void	RomBuffer::Close()
 {
 	if (spRomData)
 	{
-		CROMFileMemory::Get()->Free( spRomData );
+		free( spRomData );
 		spRomData = NULL;
 	}
 
