@@ -3,7 +3,7 @@
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 #include "WebDebug.h"
 #include "WebDebugTemplate.h"
-#include <webby.h>
+#include "third_party/webby/webby.h"
 
 #ifdef DAEDALUS_W32
 #include <winsock2.h>

@@ -1,8 +1,11 @@
 cc_library(
     name = "SysOSX",
     hdrs = glob(["**/*.h"]),
-    includes = ["Include"],
+    includes = ["Include", "."],
     visibility = ["//visibility:public"],
+    deps = [
+        "//third_party/webby",
+    ],
 )
 
 cc_library(
