@@ -1,21 +1,6 @@
 #include "stdafx.h"
 #include "StringUtil.h"
 
-char* Tidy(char* s)
-{
-	if (s == NULL || *s == '\0') return s;
-
-	char* p = s + strlen(s);
-
-	p--;
-	while (p >= s && (*p == ' ' || *p == '\r' || *p == '\n'))
-	{
-		*p = 0;
-		p--;
-	}
-	return s;
-}
-
 void Split(ConstStringRef str, char split_char, std::vector<ConstStringRef>* pieces)
 {
 	ConstStringRef cur = str;
