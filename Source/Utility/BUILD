@@ -60,7 +60,6 @@ cc_library(
         "//:stdafx",
         "//Base",
         "//Config",
-        "//Core",
         "//Debug",
         "//Input",
         "//Interface",

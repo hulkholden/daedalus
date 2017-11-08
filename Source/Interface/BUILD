@@ -3,6 +3,7 @@ cc_library(
     hdrs =glob(["*.h"]),
     deps = [
         "//:stdafx",
+        "//Core",
         "//Debug:DebugConsole",
         "//System",
         "//Utility",
@@ -16,7 +17,6 @@ cc_library(
     deps = [
         "//:stdafx",
         ":Interface",
-        "//Core",
     ],
     visibility = ["//visibility:public"],
 )
