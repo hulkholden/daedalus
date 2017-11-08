@@ -41,8 +41,6 @@ u32 sRomSize(0);
 bool sRomFixed(false);
 ROMFileCache* spRomFileCache(NULL);
 
-static bool DECOMPRESS_ROMS(true);
-
 // Maximum read length is 8 bytes (i.e. double, u64)
 const u32 SCRATCH_BUFFER_LENGTH = 16;
 u8 sScratchBuffer[SCRATCH_BUFFER_LENGTH];
@@ -179,45 +177,42 @@ bool RomBuffer::Open()
 	}
 	else
 	{
-		if (DECOMPRESS_ROMS)
+		bool compressed = p_rom_file->IsCompressed();
+		bool byteswapped = p_rom_file->RequiresSwapping();
+		if (compressed)  // || byteswapped)
 		{
-			bool compressed = p_rom_file->IsCompressed();
-			bool byteswapped = p_rom_file->RequiresSwapping();
-			if (compressed)  // || byteswapped)
+			const char* temp_filename = "daedrom.tmp";
+			if (compressed && byteswapped)
 			{
-				const char* temp_filename = "daedrom.tmp";
-				if (compressed && byteswapped)
-				{
-					DBGConsole_Msg(0, "Rom is [Mcompressed] and [Mbyteswapped]");
-				}
-				else if (compressed)
-				{
-					DBGConsole_Msg(0, "Rom is [Mcompressed]");
-				}
-				else
-				{
-					DBGConsole_Msg(0, "Rom is [Mbyteswapped]");
-				}
-				DBGConsole_Msg(0, "Decompressing rom to [C%s] (this may take some time)", temp_filename);
+				DBGConsole_Msg(0, "Rom is [Mcompressed] and [Mbyteswapped]");
+			}
+			else if (compressed)
+			{
+				DBGConsole_Msg(0, "Rom is [Mcompressed]");
+			}
+			else
+			{
+				DBGConsole_Msg(0, "Rom is [Mbyteswapped]");
+			}
+			DBGConsole_Msg(0, "Decompressing rom to [C%s] (this may take some time)", temp_filename);
 
-				CNullOutputStream local_messages;
+			CNullOutputStream local_messages;
 
-				ROMFile* p_new_file = DecompressRom(p_rom_file, temp_filename, local_messages);
+			ROMFile* p_new_file = DecompressRom(p_rom_file, temp_filename, local_messages);
 
-				DBGConsole_Msg(0, "messages:\n%s", local_messages.c_str());
+			DBGConsole_Msg(0, "messages:\n%s", local_messages.c_str());
 
-				messages << local_messages;
+			messages << local_messages;
 
-				if (p_new_file != NULL)
-				{
-					DBGConsole_Msg(0, "Decompression [gsuccessful]. Booting using decompressed rom");
-					delete p_rom_file;
-					p_rom_file = p_new_file;
-				}
-				else
-				{
-					DBGConsole_Msg(0, "Decompression [rfailed]. Booting using original rom");
-				}
+			if (p_new_file != NULL)
+			{
+				DBGConsole_Msg(0, "Decompression [gsuccessful]. Booting using decompressed rom");
+				delete p_rom_file;
+				p_rom_file = p_new_file;
+			}
+			else
+			{
+				DBGConsole_Msg(0, "Decompression [rfailed]. Booting using original rom");
 			}
 		}
 		spRomFileCache = new ROMFileCache();
