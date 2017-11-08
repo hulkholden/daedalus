@@ -19,7 +19,7 @@
 			"shell": true,
 			"working_dir": "${project_path}/Source",
 			"selector": "source.c++, source.h",
-			"file_patterns": ["*.cpp", "*.h", "*.inl"],
+			"file_patterns": ["*.cpp", "*.h", "*.inl", "BUILD"],
 
 			"cmd": ["bazel build //:daedalus"],
 			"osx": {
