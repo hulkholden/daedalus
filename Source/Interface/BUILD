@@ -18,7 +18,7 @@ cc_library(
         ":Interface",
         "//:stdafx",
         "//Input",
-        "//Utility:IniFile",
+        "//Utility",
     ],
     visibility = ["//visibility:public"],
 )

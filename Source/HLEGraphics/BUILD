@@ -23,6 +23,7 @@ cc_library(
         "//Graphics",
         "//Plugins",
         "//Test",
+        "//Utility",
     ],
     visibility = ["//visibility:public"],
 )

@@ -1,9 +1,9 @@
-#include <stdafx.h>
+#include "stdafx.h"
 #include "Utility/FastMemcpy.h"
 #include "Utility/Endian.h"
 #include "Base/Alignment.h"
 
-#include "third_party/gtest/include/gtest/gtest.h"
+#include "gtest/gtest.h"
 
 TEST(memcpy_byteswap, WorksWithZeroLength)
 {

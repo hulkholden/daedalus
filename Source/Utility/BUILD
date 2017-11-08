@@ -12,6 +12,7 @@ cc_library(
         "Endian.h",
         "FastMemcpy.h",
         "Hash.h",
+        "IniFile.h",
         "Mutex.h",
         "Profiler.h",
         "ROMFile.h",
@@ -42,6 +43,7 @@ cc_library(
         "DataSink.cpp",
         "FastMemcpy.cpp",
         "Hash.cpp",
+        "IniFile.cpp",
         "Profiler.cpp",
         "ROMFile.cpp",
         "ROMFileCache.cpp",
@@ -51,7 +53,6 @@ cc_library(
         "ZLibWrapper.cpp",
     ],
     deps = [
-        ":IniFile",
         ":Utility",
         "//:stdafx",
         "//Base",
@@ -64,16 +65,20 @@ cc_library(
         "//System",
         "//third_party/gtest",
         "//third_party/zlib/contrib/minizip",
+        "@com_google_absl//absl/strings",
     ],
 )
 
-cc_library(
-    name = "IniFile",
-    srcs = ["IniFile.cpp"],
-    hdrs = ["IniFile.h"],
+cc_test(
+    name = "FastMemcpy_test",
+    size = "small",
+    srcs = [
+        "FastMemcpy_test.cpp",
+    ],
+    visibility = ["//visibility:private"],
     deps = [
-        "//:stdafx",
-        "@com_google_absl//absl/strings",
+        ":UtilityCpp",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -85,7 +90,8 @@ cc_test(
     ],
     visibility = ["//visibility:private"],
     deps = [
-        ":IniFile",
+        ":UtilityCpp",
         "@com_google_googletest//:gtest_main",
     ],
 )
+

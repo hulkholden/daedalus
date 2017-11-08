@@ -14,6 +14,7 @@ cc_library(
         ":HLEAudio",
         "//Core",
         "//Debug:DebugConsole",
+        "//Utility",
     ],
     visibility = ["//visibility:public"],
 )
