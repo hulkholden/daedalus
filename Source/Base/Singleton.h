@@ -20,8 +20,8 @@
 
 #pragma once
 
-#ifndef UTILITY_SINGLETON_H_
-#define UTILITY_SINGLETON_H_
+#ifndef BASE_SINGLETON_H_
+#define BASE_SINGLETON_H_
 
 #include <stdlib.h>
 
@@ -81,4 +81,4 @@ class CSingleton
 template <class T>
 T* CSingleton<T>::mpInstance = NULL;
 
-#endif  // UTILITY_SINGLETON_H_
+#endif  // BASE_SINGLETON_H_

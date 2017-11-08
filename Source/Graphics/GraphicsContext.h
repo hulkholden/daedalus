@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define GRAPHICS_GRAPHICSCONTEXT_H_
 
 #include "Base/Types.h"
-#include "Utility/Singleton.h"
+#include "Base/Singleton.h"
 
 class c32;
 

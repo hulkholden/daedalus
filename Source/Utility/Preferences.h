@@ -22,9 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef UTILITY_PREFERENCES_H_
 #define UTILITY_PREFERENCES_H_
 
+#include "Base/Singleton.h"
 #include "Utility/GlobalPreferences.h"
 #include "Utility/RomPreferences.h"
-#include "Utility/Singleton.h"
 
 class RomID;
 

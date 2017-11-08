@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Macros.h"
 #include "Base/Types.h"
-#include "Utility/Singleton.h"
+#include "Base/Singleton.h"
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 

@@ -1,8 +1,8 @@
 #ifndef INPUT_INPUTMANAGER_H_
 #define INPUT_INPUTMANAGER_H_
 
+#include "Base/Singleton.h"
 #include "OSHLE/ultra_os.h"
-#include "Utility/Singleton.h"
 
 #include "Math/Vector2.h"
 

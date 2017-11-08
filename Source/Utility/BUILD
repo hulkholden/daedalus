@@ -22,7 +22,6 @@ cc_library(
         "ROMFileUncompressed.h",
         "RefCounted.h",
         "RomPreferences.h",
-        "Singleton.h",
         "SpinLock.h",
         "Stream.h",
         "Synchroniser.h",
