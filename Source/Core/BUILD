@@ -22,6 +22,7 @@ cc_library(
         "//Input",
         "//OSHLE",
         "//Plugins",
+        "//RomFile",
         "//System",
         "//Test",
         "//Utility",

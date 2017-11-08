@@ -43,9 +43,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "OSHLE/ultra_R4300.h"
 #include "Plugins/AudioPlugin.h"
 #include "Plugins/GraphicsPlugin.h"
+#include "RomFile/RomFile.h"
 #include "System/IO.h"
 #include "Utility/CRC.h"
-#include "Utility/ROMFile.h"
 #include "Utility/Stream.h"
 
 #if defined(DAEDALUS_ENABLE_DYNAREC_PROFILE) || defined(DAEDALUS_W32)

@@ -18,6 +18,7 @@ cc_library(
         ":Interface",
         "//:stdafx",
         "//Input",
+        "//RomFile",
         "//Utility",
     ],
     visibility = ["//visibility:public"],

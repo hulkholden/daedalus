@@ -19,38 +19,30 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef UTILITY_ROMFILECOMPRESSED_H_
-#define UTILITY_ROMFILECOMPRESSED_H_
+#ifndef UTILITY_ROMFILEUNCOMPRESSED_H_
+#define UTILITY_ROMFILEUNCOMPRESSED_H_
 
-// This is required so that the linker doesn't expect __fastcall unzXYZ functions.
-#define ZEXPORT DAEDALUS_ZLIB_CALL_TYPE
+#include <stdio.h>
 
-#include "third_party/zlib/contrib/minizip/unzip.h"
+#include "RomFile/RomFile.h"
 
-#include "Utility/ROMFile.h"
-
-class ROMFileCompressed : public ROMFile
+class ROMFileUncompressed : public ROMFile
 {
    public:
-	ROMFileCompressed(const char* filename);
-
-	virtual ~ROMFileCompressed();
+	ROMFileUncompressed(const char* filename);
+	virtual ~ROMFileUncompressed();
 
 	virtual bool Open(COutputStream& messages);
 
-	virtual bool IsCompressed() const { return true; }
+	virtual bool IsCompressed() const { return false; }
 	virtual u32 GetRomSize() const { return mRomSize; }
 	virtual bool LoadRawData(u32 bytes_to_read, u8* p_bytes, COutputStream& messages);
 
 	virtual bool ReadChunk(u32 offset, u8* p_dst, u32 length);
 
    private:
-	bool Seek(u32 offset, u8* p_scratch_block, u32 block_size);
-
-   private:
-	unzFile mZipFile;
-	bool mFoundRom;
+	FILE* mFH;
 	u32 mRomSize;
 };
 
-#endif  // UTILITY_ROMFILECOMPRESSED_H_
+#endif  // UTILITY_ROMFILEUNCOMPRESSED_H_
