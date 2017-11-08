@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "third_party/zlib/contrib/minizip/unzip.h"
 
-#include "ROMFile.h"
+#include "Utility/ROMFile.h"
 
 class ROMFileCompressed : public ROMFile
 {

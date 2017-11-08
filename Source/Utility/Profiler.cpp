@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "Profiler.h"
+#include "Utility/Profiler.h"
 
 #ifdef DAEDALUS_ENABLE_PROFILING
 

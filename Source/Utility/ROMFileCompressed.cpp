@@ -18,14 +18,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "ROMFileCompressed.h"
+#include "Utility/ROMFileCompressed.h"
 
-#include "Base/MathUtil.h"
-
-#include "Debug/DBGConsole.h"
-
-#include "System/IO.h"
 #include "Base/Macros.h"
+#include "Base/MathUtil.h"
+#include "Debug/DBGConsole.h"
+#include "System/IO.h"
 #include "Utility/Stream.h"
 
 ROMFileCompressed::ROMFileCompressed(const char* filename)
