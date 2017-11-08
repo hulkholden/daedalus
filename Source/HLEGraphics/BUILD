@@ -4,6 +4,7 @@ cc_library(
     deps = [
         "//:stdafx",
         "//Utility",
+        "//Math",
         "//third_party/glfw",
     ],
     visibility = ["//visibility:public"],

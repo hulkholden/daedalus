@@ -17,6 +17,7 @@ cc_library(
         "//Core",
         "//Debug",
         "//DynaRec",
+        "//Math",
         "//OSHLE",
         "//Plugins",
         "//Utility",
