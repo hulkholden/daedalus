@@ -8,7 +8,6 @@ cc_library(
         "AtomicPrimitives.h",
         "CRC.h",
         "Cond.h",
-        "DataSink.h",
         "Endian.h",
         "FastMemcpy.h",
         "Hash.h",
@@ -37,7 +36,6 @@ cc_library(
     name = "UtilityCpp",
     srcs = [
         "CRC.cpp",
-        "DataSink.cpp",
         "FastMemcpy.cpp",
         "Hash.cpp",
         "IniFile.cpp",
