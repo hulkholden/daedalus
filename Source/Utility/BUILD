@@ -59,15 +59,18 @@ cc_library(
     deps = [
         ":IniFile",
         ":Utility",
-        "//third_party/zlib/contrib/minizip",
-        "//third_party/gtest",
         "//:stdafx",
+        "//Base",
         "//Config",
         "//Core",
+        "//Debug",
         "//Input",
         "//Interface",
         "//Math",
         "//OSHLE",
+        "//System",
+        "//third_party/gtest",
+        "//third_party/zlib/contrib/minizip",
     ],
 )
 
