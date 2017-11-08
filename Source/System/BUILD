@@ -3,6 +3,8 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
         "//:stdafx",
+        "//third_party/zlib",
+        "//third_party/zlib/contrib/minizip",
     ],
     visibility = ["//visibility:public"],
 )

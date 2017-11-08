@@ -25,12 +25,9 @@ cc_library(
         "Thread.h",
         "Timer.h",
         "Timing.h",
-        "ZlibWrapper.h",
     ],
     deps = [
         "//:stdafx",
-        "//third_party/zlib",
-        "//third_party/zlib/contrib/minizip",
         "//Config",
         "//System",
     ],
@@ -50,7 +47,6 @@ cc_library(
         "ROMFileCompressed.cpp",
         "ROMFileUncompressed.cpp",
         "Timer.cpp",
-        "ZLibWrapper.cpp",
     ],
     deps = [
         ":Utility",
@@ -64,7 +60,6 @@ cc_library(
         "//OSHLE",
         "//System",
         "//third_party/gtest",
-        "//third_party/zlib/contrib/minizip",
         "@com_google_absl//absl/strings",
     ],
 )

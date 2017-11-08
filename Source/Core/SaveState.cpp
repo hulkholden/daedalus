@@ -21,19 +21,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 
-#include "SaveState.h"
-#include "Memory.h"
-#include "CPU.h"
-#include "ROM.h"
-#include "R4300.h"
+#include "Core/SaveState.h"
 
+#include "Base/MathUtil.h"
+#include "Core/CPU.h"
+#include "Core/Memory.h"
+#include "Core/R4300.h"
+#include "Core/ROM.h"
 #include "Debug/DBGConsole.h"
 #include "Interface/RomDB.h"
-#include "Base/MathUtil.h"
 #include "OSHLE/patch.h"
 #include "OSHLE/ultra_R4300.h"
+#include "System/CompressedStream.h"
 #include "Utility/ROMFile.h"
-#include "Utility/ZlibWrapper.h"
+
 //
 //	SaveState code written initially by Lkb. Seems to be based about Project 64's
 //	savestate format, which is partially documented here: http://www.hcs64.com/usf/usf.txt
