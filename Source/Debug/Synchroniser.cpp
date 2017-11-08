@@ -20,8 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 #include "Debug/Synchroniser.h"
 
-#ifdef DAEDALUS_ENABLE_SYNCHRONISATION
-
 #include "Base/MathUtil.h"
 #include "Core/CPU.h"
 #include "Core/ROM.h"
@@ -30,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/IO.h"
 #include "Utility/ZlibWrapper.h"
 
-CSynchroniser* CSynchroniser::mpSynchroniser(NULL);
+CSynchroniser* CSynchroniser::mpSynchroniser = nullptr;
 
 class ISynchProducer : public CSynchroniser
 {
@@ -45,7 +43,7 @@ class ISynchProducer : public CSynchroniser
 	virtual bool IsOpen() const;
 
    private:
-	Zlib::COutStream mStream;
+	COutStream mStream;
 };
 
 class ISynchConsumer : public CSynchroniser
@@ -61,10 +59,9 @@ class ISynchConsumer : public CSynchroniser
 	virtual void ResetData() { mStream.Reset(); }
 
    private:
-	Zlib::CInStream mStream;
+	CInStream mStream;
 };
 
-// Creation
 CSynchroniser* CSynchroniser::CreateProducer(const char* filename)
 {
 	mpSynchroniser = new ISynchProducer(filename);
@@ -80,7 +77,7 @@ CSynchroniser* CSynchroniser::CreateConsumer(const char* filename)
 void CSynchroniser::Destroy()
 {
 	delete mpSynchroniser;
-	mpSynchroniser = NULL;
+	mpSynchroniser = nullptr;
 }
 
 void CSynchroniser::HandleOutOfStorage()
@@ -208,8 +205,6 @@ bool CSynchroniser::InitialiseSynchroniser()
 		DBGConsole_Msg(0, "Start Synchroniser in [Gconsumer] mode to read [C%s]", filename);
 	}
 
-	// return p_synch != NULL && p_synch->IsOpen();
+	// return p_synch != nullptr && p_synch->IsOpen();
 	return true;
 }
-
-#endif  // DAEDALUS_ENABLE_SYNCHRONISATION

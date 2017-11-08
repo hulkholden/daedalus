@@ -131,9 +131,7 @@ ALIGNED_TYPE(struct, SCPUState, CACHE_ALIGN)
 	inline u32 GetStuffToDo() const { return StuffToDo; }
 	inline bool IsJobSet(u32 job) const { return (StuffToDo & job) != 0; }
 	void ClearStuffToDo();
-#ifdef DAEDALUS_ENABLE_SYNCHRONISATION
 	void Dump();
-#endif
 };
 
 #ifdef USE_SCRATCH_PAD
@@ -240,8 +238,6 @@ extern u64 gTotalInstructionsEmulated;
 extern u32 g_HardwareInterrupt;
 #endif
 
-#ifdef DAEDALUS_ENABLE_SYNCHRONISATION
 extern u32 CPU_ProduceRegisterHash();
-#endif
 
 #endif  // CORE_CPU_H_

@@ -280,7 +280,6 @@ void SCPUState::ClearJob(u32 job)
 	}
 }
 
-#ifdef DAEDALUS_ENABLE_SYNCHRONISATION
 static const char* const kRegisterNames[] = {"zr", "at", "v0", "v1", "a0", "a1", "a2", "a3", "t0", "t1", "t2",
 											 "t3", "t4", "t5", "t6", "t7", "s0", "s1", "s2", "s3", "s4", "s5",
 											 "s6", "s7", "t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra"};
@@ -302,7 +301,6 @@ void SCPUState::Dump()
 		DBGConsole_Msg(0, "Delay: %08x", gCPUState.Delay);
 	}
 }
-#endif
 
 bool CPU_RomOpen()
 {
@@ -726,7 +724,6 @@ void CPU_SetCompare(u32 value)
 	}
 }
 
-#ifdef DAEDALUS_ENABLE_SYNCHRONISATION
 u32 CPU_ProduceRegisterHash()
 {
 	u32 hash = 0;
@@ -752,7 +749,6 @@ u32 CPU_ProduceRegisterHash()
 
 	return hash;
 }
-#endif
 
 #ifdef FRAGMENT_SIMULATE_EXECUTION
 // Execute the specified opcode

@@ -22,8 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Macros.h"
 
-#ifdef DAEDALUS_ENABLE_SYNCHRONISATION
-
 //	Synchronisation flags
 enum ESynchFlags
 {
@@ -77,7 +75,7 @@ class CSynchroniser
 	template <typename T>
 	static void SynchData(T& data)
 	{
-		if (mpSynchroniser != NULL)
+		if (mpSynchroniser != nullptr)
 		{
 			switch (mpSynchroniser->SynchData(&data, sizeof(T)))
 			{
@@ -102,7 +100,7 @@ class CSynchroniser
 	template <typename T>
 	static void SynchPoint(const T& data, const char* msg)
 	{
-		if (mpSynchroniser != NULL)
+		if (mpSynchroniser != nullptr)
 		{
 			switch (mpSynchroniser->SynchPoint(&data, sizeof(T)))
 			{
@@ -125,7 +123,7 @@ class CSynchroniser
 
 	static void Reset()
 	{
-		if (mpSynchroniser != NULL)
+		if (mpSynchroniser != nullptr)
 		{
 			mpSynchroniser->ResetData();
 		}
@@ -138,6 +136,8 @@ class CSynchroniser
    private:
 	static CSynchroniser* mpSynchroniser;
 };
+
+#ifdef DAEDALUS_ENABLE_SYNCHRONISATION
 
 #define SYNCH_POINT(flags, x, msg) \
 	if (DAED_SYNC_MASK & (flags)) CSynchroniser::SynchPoint(x, msg)
