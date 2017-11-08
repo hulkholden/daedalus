@@ -18,19 +18,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "RDPStateManager.h"
-#include "DLDebug.h"
+#include "HLEGraphics/RDPStateManager.h"
 
+#include "Base/Alignment.h"
+#include "Base/Macros.h"
+#include "Base/MathUtil.h"
 #include "Core/Memory.h"
 #include "Core/ROM.h"
 #include "Debug/DBGConsole.h"
+#include "HLEGraphics/DLDebug.h"
 #include "HLEGraphics/uCodes/UcodeDefs.h"
-#include "Base/MathUtil.h"
 #include "OSHLE/ultra_gbi.h"
-#include "Base/Alignment.h"
 #include "Utility/Endian.h"
 #include "Utility/FastMemcpy.h"
-#include "Base/Macros.h"
 
 extern SImageDescriptor g_TI;		//Texture data from Timg ucode
 
