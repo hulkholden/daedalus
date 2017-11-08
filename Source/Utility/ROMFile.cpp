@@ -47,16 +47,9 @@ ROMFile* ROMFile::Create(const char* filename)
 	const char* ext = IO::Path::FindExtension(filename);
 	if (ext && _strcmpi(ext, ".zip") == 0)
 	{
-#ifdef DAEDALUS_COMPRESSED_ROM_SUPPORT
 		return new ROMFileCompressed(filename);
-#else
-		return NULL;
-#endif
 	}
-	else
-	{
-		return new ROMFileUncompressed(filename);
-	}
+	return new ROMFileUncompressed(filename);
 }
 
 ROMFile::ROMFile(const char* filename) : mHeaderMagic(0) { IO::Path::Assign(mFilename, filename); }

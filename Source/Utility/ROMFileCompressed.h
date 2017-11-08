@@ -22,8 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef UTILITY_ROMFILECOMPRESSED_H_
 #define UTILITY_ROMFILECOMPRESSED_H_
 
-#ifdef DAEDALUS_COMPRESSED_ROM_SUPPORT
-
 // This is required so that the linker doesn't expect __fastcall unzXYZ functions.
 #define ZEXPORT DAEDALUS_ZLIB_CALL_TYPE
 
@@ -54,7 +52,5 @@ class ROMFileCompressed : public ROMFile
 	bool mFoundRom;
 	u32 mRomSize;
 };
-
-#endif  // DAEDALUS_COMPRESSED_ROM_SUPPORT
 
 #endif  // UTILITY_ROMFILECOMPRESSED_H_

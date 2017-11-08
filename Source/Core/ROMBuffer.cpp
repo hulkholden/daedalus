@@ -41,16 +41,14 @@ u32 sRomSize(0);
 bool sRomFixed(false);
 ROMFileCache* spRomFileCache(NULL);
 
-#ifdef DAEDALUS_COMPRESSED_ROM_SUPPORT
 static bool DECOMPRESS_ROMS(true);
-#endif
+
 // Maximum read length is 8 bytes (i.e. double, u64)
 const u32 SCRATCH_BUFFER_LENGTH = 16;
 u8 sScratchBuffer[SCRATCH_BUFFER_LENGTH];
 
 bool ShouldLoadAsFixed(u32 rom_size) { return true; }
 
-#ifdef DAEDALUS_COMPRESSED_ROM_SUPPORT
 ROMFile* DecompressRom(ROMFile* p_rom_file, const char* temp_filename, COutputStream& messages)
 {
 	ROMFile* p_new_file = nullptr;
@@ -135,7 +133,6 @@ ROMFile* DecompressRom(ROMFile* p_rom_file, const char* temp_filename, COutputSt
 
 	return p_new_file;
 }
-#endif
 }
 
 bool RomBuffer::Create() { return true; }
@@ -182,7 +179,6 @@ bool RomBuffer::Open()
 	}
 	else
 	{
-#ifdef DAEDALUS_COMPRESSED_ROM_SUPPORT
 		if (DECOMPRESS_ROMS)
 		{
 			bool compressed = p_rom_file->IsCompressed();
@@ -224,7 +220,6 @@ bool RomBuffer::Open()
 				}
 			}
 		}
-#endif
 		spRomFileCache = new ROMFileCache();
 		spRomFileCache->Open(p_rom_file);
 		sRomFixed = false;

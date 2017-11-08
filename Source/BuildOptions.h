@@ -4,7 +4,6 @@
 //
 //	Platform options
 //
-#undef  DAEDALUS_COMPRESSED_ROM_SUPPORT			// Define this to enable support for compressed Roms(zip'ed). If you define this, you will need to add unzip.c and ioapi.c to the project too. (Located at Source/Utility/Zip/)
 #undef  DAEDALUS_ENABLE_DYNAREC					// Define this is dynarec is supported on the platform
 #undef  DAEDALUS_ENABLE_OS_HOOKS				// Define this to enable OS HLE
 #undef  DAEDALUS_BREAKPOINTS_ENABLED			// Define this to enable breakpoint support
