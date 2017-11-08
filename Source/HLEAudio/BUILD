@@ -13,6 +13,7 @@ cc_library(
         "//:stdafx",
         ":HLEAudio",
         "//Core",
+        "//Debug:DebugConsole",
     ],
     visibility = ["//visibility:public"],
 )

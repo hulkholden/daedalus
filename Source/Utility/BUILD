@@ -35,7 +35,6 @@ cc_library(
         "//third_party/zlib",
         "//third_party/zlib/contrib/minizip",
         "//Config",
-        "//Debug:DebugConsole",
         "//Math",
         "//System",
     ],

@@ -15,6 +15,7 @@ cc_library(
         "//:stdafx",
         ":SysGL",
         "//Core",
+        "//Debug:DebugConsole",
         "//Graphics",
         "//HLEGraphics",
         "//Input",
