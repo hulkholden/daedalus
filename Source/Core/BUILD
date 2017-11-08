@@ -23,7 +23,7 @@ cc_library(
         "//OSHLE",
         "//Plugins",
         "//RomFile",
-        "//System",
+        "//System:SystemInit",
         "//Test:BatchTest",
         "//Utility",
     ],

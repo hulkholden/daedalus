@@ -22,7 +22,7 @@ cc_library(
         "//HLEAudio",
         "//Interface",
         "//Plugins",
-        "//System",
+        "//System:SystemInit",
         "//Test:BatchTest",
     ],
     linkopts = [

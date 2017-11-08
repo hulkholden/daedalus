@@ -3,18 +3,14 @@ package(default_visibility=["//visibility:public"])
 config_setting(
     name = "darwin",
     values = {"cpu": "darwin"},
-)
-
-config_setting(
-    name = "darwin_x86_64",
-    values = {"cpu": "darwin_x86_64"},
+    visibility = [":__subpackages__"],
 )
 
 config_setting(
     name = "windows",
     values = {"cpu": "x64_windows"},
+    visibility = [":__subpackages__"],
 )
-
 
 cc_library(
     name = "stdafx",
@@ -46,14 +42,15 @@ cc_binary(
         "//Base",
         "//Core:CoreCpp",
         "//Debug:DebugCpp",
-        "//System:SystemCpp",
         "//Graphics:GraphicsCpp",
         "//HLEAudio:HLEAudioCpp",
         "//HLEGraphics:HLEGraphicsCpp",
+        "//Interface:InterfaceCpp",
         "//OSHLE:OSHLECpp",
         "//SysGL:SysGLCpp",
-        "//Utility:UtilityCpp",
-        "//Interface:InterfaceCpp",
+        "//System",
+        "//System:SystemInit",
         "//third_party/zlib",
+        "//Utility:UtilityCpp",
     ],
 )

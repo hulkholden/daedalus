@@ -1,6 +1,23 @@
 cc_library(
     name = "System",
-    hdrs = glob(["*.h"]),
+    srcs = [
+        "CompressedStream.cpp",
+        "DataSink.cpp",
+        "Paths.cpp",
+    ] + select({
+        "//:darwin": [
+            "Posix/IO.cpp",
+        ],
+        "//:windows": [
+            "Windows/IO.cpp",
+        ],
+    }),
+    hdrs = [
+        "CompressedStream.h",
+        "DataSink.h",
+        "IO.h",
+        "Paths.h",
+    ],
     deps = [
         "//:stdafx",
         "//third_party/zlib",
@@ -10,8 +27,9 @@ cc_library(
 )
 
 cc_library(
-    name = "SystemCpp",
-    srcs = glob(["*.cpp"]),
+    name = "SystemInit",
+    srcs = ["SystemInit.cpp"],
+    hdrs = ["SystemInit.h"],
     deps = [
         "//:stdafx",
         ":System",

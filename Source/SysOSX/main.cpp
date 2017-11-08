@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Interface/RomDB.h"
 #include "System/IO.h"
 #include "System/Paths.h"
-#include "System/System.h"
+#include "System/SystemInit.h"
 #include "Test/BatchTest.h"
 
 #ifdef DAEDALUS_LINUX
