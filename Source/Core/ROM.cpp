@@ -18,36 +18,35 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "ROM.h"
+#include "Core/ROM.h"
 
 #include <stdio.h>
-
-#include "Cheats.h"
-#include "CPU.h"
-#include "PIF.h"		// CController
-#include "R4300.h"
-#include "ROMBuffer.h"
-#include "ROMImage.h"
-#include "RomSettings.h"
 
 #include "Base/Macros.h"
 #include "Base/MathUtil.h"
 #include "Config/ConfigOptions.h"
+#include "Core/Cheats.h"
+#include "Core/CPU.h"
 #include "Core/FramerateLimiter.h"
+#include "Core/PIF.h"
+#include "Core/R4300.h"
+#include "Core/ROMBuffer.h"
+#include "Core/ROMImage.h"
+#include "Core/RomSettings.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
+#include "Debug/Synchroniser.h"
 #include "Interface/RomDB.h"
-#include "OSHLE/patch.h"		// Patch_ApplyPatches
-#include "OSHLE/ultra_os.h"		// System type
+#include "OSHLE/patch.h"
+#include "OSHLE/ultra_os.h"
 #include "OSHLE/ultra_R4300.h"
 #include "Plugins/AudioPlugin.h"
 #include "Plugins/GraphicsPlugin.h"
-#include "Utility/CRC.h"
 #include "System/IO.h"
+#include "Utility/CRC.h"
 #include "Utility/Preferences.h"
 #include "Utility/ROMFile.h"
 #include "Utility/Stream.h"
-#include "Utility/Synchroniser.h"
 
 #if defined(DAEDALUS_ENABLE_DYNAREC_PROFILE) || defined(DAEDALUS_W32)
 // This isn't really the most appropriate place. Need to check with

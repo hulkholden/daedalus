@@ -18,7 +18,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
+#include "System/System.h"
 
+#include "Base/Macros.h"
 #include "Core/CPU.h"
 #include "Core/FramerateLimiter.h"
 #include "Core/Memory.h"
@@ -26,10 +28,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/ROMBuffer.h"
 #include "Core/RomSettings.h"
 #include "Core/Save.h"
-
-#include "Interface/RomDB.h"
-
+#include "Debug/DBGConsole.h"
+#include "Debug/DebugLog.h"
+#include "Debug/Synchroniser.h"
 #include "Graphics/GraphicsContext.h"
+#include "Input/InputManager.h"
+#include "Interface/RomDB.h"
+#include "Plugins/AudioPlugin.h"
+#include "Plugins/GraphicsPlugin.h"
+#include "Utility/Preferences.h"
 
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_W32)
 #include "SysOSX/Debug/WebDebug.h"
@@ -41,20 +48,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysGL/Interface/UI.h"
 #endif
 
-#include "Utility/Synchroniser.h"
-#include "Base/Macros.h"
-#include "Utility/Profiler.h"
-#include "Utility/Preferences.h"
 #ifdef DAEDALUS_PSP
 #include "Utility/Translate.h"
 #endif
-#include "Input/InputManager.h"  // CInputManager::Create/Destroy
 
-#include "Debug/DBGConsole.h"
-#include "Debug/DebugLog.h"
-
-#include "Plugins/GraphicsPlugin.h"
-#include "Plugins/AudioPlugin.h"
 
 CGraphicsPlugin* gGraphicsPlugin = NULL;
 CAudioPlugin* gAudioPlugin = NULL;

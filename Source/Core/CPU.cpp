@@ -42,12 +42,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/SaveState.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
+#include "Debug/Synchroniser.h"
 #include "OSHLE/ultra_R4300.h"
 #include "System/System.h"
 #include "Utility/AtomicPrimitives.h"
 #include "Utility/Hash.h"
 #include "Utility/Mutex.h"
-#include "Utility/Synchroniser.h"
 #include "Utility/Thread.h"
 
 #ifdef DAEDALUS_W32

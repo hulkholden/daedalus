@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/R4300.h"
 #include "Core/Registers.h"
 #include "Debug/DBGConsole.h"
+#include "Debug/Synchroniser.h"
 #include "DynaRec/BranchType.h"
 #include "DynaRec/CodeBufferManager.h"
 #include "DynaRec/CodeGenerator.h"
@@ -40,7 +41,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "OSHLE/patch.h"
 #include "OSHLE/ultra_R4300.h"
 #include "Utility/Profiler.h"
-#include "Utility/Synchroniser.h"
 
 //#define IMMEDIATE_COUNTER_UPDATE
 //#define UPDATE_COUNTER_ON_EXCEPTION

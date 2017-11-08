@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Config/ConfigOptions.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
+#include "Debug/Synchroniser.h"
 #include "DynaRec/DynaRecProfile.h"
 #include "DynaRec/Fragment.h"
 #include "DynaRec/FragmentCache.h"
@@ -42,7 +43,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/IO.h"
 #include "Base/Macros.h"
 #include "Utility/Profiler.h"
-#include "Utility/Synchroniser.h"
 
 #ifdef DAEDALUS_ENABLE_DYNAREC
 

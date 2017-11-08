@@ -17,24 +17,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-// Stuff to handle Processor
 #include "stdafx.h"
+#include "Core/Interpret.h"
 
-#include "CPU.h"
-#include "Registers.h"					// For REG_?? defines
-#include "Memory.h"
-#include "Interrupt.h"
-#include "R4300.h"
-#include "Interpret.h"
-
+#include "Base/Macros.h"
 #include "Config/ConfigOptions.h"
+#include "Core/CPU.h"
+#include "Core/Interrupt.h"
+#include "Core/Memory.h"
+#include "Core/R4300.h"
+#include "Core/Registers.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
-#include "OSHLE/patch.h"				// GetCorrectOp
+#include "Debug/Synchroniser.h"
+#include "OSHLE/patch.h"
 #include "OSHLE/ultra_R4300.h"
-#include "Base/Macros.h"
 #include "Utility/Profiler.h"
-#include "Utility/Synchroniser.h"
 
 //*****************************************************************************
 //	Execute a single MIPS op. The conditionals for the templated arguments
