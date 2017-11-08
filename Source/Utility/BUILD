@@ -74,6 +74,7 @@ cc_test(
     visibility = ["//visibility:private"],
     deps = [
         ":UtilityCpp",
+        "//Test:TestUtil",
         "@com_google_googletest//:gtest_main",
     ],
 )

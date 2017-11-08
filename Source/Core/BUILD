@@ -24,7 +24,7 @@ cc_library(
         "//Plugins",
         "//RomFile",
         "//System",
-        "//Test",
+        "//Test:BatchTest",
         "//Utility",
     ],
     visibility = ["//visibility:public"],

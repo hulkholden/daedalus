@@ -1,10 +1,21 @@
 cc_library(
-    name = "Test",
-    srcs = glob(["*.cpp"]),
-    hdrs = glob(["*.h"]),
+    name = "BatchTest",
+    srcs = ["BatchTest.cpp"],
+    hdrs = ["BatchTest.h"],
     deps = [
         "//:stdafx",
 
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "TestUtil",
+    srcs = ["TestUtil.cpp"],
+    hdrs = ["TestUtil.h"],
+    deps = [
+        "//:stdafx",
+        "@com_google_absl//absl/strings",
     ],
     visibility = ["//visibility:public"],
 )

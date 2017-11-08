@@ -22,7 +22,7 @@ cc_library(
         "//Debug",
         "//Graphics",
         "//Plugins",
-        "//Test",
+        "//Test:BatchTest",
         "//Utility",
     ],
     visibility = ["//visibility:public"],

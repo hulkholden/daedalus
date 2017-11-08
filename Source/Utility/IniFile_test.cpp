@@ -4,6 +4,8 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "Test/TestUtil.h"
+
 namespace {
 
 TEST(IniFileSection, Name) {
@@ -117,21 +119,7 @@ TEST(IniFileSection, GetPropertyAsFloat) {
 	EXPECT_FALSE(section.GetProperty("not present", &value));
 }
 
-// TODO(strmnnrmn): Move this to a test helper library.
-const char* GetTestTmpDir() {
-	const char* test_srcdir = getenv("TEST_TMPDIR");
-	if (test_srcdir) {
-		return test_srcdir;
-	}
-	return getenv("TMPDIR");
-}
-
 TEST(IniFileSection, ParseFile) {
-	const char* dir = GetTestTmpDir();
-	std::string fn = absl::StrCat(dir, "/", "foo.ini");
-	FILE* fh = fopen(fn.c_str(), "w");
-	ASSERT_NE(nullptr, fh);
-
 const char *p = R"<<<(
 defaultkey=defaultvalue
 // Some comment
@@ -144,8 +132,8 @@ bar=fish
 baz=true
 
 )<<<";
-	fwrite(p, 1, strlen(p), fh);
-	fclose(fh);
+	std::string fn = testing::GetTestTmpFilename("foo.ini");
+	ASSERT_TRUE(testing::WriteFile(fn, p));
 
 	IniFile* inifile = IniFile::Create(fn.c_str());
 	ASSERT_NE(nullptr, inifile);
@@ -179,6 +167,5 @@ baz=true
 
 	delete inifile;
 }
-
 
 }  // namespace

@@ -23,7 +23,7 @@ cc_library(
         "//Interface",
         "//Plugins",
         "//System",
-        "//Test",
+        "//Test:BatchTest",
     ],
     linkopts = [
       "-framework AudioToolbox",
