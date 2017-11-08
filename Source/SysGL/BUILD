@@ -19,6 +19,7 @@ cc_library(
         "//Graphics",
         "//HLEGraphics",
         "//Input",
+        "//Interface",
         "//Plugins",
         "//third_party/libpng",
     ],

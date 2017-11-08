@@ -36,6 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
 #include "Debug/Synchroniser.h"
+#include "Interface/Preferences.h"
 #include "Interface/RomDB.h"
 #include "OSHLE/patch.h"
 #include "OSHLE/ultra_os.h"
@@ -44,7 +45,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Plugins/GraphicsPlugin.h"
 #include "System/IO.h"
 #include "Utility/CRC.h"
-#include "Utility/Preferences.h"
 #include "Utility/ROMFile.h"
 #include "Utility/Stream.h"
 

@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEGraphics/DLDebug.h"
 #include "HLEGraphics/RDPStateManager.h"
 #include "HLEGraphics/TextureCache.h"
+#include "Interface/GlobalPreferences.h"
 #include "Math/Math.h"
 #include "OSHLE/ultra_gbi.h"
 #include "Utility/Profiler.h"

@@ -15,8 +15,10 @@ cc_library(
     name = "InterfaceCpp",
     srcs =glob(["*.cpp"]),
     deps = [
-        "//:stdafx",
         ":Interface",
+        "//:stdafx",
+        "//Input",
+        "//Utility:IniFile",
     ],
     visibility = ["//visibility:public"],
 )

@@ -2123,8 +2123,6 @@ static void R4300_CALL_TYPE R4300_Cop0_MFC0( R4300_CALL_SIGNATURE )
 }
 
 // Move Word To CopReg
-static const u32 kCauseSW = CAUSE_SW1|CAUSE_SW2;
-
 static void R4300_CALL_TYPE R4300_Cop0_MTC0( R4300_CALL_SIGNATURE )
 {
 	R4300_CALL_MAKE_OP( op_code );

@@ -33,10 +33,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Synchroniser.h"
 #include "Graphics/GraphicsContext.h"
 #include "Input/InputManager.h"
+#include "Interface/Preferences.h"
 #include "Interface/RomDB.h"
 #include "Plugins/AudioPlugin.h"
 #include "Plugins/GraphicsPlugin.h"
-#include "Utility/Preferences.h"
 
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_W32)
 #include "SysOSX/Debug/WebDebug.h"

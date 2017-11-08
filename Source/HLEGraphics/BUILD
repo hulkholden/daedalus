@@ -3,9 +3,10 @@ cc_library(
     hdrs =glob(["*.h", "uCodes/*.h"]),
     deps = [
         "//:stdafx",
-        "//Utility",
+        "//Interface",
         "//Math",
         "//third_party/glfw",
+        "//Utility",
     ],
     visibility = ["//visibility:public"],
 )

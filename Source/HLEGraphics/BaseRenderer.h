@@ -20,15 +20,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_BASERENDERER_H_
 #define HLEGRAPHICS_BASERENDERER_H_
 
+#include "Config/ConfigOptions.h"
+#include "Graphics/ColourValue.h"
+#include "HLEGraphics/DaedalusVtx.h"
+#include "HLEGraphics/TextureInfo.h"
+#include "Math/Matrix4x4.h"
 #include "Math/Vector2.h"
 #include "Math/Vector3.h"
 #include "Math/Vector4.h"
-#include "Math/Matrix4x4.h"
 #include "Utility/RefCounted.h"
-#include "HLEGraphics/DaedalusVtx.h"
-#include "HLEGraphics/TextureInfo.h"
-#include "Graphics/ColourValue.h"
-#include "Utility/Preferences.h"
 
 #include "SysGL/GL.h"
 

@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "Base/Macros.h"
 #include "Core/ROM.h"
 #include "Debug/DBGConsole.h"
 #include "Graphics/ColourValue.h"
@@ -10,13 +11,12 @@
 #include "Graphics/NativeTexture.h"
 #include "HLEGraphics/DLDebug.h"
 #include "HLEGraphics/RDPStateManager.h"
+#include "Interface/Preferences.h"
 #include "OSHLE/ultra_gbi.h"
 #include "SysGL/GL.h"
-#include "System/Paths.h"
 #include "System/IO.h"
-#include "Base/Macros.h"
+#include "System/Paths.h"
 #include "Utility/Profiler.h"
-
 
 BaseRenderer * gRenderer   = NULL;
 RendererGL *   gRendererGL = NULL;

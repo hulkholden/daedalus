@@ -21,17 +21,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Config/ConfigOptions.h"
 #include "Core/CPU.h"
-#include "Core/ROM.h"				// ROM_Unload
+#include "Core/ROM.h"
 #include "Core/RomSettings.h"
-#include "Debug/DBGConsole.h"		// DBGConsole_Enable
+#include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
+#include "Interface/Preferences.h"
 #include "Interface/RomDB.h"
+#include "System/IO.h"
 #include "System/Paths.h"
 #include "System/System.h"
 #include "Test/BatchTest.h"
-#include "System/IO.h"
-#include "Utility/Preferences.h"
-#include "Utility/Profiler.h"		// CProfiler::Create/Destroy
+#include "Utility/Profiler.h"
 
 int __cdecl main(int argc, char **argv)
 {

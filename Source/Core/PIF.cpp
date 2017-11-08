@@ -86,19 +86,16 @@ area assignment does not change. After Tx/RxData assignment, this flag is reset 
 // Stuff to handle controllers
 
 #include "stdafx.h"
-
-#include "PIF.h"
-#include "CPU.h"
-#include "Memory.h"
-#include "ROM.h"
-#include "Save.h"
+#include "Core/PIF.h"
 
 #include "Base/MathUtil.h"
-#include "Utility/Preferences.h"
-
+#include "Core/CPU.h"
+#include "Core/Memory.h"
+#include "Core/ROM.h"
+#include "Core/Save.h"
 #include "Debug/DBGConsole.h"
 #include "Input/InputManager.h"
-
+#include "Interface/Preferences.h"
 #include "OSHLE/ultra_os.h"
 
 #include <time.h>

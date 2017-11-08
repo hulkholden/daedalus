@@ -18,20 +18,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "ROMBuffer.h"
-
-#include "ROM.h"
-#include "DMA.h"
+#include "Core/ROMBuffer.h"
 
 #include "Base/MathUtil.h"
-
+#include "Core/DMA.h"
+#include "Core/ROM.h"
 #include "Debug/DBGConsole.h"
-
-#include "Utility/Preferences.h"
+#include "Interface/Preferences.h"
+#include "System/IO.h"
 #include "Utility/ROMFile.h"
 #include "Utility/ROMFileCache.h"
 #include "Utility/Stream.h"
-#include "System/IO.h"
 
 namespace
 {
