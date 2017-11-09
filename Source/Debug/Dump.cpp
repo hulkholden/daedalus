@@ -108,8 +108,6 @@ void Dump_GetSaveDirectory(char* rootdir, const char* rom_filename, const char* 
 	IO::Path::Combine(rootdir, g_DaedalusConfig.mSaveDir, file_name);
 }
 
-#ifndef DAEDALUS_SILENT
-
 void Dump_DisassembleMIPSRange(FILE* fh, u32 address_offset, const OpCode* b, const OpCode* e)
 {
 	u32 address(address_offset);
@@ -177,9 +175,7 @@ void Dump_Disassemble(u32 start, u32 end, const char* p_file_name)
 
 	fclose(fp);
 }
-#endif
 
-#ifndef DAEDALUS_SILENT
 //	N.B. This assumbes that b/e are 4 byte aligned (otherwise endianness is broken)
 void Dump_MemoryRange(FILE* fh, u32 address_offset, const u32* b, const u32* e)
 {
@@ -263,9 +259,6 @@ void Dump_RSPDisassemble(const char* p_file_name)
 
 	fclose(fp);
 }
-#endif
-
-#ifndef DAEDALUS_SILENT
 
 void Dump_Strings(const char* p_file_name)
 {
@@ -322,4 +315,4 @@ void Dump_Strings(const char* p_file_name)
 	}
 	fclose(fp);
 }
-#endif
+
