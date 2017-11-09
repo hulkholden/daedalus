@@ -1,11 +1,25 @@
 
 cc_library(
     name = "Debug",
-    hdrs = glob(["*.h"]),
+    hdrs = [
+        "DBGConsole.h",
+        "DebugConsoleImpl.h",
+        "DebugLog.h",
+        "Dump.h",
+        "Synchroniser.h",
+    ],
+    srcs = select({
+        "//:darwin": [
+            "Posix/Assert.cpp",
+        ],
+        "//:windows": [
+            "Windows/Assert.cpp",
+        ],
+    }),
     deps = [
         "//:stdafx",
+        "//Base",
         "//Utility",
-        "//third_party/zlib/contrib/minizip",
     ],
     visibility = ["//visibility:public"],
 )
@@ -23,13 +37,3 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
-    name = "DebugConsole",
-    hdrs = [
-        "DBGConsole.h",
-    ],
-    deps = [
-        "//:stdafx",
-    ],
-    visibility = ["//visibility:public"],
-)

@@ -4,7 +4,7 @@ cc_library(
     deps = [
         "//:stdafx",
         "//Core",
-        "//Debug:DebugConsole",
+        "//Debug",
         "//System",
         "//Utility",
     ],

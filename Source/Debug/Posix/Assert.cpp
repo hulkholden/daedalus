@@ -39,8 +39,7 @@ EAssertResult DaedalusAssert(const char* expression, const char* file, unsigned 
 	va_end(va);
 
 	printf("************************************************************\n");
-	printf("Assert Failed: %s\n", expression);
-	printf("Location: %s(%d)\n", file, line);
+	printf("%s:%d: Assert Failed: %s\n", file, line, expression);
 	printf("\n");
 	printf("%s\n", buffer);
 	printf("\n");
@@ -51,6 +50,10 @@ EAssertResult DaedalusAssert(const char* expression, const char* file, unsigned 
 		printf("a: abort, b: break, c: continue, i: ignore\n");
 		switch (getchar())
 		{
+			case EOF:
+				// If getchar() fails, treat this the same as 'a'.
+				abort();
+				return AR_BREAK;  // Should be unreachable.
 			case 'a':
 				abort();
 				return AR_BREAK;  // Should be unreachable.

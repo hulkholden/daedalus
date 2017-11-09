@@ -34,7 +34,7 @@ cc_library(
         # TODO(strmnnrmn): Use DAEDALUS_CONFIG_DEV for debug when
         # compilation errors are fixed.
         ":release": ["DAEDALUS_CONFIG_RELEASE"],
-        ":debug": ["DAEDALUS_CONFIG_RELEASE"],
+        ":debug": ["DAEDALUS_CONFIG_DEV"],
     }),
     deps = select({
         ":darwin": [
