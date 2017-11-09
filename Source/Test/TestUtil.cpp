@@ -24,12 +24,17 @@ std::string GetTestTmpFilename(absl::string_view filename)
 
 bool WriteFile(const std::string& filename, absl::string_view data)
 {
+	return WriteFile(filename, data.begin(), data.length());
+}
+
+bool WriteFile(const std::string& filename, const void* data, size_t length)
+{
 	FILE* fh = fopen(filename.c_str(), "w");
 	if (!fh)
 	{
 		return false;
 	}
-	fwrite(data.begin(), 1, data.length(), fh);
+	fwrite(data, 1, length, fh);
 	fclose(fh);
 	return true;
 }

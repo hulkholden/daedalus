@@ -377,7 +377,7 @@ void IRomDB::AddRomDirectory(const char * directory)
 		do
 		{
 			const char * rom_filename = find_data.Name;
-			if(IsRomfilename( rom_filename ))
+			if(IsRomFilename( rom_filename ))
 			{
 				IO::Filename full_path;
 				IO::Path::Combine(full_path, directory, rom_filename);

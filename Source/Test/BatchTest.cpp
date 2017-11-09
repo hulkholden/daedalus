@@ -49,7 +49,7 @@ void MakeRomList( const char * romdir, std::vector< std::string > & roms )
 		do
 		{
 			const char * filename( find_data.Name );
-			if( IsRomfilename( filename ) )
+			if( IsRomFilename( filename ) )
 			{
 				IO::Filename rompath;
 

@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 #include "RomFile/RomFile.h"
 
+#include "absl/strings/match.h"
+
 #include "Debug/DBGConsole.h"
 #include "RomFile/RomFileCompressed.h"
 #include "RomFile/RomFileUncompressed.h"
@@ -29,16 +31,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <algorithm>
 #include <string.h>
 
-bool IsRomfilename(const char* rom_filename)
-{
-	const char* last_period(strrchr(rom_filename, '.'));
-	if (last_period == NULL) return false;
+constexpr const char* const kExtensions[] = {
+	".v64",
+	".n64",
+	".bin",
+	".pal",
+	".zip",
+	".z64",
+	".rom",
+	".jap",
+	".usa",
+};
 
-	return (_strcmpi(last_period, ".v64") == 0 || _strcmpi(last_period, ".z64") == 0 ||
-			_strcmpi(last_period, ".n64") == 0 || _strcmpi(last_period, ".rom") == 0 ||
-			_strcmpi(last_period, ".bin") == 0 || _strcmpi(last_period, ".jap") == 0 ||
-			_strcmpi(last_period, ".pal") == 0 || _strcmpi(last_period, ".usa") == 0 ||
-			_strcmpi(last_period, ".zip") == 0);
+bool IsRomFilename(absl::string_view rom_filename)
+{
+	for (const char* extension : kExtensions) {
+		if (absl::EndsWithIgnoreCase(rom_filename, extension)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 ROMFile* ROMFile::Create(const char* filename)

@@ -12,6 +12,7 @@ std::string GetTestTmpDir();
 std::string GetTestTmpFilename(absl::string_view filename);
 
 bool WriteFile(const std::string& filename, absl::string_view data);
+bool WriteFile(const std::string& filename, const void* data, size_t length);
 
 }  // testing
 

@@ -22,11 +22,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef UTILITY_ROMFILE_H_
 #define UTILITY_ROMFILE_H_
 
+#include "absl/strings/string_view.h"
+
 #include "System/IO.h"
 
 class COutputStream;
 
-bool IsRomfilename(const char* rom_filename);
+bool IsRomFilename(absl::string_view rom_filename);
 
 class ROMFile
 {
