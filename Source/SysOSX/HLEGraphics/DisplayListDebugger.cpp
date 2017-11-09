@@ -20,7 +20,6 @@
 #include "HLEGraphics/TextureCache.h"
 
 #include "Utility/Cond.h"
-#include "Utility/StringUtil.h"
 #include "Utility/Thread.h"
 #include "Utility/Mutex.h"
 
@@ -339,7 +338,10 @@ static void DLDebugHandler(void *arg, WebDebugConnection *connection)
 			}
 			else if (params[i].Key == "scrub")
 			{
-				absl::SimpleAtoi(params[i].Value, &gInstructionCountLimit);
+				if (!absl::SimpleAtoi(params[i].Value, &gInstructionCountLimit))
+				{
+					// Ignore errors and use the default value.
+				}
 				DoTask(connection, kTaskScrub);
 				return;
 			}

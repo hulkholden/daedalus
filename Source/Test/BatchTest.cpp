@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEGraphics/DLParser.h"
 #include "RomFile/RomFile.h"
 #include "System/IO.h"
-#include "System/System.h"
+#include "System/SystemInit.h"
 #include "Utility/Hash.h"
 #include "Utility/Timer.h"
 #include "Utility/Timing.h"

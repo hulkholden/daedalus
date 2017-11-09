@@ -4,7 +4,12 @@ cc_library(
     hdrs = ["BatchTest.h"],
     deps = [
         "//:stdafx",
-
+        "//Core",
+        "//Debug",
+        "//HLEGraphics",
+        "//RomFile",
+        "//System:SystemInit",
+        "//Utility",
     ],
     visibility = ["//visibility:public"],
 )
