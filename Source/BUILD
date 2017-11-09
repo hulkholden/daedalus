@@ -12,6 +12,17 @@ config_setting(
     visibility = [":__subpackages__"],
 )
 
+config_setting(
+    name = "release",
+    values = {"compilation_mode": "opt"}
+)
+
+config_setting(
+    name = "debug",
+    values = {"compilation_mode": "fastbuild"}
+)
+
+
 cc_library(
     name = "stdafx",
     srcs = ["StdAfx.cpp"],
@@ -19,6 +30,12 @@ cc_library(
         "stdafx.h",
         "BuildOptions.h",
     ],
+    defines = select({
+        # TODO(strmnnrmn): Use DAEDALUS_CONFIG_DEV for debug when
+        # compilation errors are fixed.
+        ":release": ["DAEDALUS_CONFIG_RELEASE"],
+        ":debug": ["DAEDALUS_CONFIG_RELEASE"],
+    }),
     deps = select({
         ":darwin": [
            "//SysOSX",

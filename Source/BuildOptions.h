@@ -77,6 +77,15 @@
 //
 //	Configuration options. These are not really platform-specific, but control various features
 //
+#if defined(DAEDALUS_CONFIG_RELEASE)
 #include "Base/Release/BuildConfig.h"
+#elif defined(DAEDALUS_CONFIG_PROFILE)
+#include "Base/Profile/BuildConfig.h"
+#elif defined(DAEDALUS_CONFIG_DEV)
+#include "Base/Dev/BuildConfig.h"
+#else
+#error Unknown compilation mode
+#endif
+
 
 #endif // BUILDOPTIONS_H_
