@@ -23,16 +23,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <ctype.h>
 
-#include "Config/ConfigOptions.h"
 #include "Core/CPU.h"
-#include "Core/Interrupt.h"
 #include "Core/Memory.h"
 #include "Core/PrintOpCode.h"
 #include "Core/ROMBuffer.h"
 #include "Debug/DBGConsole.h"
-#include "Debug/DebugLog.h"
 #include "OSHLE/patch.h"
-#include "OSHLE/ultra_R4300.h"
 #include "System/IO.h"
 #include "System/Paths.h"
 
@@ -68,44 +64,6 @@ void Dump_GetDumpDirectory(char* rootdir, const char* subdir)
 	}
 #endif
 	IO::Directory::EnsureExists(rootdir);
-}
-
-// E.g. Dump_GetSaveDirectory([out], "c:\roms\test.rom", ".sra")
-// would first try to find the save in g_DaedalusConfig.mSaveDir. If this is not
-// found, g_DaedalusConfig.mRomsDir is checked.
-void Dump_GetSaveDirectory(char* rootdir, const char* rom_filename, const char* extension)
-{
-	// If the Save path has not yet been set up, prompt user
-	if (strlen(g_DaedalusConfig.mSaveDir) == 0)
-	{
-		// FIXME: missing prompt here!
-
-		// User may have cancelled
-		if (strlen(g_DaedalusConfig.mSaveDir) == 0)
-		{
-			// Default to rom path
-			IO::Path::Assign(g_DaedalusConfig.mSaveDir, rom_filename);
-			IO::Path::RemoveFileSpec(g_DaedalusConfig.mSaveDir);
-			// FIXME(strmnnrmn): for OSX I generate savegames in a subdir Save, to make it easier to clean up.
-			IO::Path::Append(g_DaedalusConfig.mSaveDir, "Save");
-
-#ifdef DAEDALUS_DEBUG_CONSOLE
-			if (CDebugConsole::IsAvailable())
-			{
-				DBGConsole_Msg(0, "SaveDir is still empty - defaulting to [C%s]", g_DaedalusConfig.mSaveDir);
-			}
-#endif
-		}
-	}
-
-	IO::Directory::EnsureExists(g_DaedalusConfig.mSaveDir);
-
-	// Form the filename from the file spec (i.e. strip path and replace the extension)
-	IO::Filename file_name;
-	IO::Path::Assign(file_name, IO::Path::FindFileName(rom_filename));
-	IO::Path::SetExtension(file_name, extension);
-
-	IO::Path::Combine(rootdir, g_DaedalusConfig.mSaveDir, file_name);
 }
 
 void Dump_DisassembleMIPSRange(FILE* fh, u32 address_offset, const OpCode* b, const OpCode* e)

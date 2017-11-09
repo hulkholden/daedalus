@@ -20,19 +20,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Various stuff to map an address onto the correct memory region
 
 #include "stdafx.h"
-#include "Memory.h"
-
-#include "CPU.h"
-#include "DMA.h"
-#include "Interrupt.h"
-#include "ROM.h"
-#include "ROMBuffer.h"
+#include "Core/Memory.h"
 
 #include "Config/ConfigOptions.h"
+#include "Core/CPU.h"
+#include "Core/DMA.h"
+#include "Core/Interrupt.h"
+#include "Core/ROM.h"
+#include "Core/ROMBuffer.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
-#include "Debug/DebugLog.h"
-#include "Debug/Dump.h"		// Dump_GetSaveDirectory()
 #include "OSHLE/ultra_R4300.h"
 #include "Plugins/AudioPlugin.h"
 #include "Plugins/GraphicsPlugin.h"

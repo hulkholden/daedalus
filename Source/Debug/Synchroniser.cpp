@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/MathUtil.h"
 #include "Core/CPU.h"
 #include "Core/ROM.h"
+#include "Core/Save.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/Dump.h"
 #include "System/CompressedStream.h"
@@ -188,12 +189,11 @@ CSynchroniser::ESynchResult ISynchConsumer::SynchData(void* data, u32 length)
 
 bool CSynchroniser::InitialiseSynchroniser()
 {
-	const char* name = g_ROM.mFileName;
-	CSynchroniser* p_synch;
 	IO::Filename filename;
 
-	Dump_GetSaveDirectory(filename, name, ".syn");
+	Save_GetDirectory(filename, g_ROM.mFileName, ".syn");
 
+	CSynchroniser* p_synch;
 	if (!IO::File::Exists(filename))
 	{
 		p_synch = CSynchroniser::CreateProducer(filename);

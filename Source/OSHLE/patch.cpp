@@ -35,6 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/R4300.h"
 #include "Core/Registers.h"
 #include "Core/ROM.h"
+#include "Core/Save.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
 #include "Debug/Dump.h"
@@ -891,7 +892,7 @@ static void Patch_FlushCache()
 {
 	IO::Filename name;
 
-	Dump_GetSaveDirectory(name, g_ROM.mFileName, ".hle");
+	Save_GetDirectory(name, g_ROM.mFileName, ".hle");
 	DBGConsole_Msg(0, "Write OSHLE cache: %s", name);
 
 	FILE *fp = fopen(name, "wb");
@@ -947,7 +948,7 @@ static bool Patch_GetCache()
 {
 	IO::Filename name;
 
-	Dump_GetSaveDirectory(name, g_ROM.mFileName, ".hle");
+	Save_GetDirectory(name, g_ROM.mFileName, ".hle");
 	FILE *fp = fopen(name, "rb");
 
 	if (fp != NULL)

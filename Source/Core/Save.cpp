@@ -36,6 +36,44 @@ static u32				gSaveSize;
 static IO::Filename		gMempackFileName;
 static bool				gMempackDirty;
 
+
+// E.g. Save_GetDirectory([out], "c:\roms\test.rom", ".sra")
+// would first try to find the save in g_DaedalusConfig.mSaveDir. If this is not
+// found, g_DaedalusConfig.mRomsDir is checked.
+void Save_GetDirectory(char* rootdir, const char* rom_filename, const char* extension)
+{
+	// If the Save path has not yet been set up, prompt user
+	if (strlen(g_DaedalusConfig.mSaveDir) == 0)
+	{
+		// FIXME: missing prompt here!
+
+		// User may have cancelled
+		if (strlen(g_DaedalusConfig.mSaveDir) == 0)
+		{
+			// Default to rom path
+			IO::Path::Assign(g_DaedalusConfig.mSaveDir, rom_filename);
+			IO::Path::RemoveFileSpec(g_DaedalusConfig.mSaveDir);
+			// FIXME(strmnnrmn): for OSX I generate savegames in a subdir Save, to make it easier to clean up.
+			IO::Path::Append(g_DaedalusConfig.mSaveDir, "Save");
+
+#ifdef DAEDALUS_DEBUG_CONSOLE
+			if (CDebugConsole::IsAvailable())
+			{
+				DBGConsole_Msg(0, "SaveDir is still empty - defaulting to [C%s]", g_DaedalusConfig.mSaveDir);
+			}
+#endif
+		}
+	}
+
+	IO::Directory::EnsureExists(g_DaedalusConfig.mSaveDir);
+
+	// Form the filename from the file spec (i.e. strip path and replace the extension)
+	IO::Filename file_name;
+	IO::Path::Assign(file_name, IO::Path::FindFileName(rom_filename));
+	IO::Path::SetExtension(file_name, extension);
+
+	IO::Path::Combine(rootdir, g_DaedalusConfig.mSaveDir, file_name);
+}
 bool Save_Reset()
 {
 	const char * ext;
@@ -67,7 +105,7 @@ bool Save_Reset()
 	gSaveDirty = false;
 	if (gSaveSize > 0)
 	{
-		Dump_GetSaveDirectory(gSaveFileName, g_ROM.mFileName, ext);
+		Save_GetDirectory(gSaveFileName, g_ROM.mFileName, ext);
 
 		FILE * fp = fopen(gSaveFileName, "rb");
 		if (fp != NULL)
@@ -96,7 +134,7 @@ bool Save_Reset()
 
 	// init mempack
 	{
-		Dump_GetSaveDirectory(gMempackFileName, g_ROM.mFileName, ".mpk");
+		Save_GetDirectory(gMempackFileName, g_ROM.mFileName, ".mpk");
 		FILE * fp = fopen(gMempackFileName, "rb");
 		if (fp != NULL)
 		{

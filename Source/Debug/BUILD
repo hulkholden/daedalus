@@ -31,7 +31,6 @@ cc_library(
         "//:stdafx",
         "//Debug",
         "//Core",
-        "//Config",
         "//OSHLE",
     ],
     visibility = ["//visibility:public"],
