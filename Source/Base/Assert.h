@@ -43,10 +43,12 @@
 //
 template <bool>
 struct STATIC_ASSERTION_FAILURE;
+
 template <>
 struct STATIC_ASSERTION_FAILURE<true>
 {
 };
+
 template <int x>
 struct static_assert_test
 {
@@ -94,7 +96,7 @@ inline void SetAssertHook(DaedalusAssertHook hook) { gAssertHook = hook; }
 		if (!(e) && !ignore)                                              \
 		{                                                                 \
 			EAssertResult ar;                                             \
-			if (gAssertHook != NULL)                                      \
+			if (gAssertHook != nullptr)                                   \
 				ar = gAssertHook(#e, __FILE__, __LINE__, __VA_ARGS__);    \
 			else                                                          \
 				ar = DaedalusAssert(#e, __FILE__, __LINE__, __VA_ARGS__); \
@@ -118,7 +120,7 @@ inline void SetAssertHook(DaedalusAssertHook hook) { gAssertHook = hook; }
 		if (!(e) && !ignore)                                     \
 		{                                                        \
 			EAssertResult ar;                                    \
-			if (gAssertHook != NULL)                             \
+			if (gAssertHook != nullptr)                          \
 				ar = gAssertHook(#e, __FILE__, __LINE__, "");    \
 			else                                                 \
 				ar = DaedalusAssert(#e, __FILE__, __LINE__, ""); \
