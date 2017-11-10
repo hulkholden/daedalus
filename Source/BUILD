@@ -58,7 +58,7 @@ cc_binary(
     }) + [
         "//Base",
         "//Core:CoreCpp",
-        "//Debug:DebugCpp",
+        "//Debug",
         "//Graphics:GraphicsCpp",
         "//HLEAudio:HLEAudioCpp",
         "//HLEGraphics:HLEGraphicsCpp",

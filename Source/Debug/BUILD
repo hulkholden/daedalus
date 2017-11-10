@@ -2,13 +2,11 @@ package(default_visibility=["//visibility:public"])
 
 cc_library(
     name = "Debug",
-    hdrs = [
-        "DBGConsole.h",
-        "DebugConsoleImpl.h",
-        "DebugLog.h",
-        "Dump.h",
-    ],
-    srcs = select({
+    srcs = [
+        "DebugConsoleImpl.cpp",
+        "DebugLog.cpp",
+        "Dump.cpp",
+    ] + select({
         "//:darwin": [
             "Posix/Assert.cpp",
         ],
@@ -16,23 +14,16 @@ cc_library(
             "Windows/Assert.cpp",
         ],
     }),
+    hdrs = [
+        "DBGConsole.h",
+        "DebugConsoleImpl.h",
+        "DebugLog.h",
+        "Dump.h",
+    ],
     deps = [
         "//:stdafx",
         "//Base",
         "//Utility",
-    ],
-)
-
-cc_library(
-    name = "DebugCpp",
-    srcs = [
-        "DebugConsoleImpl.cpp",
-        "DebugLog.cpp",
-        "Dump.cpp",
-    ],
-    deps = [
-        "//:stdafx",
-        "//Debug",
     ],
 )
 
