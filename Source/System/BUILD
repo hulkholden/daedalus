@@ -35,6 +35,7 @@ cc_library(
         ":System",
         "//Core",
         "//Debug",
+        "//Debug:Synchroniser",
         "//Graphics",
         "//HLEGraphics",
         "//Interface",

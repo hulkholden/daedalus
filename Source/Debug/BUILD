@@ -1,3 +1,4 @@
+package(default_visibility=["//visibility:public"])
 
 cc_library(
     name = "Debug",
@@ -6,7 +7,6 @@ cc_library(
         "DebugConsoleImpl.h",
         "DebugLog.h",
         "Dump.h",
-        "Synchroniser.h",
     ],
     srcs = select({
         "//:darwin": [
@@ -21,18 +21,28 @@ cc_library(
         "//Base",
         "//Utility",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "DebugCpp",
-    srcs = glob(["*.cpp"]),
+    srcs = [
+        "DebugConsoleImpl.cpp",
+        "DebugLog.cpp",
+        "Dump.cpp",
+    ],
     deps = [
         "//:stdafx",
         "//Debug",
-        "//Core",
-        "//OSHLE",
     ],
-    visibility = ["//visibility:public"],
 )
 
+cc_library(
+    name = "Synchroniser",
+    srcs = ["Synchroniser.cpp"],
+    hdrs = ["Synchroniser.h"],
+    deps = [
+        ":Debug",
+        "//:stdafx",
+        "//Core:Core",
+    ],
+)

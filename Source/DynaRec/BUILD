@@ -11,9 +11,10 @@ cc_library(
     name = "DynaRecCpp",
     srcs = glob(["*.cpp"]),
     deps = [
+        ":DynaRec",
         "//:stdafx",
         "//Debug",
-        ":DynaRec",
+        "//Debug:Synchroniser",
         "//Core",
         "//System",
         "//Utility",
