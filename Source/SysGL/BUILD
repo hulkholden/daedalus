@@ -23,4 +23,14 @@ cc_library(
         "//Plugins",
         "//third_party/libpng",
     ],
+    data = [
+        ":shaders",
+    ],
+)
+
+filegroup(
+    name = "shaders",
+    srcs = [
+        "HLEGraphics/n64.psh",
+    ],
 )

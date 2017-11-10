@@ -1,3 +1,5 @@
+workspace(name = "daedalus")
+
 # Abseil.
 http_archive(
     name = "com_google_absl",

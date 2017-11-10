@@ -175,7 +175,7 @@ void Generate500(WebDebugConnection *connection, const char *message)
 {
 	connection->BeginResponse(500, -1, kTextHTML);
 
-	WriteStandardHeader(connection, "404 - Page Not Found");
+	WriteStandardHeader(connection, "500 - Internal Server Error");
 
 	connection->WriteString(
 		"<div class=\"container\">\n"
@@ -449,10 +449,9 @@ bool WebDebug_Init()
 		return false;
 	}
 
-	IO::Filename data_path;
-	IO::Path::Combine(data_path, gDaedalusExePath, "Web");
-	DBGConsole_Msg(0, "Looking for static resource in [C%s]", data_path);
-	AddStaticContent(data_path, "");
+	std::string data_path = GetRunfilePath("SysOSX/Debug/Web");
+	DBGConsole_Msg(0, "Looking for static resource in [C%s]", data_path.c_str());
+	AddStaticContent(data_path.c_str(), "");
 
 	gKeepRunning = true;
 	gThread = CreateThread("WebDebug", &WebDebugThread, gServer);

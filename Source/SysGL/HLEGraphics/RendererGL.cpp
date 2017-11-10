@@ -92,14 +92,13 @@ bool initgl()
 
 	// FIXME(strmnnrmn): need a nicer 'load file' utility function.
 	{
-		IO::Filename shader_path;
-		IO::Path::Combine(shader_path, gDaedalusExePath, "n64.psh");
+		std::string shader_path = GetRunfilePath("SysGL/HLEGraphics/n64.psh");
 
-		FILE * fh = fopen(shader_path, "r");
+		FILE * fh = fopen(shader_path.c_str(), "r");
 		if (!fh)
 		{
-			DAEDALUS_ERROR("Couldn't load shader source %s", shader_path);
-			fprintf(stderr, "ERROR: couldn't load shader source %s\n", shader_path);
+			DAEDALUS_ERROR("Couldn't load shader source %s", shader_path.c_str());
+			fprintf(stderr, "ERROR: couldn't load shader source %s\n", shader_path.c_str());
 			return false;
 		}
 

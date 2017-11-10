@@ -368,7 +368,7 @@ static void DLDebugHandler(void *arg, WebDebugConnection *connection)
 
 	if (!ServeResource(connection, "/html/dldebugger.html"))
 	{
-		Generate500(connection, "Couldn't load html/debugger.html");
+		Generate500(connection, "Couldn't load html/dldebugger.html");
 	}
 }
 
