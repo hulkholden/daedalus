@@ -23,7 +23,7 @@ cc_library(
     deps = [
         "//:stdafx",
         "//Base",
-        "//Utility",
+        "//System",
     ],
 )
 

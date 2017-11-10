@@ -21,15 +21,6 @@ cc_library(
         "Timer.h",
         "Timing.h",
     ],
-    deps = [
-        "//:stdafx",
-        "//Config",
-        "//System",
-    ],
-)
-
-cc_library(
-    name = "UtilityCpp",
     srcs = [
         "CRC.cpp",
         "FastMemcpy.cpp",
@@ -39,14 +30,13 @@ cc_library(
         "Timer.cpp",
     ],
     deps = [
-        ":Utility",
         "//:stdafx",
         "//Base",
         "//Config",
         "//Debug",
         "//Input",
-        "//Interface",
         "//Math",
+        "//System",
         "//third_party/gtest",
         "@com_google_absl//absl/strings",
     ],
@@ -60,7 +50,8 @@ cc_test(
     ],
     visibility = ["//visibility:private"],
     deps = [
-        ":UtilityCpp",
+        ":Utility",
+        "//:stdafx",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -73,7 +64,8 @@ cc_test(
     ],
     visibility = ["//visibility:private"],
     deps = [
-        ":UtilityCpp",
+        ":Utility",
+        "//:stdafx",
         "//Test:TestUtil",
         "@com_google_googletest//:gtest_main",
     ],

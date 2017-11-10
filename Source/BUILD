@@ -68,6 +68,6 @@ cc_binary(
         "//System",
         "//System:SystemInit",
         "//third_party/zlib",
-        "//Utility:UtilityCpp",
+        "//Utility",
     ],
 )
