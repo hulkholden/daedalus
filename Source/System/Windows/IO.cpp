@@ -45,30 +45,9 @@ namespace IO
 	}
 	namespace Directory
 	{
-		bool	Create( const char * p_path )
+		bool	Create( const std::string& path )
 		{
-			return ::CreateDirectory( p_path, NULL ) ? true : false;
-		}
-
-		bool	EnsureExists( const char * p_path )
-		{
-			if ( IsDirectory(p_path) )
-				return true;
-
-			// Make sure parent exists,
-			IO::Filename	p_path_parent;
-			IO::Path::Assign( p_path_parent, p_path );
-			IO::Path::RemoveBackslash( p_path_parent );
-			if( IO::Path::RemoveFileSpec( p_path_parent ) )
-			{
-				//
-				//	Recursively create parents. Need to be careful of stack overflow
-				//
-				if( !EnsureExists( p_path_parent ) )
-					return false;
-			}
-
-			return Create( p_path );
+			return ::CreateDirectory( path.c_str(), NULL ) ? true : false;
 		}
 
 		bool	IsDirectory( const std::string& path )
@@ -99,15 +78,6 @@ namespace IO
 			return ::PathFindFileName( p_path );
 		}
 
-		char *	RemoveBackslash( char * p_path )
-		{
-			return ::PathRemoveBackslash( p_path );
-		}
-
-		bool	RemoveFileSpec( char * p_path )
-		{
-			return ::PathRemoveFileSpec( p_path ) ? true : false;
-		}
 	}
 
 	bool	FindFileOpen( const std::string& path, FindHandleT * handle, FindDataT & data )

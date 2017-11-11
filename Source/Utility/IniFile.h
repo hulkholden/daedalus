@@ -55,12 +55,12 @@ class IniFile
 {
    private:
 	IniFile() : mpDefaultSection(nullptr) {}
-	bool Open(const char* filename);
+	bool Open(const std::string& filename);
 
    public:
 	~IniFile();
 
-	static IniFile* Create(const char* filename);
+	static IniFile* Create(const std::string& filename);
 
 	const IniFileSection* GetDefaultSection() const { return mpDefaultSection; }
 

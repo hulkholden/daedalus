@@ -3,7 +3,9 @@
 
 #include "absl/strings/str_cat.h"
 
-IO::Filename gDaedalusExePath;
+#include "System/IO.h"
+
+std::string gDaedalusExePath;
 
 constexpr char kRunfilesDir[] = "/daedalus.runfiles/daedalus/";
 

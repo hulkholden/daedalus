@@ -261,14 +261,13 @@ bool CheatCodes_Read(const char* rom_name, const char* file, u8 countryID)
 	// Always clear when parsing a new ROM
 	CheatCodes_Clear();
 
-	IO::Filename path;
-	IO::Path::Combine(path, gDaedalusExePath, file);
+	std::string path = IO::Path::Join(gDaedalusExePath, file);
 
-	stream = fopen(path, "rt");
+	stream = fopen(path.c_str(), "rt");
 	if (stream == NULL)
 	{
 		// File does not exist, try to create a new empty one
-		stream = fopen(path, "wt");
+		stream = fopen(path.c_str(), "wt");
 
 		if (stream == NULL)
 		{

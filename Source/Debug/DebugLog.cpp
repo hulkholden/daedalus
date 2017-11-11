@@ -33,19 +33,15 @@ static FILE* g_hOutputLog = NULL;
 
 bool Debug_InitLogging()
 {
-	IO::Filename log_filename;
-
-	Dump_GetDumpDirectory(log_filename, "");
-
-	IO::Path::Append(log_filename, "daedalus.txt");
+	std::string log_filename = IO::Path::Join(Dump_GetDumpDirectory(""), "daedalus.txt");
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 	if (CDebugConsole::IsAvailable())
 	{
-		CDebugConsole::Get()->Msg(0, "Creating Dump file '%s'", log_filename);
+		CDebugConsole::Get()->Msg(0, "Creating Dump file '%s'", log_filename.c_str());
 	}
 #endif
-	g_hOutputLog = fopen(log_filename, "w");
+	g_hOutputLog = fopen(log_filename.c_str(), "w");
 
 	return g_hOutputLog != NULL;
 }

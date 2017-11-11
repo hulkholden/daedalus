@@ -36,8 +36,8 @@ bool Exists(const std::string& path);
 }
 namespace Directory
 {
-bool Create(const char* p_path);
-bool EnsureExists(const char* p_path);
+bool Create(const std::string& path);
+bool EnsureExists(const std::string& p_path);
 bool IsDirectory(const std::string& path);
 }
 
@@ -58,9 +58,9 @@ char* Combine(char* p_dest, const char* p_dir, const char* p_file);
 bool Append(char* p_path, const char* p_more);
 const char* FindExtension(const char* p_path);
 const char* FindFileName(const char* p_path);
-char* RemoveBackslash(char* p_path);
-bool RemoveFileSpec(char* p_path);
-void RemoveExtension(std::string* path);
+bool RemoveBackslash(std::string* path);
+bool RemoveFileSpec(std::string* path);
+bool RemoveExtension(std::string* path);
 void AddExtension(std::string* path, absl::string_view ext);
 
 inline void SetExtension(std::string* path, absl::string_view ext)

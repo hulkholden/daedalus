@@ -22,12 +22,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdlib.h>
 
+#include <string>
+
 #include "TextureFormat.h"
 
 class DataSink;
 class CNativeTexture;
 
-void PngSaveImage( const char* filename, const void * data, const void * palette, ETextureFormat pixelformat, s32 pitch, u32 width, u32 height, bool use_alpha );
+void PngSaveImage( const std::string& filename, const void * data, const void * palette, ETextureFormat pixelformat, s32 pitch, u32 width, u32 height, bool use_alpha );
 void PngSaveImage( DataSink * sink, const void * data, const void * palette, ETextureFormat pixelformat, s32 pitch, u32 width, u32 height, bool use_alpha );
 void PngSaveImage( DataSink * sink, const CNativeTexture * texture );
 

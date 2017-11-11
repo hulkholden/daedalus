@@ -52,11 +52,11 @@ class IPreferences : public CPreferences
 	IPreferences();
 	virtual ~IPreferences();
 
-	bool OpenPreferencesFile(const char* filename);
-	void Commit();
+	bool OpenPreferencesFile(const std::string& filename) override;
+	void Commit() override;
 
-	bool GetRomPreferences(const RomID& id, SRomPreferences* preferences) const;
-	void SetRomPreferences(const RomID& id, const SRomPreferences& preferences);
+	bool GetRomPreferences(const RomID& id, SRomPreferences* preferences) const override;
+	void SetRomPreferences(const RomID& id, const SRomPreferences& preferences) override;
 
    private:
 	void OutputSectionDetails(const RomID& id, const SRomPreferences& preferences, FILE* fh);
@@ -84,8 +84,7 @@ CPreferences::~CPreferences() {}
 
 IPreferences::IPreferences() : mDirty(false)
 {
-	IO::Filename ini_filename;
-	IO::Path::Combine(ini_filename, gDaedalusExePath, "preferences.ini");
+	std::string ini_filename = IO::Path::Join(gDaedalusExePath, "preferences.ini");
 	OpenPreferencesFile(ini_filename);
 }
 
@@ -104,7 +103,7 @@ static RomID RomIDFromString(const char* str)
 	return RomID(crc1, crc2, (u8)country);
 }
 
-bool IPreferences::OpenPreferencesFile(const char* filename)
+bool IPreferences::OpenPreferencesFile(const std::string& filename)
 {
 	mFilename = filename;
 

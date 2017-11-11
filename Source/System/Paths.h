@@ -4,11 +4,9 @@
 
 #include <string>
 
-#include "System/IO.h"
-
 #include "absl/strings/string_view.h"
 
-extern IO::Filename gDaedalusExePath;
+extern std::string gDaedalusExePath;
 
 std::string GetRunfilePath(absl::string_view filename);
 

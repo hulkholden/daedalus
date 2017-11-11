@@ -105,22 +105,24 @@ static void Dump_DisassembleRSPRange(FILE* fh, u32 address_offset, const OpCode*
 	}
 }
 
+static std::string GetDumpPath(const char* filename, const char* default_filename)
+{
+	if (filename == NULL || strlen(filename) == 0)
+	{
+		return IO::Path::Join(Dump_GetDumpDirectory(""), default_filename);
+	}
+	return filename;
+}
+
 void Dump_Disassemble(u32 start, u32 end, const char* p_file_name)
 {
-	IO::Filename file_path;
+	std::string file_path = GetDumpPath(p_file_name, "dis.txt");
 
 	// Cute hack - if the end of the range is less than the start,
 	// assume it is a length to disassemble
-	if (end < start) end = start + end;
-
-	if (p_file_name == NULL || strlen(p_file_name) == 0)
+	if (end < start)
 	{
-		Dump_GetDumpDirectory(file_path, "");
-		IO::Path::Append(file_path, "dis.txt");
-	}
-	else
-	{
-		IO::Path::Assign(file_path, p_file_name);
+		end = start + end;
 	}
 
 	u8* p_base;
@@ -130,10 +132,13 @@ void Dump_Disassemble(u32 start, u32 end, const char* p_file_name)
 		return;
 	}
 
-	FILE* fp(fopen(file_path, "w"));
-	if (fp == NULL) return;
+	FILE* fp = fopen(file_path.c_str(), "w");
+	if (!fp)
+	{
+		return;
+	}
 
-	DBGConsole_Msg(0, "Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path);
+	DBGConsole_Msg(0, "Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path.c_str());
 
 	const OpCode* op_start(reinterpret_cast<const OpCode*>(p_base));
 	const OpCode* op_end(reinterpret_cast<const OpCode*>(p_base + (end - start)));
@@ -145,6 +150,8 @@ void Dump_Disassemble(u32 start, u32 end, const char* p_file_name)
 
 void Dump_RSPDisassemble(const char* p_file_name)
 {
+	std::string file_path = GetDumpPath(p_file_name, "rdis.txt");
+
 	u8* base;
 	u32 start = 0xa4000000;
 	u32 end = 0xa4002000;
@@ -155,22 +162,13 @@ void Dump_RSPDisassemble(const char* p_file_name)
 		return;
 	}
 
-	IO::Filename file_path;
+	DBGConsole_Msg(0, "Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path.c_str());
 
-	if (p_file_name == NULL || strlen(p_file_name) == 0)
+	FILE* fp = fopen(file_path.c_str(), "w");
+	if (!fp)
 	{
-		Dump_GetDumpDirectory(file_path, "");
-		IO::Path::Append(file_path, "rdis.txt");
+		return;
 	}
-	else
-	{
-		IO::Path::Assign(file_path, p_file_name);
-	}
-
-	DBGConsole_Msg(0, "Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path);
-
-	FILE* fp(fopen(file_path, "w"));
-	if (fp == NULL) return;
 
 	const u32* mem_start(reinterpret_cast<const u32*>(base + 0x0000));
 	const u32* mem_end(reinterpret_cast<const u32*>(base + 0x1000));
@@ -187,26 +185,17 @@ void Dump_RSPDisassemble(const char* p_file_name)
 
 void Dump_Strings(const char* p_file_name)
 {
-	IO::Filename file_path;
-	FILE* fp;
+	std::string file_path = GetDumpPath(p_file_name, "strings.txt");
 
 	static const u32 MIN_LENGTH = 5;
 
-	if (p_file_name == NULL || strlen(p_file_name) == 0)
-	{
-		Dump_GetDumpDirectory(file_path, "");
-		IO::Path::Append(file_path, "strings.txt");
-	}
-	else
-	{
-		IO::Path::Assign(file_path, p_file_name);
-	}
+	DBGConsole_Msg(0, "Dumping strings in rom ([C%s])", file_path.c_str());
 
-	DBGConsole_Msg(0, "Dumping strings in rom ([C%s])", file_path);
-
-	// Overwrite here
-	fp = fopen(file_path, "w");
-	if (fp == NULL) return;
+	FILE* fp = fopen(file_path.c_str(), "w");
+	if (!fp)
+	{
+		return;
+	}
 
 	// Memory dump
 	u32 ascii_start = 0;

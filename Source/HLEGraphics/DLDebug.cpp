@@ -452,22 +452,22 @@ public:
 		delete Sink;
 	}
 
-	bool Open(const char * filename)
+	bool Open(const std::string& filename)
 	{
 		return Sink->Open(filename, "w");
 	}
 
-	virtual size_t Write(const void * p, size_t len)
+	size_t Write(const void * p, size_t len) override
 	{
 		return Sink->Write(p, len);
 	}
 
-	virtual void BeginInstruction(u32 idx, u32 cmd0, u32 cmd1, u32 depth, const char * name)
+	void BeginInstruction(u32 idx, u32 cmd0, u32 cmd1, u32 depth, const char * name) override
 	{
 		Print("[%05d] %08x %08x %-10s\n", idx, cmd0, cmd1, name);
 	}
 
-	virtual void EndInstruction()
+	void EndInstruction() override
 	{
 	}
 
@@ -478,26 +478,21 @@ DLDebugOutput * DLDebug_CreateFileOutput()
 {
 	static u32 count = 0;
 
-	IO::Filename dumpdir;
-	IO::Path::Combine(dumpdir, g_ROM.settings.GameName.c_str(), "DisplayLists");
-
-	IO::Filename filepath;
-	Dump_GetDumpDirectory(filepath, dumpdir);
-
 	char filename[64];
 	sprintf(filename, "dl%04d.txt", count++);
 
-	IO::Path::Append(filepath, filename);
+	std::string dumpdir = IO::Path::Join(g_ROM.settings.GameName, "DisplayLists");
+	std::string filepath = IO::Path::Join(Dump_GetDumpDirectory(dumpdir), filename);
 
 	DLDebugOutputFile * output = new DLDebugOutputFile();
 	if (!output->Open(filepath))
 	{
 		delete output;
-		DBGConsole_Msg(0, "RDP: Couldn't create dumpfile %s", filepath);
+		DBGConsole_Msg(0, "RDP: Couldn't create dumpfile %s", filepath.c_str());
 		return NULL;
 	}
 
-	DBGConsole_Msg(0, "RDP: Dumping Display List as %s", filepath);
+	DBGConsole_Msg(0, "RDP: Dumping Display List as %s", filepath.c_str());
 	return output;
 }
 

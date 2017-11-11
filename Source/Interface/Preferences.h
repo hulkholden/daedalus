@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef UTILITY_PREFERENCES_H_
 #define UTILITY_PREFERENCES_H_
 
+#include <string>
+
 #include "Base/Singleton.h"
 #include "Interface/GlobalPreferences.h"
 #include "Interface/RomPreferences.h"
@@ -33,7 +35,7 @@ class CPreferences : public CSingleton<CPreferences>
    public:
 	virtual ~CPreferences();
 
-	virtual bool OpenPreferencesFile(const char* filename) = 0;
+	virtual bool OpenPreferencesFile(const std::string& filename) = 0;
 	virtual void Commit() = 0;
 
 	virtual bool GetRomPreferences(const RomID& id, SRomPreferences* preferences) const = 0;

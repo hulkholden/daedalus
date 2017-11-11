@@ -106,9 +106,9 @@ IniFile::~IniFile()
 	}
 }
 
-IniFile* IniFile::Create(const char* filename)
+IniFile* IniFile::Create(const std::string& filename)
 {
-	IniFile* p_file = new IniFile;
+	IniFile* p_file = new IniFile();
 	if (p_file)
 	{
 		if (p_file->Open(filename))
@@ -122,9 +122,9 @@ IniFile* IniFile::Create(const char* filename)
 	return nullptr;
 }
 
-bool IniFile::Open(const char* filename)
+bool IniFile::Open(const std::string& filename)
 {
-	FILE* fh = fopen(filename, "r");
+	FILE* fh = fopen(filename.c_str(), "r");
 	if (!fh)
 	{
 		return false;

@@ -1,7 +1,9 @@
-#ifndef UTILITY_DATASINK_H_
-#define UTILITY_DATASINK_H_
+#ifndef SYSTEM_DATASINK_H_
+#define SYSTEM_DATASINK_H_
 
 #include <stdio.h>
+
+#include <string>
 
 class DataSink
 {
@@ -17,7 +19,7 @@ class FileSink : public DataSink
 	FileSink();
 	~FileSink();
 
-	bool Open(const char* filename, const char* mode);
+	bool Open(const std::string& filename, const char* mode);
 
 	virtual size_t Write(const void* p, size_t len);
 	virtual void Flush();
@@ -26,4 +28,4 @@ class FileSink : public DataSink
 	FILE* Handle;
 };
 
-#endif  // UTILITY_DATASINK_H_
+#endif  // SYSTEM_DATASINK_H_

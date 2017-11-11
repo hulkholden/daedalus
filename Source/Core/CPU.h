@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdlib.h>
 
+#include <string>
+
 #include "R4300Instruction.h"
 #include "R4300OpCode.h"
 #include "Memory.h"
@@ -148,8 +150,8 @@ void CPU_RomClose();
 void CPU_Step();
 void CPU_Skip();
 bool CPU_Run();
-bool CPU_RequestSaveState(const char* filename);
-bool CPU_RequestLoadState(const char* filename);
+bool CPU_RequestSaveState(const std::string& filename);
+bool CPU_RequestLoadState(const std::string& filename);
 void CPU_Halt(const char* reason);
 void CPU_SelectCore();
 u32 CPU_GetVideoInterruptEventCount();

@@ -171,20 +171,16 @@ void Patch_PatchAll()
 	}
 #ifdef DUMPOSFUNCTIONS
 	FILE *fp;
-	IO::Filename path;
-	Dump_GetDumpDirectory(path, "");
-	IO::Path::Append(path, "n64.cfg");
-	fp = fopen(path, "w");
+	std::string path = IO::Path::Join(Dump_GetDumpDirectory(""), "n64.cfg");
+	fp = fopen(path.c_str(), "w");
 #endif
 	for (u32 i = 0; i < nPatchSymbols; i++)
 	{
 		if (g_PatchSymbols[i]->Found)
 		{
 #ifdef DUMPOSFUNCTIONS
-			IO::Filename buf;
 			PatchSymbol * ps = g_PatchSymbols[i];
-			Dump_GetDumpDirectory(buf, "oshle");
-			IO::Path::Append(buf, ps->Name);
+			std::string buf = IO::Path::Join(Dump_GetDumpDirectory("oshle"), ps->Name);
 
 			Dump_Disassemble(PHYS_TO_K0(ps->Location), PHYS_TO_K0(ps->Location) + ps->Signatures->NumOps * sizeof(OpCode),
 				buf);

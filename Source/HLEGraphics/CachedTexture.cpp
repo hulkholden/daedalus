@@ -326,19 +326,13 @@ void CachedTexture::DumpTexture( const TextureInfo & ti, const CNativeTexture * 
 	if( texture != NULL && texture->HasData() )
 	{
 		IO::Filename filename;
-		IO::Filename filepath;
-		IO::Filename dumpdir;
-
-		IO::Path::Combine( dumpdir, g_ROM.settings.GameName.c_str(), "Textures" );
-
-		Dump_GetDumpDirectory( filepath, dumpdir );
-
 		sprintf( filename, "%08x-%s_%dbpp-%dx%d-%dx%d.png",
 							ti.GetLoadAddress(), ti.GetFormatName(), ti.GetSizeInBits(),
 							0, 0,		// Left/Top
 							ti.GetWidth(), ti.GetHeight() );
 
-		IO::Path::Append( filepath, filename );
+		std::string dumpdir = IO::Path::Join(g_ROM.settings.GameName, "Textures");
+		std::string filepath = IO::Path::Join(Dump_GetDumpDirectory(dumpdir), filename);
 
 		void *	texels;
 		void *	palette;

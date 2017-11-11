@@ -135,7 +135,7 @@ baz=true
 	std::string fn = testing::GetTestTmpFilename("foo.ini");
 	ASSERT_TRUE(testing::WriteFile(fn, p));
 
-	IniFile* inifile = IniFile::Create(fn.c_str());
+	IniFile* inifile = IniFile::Create(fn);
 	ASSERT_NE(nullptr, inifile);
 
 	std::string str_value;

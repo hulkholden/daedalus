@@ -25,9 +25,34 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 namespace IO
 {
+namespace Directory
+{
+bool EnsureExists(const std::string& path)
+{
+	if (IsDirectory(path))
+	{
+		return true;
+	}
+
+	// Make sure parent exists,
+	std::string path_parent = path;
+	IO::Path::RemoveBackslash(&path_parent);
+	if (IO::Path::RemoveFileSpec(&path_parent))
+	{
+		//	Recursively create parents.
+		if (!EnsureExists(path_parent))
+		{
+			return false;
+		}
+	}
+
+	return Create(path);
+}
+
+}
 namespace Path
 {
-
+const char kPathSeparator = '/';
 const char kPathSeparatorStr[] = "/";
 
 std::string Join(absl::string_view a, absl::string_view b)
@@ -44,18 +69,43 @@ std::string Join(absl::string_view a, absl::string_view b, absl::string_view c)
 	return Join(Join(a, b), c);
 }
 
-void AddExtension(std::string* path, absl::string_view ext) {
+void AddExtension(std::string* path, absl::string_view ext)
+{
 	absl::StrAppend(path, ext);
 }
 
-void RemoveExtension(std::string* path)
+bool RemoveExtension(std::string* path)
 {
 	size_t idx = path->rfind('.');
 	if (idx != std::string::npos)
 	{
 		path->resize(idx);
+		return true;
 	}
+	return false;
 }
+
+bool RemoveFileSpec(std::string* path)
+{
+	size_t idx = path->rfind(kPathSeparator);
+	if (idx != std::string::npos)
+	{
+		path->resize(idx);
+		return true;
+	}
+	return false;
+}
+
+bool RemoveBackslash(std::string* path)
+{
+	size_t len = path->length();
+	while (!path->empty() && path->back() == kPathSeparator)
+	{
+		path->pop_back();
+	}
+	return len != path->length();
+}
+
 
 }  // namespace Path
 }  // namespace IO

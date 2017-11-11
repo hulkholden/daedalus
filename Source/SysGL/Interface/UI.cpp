@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#include "absl/strings/str_cat.h"
+
 #include "Core/CPU.h"
 #include "Core/ROM.h"
 
@@ -23,18 +25,12 @@ static void HandleKeys(GLFWwindow * window, int key, int scancode, int action, i
 
 			bool ctrl_down = (mods & GLFW_MOD_CONTROL) != 0;
 
-			char filename_ss[64];
-			sprintf( filename_ss, "saveslot%u.ss", idx );
+			std::string filename_ss = absl::StrCat("saveslot", idx, ".ss");
+			std::string path_sub = absl::StrCat("SaveStates\\", g_ROM.settings.GameName);
+			std::string path_ss = IO::Path::Join(gDaedalusExePath, path_sub);
+			IO::Directory::EnsureExists(path_ss);
 
-			IO::Filename path_sub;
-			sprintf( path_sub, "SaveStates\\%s", g_ROM.settings.GameName.c_str());
-
-			IO::Filename path_ss;
-			IO::Path::Combine( path_ss, gDaedalusExePath, path_sub );
-			IO::Directory::EnsureExists( path_ss );		// Ensure this dir exists
-
-			IO::Filename filename;
-			IO::Path::Combine(filename, path_ss, filename_ss);
+			std::string filename = IO::Path::Join(path_ss, filename_ss);
 
 			if (ctrl_down)
 			{
@@ -65,7 +61,7 @@ static void HandleKeys(GLFWwindow * window, int key, int scancode, int action, i
 				monitor = glfwGetPrimaryMonitor();
 
 				// Get destop resolution, this should tell us the max resolution we can use
-				const GLFWvidmode* mode = glfwGetVideoMode(monitor);	
+				const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 				width = mode->width;
 				height= mode->height;
 			}

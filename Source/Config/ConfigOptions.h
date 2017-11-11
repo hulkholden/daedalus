@@ -23,23 +23,23 @@
 #ifndef CONFIG_CONFIGOPTIONS_H_
 #define CONFIG_CONFIGOPTIONS_H_
 
-#include "System/IO.h"
+#include <string>
 
 // Config stuff
 struct DaedalusConfig
 {
-	// FIXME(strmnnrmn): We never seem to assign to mRomsDir?!
-	IO::Filename mRomsDir;
-	IO::Filename mSaveDir;
+	// FIXME(strmnnrmn): We never seem to assign to RomsDir?!
+	std::string RomsDir;
+	std::string SaveDir;
 };
 
 extern DaedalusConfig g_DaedalusConfig;
 
 // Per-ROM config
-extern bool gDynarecEnabled;							// Use dynamic recompilation
-extern bool gDynarecLoopOptimisation;			// Enable the dynarec loop optmisation
+extern bool gDynarecEnabled;				// Use dynamic recompilation
+extern bool gDynarecLoopOptimisation;		// Enable the dynarec loop optmisation
 extern bool gDynarecDoublesOptimisation;	// Enable the dynarec loop optmisation
-extern bool gOSHooksEnabled;							// Apply os-hooks
+extern bool gOSHooksEnabled;				// Apply os-hooks
 extern u32 gSpeedSyncEnabled;
 extern bool gDoubleDisplayEnabled;
 extern bool gAudioRateMatch;

@@ -37,41 +37,37 @@ static u32				gSaveSize;
 static std::string		gMempackFileName;
 static bool				gMempackDirty;
 
-
-// E.g. out = Save_GetDirectory("c:\roms\test.rom", ".sra")
-// would first try to find the save in g_DaedalusConfig.mSaveDir. If this is not
-// found, g_DaedalusConfig.mRomsDir is checked.
 std::string Save_GetDirectory(const char* rom_filename, const char* extension)
 {
 	// If the Save path has not yet been set up, prompt user
-	if (strlen(g_DaedalusConfig.mSaveDir) == 0)
+	if (g_DaedalusConfig.SaveDir.empty())
 	{
 		// FIXME: missing prompt here!
 
 		// User may have cancelled
-		if (strlen(g_DaedalusConfig.mSaveDir) == 0)
+		if (g_DaedalusConfig.SaveDir.empty())
 		{
 			// Default to rom path
-			IO::Path::Assign(g_DaedalusConfig.mSaveDir, rom_filename);
-			IO::Path::RemoveFileSpec(g_DaedalusConfig.mSaveDir);
+			std::string save_dir = rom_filename;
+			IO::Path::RemoveFileSpec(&save_dir);
 			// FIXME(strmnnrmn): for OSX I generate savegames in a subdir Save, to make it easier to clean up.
-			IO::Path::Append(g_DaedalusConfig.mSaveDir, "Save");
+			g_DaedalusConfig.SaveDir = IO::Path::Join(save_dir, "Save");
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 			if (CDebugConsole::IsAvailable())
 			{
-				DBGConsole_Msg(0, "SaveDir is still empty - defaulting to [C%s]", g_DaedalusConfig.mSaveDir);
+				DBGConsole_Msg(0, "SaveDir is still empty - defaulting to [C%s]", g_DaedalusConfig.SaveDir.c_str());
 			}
 #endif
 		}
 	}
 
-	IO::Directory::EnsureExists(g_DaedalusConfig.mSaveDir);
+	IO::Directory::EnsureExists(g_DaedalusConfig.SaveDir);
 
 	// Form the filename from the file spec (i.e. strip path and replace the extension)
 	std::string file_name = IO::Path::FindFileName(rom_filename);
 	IO::Path::SetExtension(&file_name, extension);
-	return IO::Path::Join(g_DaedalusConfig.mSaveDir, file_name);
+	return IO::Path::Join(g_DaedalusConfig.SaveDir, file_name);
 }
 
 bool Save_Reset()

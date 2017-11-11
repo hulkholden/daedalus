@@ -40,8 +40,8 @@ int main(int argc, char **argv)
 		IO::Filename exe_path;
 		realpath(argv[0], exe_path);
 
-		strcpy(gDaedalusExePath, exe_path);
-		IO::Path::RemoveFileSpec(gDaedalusExePath);
+		gDaedalusExePath = exe_path;
+		IO::Path::RemoveFileSpec(&gDaedalusExePath);
 	}
 	else
 	{

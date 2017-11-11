@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef DEBUG_DUMP_H_
 #define DEBUG_DUMP_H_
 
-void Dump_GetDumpDirectory(char* rootdir, const char* subdir);
+#include <string>
+
+std::string Dump_GetDumpDirectory(const std::string& subdir);
 
 #endif  // DEBUG_DUMP_H_

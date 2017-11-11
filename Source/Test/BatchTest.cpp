@@ -40,31 +40,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Timer.h"
 #include "Utility/Timing.h"
 
-void MakeRomList( const char * romdir, std::vector< std::string > & roms )
+static void MakeRomList( const std::string& romdir, std::vector< std::string > & roms )
 {
 	IO::FindHandleT		find_handle;
 	IO::FindDataT		find_data;
-	if(IO::FindFileOpen( romdir, &find_handle, find_data ))
+	if (IO::FindFileOpen( romdir, &find_handle, find_data ))
 	{
 		do
 		{
-			const char * filename( find_data.Name );
-			if( IsRomFilename( filename ) )
+			const char * filename = find_data.Name;
+			if ( IsRomFilename( filename ) )
 			{
-				IO::Filename rompath;
-
-				IO::Path::Combine( rompath, romdir, filename );
-
-				roms.push_back( rompath );
+				roms.push_back( IO::Path::Join( romdir, filename ) );
 			}
 		}
 		while(IO::FindFileNext( find_handle, find_data ));
 
 		IO::FindFileClose( find_handle );
 	}
-
-	//_finddata_t		data;
-	//_findfirst("foo", &data )
 }
 
 static FILE * gBatchFH = NULL;
@@ -81,7 +74,9 @@ static EAssertResult BatchAssertHook( const char * expression, const char * file
 	va_end(va);
 
 	if( gBatchTestEventHandler )
+	{
 		return gBatchTestEventHandler->OnAssert( expression, file, line, buffer );
+	}
 
 	return AR_IGNORE;
 }
@@ -96,37 +91,42 @@ static void BatchVblHandler( void * arg )
 	gBatchTestEventHandler->OnVerticalBlank();
 }
 
-static void MakeNewLogFilename( IO::Filename & filepath, const char * rundir )
+static std::string MakeNewLogFilename( const std::string& rundir )
 {
 	u32 count = 0;
+	std::string filepath;
 	do
 	{
 		char filename[64];
 		sprintf( filename, "log%04d.txt", count );
 		++count;
 
-		IO::Path::Combine(filepath, rundir, filename);
+		filepath = IO::Path::Join(rundir, filename);
 	}
 	while( IO::File::Exists( filepath ) );
+	return filepath;
 }
 
-static void SprintRunDirectory( IO::Filename & rundir, const char * batchdir, u32 run_id )
+static std::string SprintRunDirectory( const std::string& batchdir, u32 run_id )
 {
 	char filename[64];
 	sprintf( filename, "run%04d", run_id );
-	IO::Path::Combine(rundir, batchdir, filename);
+	return IO::Path::Join(batchdir, filename);
 }
 
-static bool MakeRunDirectory( IO::Filename & rundir, const char * batchdir )
+static bool MakeRunDirectory( std::string* rundir, const std::string& batchdir )
 {
 	// Find an unused directory
-	for( u32 run_id = 0; run_id < 100; ++run_id )
+	for ( u32 run_id = 0; run_id < 100; ++run_id )
 	{
-		SprintRunDirectory( rundir, batchdir, run_id );
+		std::string dir = SprintRunDirectory( batchdir, run_id );
 
 		// Skip if it already exists as a file or directory
-		if( IO::Directory::Create( rundir ) )
+		if( IO::Directory::Create( dir ) )
+		{
+			*rundir = dir;
 			return true;
+		}
 	}
 
 	return false;
@@ -135,7 +135,7 @@ static bool MakeRunDirectory( IO::Filename & rundir, const char * batchdir )
 void BatchTestMain( int argc, char* argv[] )
 {
 	// TODO: Allow other directories and configuration
-	const char * const romdir = g_DaedalusConfig.mRomsDir;
+	const std::string romdir = g_DaedalusConfig.RomsDir;
 
 	bool	random_order( false );		// Whether to randomise the order of processing, to help avoid hangs
 	bool	update_results( false );	// Whether to update existing results
@@ -166,13 +166,12 @@ void BatchTestMain( int argc, char* argv[] )
 		}
 	}
 
-	IO::Filename batchdir;
-	Dump_GetDumpDirectory( batchdir, "batch" );
+	std::string batchdir = Dump_GetDumpDirectory("batch");
 
-	IO::Filename rundir;
+	std::string rundir;
 	if( run_id < 0 )
 	{
-		if( !MakeRunDirectory( rundir, batchdir ) )
+		if( !MakeRunDirectory( &rundir, batchdir ) )
 		{
 			printf( "Couldn't start a new run\n" );
 			return;
@@ -180,7 +179,7 @@ void BatchTestMain( int argc, char* argv[] )
 	}
 	else
 	{
-		SprintRunDirectory( rundir, batchdir, run_id );
+		rundir = SprintRunDirectory( batchdir, run_id );
 		if( !IO::Directory::IsDirectory( rundir ) )
 		{
 			printf( "Couldn't resume run %d\n", run_id );
@@ -190,12 +189,11 @@ void BatchTestMain( int argc, char* argv[] )
 
 	gBatchTestEventHandler = new CBatchTestEventHandler();
 
-	IO::Filename logpath;
-	MakeNewLogFilename( logpath, rundir );
-	gBatchFH = fopen(logpath, "w");
+	std::string logpath = MakeNewLogFilename( rundir );
+	gBatchFH = fopen(logpath.c_str(), "w");
 	if( !gBatchFH )
 	{
-		printf( "Unable to open '%s' for writing", logpath );
+		printf( "Unable to open '%s' for writing", logpath.c_str() );
 		return;
 	}
 

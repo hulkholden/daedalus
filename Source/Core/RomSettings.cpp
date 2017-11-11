@@ -110,16 +110,14 @@ class IRomSettingsDB : public CRomSettingsDB
 {
    public:
 	IRomSettingsDB();
-	virtual ~IRomSettingsDB();
-
 	//
-	// CRomSettingsDB implementation
-	//
-	bool OpenSettingsFile(const char* filename);
-	void Commit();  // (STRMNNRMN - Write ini back out to disk?)
+	virtual ~IRomSettingsDB() override;
 
-	bool GetSettings(const RomID& id, RomSettings* p_settings) const;
-	void SetSettings(const RomID& id, const RomSettings& settings);
+	bool OpenSettingsFile(const std::string& filename) override;
+	void Commit() override;
+
+	bool GetSettings(const RomID& id, RomSettings* p_settings) const override;
+	void SetSettings(const RomID& id, const RomSettings& settings) override;
 
    private:
 	void OutputSectionDetails(const RomID& id, const RomSettings& settings, FILE* fh);
@@ -130,7 +128,7 @@ class IRomSettingsDB : public CRomSettingsDB
 	SettingsMap mSettings;
 
 	bool mDirty;  // (STRMNNRMN - Changed since read from disk?)
-	IO::Filename mFilename;
+	std::string mFilename;
 };
 
 template <>
@@ -140,8 +138,7 @@ bool CSingleton<CRomSettingsDB>::Create()
 
 	mpInstance = new IRomSettingsDB();
 
-	IO::Filename ini_filename;
-	IO::Path::Combine(ini_filename, gDaedalusExePath, "roms.ini");
+	std::string ini_filename = IO::Path::Join(gDaedalusExePath, "roms.ini");
 	mpInstance->OpenSettingsFile(ini_filename);
 
 	return true;
@@ -200,17 +197,14 @@ static RomID RomIDFromString(const char* str)
 	return RomID(crc1, crc2, (u8)country);
 }
 
-bool IRomSettingsDB::OpenSettingsFile(const char* filename)
+bool IRomSettingsDB::OpenSettingsFile(const std::string& filename)
 {
-	//
-	// Remember the filename
-	//
-	strcpy(mFilename, filename);
+	mFilename = filename;
 
 	IniFile* inifile = IniFile::Create(filename);
 	if (inifile == NULL)
 	{
-		DBGConsole_Msg(0, "Failed to open RomDB from %s\n", filename);
+		DBGConsole_Msg(0, "Failed to open RomDB from %s\n", filename.c_str());
 		return false;
 	}
 
@@ -264,7 +258,7 @@ void IRomSettingsDB::Commit()
 	IO::Path::AddExtension(&filename_tmp, ".tmp");
 	IO::Path::AddExtension(&filename_del, ".del");
 
-	FILE* fh_src = fopen(mFilename, "r");
+	FILE* fh_src = fopen(mFilename.c_str(), "r");
 	if (fh_src == NULL)
 	{
 		return;

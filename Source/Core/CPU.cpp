@@ -72,7 +72,7 @@ volatile u32 eventQueueLocked = 0;
 
 static bool gCPURunning = false;  // CPU is actively running
 u8* gLastAddress = NULL;
-std::string gSaveStateFilename = "";
+static std::string gSaveStateFilename = "";
 
 // When stopping, try to stop in a 'simple' state (i.e. no RSP running and not in a branch delay slot)
 static bool gCPUStopOnSimpleState = false;
@@ -400,7 +400,7 @@ void CPU_SelectCore()
 	}
 }
 
-bool CPU_RequestSaveState(const char* filename)
+bool CPU_RequestSaveState(const std::string& filename)
 {
 	// Call SaveState_SaveToFile directly if the CPU is not running.
 	DAEDALUS_ASSERT(gCPURunning, "Expecting the CPU to be running at this point");
@@ -420,7 +420,7 @@ bool CPU_RequestSaveState(const char* filename)
 	return true;
 }
 
-bool CPU_RequestLoadState(const char* filename)
+bool CPU_RequestLoadState(const std::string& filename)
 {
 	// Call SaveState_SaveToFile directly if the CPU is not running.
 	DAEDALUS_ASSERT(gCPURunning, "Expecting the CPU to be running at this point");

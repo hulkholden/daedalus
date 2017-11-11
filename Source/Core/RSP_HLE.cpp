@@ -46,11 +46,8 @@ static void RDP_DumpRSPCode(char * name, u32 crc, u32 * mem_base, u32 pc_base, u
 	char filename[100];
 	sprintf(filename, "task_dump_%s_crc_0x%08x.txt", name, crc);
 
-	IO::Filename filepath;
-	Dump_GetDumpDirectory(filepath, "rsp_dumps");
-	IO::Path::Append(filepath, filename);
-
-	FILE * fp = fopen(filepath, "w");
+	std::string filepath = IO::Path::Join(Dump_GetDumpDirectory("rsp_dumps"), filename);
+	FILE * fp = fopen(filepath.c_str(), "w");
 	if (fp == NULL)
 		return;
 
@@ -77,11 +74,8 @@ static void RDP_DumpRSPData(char * name, u32 crc, u32 * mem_base, u32 pc_base, u
 	char filename[100];
 	sprintf(filename, "task_data_dump_%s_crc_0x%08x.txt", name, crc);
 
-	IO::Filename filepath;
-	Dump_GetDumpDirectory(filepath, "rsp_dumps");
-	IO::Path::Append(filepath, filename);
-
-	FILE * fp = fopen(filepath, "w");
+	std::string filepath = IO::Path::Join(Dump_GetDumpDirectory("rsp_dumps"), filename);
+	FILE * fp = fopen(filepath.c_str(), "w");
 	if (fp == NULL)
 		return;
 

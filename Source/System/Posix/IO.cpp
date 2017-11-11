@@ -34,11 +34,13 @@ const char kPathSeparator = '/';
 
 namespace File
 {
-bool Move(const std::string& from, const std::string& to) {
+bool Move(const std::string& from, const std::string& to)
+{
 	return rename(from.c_str(), to.c_str()) >= 0;
 }
 
-bool Delete(const std::string& file) {
+bool Delete(const std::string& file)
+{
 	return remove(file.c_str()) == 0;
 }
 
@@ -56,23 +58,9 @@ bool Exists(const std::string& path)
 }
 namespace Directory
 {
-bool Create(const char* p_path) { return mkdir(p_path, 0777) == 0; }
-
-bool EnsureExists(const char* p_path)
+bool Create(const std::string& path)
 {
-	if (IsDirectory(p_path)) return true;
-
-	// Make sure parent exists,
-	IO::Filename p_path_parent;
-	IO::Path::Assign(p_path_parent, p_path);
-	IO::Path::RemoveBackslash(p_path_parent);
-	if (IO::Path::RemoveFileSpec(p_path_parent))
-	{
-		//	Recursively create parents. Need to be careful of stack overflow
-		if (!EnsureExists(p_path_parent)) return false;
-	}
-
-	return Create(p_path);
+	return mkdir(path.c_str(), 0777) == 0;
 }
 
 bool IsDirectory(const std::string& path)
@@ -130,32 +118,6 @@ const char* FindFileName(const char* p_path)
 	{
 		return nullptr;
 	}
-}
-
-char* RemoveBackslash(char* p_path)
-{
-	u32 len = strlen(p_path);
-	if (len > 0)
-	{
-		char* p_last_char(&p_path[len - 1]);
-		if (*p_last_char == kPathSeparator)
-		{
-			*p_last_char = '\0';
-		}
-		return p_last_char;
-	}
-	return nullptr;
-}
-
-bool RemoveFileSpec(char* p_path)
-{
-	char* last_slash = strrchr(p_path, kPathSeparator);
-	if (last_slash)
-	{
-		*last_slash = '\0';
-		return true;
-	}
-	return false;
 }
 
 }  // namespace Path
