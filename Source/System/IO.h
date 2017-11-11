@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string.h>
 
+#include "absl/strings/string_view.h"
+
 namespace IO
 {
 namespace File
@@ -48,6 +50,9 @@ inline void Assign(char* p_dest, const char* p_dir)
 	strncpy(p_dest, p_dir, kMaxPathLen);
 	p_dest[kMaxPathLen - 1] = '\0';
 }
+
+std::string Join(absl::string_view a, absl::string_view b);
+std::string Join(absl::string_view a, absl::string_view b, absl::string_view c);
 
 char* Combine(char* p_dest, const char* p_dir, const char* p_file);
 bool Append(char* p_path, const char* p_more);

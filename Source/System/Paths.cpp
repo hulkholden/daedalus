@@ -10,5 +10,5 @@ constexpr char kRunfilesDir[] = "/daedalus.runfiles/daedalus/";
 
 std::string GetRunfilePath(absl::string_view filename)
 {
-	return absl::StrCat(gDaedalusExePath, kRunfilesDir, filename);
+	return IO::Path::Join(gDaedalusExePath, kRunfilesDir, filename);
 }

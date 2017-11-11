@@ -3,6 +3,7 @@ cc_library(
     srcs = [
         "CompressedStream.cpp",
         "DataSink.cpp",
+        "IO.cpp",
         "Paths.cpp",
     ] + select({
         "//:darwin": [
@@ -47,4 +48,19 @@ cc_library(
         "//Utility",
     ],
     visibility = ["//visibility:public"],
+)
+
+cc_test(
+    name = "IO_test",
+    size = "small",
+    srcs = [
+        "IO_test.cpp",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":System",
+        # Shouldn't need this.
+        "//Debug",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
