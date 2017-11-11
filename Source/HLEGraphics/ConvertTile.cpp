@@ -4,8 +4,8 @@
 #include "HLEGraphics/ConvertTile.h"
 
 #include "Base/Alignment.h"
+#include "Core/ROM.h"
 #include "Graphics/NativePixelFormat.h"
-#include "HLEGraphics/Core/ROM.h"
 #include "HLEGraphics/RDP.h"
 #include "HLEGraphics/TextureInfo.h"
 #include "System/Endian.h"
