@@ -20,11 +20,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 #include "RomFile/RomFileUncompressed.h"
 
-ROMFileUncompressed::ROMFileUncompressed(const char* filename) : ROMFile(filename), mFH(NULL), mRomSize(0) {}
+ROMFileUncompressed::ROMFileUncompressed(const std::string& filename) : ROMFile(filename), mFH(nullptr), mRomSize(0) {}
 
 ROMFileUncompressed::~ROMFileUncompressed()
 {
-	if (mFH != NULL)
+	if (mFH != nullptr)
 	{
 		fclose(mFH);
 	}
@@ -32,11 +32,11 @@ ROMFileUncompressed::~ROMFileUncompressed()
 
 bool ROMFileUncompressed::Open(COutputStream& messages)
 {
-	DAEDALUS_ASSERT(mFH == NULL, "Opening the file twice?");
+	DAEDALUS_ASSERT(mFH == nullptr, "Opening the file twice?");
 
 	// Open the file and read in the data
-	mFH = fopen(mFilename, "rb");
-	if (mFH == NULL)
+	mFH = fopen(mFilename.c_str(), "rb");
+	if (mFH == nullptr)
 	{
 		return false;
 	}
@@ -72,9 +72,9 @@ bool ROMFileUncompressed::Open(COutputStream& messages)
 
 bool ROMFileUncompressed::LoadRawData(u32 bytes_to_read, u8* p_bytes, COutputStream& messages)
 {
-	DAEDALUS_ASSERT(mFH != NULL, "Reading data when Open failed?");
+	DAEDALUS_ASSERT(mFH != nullptr, "Reading data when Open failed?");
 
-	if (p_bytes == NULL)
+	if (p_bytes == nullptr)
 	{
 		return false;
 	}
@@ -97,7 +97,7 @@ bool ROMFileUncompressed::LoadRawData(u32 bytes_to_read, u8* p_bytes, COutputStr
 
 bool ROMFileUncompressed::ReadChunk(u32 offset, u8* p_dst, u32 length)
 {
-	DAEDALUS_ASSERT(mFH != NULL, "Reading data when Open failed?");
+	DAEDALUS_ASSERT(mFH != nullptr, "Reading data when Open failed?");
 
 	// Try and read in data - reset to the specified offset
 	fseek(mFH, offset, SEEK_SET);

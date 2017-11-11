@@ -52,7 +52,6 @@ int __cdecl main(int argc, char **argv)
 	//ReadConfiguration();
 
 	int result = 0;
-	IO::Filename rom_path;
 
 	if (!System_Init())
 		return 1;
@@ -90,10 +89,10 @@ int __cdecl main(int argc, char **argv)
 		}
 		else if (filename)
 		{
-			//Need absolute path when loading from Visual Studio
-			//This is ok when loading from console too, since arg0 will be empty, it'll just load file name (arg1)
-			IO::Path::Combine(rom_path, gDaedalusExePath, argv[1]);
-			fprintf(stderr, "Loading %s\n",rom_path);
+			// Need absolute path when loading from Visual Studio
+			// This is ok when loading from console too, since arg0 will be empty, it'll just load file name (arg1)
+			std::string rom_path = IO::Path::Join(gDaedalusExePath, argv[1]);
+			fprintf(stderr, "Loading %s\n", rom_path).c_str();
 			System_Open(rom_path);
 			CPU_Run();
 			System_Close();

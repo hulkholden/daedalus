@@ -81,31 +81,6 @@ bool IsDirectory(const std::string& path)
 
 namespace Path
 {
-char* Combine(char* p_dest, const char* p_dir, const char* p_file)
-{
-	strcpy(p_dest, p_dir);
-	Append(p_dest, p_file);
-	return p_dest;
-}
-
-bool Append(char* p_path, const char* p_more)
-{
-	u32 len(strlen(p_path));
-
-	if (len > 0)
-	{
-		if (p_path[len - 1] != kPathSeparator)
-		{
-			p_path[len] = kPathSeparator;
-			p_path[len + 1] = '\0';
-			len++;
-		}
-	}
-	strcat(p_path, p_more);
-	return true;
-}
-
-const char* FindExtension(const char* p_path) { return strrchr(p_path, '.'); }
 
 const char* FindFileName(const char* p_path)
 {
@@ -147,9 +122,12 @@ bool FindFileNext(FindHandleT handle, FindDataT& data)
 	while (dirent* ep = readdir(static_cast<DIR*>(handle)))
 	{
 		// Ignore hidden files (and '.' and '..')
-		if (ep->d_name[0] == '.') continue;
+		if (ep->d_name[0] == '.')
+		{
+			continue;
+		}
 
-		IO::Path::Assign(data.Name, ep->d_name);
+		data.Name = ep->d_name;
 		return true;
 	}
 

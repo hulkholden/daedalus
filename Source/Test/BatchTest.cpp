@@ -48,10 +48,9 @@ static void MakeRomList( const std::string& romdir, std::vector< std::string > &
 	{
 		do
 		{
-			const char * filename = find_data.Name;
-			if ( IsRomFilename( filename ) )
+			if ( IsRomFilename( find_data.Name ) )
 			{
-				roms.push_back( IO::Path::Join( romdir, filename ) );
+				roms.push_back( IO::Path::Join( romdir, find_data.Name ) );
 			}
 		}
 		while(IO::FindFileNext( find_handle, find_data ));
@@ -255,7 +254,7 @@ void BatchTestMain( int argc, char* argv[] )
 				fflush( gBatchFH );
 
 				// TODO: use ROM_GetRomDetailsByFilename and the alternative form of ROM_LoadFile with overridden preferences (allows us to test if roms break by changing prefs)
-				System_Open( rom_to_load.c_str() );
+				System_Open( rom_to_load );
 
 				CPU_Run();
 

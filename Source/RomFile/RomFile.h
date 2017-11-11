@@ -22,9 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef UTILITY_ROMFILE_H_
 #define UTILITY_ROMFILE_H_
 
-#include "absl/strings/string_view.h"
+#include <string>
 
-#include "System/IO.h"
+#include "absl/strings/string_view.h"
 
 class COutputStream;
 
@@ -33,9 +33,9 @@ bool IsRomFilename(absl::string_view rom_filename);
 class ROMFile
 {
    public:
-	static ROMFile* Create(const char* filename);
+	static ROMFile* Create(const std::string& filename);
 
-	ROMFile(const char* filename);
+	ROMFile(const std::string& filename);
 	virtual ~ROMFile();
 
 	bool LoadData(u32 bytes_to_read, u8* p_bytes, COutputStream& messages);
@@ -62,7 +62,7 @@ class ROMFile
 	virtual bool LoadRawData(u32 bytes_to_read, u8* p_bytes, COutputStream& messages) = 0;
 
    protected:
-	IO::Filename mFilename;
+	std::string mFilename;
 	u32 mHeaderMagic;
 };
 

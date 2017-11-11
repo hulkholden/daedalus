@@ -53,17 +53,16 @@ bool IsRomFilename(absl::string_view rom_filename)
 	return false;
 }
 
-ROMFile* ROMFile::Create(const char* filename)
+ROMFile* ROMFile::Create(const std::string& filename)
 {
-	const char* ext = IO::Path::FindExtension(filename);
-	if (ext && _strcmpi(ext, ".zip") == 0)
+	if (absl::EndsWithIgnoreCase(filename, ".zip"))
 	{
 		return new ROMFileCompressed(filename);
 	}
 	return new ROMFileUncompressed(filename);
 }
 
-ROMFile::ROMFile(const char* filename) : mHeaderMagic(0) { IO::Path::Assign(mFilename, filename); }
+ROMFile::ROMFile(const std::string& filename) : mFilename(filename), mHeaderMagic(0) {}
 
 ROMFile::~ROMFile() {}
 
@@ -97,8 +96,8 @@ bool ROMFile::SetHeaderMagic(u32 magic)
 		case 0x12408037:
 			break;
 		default:
-			DAEDALUS_ERROR("Unhandled swapping mode %08x for %s", magic, mFilename);
-			DBGConsole_Msg(0, "[CUnknown ROM format for %s: 0x%08x", mFilename, magic);
+			DAEDALUS_ERROR("Unhandled swapping mode %08x for %s", magic, mFilename.c_str());
+			DBGConsole_Msg(0, "[CUnknown ROM format for %s: 0x%08x", mFilename.c_str(), magic);
 			return false;
 	}
 #endif

@@ -313,17 +313,11 @@ void CFragmentCache::DumpStats( const char * outputdir ) const
 
 	std::sort( all_fragments.begin(), all_fragments.end(), SDescendingCyclesSort() );
 
-
-	IO::Filename	filename;
-	IO::Filename	fragments_dir;
-
-	IO::Path::Assign( fragments_dir, outputdir );
-	IO::Path::Append( fragments_dir, "fragments" );
+	std::string	fragments_dir = IO::Path::Join(outputdir, "fragments" );
 	IO::Directory::EnsureExists( fragments_dir );
 
-	IO::Path::Combine( filename, outputdir, "fragments.html" );
-
-	FILE * fh( fopen( filename, "w" ) );
+	std::string	filename = IO::Path::Join( outputdir, "fragments.html" );
+	FILE * fh( fopen( filename.c_str(), "w" ) );
 	if(fh)
 	{
 		fputs( "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">", fh );
@@ -355,12 +349,11 @@ void CFragmentCache::DumpStats( const char * outputdir ) const
 			fprintf( fh, "<td>%#.2f</td>", f32( fragment->GetOutputLength() ) / f32( fragment->GetInputLength() ) );
 			fputs( "</tr>\n", fh );
 
-			IO::Filename	fragment_path;
 			char			fragment_name[ 32+1 ];
 			sprintf( fragment_name, "%08x.html", fragment->GetEntryAddress() );
-			IO::Path::Combine( fragment_path, fragments_dir, fragment_name );
+			std::string	fragment_path = IO::Path::Join( fragments_dir, fragment_name );
 
-			FILE * fragment_fh( fopen( fragment_path, "w" ) );
+			FILE * fragment_fh( fopen( fragment_path.c_str(), "w" ) );
 			if( fragment_fh != NULL )
 			{
 				fragment->DumpFragmentInfoHtml( fragment_fh, total_cycles );

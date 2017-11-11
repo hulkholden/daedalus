@@ -29,7 +29,7 @@ TEST(RomFile, Create) {
 	std::string fn = testing::GetTestTmpFilename("foo.rom");
 	ASSERT_TRUE(testing::WriteFile(fn, p, 4));
 
-	ROMFile* romfile = ROMFile::Create(fn.c_str());
+	ROMFile* romfile = ROMFile::Create(fn);
 	ASSERT_NE(nullptr, romfile);
 	ASSERT_FALSE(romfile->IsCompressed());
 	//ASSERT_FALSE(romfile->RequiresSwapping());

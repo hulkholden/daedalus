@@ -26,14 +26,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/IO.h"
 #include "Utility/Stream.h"
 
-ROMFileCompressed::ROMFileCompressed(const char* filename)
-	: ROMFile(filename), mZipFile(NULL), mFoundRom(false), mRomSize(0)
+ROMFileCompressed::ROMFileCompressed(const std::string& filename)
+	: ROMFile(filename), mZipFile(nullptr), mFoundRom(false), mRomSize(0)
 {
 }
 
 ROMFileCompressed::~ROMFileCompressed()
 {
-	if (mZipFile != NULL)
+	if (mZipFile != nullptr)
 	{
 		unzClose(mZipFile);
 	}
@@ -41,11 +41,11 @@ ROMFileCompressed::~ROMFileCompressed()
 
 bool ROMFileCompressed::Open(COutputStream& messages)
 {
-	DAEDALUS_ASSERT(mZipFile == NULL, "Opening the zipfile twice?");
+	DAEDALUS_ASSERT(mZipFile == nullptr, "Opening the zipfile twice?");
 
 	mFoundRom = false;
-	mZipFile = unzOpen(mFilename);
-	if (mZipFile == NULL)
+	mZipFile = unzOpen(mFilename.c_str());
+	if (mZipFile == nullptr)
 	{
 		messages << "Couldn't open " << mFilename;
 		return false;
@@ -64,7 +64,7 @@ bool ROMFileCompressed::Open(COutputStream& messages)
 	{
 		do
 		{
-			err = unzGetCurrentFileInfo(mZipFile, &file_info, rom_filename, ARRAYSIZE(rom_filename), NULL, 0, NULL, 0);
+			err = unzGetCurrentFileInfo(mZipFile, &file_info, rom_filename, ARRAYSIZE(rom_filename), nullptr, 0, NULL, 0);
 			if (err != UNZ_OK)
 			{
 				messages << "error " << err << "with zipfile in unzGetCurrentFileInfo";
@@ -124,10 +124,10 @@ bool ROMFileCompressed::Open(COutputStream& messages)
 
 bool ROMFileCompressed::LoadRawData(u32 bytes_to_read, u8* p_bytes, COutputStream& messages)
 {
-	DAEDALUS_ASSERT(mZipFile != NULL, "No open zipfile?");
+	DAEDALUS_ASSERT(mZipFile != nullptr, "No open zipfile?");
 	DAEDALUS_ASSERT(mFoundRom, "Why are we loading data when no rom was found?");
 
-	if (p_bytes == NULL)
+	if (p_bytes == nullptr)
 	{
 		return false;
 	}
@@ -178,7 +178,7 @@ bool ROMFileCompressed::LoadRawData(u32 bytes_to_read, u8* p_bytes, COutputStrea
 //	Uses the specified buffer as a scratch pad to temporarilly decompress data.
 bool ROMFileCompressed::Seek(u32 offset, u8* p_scratch_block, u32 block_size)
 {
-	DAEDALUS_ASSERT(mZipFile != NULL, "No open zipfile?");
+	DAEDALUS_ASSERT(mZipFile != nullptr, "No open zipfile?");
 
 	int err;
 	u32 current_offset(unztell(mZipFile));
@@ -224,7 +224,7 @@ bool ROMFileCompressed::Seek(u32 offset, u8* p_scratch_block, u32 block_size)
 
 bool ROMFileCompressed::ReadChunk(u32 offset, u8* p_dst, u32 length)
 {
-	DAEDALUS_ASSERT(mZipFile != NULL, "No open zipfile?");
+	DAEDALUS_ASSERT(mZipFile != nullptr, "No open zipfile?");
 	DAEDALUS_ASSERT(mFoundRom, "Why are we loading data when no rom was found?");
 
 	if (!Seek(offset, p_dst, length))

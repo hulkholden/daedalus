@@ -45,18 +45,9 @@ namespace Path
 {
 const u32 kMaxPathLen = 260;
 
-inline void Assign(char* p_dest, const char* p_dir)
-{
-	strncpy(p_dest, p_dir, kMaxPathLen);
-	p_dest[kMaxPathLen - 1] = '\0';
-}
-
 std::string Join(absl::string_view a, absl::string_view b);
 std::string Join(absl::string_view a, absl::string_view b, absl::string_view c);
 
-char* Combine(char* p_dest, const char* p_dir, const char* p_file);
-bool Append(char* p_path, const char* p_more);
-const char* FindExtension(const char* p_path);
 const char* FindFileName(const char* p_path);
 bool RemoveBackslash(std::string* path);
 bool RemoveFileSpec(std::string* path);
@@ -74,7 +65,7 @@ typedef char Filename[IO::Path::kMaxPathLen + 1];
 
 struct FindDataT
 {
-	Filename Name;
+	std::string Name;
 };
 
 #if defined(DAEDALUS_W32)

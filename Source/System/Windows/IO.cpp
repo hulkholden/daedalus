@@ -58,21 +58,6 @@ namespace IO
 
 	namespace Path
 	{
-		char *	Combine( char * p_dest, const char * p_dir, const char * p_file )
-		{
-			return ::PathCombine( p_dest, p_dir, p_file );
-		}
-
-		bool	Append( char * p_path, const char * p_more )
-		{
-			return ::PathAppend( p_path, p_more ) ? true : false;
-		}
-
-		const char *  FindExtension( const char * p_path )
-		{
-			return ::PathFindExtension( p_path );
-		}
-
 		const char *	FindFileName( const char * p_path )
 		{
 			return ::PathFindFileName( p_path );
@@ -88,10 +73,10 @@ namespace IO
 
 		if( *handle != -1 )
 		{
-			IO::Path::Assign( data.Name, _data.name );
+			data.Name = _data.name;
 
 			// Ignore hidden files (and '.' and '..')
-			if (data.Name[0] == '.')
+			if (_data.name[0] == '.')
 			{
 				if (!FindFileNext(*handle, data))
 				{
@@ -117,7 +102,7 @@ namespace IO
 			if (_data.name[0] == '.')
 				continue;
 
-			IO::Path::Assign( data.Name, _data.name );
+			data.Name = _data.name;
 			return true;
 		}
 

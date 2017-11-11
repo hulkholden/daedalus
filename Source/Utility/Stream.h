@@ -27,7 +27,8 @@ class COutputStream
    public:
 	virtual ~COutputStream() {}
 
-	virtual COutputStream& operator<<(const char* p_str) = 0;
+	virtual COutputStream& operator<<(const char* str) = 0;
+	virtual COutputStream& operator<<(const std::string& str) = 0;
 	virtual COutputStream& operator<<(char val) = 0;
 	virtual COutputStream& operator<<(s32 val) = 0;
 	virtual COutputStream& operator<<(u32 val) = 0;
@@ -38,7 +39,8 @@ class CNullOutputStream : public COutputStream
    public:
 	virtual ~CNullOutputStream() {}
 
-	virtual COutputStream& operator<<(const char* p_str) { return *this; }
+	virtual COutputStream& operator<<(const char* str) { return *this; }
+	virtual COutputStream& operator<<(const std::string& str) { return *this; }
 	virtual COutputStream& operator<<(char val) { return *this; }
 	virtual COutputStream& operator<<(s32 val) { return *this; }
 	virtual COutputStream& operator<<(u32 val) { return *this; }

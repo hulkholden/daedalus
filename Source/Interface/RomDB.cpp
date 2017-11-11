@@ -384,7 +384,7 @@ void IRomDB::AddRomFile(const std::string& filename)
 static bool GenerateRomDetails( const std::string& filename, RomID * id, u32 * rom_size, ECicType * cic_type )
 {
 	// Haven't seen this rom before - try to add it to the database
-	ROMFile * rom_file = ROMFile::Create( filename.c_str() );
+	ROMFile * rom_file = ROMFile::Create(filename);
 	if( rom_file == nullptr )
 	{
 		return false;

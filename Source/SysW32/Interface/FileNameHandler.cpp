@@ -68,8 +68,7 @@ void FileNameHandler::GetDefaultDirectory(LPTSTR szOutBuffer)
 
 	// Initialize the directory name
 	GetModuleDirectory(szOutBuffer);
-
-	IO::Path::Append(szOutBuffer, m_szSectionName);
+	::PathAppend(szOutBuffer, m_szSectionName);
 
 	// Don't save default path for unknown sections...
 	if (lstrlen(m_szSectionName) == 0)
