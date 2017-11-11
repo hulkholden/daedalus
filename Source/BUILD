@@ -55,6 +55,9 @@ cc_binary(
            "//SysOSX:Main",
            "//SysPosix:SysPosixCpp",
         ],
+        ":windows": [
+           "//SysW32:Main",
+        ],
     }) + [
         "//Base",
         "//Core:CoreCpp",
