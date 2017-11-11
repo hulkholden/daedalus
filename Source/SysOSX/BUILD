@@ -22,17 +22,7 @@ cc_library(
         "//System:SystemInit",
         "//Test:BatchTest",
     ],
-    data = [
-        ":static_content",
-    ],
     linkopts = [
       "-framework AudioToolbox",
     ],
-)
-
-filegroup(
-    name = "static_content",
-    srcs = glob([
-        "Debug/Web/**",
-    ]),
 )

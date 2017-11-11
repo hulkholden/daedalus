@@ -27,7 +27,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Config/ConfigOptions.h"
 #include "Core/Cheats.h"
 #include "Core/CPU.h"
-#include "Core/FramerateLimiter.h"
 #include "Core/PIF.h"
 #include "Core/R4300.h"
 #include "Core/ROMBuffer.h"

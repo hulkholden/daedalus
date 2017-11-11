@@ -30,6 +30,9 @@ cc_library(
         "//System",
         "//third_party/webby",
     ],
+    data = [
+        ":static_content",
+    ],
 )
 
 cc_library(
@@ -41,4 +44,11 @@ cc_library(
         "//:stdafx",
         "//Core:Core",
     ],
+)
+
+filegroup(
+    name = "static_content",
+    srcs = glob([
+        "Web/**",
+    ]),
 )

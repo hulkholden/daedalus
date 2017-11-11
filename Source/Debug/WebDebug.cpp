@@ -24,10 +24,7 @@
 #include "System/Paths.h"
 #include "System/Thread.h"
 
-enum
-{
-	MAX_WSCONN = 8
-};
+static const int kMaxConnections = 8;
 
 struct WebDebugHandlerEntry
 {
@@ -48,7 +45,7 @@ static volatile bool gKeepRunning = false;
 static ThreadHandle gThread = kInvalidThreadHandle;
 
 static int ws_connection_count;
-static struct WebbyConnection *ws_connections[MAX_WSCONN];
+static struct WebbyConnection *ws_connections[kMaxConnections];
 static std::vector<WebDebugHandlerEntry> gHandlers;
 static std::vector<StaticResource> gStaticResources;
 
@@ -278,7 +275,7 @@ static int WebDebugDispatch(struct WebbyConnection *connection)
 static int test_ws_connect(struct WebbyConnection *connection)
 {
 	/* Allow websocket upgrades on /wstest */
-	if (0 == strcmp(connection->request.uri, "/wstest") && ws_connection_count < MAX_WSCONN)
+	if (0 == strcmp(connection->request.uri, "/wstest") && ws_connection_count < kMaxConnections)
 		return 0;
 	else
 		return 1;
