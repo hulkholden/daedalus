@@ -7,18 +7,22 @@ cc_library(
         "Paths.cpp",
     ] + select({
         "//:darwin": [
+            "Posix/Condition.cpp",
             "Posix/IO.cpp",
             "Posix/Thread.cpp",
         ],
         "//:windows": [
+            "Windows/Condition.cpp",
             "Windows/IO.cpp",
             "Windows/Thread.cpp",
         ],
     }),
     hdrs = [
         "CompressedStream.h",
+        "Condition.h",
         "DataSink.h",
         "IO.h",
+        "Mutex.h",
         "Paths.h",
         "Thread.h",
     ],

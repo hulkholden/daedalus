@@ -1,12 +1,12 @@
 #include "stdafx.h"
-#include "Utility/Cond.h"
-#include "Utility/Mutex.h"
+#include "System/Condition.h"
+#include "System/Mutex.h"
 
 const double kTimeoutInfinity = 0.f;
 
 // Cond wrapper derived from GLFW 2.7, see http://www.glfw.org/.
 
-enum 
+enum
 {
     COND_SIGNAL     = 0,
     COND_BROADCAST  = 1
@@ -19,7 +19,7 @@ struct _cond
     CRITICAL_SECTION waiters_count_lock;
 };
 
-Cond * CondCreate()
+Condition * ConditionCreate()
 {
    _cond   *cond;
     cond = (_cond *) malloc( sizeof(_cond) );
@@ -33,10 +33,10 @@ Cond * CondCreate()
     cond->events[ COND_BROADCAST ] = CreateEvent( NULL, true, false, NULL );
     InitializeCriticalSection( &cond->waiters_count_lock );
 
-    return (Cond*)cond;
+    return (Condition*)cond;
 }
 
-void CondDestroy(Cond * cond)
+void ConditionDestroy(Condition * cond)
 {
     CloseHandle( ((_cond *)cond)->events[ COND_SIGNAL ] );
     CloseHandle( ((_cond *)cond)->events[ COND_BROADCAST ] );
@@ -45,7 +45,7 @@ void CondDestroy(Cond * cond)
     free( (void *)cond );
 }
 
-void CondWait(Cond * cond, Mutex * mutex, double timeout)
+void ConditionWait(Condition * cond, Mutex * mutex, double timeout)
 {
 	_cond *cv = (_cond *)cond;
 	s32 result, last_waiter;
@@ -80,7 +80,7 @@ void CondWait(Cond * cond, Mutex * mutex, double timeout)
     EnterCriticalSection( &mutex->cs );
 }
 
-void CondSignal(Cond * cond)
+void ConditionSignal(Condition * cond)
 {
     _cond *cv = (_cond*)cond;
     s32 have_waiters;

@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "Utility/Cond.h"
-#include "Utility/Mutex.h"
+#include "System/Condition.h"
+#include "System/Mutex.h"
 
 #include <pthread.h>
 #include <stdlib.h>
@@ -8,9 +8,9 @@
 
 const double kTimeoutInfinity = 0.f;
 
-// Cond wrapper derived from GLFW 2.7, see http://www.glfw.org/.
+// Condition wrapper derived from GLFW 2.7, see http://www.glfw.org/.
 
-Cond* CondCreate()
+Condition* ConditionCreate()
 {
 	pthread_cond_t* cond = (pthread_cond_t*)malloc(sizeof(pthread_cond_t));
 	if (!cond)
@@ -19,10 +19,10 @@ Cond* CondCreate()
 	}
 
 	pthread_cond_init(cond, NULL);
-	return (Cond*)cond;
+	return (Condition*)cond;
 }
 
-void CondDestroy(Cond* cond)
+void ConditionDestroy(Condition* cond)
 {
 	pthread_cond_destroy((pthread_cond_t*)cond);
 	free(cond);
@@ -44,7 +44,7 @@ static void ComputeWait(double timeout, timespec* wait)
 	wait->tv_sec = currenttime.tv_sec + dt_sec;
 }
 
-void CondWait(Cond* cond, Mutex* mutex, double timeout)
+void ConditionWait(Condition* cond, Mutex* mutex, double timeout)
 {
 	if (timeout <= 0)
 	{
@@ -59,4 +59,4 @@ void CondWait(Cond* cond, Mutex* mutex, double timeout)
 	}
 }
 
-void CondSignal(Cond* cond) { pthread_cond_signal((pthread_cond_t*)cond); }
+void ConditionSignal(Condition* cond) { pthread_cond_signal((pthread_cond_t*)cond); }

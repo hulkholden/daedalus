@@ -6,7 +6,7 @@
 #include "Debug/WebDebugTemplate.h"
 #include "Graphics/PngUtil.h"
 #include "System/DataSink.h"
-#include "Utility/Mutex.h"
+#include "System/Mutex.h"
 
 
 static void TextureHandler(void * arg, WebDebugConnection * connection)
