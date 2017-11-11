@@ -36,9 +36,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "RomFile/RomFile.h"
 #include "System/IO.h"
 #include "System/SystemInit.h"
+#include "System/Timing.h"
 #include "Utility/Hash.h"
 #include "Utility/Timer.h"
-#include "Utility/Timing.h"
 
 static void MakeRomList( const std::string& romdir, std::vector< std::string > & roms )
 {

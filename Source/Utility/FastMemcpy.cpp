@@ -12,7 +12,7 @@ homepage: http://wordpress.fx-world.org
 
 #include "Base/Types.h"
 #include "System/Endian.h"
-#include "Utility/Timing.h"
+#include "System/Timing.h"
 
 #include <stdio.h>
 

@@ -10,11 +10,13 @@ cc_library(
             "Posix/Condition.cpp",
             "Posix/IO.cpp",
             "Posix/Thread.cpp",
+            "Posix/Timing.cpp",
         ],
         "//:windows": [
             "Windows/Condition.cpp",
             "Windows/IO.cpp",
             "Windows/Thread.cpp",
+            "Windows/Timing.cpp",
         ],
     }),
     hdrs = [
@@ -26,6 +28,7 @@ cc_library(
         "Mutex.h",
         "Paths.h",
         "Thread.h",
+        "Timing.h",
     ],
     deps = [
         "//:stdafx",

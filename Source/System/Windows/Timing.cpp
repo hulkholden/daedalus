@@ -18,25 +18,29 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "Utility/Timing.h"
+#include "System/Timing.h"
 
-#include <stdio.h>
-#include <sys/time.h>
+namespace NTiming {
 
-namespace NTiming
+bool GetPreciseFrequency( u64 * p_freq )
 {
-bool GetPreciseFrequency(u64* p_freq)
-{
-	*p_freq = 1 * 1000 * 1000;  // Microseconds
-	return true;
+	LARGE_INTEGER	freq;
+	if(::QueryPerformanceFrequency( &freq ))
+	{
+		*p_freq = freq.QuadPart;
+		return true;
+	}
+
+	*p_freq = 1;
+	return false;
 }
 
-bool GetPreciseTime(u64* p_time)
+bool GetPreciseTime( u64 * p_time )
 {
-	timeval tv;
-	if (::gettimeofday(&tv, NULL) == 0)
+	LARGE_INTEGER	time;
+	if(::QueryPerformanceCounter( &time ))
 	{
-		*p_time = u64(tv.tv_sec) * 1000000LL + u64(tv.tv_usec);
+		*p_time = time.QuadPart;
 		return true;
 	}
 
@@ -44,6 +48,12 @@ bool GetPreciseTime(u64* p_time)
 	return false;
 }
 
-u64 ToMilliseconds(u64 ticks) { return (ticks * 1000LL) / 1000000LL; }
+u64 ToMilliseconds( u64 ticks )
+{
+	static u64 tick_resolution = 0;
+	if (tick_resolution == 0)
+		GetPreciseFrequency(&tick_resolution);
+	return (ticks*1000LL) / tick_resolution;
+}
 
-}  // namespace NTiming
+} // NTiming

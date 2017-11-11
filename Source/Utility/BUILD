@@ -15,7 +15,6 @@ cc_library(
         "SpinLock.h",
         "Stream.h",
         "Timer.h",
-        "Timing.h",
     ],
     srcs = [
         "CRC.cpp",

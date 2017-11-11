@@ -228,8 +228,6 @@ void myMulMatrixCPU(Matrix4x4 * m_out, const Matrix4x4 *mat_a, const Matrix4x4 *
 }
 */
 
-//#include "Utility/Timing.h"
-
 Matrix4x4 Matrix4x4::operator*( const Matrix4x4 & rhs ) const
 {
 	Matrix4x4 r;

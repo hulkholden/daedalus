@@ -53,7 +53,6 @@ cc_binary(
     deps = select({
         ":darwin": [
            "//SysOSX:Main",
-           "//SysPosix:SysPosixCpp",
         ],
         ":windows": [
            "//SysW32:Main",

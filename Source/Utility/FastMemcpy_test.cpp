@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Utility/FastMemcpy.h"
-#include "System/Endian.h"
 #include "Base/Alignment.h"
+#include "System/Endian.h"
 
 #include "gtest/gtest.h"
 

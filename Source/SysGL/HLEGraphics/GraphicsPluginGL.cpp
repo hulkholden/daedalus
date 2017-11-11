@@ -12,7 +12,7 @@
 #include "Interface/Preferences.h"
 #include "Plugins/GraphicsPlugin.h"
 #include "SysGL/GL.h"
-#include "Utility/Timing.h"
+#include "System/Timing.h"
 
 EFrameskipValue     gFrameskipValue = FV_DISABLED;
 u32                 gVISyncRate     = 1500;
