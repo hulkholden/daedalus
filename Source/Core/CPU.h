@@ -24,11 +24,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string>
 
-#include "R4300Instruction.h"
-#include "R4300OpCode.h"
-#include "Memory.h"
-#include "TLB.h"
-#include "Utility/SpinLock.h"
+#include "Core/R4300Instruction.h"
+#include "Core/R4300OpCode.h"
+#include "Core/Memory.h"
+#include "Core/TLB.h"
+#include "System/SpinLock.h"
 
 enum EDelayType
 {

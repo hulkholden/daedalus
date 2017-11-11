@@ -12,7 +12,6 @@ cc_library(
         "IniFile.h",
         "Profiler.h",
         "RefCounted.h",
-        "SpinLock.h",
         "Stream.h",
         "Timer.h",
     ],

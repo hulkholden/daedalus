@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef UTILITY_SPINLOCK_H_
-#define UTILITY_SPINLOCK_H_
+#ifndef SYSTEM_SPINLOCK_H_
+#define SYSTEM_SPINLOCK_H_
 
 #include "System/Thread.h"
 
@@ -43,4 +43,4 @@ class CSpinLock
 	volatile u32* Var;
 };
 
-#endif  // UTILITY_SPINLOCK_H_
+#endif  // SYSTEM_SPINLOCK_H_

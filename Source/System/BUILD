@@ -27,6 +27,7 @@ cc_library(
         "IO.h",
         "Mutex.h",
         "Paths.h",
+        "SpinLock.h",
         "Thread.h",
         "Timing.h",
     ],
