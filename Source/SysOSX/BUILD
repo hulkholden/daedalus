@@ -3,9 +3,6 @@ cc_library(
     hdrs = glob(["**/*.h"]),
     includes = ["Include", "."],
     visibility = ["//visibility:public"],
-    deps = [
-        "//third_party/webby",
-    ],
 )
 
 cc_library(
