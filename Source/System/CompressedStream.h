@@ -17,16 +17,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef UTILITY_ZLIBWRAPPER_H_
-#define UTILITY_ZLIBWRAPPER_H_
+#ifndef SYSTEM_COMPRESSED_STREAM_H_
+#define SYSTEM_COMPRESSED_STREAM_H_
 
-//
-//	A buffered output stream
-//
+#include <string>
+
+// A buffered output stream
 class COutStream
 {
    public:
-	COutStream(const char* filename);
+	COutStream(const std::string& filename);
 	~COutStream();
 
 	bool IsOpen() const;
@@ -44,7 +44,7 @@ class COutStream
 class CInStream
 {
    public:
-	CInStream(const char* filename);
+	CInStream(const std::string& filename);
 	~CInStream();
 
 	bool IsOpen() const;
@@ -62,4 +62,4 @@ class CInStream
 	void* const mFile;
 };
 
-#endif  // UTILITY_ZLIBWRAPPER_H_
+#endif  // SYSTEM_COMPRESSED_STREAM_H_

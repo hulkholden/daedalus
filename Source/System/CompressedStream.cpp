@@ -30,18 +30,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // NB: Latest zlib uses a new type for the file handle - it's no longer void *.
 #define toGzipFile(fh) ((gzFile_s*)fh)
 
-COutStream::COutStream(const char* filename) : mBufferCount(0), mFile(gzopen(filename, "wb")) {}
+COutStream::COutStream(const std::string& filename)
+: mBufferCount(0),
+  mFile(gzopen(filename.c_str(), "wb")) {
+}
 
 COutStream::~COutStream()
 {
-	if (mFile != NULL)
+	if (mFile != nullptr)
 	{
 		Flush();
 		gzclose(toGzipFile(mFile));
 	}
 }
 
-bool COutStream::IsOpen() const { return mFile != NULL; }
+bool COutStream::IsOpen() const { return mFile != nullptr; }
 
 bool COutStream::Flush()
 {
@@ -56,7 +59,7 @@ bool COutStream::Flush()
 
 bool COutStream::WriteData(const void* data, u32 length)
 {
-	if (mFile != NULL)
+	if (mFile != nullptr)
 	{
 		const u8* current_ptr(reinterpret_cast<const u8*>(data));
 		u32 bytes_remaining(length);
@@ -103,17 +106,17 @@ void COutStream::Reset()
 	gzseek(toGzipFile(mFile), 0, SEEK_SET);
 }
 
-CInStream::CInStream(const char* filename) : mBufferOffset(0), mBytesAvailable(0), mFile(gzopen(filename, "rb")) {}
+CInStream::CInStream(const std::string& filename) : mBufferOffset(0), mBytesAvailable(0), mFile(gzopen(filename.c_str(), "rb")) {}
 
 CInStream::~CInStream()
 {
-	if (mFile != NULL)
+	if (mFile != nullptr)
 	{
 		gzclose(toGzipFile(mFile));
 	}
 }
 
-bool CInStream::IsOpen() const { return mFile != NULL; }
+bool CInStream::IsOpen() const { return mFile != nullptr; }
 
 bool CInStream::Fill()
 {
@@ -137,7 +140,7 @@ bool CInStream::Fill()
 
 bool CInStream::ReadData(void* data, u32 length)
 {
-	if (mFile != NULL)
+	if (mFile != nullptr)
 	{
 		u8* current_ptr(reinterpret_cast<u8*>(data));
 		u32 bytes_remaining(length);

@@ -67,9 +67,9 @@ void MakeRomList( const char * romdir, std::vector< std::string > & roms )
 	//_findfirst("foo", &data )
 }
 
-FILE * gBatchFH = NULL;
-FILE * gRomLogFH = NULL;
-CBatchTestEventHandler * gBatchTestEventHandler = NULL;
+static FILE * gBatchFH = NULL;
+static FILE * gRomLogFH = NULL;
+static CBatchTestEventHandler * gBatchTestEventHandler = NULL;
 
 static EAssertResult BatchAssertHook( const char * expression, const char * file, unsigned int line, const char * msg, ... )
 {
@@ -214,40 +214,40 @@ void BatchTestMain( int argc, char* argv[] )
 	// Hook in our Vbl handler.
 	CPU_RegisterVblCallback( &BatchVblHandler, NULL );
 
-	IO::Filename tmpfilepath;
-	IO::Path::Combine( tmpfilepath, rundir, "tmp.tmp" );
+	std::string tmpfilepath = IO::Path::Join(rundir, "tmp.tmp");
 
 	while( !roms.empty() )
 	{
 		gBatchTestEventHandler->Reset();
 
-		u32 idx( 0 );
+		u32 idx = 0;
 
 		// Picking roms in a random order means we can work around roms which crash the emulator a little more easily
 		if( random_order )
+		{
 			idx = rand() % roms.size();
+		}
 
-		std::string	r;
-		r.swap( roms[idx] );
+		std::string	rom_to_load;
+		rom_to_load.swap( roms[idx] );
 		roms.erase( roms.begin() + idx );
 
 		// Make a filename of the form: '<rundir>/<romfilename>.txt'
-		IO::Filename rom_logpath;
-		IO::Path::Combine( rom_logpath, rundir, IO::Path::FindFileName( r.c_str() ) );
-		IO::Path::SetExtension( rom_logpath, ".txt" );
+		std::string rom_logpath = IO::Path::Join(rundir, IO::Path::FindFileName( rom_to_load.c_str() ));
+		IO::Path::SetExtension(&rom_logpath, ".txt");
 
-		bool	result_exists( IO::File::Exists( rom_logpath ) );
+		bool result_exists = IO::File::Exists(rom_logpath);
 
 		if( !update_results && result_exists )
 		{
 			// Already exists, skip
-			fprintf( gBatchFH, "\n\n%#.3f: Skipping %s - log already exists\n", timer.GetElapsedSecondsSinceReset(), r.c_str() );
+			fprintf( gBatchFH, "\n\n%#.3f: Skipping %s - log already exists\n", timer.GetElapsedSecondsSinceReset(), rom_to_load.c_str() );
 		}
 		else
 		{
-			fprintf( gBatchFH, "\n\n%#.3f: Processing: %s\n", timer.GetElapsedSecondsSinceReset(), r.c_str() );
+			fprintf( gBatchFH, "\n\n%#.3f: Processing: %s\n", timer.GetElapsedSecondsSinceReset(), rom_to_load.c_str() );
 
-			gRomLogFH = fopen( tmpfilepath, "w" );
+			gRomLogFH = fopen( tmpfilepath.c_str(), "w" );
 			if( !gRomLogFH )
 			{
 				fprintf( gBatchFH, "#%.3f: Unable to open temp file\n", timer.GetElapsedSecondsSinceReset() );
@@ -257,7 +257,7 @@ void BatchTestMain( int argc, char* argv[] )
 				fflush( gBatchFH );
 
 				// TODO: use ROM_GetRomDetailsByFilename and the alternative form of ROM_LoadFile with overridden preferences (allows us to test if roms break by changing prefs)
-				System_Open( r.c_str() );
+				System_Open( rom_to_load.c_str() );
 
 				CPU_Run();
 
@@ -265,19 +265,19 @@ void BatchTestMain( int argc, char* argv[] )
 
 				const char * reason( CBatchTestEventHandler::GetTerminationReasonString( gBatchTestEventHandler->GetTerminationReason() ) );
 
-				fprintf( gBatchFH, "%#.3f: Finished running: %s - %s\n", timer.GetElapsedSecondsSinceReset(), r.c_str(), reason );
+				fprintf( gBatchFH, "%#.3f: Finished running: %s - %s\n", timer.GetElapsedSecondsSinceReset(), rom_to_load.c_str(), reason );
 
 				// Copy temp file over rom_logpath
 				gBatchTestEventHandler->PrintSummary( gRomLogFH );
 				fclose( gRomLogFH );
-				gRomLogFH = NULL;
+				gRomLogFH = nullptr;
 				if( result_exists )
 				{
-					IO::File::Delete( rom_logpath );
+					IO::File::Delete(rom_logpath);
 				}
-				if( !IO::File::Move( tmpfilepath, rom_logpath ) )
+				if( !IO::File::Move(tmpfilepath, rom_logpath) )
 				{
-					fprintf( gBatchFH, "%#.3f: Coping %s -> %s failed\n", timer.GetElapsedSecondsSinceReset(), tmpfilepath, rom_logpath );
+					fprintf( gBatchFH, "%#.3f: Coping %s -> %s failed\n", timer.GetElapsedSecondsSinceReset(), tmpfilepath.c_str(), rom_logpath.c_str() );
 				}
 			}
 
@@ -285,14 +285,14 @@ void BatchTestMain( int argc, char* argv[] )
 
 	}
 
-	CPU_UnregisterVblCallback( &BatchVblHandler, NULL );
-	SetAssertHook( NULL );
+	CPU_UnregisterVblCallback( &BatchVblHandler, nullptr );
+	SetAssertHook( nullptr );
 
 	fclose( gBatchFH );
-	gBatchFH = NULL;
+	gBatchFH = nullptr;
 
 	delete gBatchTestEventHandler;
-	gBatchTestEventHandler = NULL;
+	gBatchTestEventHandler = nullptr;
 }
 
 // Should make these configurable

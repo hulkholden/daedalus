@@ -890,13 +890,10 @@ fail_find:
 
 static void Patch_FlushCache()
 {
-	IO::Filename name;
+	std::string name = Save_GetDirectory(g_ROM.mFileName, ".hle");
+	DBGConsole_Msg(0, "Write OSHLE cache: %s", name.c_str());
 
-	Save_GetDirectory(name, g_ROM.mFileName, ".hle");
-	DBGConsole_Msg(0, "Write OSHLE cache: %s", name);
-
-	FILE *fp = fopen(name, "wb");
-
+	FILE *fp = fopen(name.c_str(), "wb");
 	if (fp != NULL)
 	{
 		u32 data = MAGIC_HEADER;
@@ -946,14 +943,11 @@ static void Patch_FlushCache()
 
 static bool Patch_GetCache()
 {
-	IO::Filename name;
-
-	Save_GetDirectory(name, g_ROM.mFileName, ".hle");
-	FILE *fp = fopen(name, "rb");
-
+	std::string name = Save_GetDirectory(g_ROM.mFileName, ".hle");
+	FILE *fp = fopen(name.c_str(), "rb");
 	if (fp != NULL)
 	{
-		DBGConsole_Msg(0, "Read from OSHLE cache: %s", name);
+		DBGConsole_Msg(0, "Read from OSHLE cache: %s", name.c_str());
 		u32 data;
 
 		fread(&data, 1, sizeof(data), fp);

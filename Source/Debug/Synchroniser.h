@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef UTILITY_SYNCHRONISER_H_
 #define UTILITY_SYNCHRONISER_H_
 
+#include <string>
+
 #include "Base/Macros.h"
 
 //	Synchronisation flags
@@ -66,8 +68,8 @@ class CSynchroniser
 
    public:
 	static bool InitialiseSynchroniser();
-	static CSynchroniser* CreateProducer(const char* filename);
-	static CSynchroniser* CreateConsumer(const char* filename);
+	static CSynchroniser* CreateProducer(const std::string& filename);
+	static CSynchroniser* CreateConsumer(const std::string& filename);
 
 	static void Destroy();
 

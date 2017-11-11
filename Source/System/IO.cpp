@@ -28,11 +28,7 @@ namespace IO
 namespace Path
 {
 
-#if defined(DAEDALUS_W32)
-const char kPathSeparatorStr[] = "\\";
-#else
 const char kPathSeparatorStr[] = "/";
-#endif
 
 std::string Join(absl::string_view a, absl::string_view b)
 {
@@ -48,6 +44,18 @@ std::string Join(absl::string_view a, absl::string_view b, absl::string_view c)
 	return Join(Join(a, b), c);
 }
 
+void AddExtension(std::string* path, absl::string_view ext) {
+	absl::StrAppend(path, ext);
+}
+
+void RemoveExtension(std::string* path)
+{
+	size_t idx = path->rfind('.');
+	if (idx != std::string::npos)
+	{
+		path->resize(idx);
+	}
+}
 
 }  // namespace Path
 }  // namespace IO

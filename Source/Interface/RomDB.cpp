@@ -357,7 +357,7 @@ void IRomDB::AddRomDirectory(const std::string& directory)
 
 	IO::FindHandleT		find_handle;
 	IO::FindDataT		find_data;
-	if(IO::FindFileOpen( directory.c_str(), &find_handle, find_data ))
+	if(IO::FindFileOpen( directory, &find_handle, find_data ))
 	{
 		do
 		{

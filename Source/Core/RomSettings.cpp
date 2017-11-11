@@ -258,11 +258,11 @@ bool IRomSettingsDB::OpenSettingsFile(const char* filename)
 // Write out the .ini file, keeping the original comments intact
 void IRomSettingsDB::Commit()
 {
-	IO::Filename filename_tmp;
-	IO::Filename filename_del;
+	std::string filename_tmp = mFilename;
+	std::string filename_del = mFilename;
 
-	sprintf(filename_tmp, "%s.tmp", mFilename);
-	sprintf(filename_del, "%s.del", mFilename);
+	IO::Path::AddExtension(&filename_tmp, ".tmp");
+	IO::Path::AddExtension(&filename_del, ".del");
 
 	FILE* fh_src = fopen(mFilename, "r");
 	if (fh_src == NULL)
@@ -270,7 +270,7 @@ void IRomSettingsDB::Commit()
 		return;
 	}
 
-	FILE* fh_dst = fopen(filename_tmp, "w");
+	FILE* fh_dst = fopen(filename_tmp.c_str(), "w");
 	if (fh_dst == NULL)
 	{
 		fclose(fh_src);

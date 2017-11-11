@@ -34,13 +34,18 @@ const char kPathSeparator = '/';
 
 namespace File
 {
-bool Move(const char* p_existing, const char* p_new) { return rename(p_existing, p_new) >= 0; }
+bool Move(const std::string& from, const std::string& to) {
+	return rename(from.c_str(), to.c_str()) >= 0;
+}
 
-bool Delete(const char* p_file) { return remove(p_file) == 0; }
+bool Delete(const std::string& file) {
+	return remove(file.c_str()) == 0;
+}
 
-bool Exists(const char* p_path)
+bool Exists(const std::string& path)
 {
-	FILE* fh = fopen(p_path, "rb");
+	// TODO(strmnnrmn): Just stat?
+	FILE* fh = fopen(path.c_str(), "rb");
 	if (fh)
 	{
 		fclose(fh);
@@ -70,11 +75,11 @@ bool EnsureExists(const char* p_path)
 	return Create(p_path);
 }
 
-bool IsDirectory(const char* p_path)
+bool IsDirectory(const std::string& path)
 {
 	struct stat s;
 
-	if (stat(p_path, &s) == 0)
+	if (stat(path.c_str(), &s) == 0)
 	{
 		if (s.st_mode & S_IFDIR)
 		{
@@ -123,7 +128,7 @@ const char* FindFileName(const char* p_path)
 	}
 	else
 	{
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -139,7 +144,7 @@ char* RemoveBackslash(char* p_path)
 		}
 		return p_last_char;
 	}
-	return NULL;
+	return nullptr;
 }
 
 bool RemoveFileSpec(char* p_path)
@@ -153,22 +158,12 @@ bool RemoveFileSpec(char* p_path)
 	return false;
 }
 
-void RemoveExtension(char* p_path)
-{
-	char* ext = const_cast<char*>(FindExtension(p_path));
-	if (ext)
-	{
-		*ext = '\0';
-	}
-}
-
-void AddExtension(char* p_path, const char* p_ext) { strcat(p_path, p_ext); }
 }  // namespace Path
 
-bool FindFileOpen(const char* path, FindHandleT* handle, FindDataT& data)
+bool FindFileOpen(const std::string& path, FindHandleT* handle, FindDataT& data)
 {
-	DIR* d = opendir(path);
-	if (d != NULL)
+	DIR* d = opendir(path.c_str());
+	if (d != nullptr)
 	{
 		// To support findfirstfile() API we must return the first result immediately
 		if (FindFileNext(d, data))
@@ -185,7 +180,7 @@ bool FindFileOpen(const char* path, FindHandleT* handle, FindDataT& data)
 
 bool FindFileNext(FindHandleT handle, FindDataT& data)
 {
-	DAEDALUS_ASSERT(handle != NULL, "Cannot search with invalid directory handle");
+	DAEDALUS_ASSERT(handle != nullptr, "Cannot search with invalid directory handle");
 
 	while (dirent* ep = readdir(static_cast<DIR*>(handle)))
 	{
@@ -201,7 +196,7 @@ bool FindFileNext(FindHandleT handle, FindDataT& data)
 
 bool FindFileClose(FindHandleT handle)
 {
-	DAEDALUS_ASSERT(handle != NULL, "Trying to close an invalid directory handle");
+	DAEDALUS_ASSERT(handle != nullptr, "Trying to close an invalid directory handle");
 
 	return closedir(static_cast<DIR*>(handle)) >= 0;
 }

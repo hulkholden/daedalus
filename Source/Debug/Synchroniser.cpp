@@ -33,7 +33,7 @@ CSynchroniser* CSynchroniser::mpSynchroniser = nullptr;
 class ISynchProducer : public CSynchroniser
 {
    public:
-	ISynchProducer(const char* filename);
+	ISynchProducer(const std::string& filename);
 	~ISynchProducer();
 
 	virtual ESynchResult SynchPoint(const void* data, u32 length);
@@ -49,7 +49,7 @@ class ISynchProducer : public CSynchroniser
 class ISynchConsumer : public CSynchroniser
 {
    public:
-	ISynchConsumer(const char* filename);
+	ISynchConsumer(const std::string& filename);
 	~ISynchConsumer();
 
 	virtual ESynchResult SynchPoint(const void* data, u32 length);
@@ -62,13 +62,13 @@ class ISynchConsumer : public CSynchroniser
 	CInStream mStream;
 };
 
-CSynchroniser* CSynchroniser::CreateProducer(const char* filename)
+CSynchroniser* CSynchroniser::CreateProducer(const std::string& filename)
 {
 	mpSynchroniser = new ISynchProducer(filename);
 	return mpSynchroniser;
 }
 
-CSynchroniser* CSynchroniser::CreateConsumer(const char* filename)
+CSynchroniser* CSynchroniser::CreateConsumer(const std::string& filename)
 {
 	mpSynchroniser = new ISynchConsumer(filename);
 	return mpSynchroniser;
@@ -104,7 +104,7 @@ void CSynchroniser::HandleOutOfSynch(const char* msg)
 	Destroy();
 }
 
-ISynchProducer::ISynchProducer(const char* filename) : mStream(filename) {}
+ISynchProducer::ISynchProducer(const std::string& filename) : mStream(filename) {}
 
 ISynchProducer::~ISynchProducer() {}
 
@@ -130,7 +130,7 @@ CSynchroniser::ESynchResult ISynchProducer::SynchData(void* data, u32 length)
 	return SR_OUT_OF_STORAGE;
 }
 
-ISynchConsumer::ISynchConsumer(const char* filename) : mStream(filename) {}
+ISynchConsumer::ISynchConsumer(const std::string& filename) : mStream(filename) {}
 
 ISynchConsumer::~ISynchConsumer() {}
 
@@ -188,20 +188,18 @@ CSynchroniser::ESynchResult ISynchConsumer::SynchData(void* data, u32 length)
 
 bool CSynchroniser::InitialiseSynchroniser()
 {
-	IO::Filename filename;
-
-	Save_GetDirectory(filename, g_ROM.mFileName, ".syn");
+	std::string filename = Save_GetDirectory(g_ROM.mFileName, ".syn");
 
 	CSynchroniser* p_synch;
 	if (!IO::File::Exists(filename))
 	{
 		p_synch = CSynchroniser::CreateProducer(filename);
-		DBGConsole_Msg(0, "Start Synchroniser in [Gproducer] mode to create [C%s]", filename);
+		DBGConsole_Msg(0, "Start Synchroniser in [Gproducer] mode to create [C%s]", filename.c_str());
 	}
 	else
 	{
 		p_synch = CSynchroniser::CreateConsumer(filename);
-		DBGConsole_Msg(0, "Start Synchroniser in [Gconsumer] mode to read [C%s]", filename);
+		DBGConsole_Msg(0, "Start Synchroniser in [Gconsumer] mode to read [C%s]", filename.c_str());
 	}
 
 	// return p_synch != nullptr && p_synch->IsOpen();

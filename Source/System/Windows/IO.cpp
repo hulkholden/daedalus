@@ -28,19 +28,19 @@ namespace IO
 {
 	namespace File
 	{
-		bool	Move( const char * p_existing, const char * p_new )
+		bool	Move( const std::string& from.c_str(), const std::string& to.c_str() )
 		{
-			return ::MoveFile( p_existing, p_new ) ? true : false;
+			return ::MoveFile( from.c_str(), to.c_str() ) ? true : false;
 		}
 
-		bool	Delete( const char * p_file )
+		bool	Delete( const std::string& file )
 		{
-			return ::DeleteFile( p_file ) ? true : false;
+			return ::DeleteFile( file.c_str() ) ? true : false;
 		}
 
-		bool	Exists( const char * p_path )
+		bool	Exists( const std::string& path )
 		{
-			return ::PathFileExists( p_path ) ? true : false;
+			return ::PathFileExists( path.c_str() ) ? true : false;
 		}
 	}
 	namespace Directory
@@ -71,9 +71,9 @@ namespace IO
 			return Create( p_path );
 		}
 
-		bool	IsDirectory( const char * p_path )
+		bool	IsDirectory( const std::string& path )
 		{
-			return ::PathIsDirectory( p_path ) ? true : false;
+			return ::PathIsDirectory( path.c_str() ) ? true : false;
 		}
 	}
 
@@ -108,24 +108,13 @@ namespace IO
 		{
 			return ::PathRemoveFileSpec( p_path ) ? true : false;
 		}
-
-		void	RemoveExtension( char * p_path )
-		{
-			::PathRemoveExtension( p_path );
-		}
-
-		void	AddExtension( char * p_path, const char * p_ext )
-		{
-			::PathAddExtension( p_path, p_ext );
-		}
 	}
 
-	bool	FindFileOpen( const char * path, FindHandleT * handle, FindDataT & data )
+	bool	FindFileOpen( const std::string& path, FindHandleT * handle, FindDataT & data )
 	{
-		IO::Filename name;
-		Path::Combine(name, path, "*.*");
+		std::string name = Path::Join(path, "*.*");
 		_finddata_t	_data;
-		*handle = _findfirst( name, &_data );
+		*handle = _findfirst( name.c_str(), &_data );
 
 		if( *handle != -1 )
 		{

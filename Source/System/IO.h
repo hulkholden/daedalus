@@ -30,15 +30,15 @@ namespace IO
 {
 namespace File
 {
-bool Move(const char* p_existing, const char* p_new);
-bool Delete(const char* p_file);
-bool Exists(const char* p_path);
+bool Move(const std::string& from, const std::string& to);
+bool Delete(const std::string& file);
+bool Exists(const std::string& path);
 }
 namespace Directory
 {
 bool Create(const char* p_path);
 bool EnsureExists(const char* p_path);
-bool IsDirectory(const char* p_path);
+bool IsDirectory(const std::string& path);
 }
 
 namespace Path
@@ -60,13 +60,13 @@ const char* FindExtension(const char* p_path);
 const char* FindFileName(const char* p_path);
 char* RemoveBackslash(char* p_path);
 bool RemoveFileSpec(char* p_path);
-void RemoveExtension(char* p_path);
-void AddExtension(char* p_path, const char* p_ext);
+void RemoveExtension(std::string* path);
+void AddExtension(std::string* path, absl::string_view ext);
 
-inline void SetExtension(char* p_path, const char* p_extension)
+inline void SetExtension(std::string* path, absl::string_view ext)
 {
-	RemoveExtension(p_path);
-	AddExtension(p_path, p_extension);
+	RemoveExtension(path);
+	AddExtension(path, ext);
 }
 }
 
@@ -85,7 +85,7 @@ typedef void* FindHandleT;
 #error Need to define FindHandleT for this platform
 #endif
 
-bool FindFileOpen(const char* path, FindHandleT* handle, FindDataT& data);
+bool FindFileOpen(const std::string& path, FindHandleT* handle, FindDataT& data);
 bool FindFileNext(FindHandleT handle, FindDataT& data);
 bool FindFileClose(FindHandleT handle);
 }

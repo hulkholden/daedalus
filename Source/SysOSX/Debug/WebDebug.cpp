@@ -372,7 +372,7 @@ static u32 DAEDALUS_THREAD_CALL_TYPE WebDebugThread(void *arg)
 	return 0;
 }
 
-static void AddStaticContent(const char *dir, const char *root)
+static void AddStaticContent(const std::string& dir, const std::string& root)
 {
 	IO::FindHandleT find_handle;
 	IO::FindDataT find_data;
@@ -381,16 +381,12 @@ static void AddStaticContent(const char *dir, const char *root)
 	{
 		do
 		{
-			IO::Filename full_path;
-			IO::Path::Combine(full_path, dir, find_data.Name);
-
-			std::string resource_path = root;
-			resource_path += '/';
-			resource_path += find_data.Name;
+			std::string full_path = IO::Path::Join(dir, find_data.Name);
+			std::string resource_path = IO::Path::Join(root, find_data.Name);
 
 			if (IO::Directory::IsDirectory(full_path))
 			{
-				AddStaticContent(full_path, resource_path.c_str());
+				AddStaticContent(full_path, resource_path);
 			}
 			else if (IO::File::Exists(full_path))
 			{
@@ -451,7 +447,7 @@ bool WebDebug_Init()
 
 	std::string data_path = GetRunfilePath("SysOSX/Debug/Web");
 	DBGConsole_Msg(0, "Looking for static resource in [C%s]", data_path.c_str());
-	AddStaticContent(data_path.c_str(), "");
+	AddStaticContent(data_path, "");
 
 	gKeepRunning = true;
 	gThread = CreateThread("WebDebug", &WebDebugThread, gServer);

@@ -30,17 +30,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 static void InitMempackContent();
 
-static IO::Filename		gSaveFileName;
+static std::string		gSaveFileName;
 static bool				gSaveDirty;
 static u32				gSaveSize;
-static IO::Filename		gMempackFileName;
+
+static std::string		gMempackFileName;
 static bool				gMempackDirty;
 
 
-// E.g. Save_GetDirectory([out], "c:\roms\test.rom", ".sra")
+// E.g. out = Save_GetDirectory("c:\roms\test.rom", ".sra")
 // would first try to find the save in g_DaedalusConfig.mSaveDir. If this is not
 // found, g_DaedalusConfig.mRomsDir is checked.
-void Save_GetDirectory(char* rootdir, const char* rom_filename, const char* extension)
+std::string Save_GetDirectory(const char* rom_filename, const char* extension)
 {
 	// If the Save path has not yet been set up, prompt user
 	if (strlen(g_DaedalusConfig.mSaveDir) == 0)
@@ -68,12 +69,11 @@ void Save_GetDirectory(char* rootdir, const char* rom_filename, const char* exte
 	IO::Directory::EnsureExists(g_DaedalusConfig.mSaveDir);
 
 	// Form the filename from the file spec (i.e. strip path and replace the extension)
-	IO::Filename file_name;
-	IO::Path::Assign(file_name, IO::Path::FindFileName(rom_filename));
-	IO::Path::SetExtension(file_name, extension);
-
-	IO::Path::Combine(rootdir, g_DaedalusConfig.mSaveDir, file_name);
+	std::string file_name = IO::Path::FindFileName(rom_filename);
+	IO::Path::SetExtension(&file_name, extension);
+	return IO::Path::Join(g_DaedalusConfig.mSaveDir, file_name);
 }
+
 bool Save_Reset()
 {
 	const char * ext;
@@ -105,12 +105,12 @@ bool Save_Reset()
 	gSaveDirty = false;
 	if (gSaveSize > 0)
 	{
-		Save_GetDirectory(gSaveFileName, g_ROM.mFileName, ext);
+		gSaveFileName = Save_GetDirectory(g_ROM.mFileName, ext);
 
-		FILE * fp = fopen(gSaveFileName, "rb");
+		FILE * fp = fopen(gSaveFileName.c_str(), "rb");
 		if (fp != NULL)
 		{
-			DBGConsole_Msg(0, "Loading save from [C%s]", gSaveFileName);
+			DBGConsole_Msg(0, "Loading save from [C%s]", gSaveFileName.c_str());
 
 			u8 buffer[2048];
 			u8 * dst = (u8*)g_pMemoryBuffers[MEM_SAVE];
@@ -128,24 +128,24 @@ bool Save_Reset()
 		}
 		else
 		{
-			DBGConsole_Msg(0, "Save File [C%s] cannot be found.", gSaveFileName);
+			DBGConsole_Msg(0, "Save File [C%s] cannot be found.", gSaveFileName.c_str());
 		}
 	}
 
 	// init mempack
 	{
-		Save_GetDirectory(gMempackFileName, g_ROM.mFileName, ".mpk");
-		FILE * fp = fopen(gMempackFileName, "rb");
+		gMempackFileName = Save_GetDirectory(g_ROM.mFileName, ".mpk");
+		FILE * fp = fopen(gMempackFileName.c_str(), "rb");
 		if (fp != NULL)
 		{
-			DBGConsole_Msg(0, "Loading MemPack from [C%s]", gMempackFileName);
+			DBGConsole_Msg(0, "Loading MemPack from [C%s]", gMempackFileName.c_str());
 			fread(g_pMemoryBuffers[MEM_MEMPACK], MemoryRegionSizes[MEM_MEMPACK], 1, fp);
 			fclose(fp);
 			gMempackDirty = false;
 		}
 		else
 		{
-			DBGConsole_Msg(0, "MemPack File [C%s] cannot be found.", gMempackFileName);
+			DBGConsole_Msg(0, "MemPack File [C%s] cannot be found.", gMempackFileName.c_str());
 			InitMempackContent();
 			gMempackDirty = true;
 		}
@@ -174,9 +174,9 @@ void Save_Flush(bool force)
 {
 	if ((gSaveDirty || force) && g_ROM.settings.SaveType != SAVE_TYPE_UNKNOWN)
 	{
-		DBGConsole_Msg(0, "Saving to [C%s]", gSaveFileName);
+		DBGConsole_Msg(0, "Saving to [C%s]", gSaveFileName.c_str());
 
-		FILE * fp = fopen(gSaveFileName, "wb");
+		FILE * fp = fopen(gSaveFileName.c_str(), "wb");
 		if (fp != NULL)
 		{
 			u8 buffer[2048];
@@ -197,9 +197,9 @@ void Save_Flush(bool force)
 
 	if (gMempackDirty || force)
 	{
-		DBGConsole_Msg(0, "Saving MemPack to [C%s]", gMempackFileName);
+		DBGConsole_Msg(0, "Saving MemPack to [C%s]", gMempackFileName.c_str());
 
-		FILE * fp = fopen(gMempackFileName, "wb");
+		FILE * fp = fopen(gMempackFileName.c_str(), "wb");
 		if (fp != NULL)
 		{
 			fwrite(g_pMemoryBuffers[MEM_MEMPACK], MemoryRegionSizes[MEM_MEMPACK], 1, fp);
