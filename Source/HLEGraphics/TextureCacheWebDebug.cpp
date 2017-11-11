@@ -10,7 +10,6 @@
 #include "Graphics/PngUtil.h"
 
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 static void TextureHandler(void * arg, WebDebugConnection * connection)
 {
 	const char * params = connection->GetQueryString();
@@ -58,10 +57,7 @@ static void TextureHandler(void * arg, WebDebugConnection * connection)
 
 	connection->EndResponse();
 }
-#endif // DAEDALUS_DEBUG_DISPLAYLIST
 
-
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 static void TextureCacheHandler(void * arg, WebDebugConnection * connection)
 {
 	connection->BeginResponse(200, -1, "text/html" );
@@ -137,14 +133,11 @@ static void TextureCacheHandler(void * arg, WebDebugConnection * connection)
 	WriteStandardFooter(connection);
 	connection->EndResponse();
 }
-#endif // DAEDALUS_DEBUG_DISPLAYLIST
 
 bool TextureCache_RegisterWebDebug()
 {
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	WebDebug_Register( "/texture_cache", &TextureCacheHandler, NULL );
 	WebDebug_Register( "/texture", &TextureHandler, NULL );
-#endif
 	return true;
 }
 
