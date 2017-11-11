@@ -21,6 +21,7 @@ cc_library(
         "CompressedStream.h",
         "Condition.h",
         "DataSink.h",
+        "Endian.h",
         "IO.h",
         "Mutex.h",
         "Paths.h",

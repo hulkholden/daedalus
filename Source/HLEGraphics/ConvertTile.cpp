@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
 #ifdef DAEDALUS_ACCURATE_TMEM
-#include "ConvertTile.h"
-#include "RDP.h"
-#include "Core/ROM.h"
-#include "TextureInfo.h"
-#include "Graphics/NativePixelFormat.h"
+#include "HLEGraphics/ConvertTile.h"
 
-#include "Utility/Endian.h"
 #include "Base/Alignment.h"
+#include "Graphics/NativePixelFormat.h"
+#include "HLEGraphics/Core/ROM.h"
+#include "HLEGraphics/RDP.h"
+#include "HLEGraphics/TextureInfo.h"
+#include "System/Endian.h"
 
 #include <vector>
 

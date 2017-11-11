@@ -7,7 +7,6 @@ cc_library(
     hdrs = [
         "AtomicPrimitives.h",
         "CRC.h",
-        "Endian.h",
         "FastMemcpy.h",
         "Hash.h",
         "IniFile.h",

@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define CORE_R4300OPCODE_H_
 
 #include "Base/Types.h"
-#include "Utility/Endian.h"
+#include "System/Endian.h"
 #include "N64Reg.h"
 
 enum OpCodeValue {

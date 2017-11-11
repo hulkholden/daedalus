@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEGraphics/DLDebug.h"
 #include "HLEGraphics/uCodes/UcodeDefs.h"
 #include "OSHLE/ultra_gbi.h"
-#include "Utility/Endian.h"
+#include "System/Endian.h"
 #include "Utility/FastMemcpy.h"
 
 extern SImageDescriptor g_TI;		//Texture data from Timg ucode
