@@ -5,7 +5,6 @@ package(
 cc_library(
     name = "Utility",
     hdrs = [
-        "AtomicPrimitives.h",
         "CRC.h",
         "FastMemcpy.h",
         "Hash.h",

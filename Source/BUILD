@@ -38,7 +38,7 @@ cc_library(
     }),
     deps = select({
         ":darwin": [
-           "//SysOSX",
+            "//SysOSX",
         ],
         ":windows": [
             "//SysW32",

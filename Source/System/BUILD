@@ -20,6 +20,7 @@ cc_library(
         ],
     }),
     hdrs = [
+        "AtomicPrimitives.h",
         "CompressedStream.h",
         "Condition.h",
         "DataSink.h",
