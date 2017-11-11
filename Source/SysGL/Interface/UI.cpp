@@ -7,11 +7,10 @@
 
 #include "Core/CPU.h"
 #include "Core/ROM.h"
-
 #include "SysGL/GL.h"
-#include "System/Paths.h"
 #include "System/IO.h"
-#include "Utility/Thread.h"
+#include "System/Paths.h"
+#include "System/Thread.h"
 
 //static bool toggle_fullscreen = false;
 

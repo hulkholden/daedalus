@@ -17,7 +17,6 @@ cc_library(
         "RefCounted.h",
         "SpinLock.h",
         "Stream.h",
-        "Thread.h",
         "Timer.h",
         "Timing.h",
     ],

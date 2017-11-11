@@ -45,10 +45,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Synchroniser.h"
 #include "OSHLE/ultra_R4300.h"
 #include "System/SystemInit.h"
+#include "System/Thread.h"
 #include "Utility/AtomicPrimitives.h"
 #include "Utility/Hash.h"
 #include "Utility/Mutex.h"
-#include "Utility/Thread.h"
 
 #ifdef DAEDALUS_W32
 #include "Plugins/AudioPlugin.h"

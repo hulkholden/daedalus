@@ -8,9 +8,11 @@ cc_library(
     ] + select({
         "//:darwin": [
             "Posix/IO.cpp",
+            "Posix/Thread.cpp",
         ],
         "//:windows": [
             "Windows/IO.cpp",
+            "Windows/Thread.cpp",
         ],
     }),
     hdrs = [
@@ -18,6 +20,7 @@ cc_library(
         "DataSink.h",
         "IO.h",
         "Paths.h",
+        "Thread.h",
     ],
     deps = [
         "//:stdafx",

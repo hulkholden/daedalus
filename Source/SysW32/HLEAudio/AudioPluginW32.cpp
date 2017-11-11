@@ -31,8 +31,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/ROM.h"
 #include "Core/RSP_HLE.h"
 #include "HLEAudio/audiohle.h"
+#include "System/Thread.h"
 #include "Utility/FastMemcpy.h"
-#include "Utility/Thread.h"
 
 //This is disabled, it doesn't work well, causes random deadlocks/Lock failures :(
 //Would be nice to get it working correctly, since running audio in the main thread is abit jerky

@@ -11,16 +11,14 @@
 #include "Graphics/GraphicsContext.h"
 #include "Graphics/NativeTexture.h"
 #include "Graphics/PngUtil.h"
-
 #include "HLEGraphics/BaseRenderer.h"
 #include "HLEGraphics/DLDebug.h"
 #include "HLEGraphics/DLParser.h"
 #include "HLEGraphics/RDP.h"
 #include "HLEGraphics/RDPStateManager.h"
 #include "HLEGraphics/TextureCache.h"
-
+#include "System/Thread.h"
 #include "Utility/Cond.h"
-#include "Utility/Thread.h"
 #include "Utility/Mutex.h"
 
 #include "SysGL/GL.h"
