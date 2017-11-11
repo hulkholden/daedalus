@@ -14,8 +14,7 @@ TEST(Path, Join) {
 }
 
 TEST(Path, AddExtension) {
-	std::string filename;
-	filename = "foo";
+	std::string filename = "foo";
 	IO::Path::AddExtension(&filename, ".bar");
 	EXPECT_EQ("foo.bar", filename);
 	IO::Path::AddExtension(&filename, ".baz");
@@ -23,8 +22,7 @@ TEST(Path, AddExtension) {
 }
 
 TEST(Path, RemoveExtension) {
-	std::string filename;
-	filename = "foo.bar.baz";
+	std::string filename = "foo.bar.baz";
 	EXPECT_TRUE(IO::Path::RemoveExtension(&filename));
 	EXPECT_EQ("foo.bar", filename);
 	EXPECT_TRUE(IO::Path::RemoveExtension(&filename));
@@ -34,8 +32,7 @@ TEST(Path, RemoveExtension) {
 }
 
 TEST(Path, RemoveFileSpec) {
-	std::string filename;
-	filename = "foo/bar/baz.txt";
+	std::string filename = "foo/bar/baz.txt";
 	EXPECT_TRUE(IO::Path::RemoveFileSpec(&filename));
 	EXPECT_EQ("foo/bar", filename);
 	EXPECT_TRUE(IO::Path::RemoveFileSpec(&filename));
@@ -45,10 +42,19 @@ TEST(Path, RemoveFileSpec) {
 }
 
 TEST(Path, RemoveBackslash) {
-	std::string filename;
-	filename = "foo//";
+	std::string filename = "foo//";
 	EXPECT_TRUE(IO::Path::RemoveBackslash(&filename));
 	EXPECT_EQ("foo", filename);
 	EXPECT_FALSE(IO::Path::RemoveBackslash(&filename));
 	EXPECT_EQ("foo", filename);
 }
+
+TEST(Path, FindFileName) {
+	std::string filename = "path/foo/bar.baz";
+	EXPECT_EQ("bar.baz", IO::Path::FindFileName(filename));
+	filename = "foo/bar";
+	EXPECT_EQ("bar", IO::Path::FindFileName(filename));
+	filename = "foo";
+	EXPECT_EQ("", IO::Path::FindFileName(filename));
+}
+

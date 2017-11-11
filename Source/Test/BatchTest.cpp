@@ -230,7 +230,7 @@ void BatchTestMain( int argc, char* argv[] )
 		roms.erase( roms.begin() + idx );
 
 		// Make a filename of the form: '<rundir>/<romfilename>.txt'
-		std::string rom_logpath = IO::Path::Join(rundir, IO::Path::FindFileName( rom_to_load.c_str() ));
+		std::string rom_logpath = IO::Path::Join(rundir, IO::Path::FindFileName( rom_to_load ));
 		IO::Path::SetExtension(&rom_logpath, ".txt");
 
 		bool result_exists = IO::File::Exists(rom_logpath);

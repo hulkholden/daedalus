@@ -48,7 +48,7 @@ const u32 kMaxPathLen = 260;
 std::string Join(absl::string_view a, absl::string_view b);
 std::string Join(absl::string_view a, absl::string_view b, absl::string_view c);
 
-const char* FindFileName(const char* p_path);
+absl::string_view FindFileName(const std::string& path);
 bool RemoveBackslash(std::string* path);
 bool RemoveFileSpec(std::string* path);
 bool RemoveExtension(std::string* path);

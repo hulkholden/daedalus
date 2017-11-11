@@ -222,7 +222,7 @@ bool System_Init()
 
 bool System_Open(const std::string& filename)
 {
-	strcpy(g_ROM.mFileName, filename.c_str());
+	g_ROM.FileName = filename;
 	for (u32 i = 0; i < ARRAYSIZE(gRomInitTable); i++)
 	{
 		const RomEntityEntry& entry = gRomInitTable[i];

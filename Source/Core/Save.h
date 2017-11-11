@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string>
 
-std::string Save_GetDirectory(const char* rom_filename, const char* extension);
+std::string Save_GetDirectory(const std::string& rom_filename, const char* extension);
 
 bool Save_Reset();
 void Save_Fini();

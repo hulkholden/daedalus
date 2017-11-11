@@ -188,7 +188,7 @@ CSynchroniser::ESynchResult ISynchConsumer::SynchData(void* data, u32 length)
 
 bool CSynchroniser::InitialiseSynchroniser()
 {
-	std::string filename = Save_GetDirectory(g_ROM.mFileName, ".syn");
+	std::string filename = Save_GetDirectory(g_ROM.FileName, ".syn");
 
 	CSynchroniser* p_synch;
 	if (!IO::File::Exists(filename))

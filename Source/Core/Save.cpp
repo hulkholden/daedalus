@@ -37,7 +37,7 @@ static u32				gSaveSize;
 static std::string		gMempackFileName;
 static bool				gMempackDirty;
 
-std::string Save_GetDirectory(const char* rom_filename, const char* extension)
+std::string Save_GetDirectory(const std::string& rom_filename, const char* extension)
 {
 	// If the Save path has not yet been set up, prompt user
 	if (g_DaedalusConfig.SaveDir.empty())
@@ -65,9 +65,10 @@ std::string Save_GetDirectory(const char* rom_filename, const char* extension)
 	IO::Directory::EnsureExists(g_DaedalusConfig.SaveDir);
 
 	// Form the filename from the file spec (i.e. strip path and replace the extension)
-	std::string file_name = IO::Path::FindFileName(rom_filename);
-	IO::Path::SetExtension(&file_name, extension);
-	return IO::Path::Join(g_DaedalusConfig.SaveDir, file_name);
+	absl::string_view fn_view = IO::Path::FindFileName(rom_filename);
+	std::string filename(fn_view.begin(), fn_view.end());
+	IO::Path::SetExtension(&filename, extension);
+	return IO::Path::Join(g_DaedalusConfig.SaveDir, filename);
 }
 
 bool Save_Reset()
@@ -101,7 +102,7 @@ bool Save_Reset()
 	gSaveDirty = false;
 	if (gSaveSize > 0)
 	{
-		gSaveFileName = Save_GetDirectory(g_ROM.mFileName, ext);
+		gSaveFileName = Save_GetDirectory(g_ROM.FileName, ext);
 
 		FILE * fp = fopen(gSaveFileName.c_str(), "rb");
 		if (fp != NULL)
@@ -130,7 +131,7 @@ bool Save_Reset()
 
 	// init mempack
 	{
-		gMempackFileName = Save_GetDirectory(g_ROM.mFileName, ".mpk");
+		gMempackFileName = Save_GetDirectory(g_ROM.FileName, ".mpk");
 		FILE * fp = fopen(gMempackFileName.c_str(), "rb");
 		if (fp != NULL)
 		{

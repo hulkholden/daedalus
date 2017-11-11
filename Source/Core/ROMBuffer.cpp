@@ -137,17 +137,17 @@ void RomBuffer::Destroy() {}
 bool RomBuffer::Open()
 {
 	CNullOutputStream messages;
-	const char* filename = g_ROM.mFileName;
+	std::string filename = g_ROM.FileName;
 	ROMFile* p_rom_file = ROMFile::Create(filename);
 	if (p_rom_file == NULL)
 	{
-		DBGConsole_Msg(0, "Failed to create [C%s]\n", filename);
+		DBGConsole_Msg(0, "Failed to create [C%s]\n", filename.c_str());
 		return false;
 	}
 
 	if (!p_rom_file->Open(messages))
 	{
-		DBGConsole_Msg(0, "Failed to open [C%s]\n", filename);
+		DBGConsole_Msg(0, "Failed to open [C%s]\n", filename.c_str());
 		delete p_rom_file;
 		return false;
 	}
@@ -162,7 +162,7 @@ bool RomBuffer::Open()
 
 		if (!p_rom_file->LoadData(sRomSize, p_bytes, messages))
 		{
-			DBGConsole_Msg(0, "Failed to load [C%s]\n", filename);
+			DBGConsole_Msg(0, "Failed to load [C%s]\n", filename.c_str());
 			free(p_bytes);
 			delete p_rom_file;
 			return false;
@@ -217,7 +217,7 @@ bool RomBuffer::Open()
 		sRomFixed = false;
 	}
 
-	DBGConsole_Msg(0, "Opened [C%s]\n", filename);
+	DBGConsole_Msg(0, "Opened [C%s]\n", filename.c_str());
 	sRomLoaded = true;
 	return true;
 }

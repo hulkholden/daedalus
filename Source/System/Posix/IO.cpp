@@ -82,17 +82,14 @@ bool IsDirectory(const std::string& path)
 namespace Path
 {
 
-const char* FindFileName(const char* p_path)
+absl::string_view FindFileName(const std::string& path)
 {
-	const char* p_last_slash = strrchr(p_path, kPathSeparator);
-	if (p_last_slash)
+	size_t idx = path.rfind(kPathSeparator);
+	if (idx != std::string::npos)
 	{
-		return p_last_slash + 1;
+		return &path[idx] + 1;
 	}
-	else
-	{
-		return nullptr;
-	}
+	return "";
 }
 
 }  // namespace Path

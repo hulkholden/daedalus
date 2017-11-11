@@ -886,7 +886,7 @@ fail_find:
 
 static void Patch_FlushCache()
 {
-	std::string name = Save_GetDirectory(g_ROM.mFileName, ".hle");
+	std::string name = Save_GetDirectory(g_ROM.FileName, ".hle");
 	DBGConsole_Msg(0, "Write OSHLE cache: %s", name.c_str());
 
 	FILE *fp = fopen(name.c_str(), "wb");
@@ -939,7 +939,7 @@ static void Patch_FlushCache()
 
 static bool Patch_GetCache()
 {
-	std::string name = Save_GetDirectory(g_ROM.mFileName, ".hle");
+	std::string name = Save_GetDirectory(g_ROM.FileName, ".hle");
 	FILE *fp = fopen(name.c_str(), "rb");
 	if (fp != NULL)
 	{

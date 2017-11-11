@@ -58,9 +58,9 @@ namespace IO
 
 	namespace Path
 	{
-		const char *	FindFileName( const char * p_path )
+		absl::string_view FindFileName( const std::string& path )
 		{
-			return ::PathFindFileName( p_path );
+			return ::PathFindFileName( path.c_str() );
 		}
 
 	}
