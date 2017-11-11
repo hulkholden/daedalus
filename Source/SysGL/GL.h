@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Base/Types.h"
+#include "Math/Matrix4x4.h"
 
 extern GLFWwindow * gWindow;
 
@@ -17,18 +18,5 @@ enum EGuTextureWrapMode
 	GU_CLAMP			= GL_CLAMP_TO_EDGE,
 	GU_REPEAT			= GL_REPEAT,
 };
-
-enum EGuMatrixType
-{
-	GU_PROJECTION		= GL_PROJECTION,
-};
-
-struct ScePspFMatrix4
-{
-	float m[16];
-};
-
-void sceGuSetMatrix(EGuMatrixType type, const ScePspFMatrix4 * mtx);
-
 
 #endif // SYSGL_GL_H_

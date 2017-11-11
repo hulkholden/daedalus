@@ -144,16 +144,6 @@ void sceGuFog(f32 mn, f32 mx, u32 col)
 	//DAEDALUS_ERROR( "%s: Not implemented", __FUNCTION__ );
 }
 
-
-ScePspFMatrix4		gProjection;
-void sceGuSetMatrix(EGuMatrixType type, const ScePspFMatrix4 * mtx)
-{
-	if (type == GL_PROJECTION)
-	{
-		memcpy(&gProjection, mtx, sizeof(gProjection));
-	}
-}
-
 // This defines all the state that is expressed by a given shader.
 // If any of these fields change, it requires building a different shader.
 struct ShaderConfiguration
@@ -872,7 +862,7 @@ inline u32 MakeMirror(u32 mirror, u32 m)
 	return (mirror && m) ? (1<<m) : 0;
 }
 
-void RendererGL::PrepareRenderState(const float (&mat_project)[16], bool disable_zbuffer)
+void RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zbuffer)
 {
 	DAEDALUS_PROFILE( "RendererGL::PrepareRenderState" );
 
@@ -932,7 +922,7 @@ void RendererGL::PrepareRenderState(const float (&mat_project)[16], bool disable
 
 	glUseProgram(program->program);
 
-	glUniformMatrix4fv(program->uloc_project, 1, GL_FALSE, mat_project);
+	glUniformMatrix4fv(program->uloc_project, 1, GL_FALSE, mat_project.mRaw);
 
 	glUniform4f(program->uloc_primcol, mPrimitiveColour.GetRf(), mPrimitiveColour.GetGf(), mPrimitiveColour.GetBf(), mPrimitiveColour.GetAf());
 	glUniform4f(program->uloc_envcol,  mEnvColour.GetRf(),       mEnvColour.GetGf(),       mEnvColour.GetBf(),       mEnvColour.GetAf());
@@ -1034,7 +1024,7 @@ void RendererGL::RenderTriangles( DaedalusVtx * p_vertices, u32 num_vertices, bo
 		}
 	}
 
-	PrepareRenderState(gProjection.m, disable_zbuffer);
+	PrepareRenderState(mProjection, disable_zbuffer);
 	RenderDaedalusVtx(GL_TRIANGLES, p_vertices, num_vertices);
 }
 
@@ -1048,7 +1038,7 @@ void RendererGL::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord
 	// We have to do it before PrepareRenderState, because those values are applied to the graphics state.
 	PrepareTexRectUVs(&st0, &st1);
 
-	PrepareRenderState(mScreenToDevice.mRaw, gRDPOtherMode.depth_source ? false : true);
+	PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
 	v2 screen0;
 	v2 screen1;
@@ -1096,7 +1086,7 @@ void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexC
 	// We have to do it before PrepareRenderState, because those values are applied to the graphics state.
 	PrepareTexRectUVs(&st0, &st1);
 
-	PrepareRenderState(mScreenToDevice.mRaw, gRDPOtherMode.depth_source ? false : true);
+	PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
 	v2 screen0;
 	v2 screen1;
@@ -1138,7 +1128,7 @@ void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexC
 
 void RendererGL::FillRect( const v2 & xy0, const v2 & xy1, u32 color )
 {
-	PrepareRenderState(mScreenToDevice.mRaw, gRDPOtherMode.depth_source ? false : true);
+	PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
 	v2 screen0;
 	v2 screen1;
@@ -1187,7 +1177,7 @@ void RendererGL::Draw2DTexture(f32 x0, f32 y0, f32 x1, f32 y1,
 	// FIXME(strmnnrmn): is this right? Gross anyway.
 	gRDPOtherMode.cycle_type = CYCLE_COPY;
 
-	PrepareRenderState(mScreenToDevice.mRaw, false /* disable_depth */);
+	PrepareRenderState(mScreenToDevice, false /* disable_depth */);
 
 	glEnable(GL_BLEND);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1238,7 +1228,7 @@ void RendererGL::Draw2DTextureR(f32 x0, f32 y0,
 	// FIXME(strmnnrmn): is this right? Gross anyway.
 	gRDPOtherMode.cycle_type = CYCLE_COPY;
 
-	PrepareRenderState(mScreenToDevice.mRaw, false /* disable_depth */);
+	PrepareRenderState(mScreenToDevice, false /* disable_depth */);
 
 	glEnable(GL_BLEND);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

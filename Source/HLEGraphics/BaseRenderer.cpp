@@ -1191,7 +1191,7 @@ void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboar
 		if( mWPmodified )
 		{	//Only reload matrix if it has been changed and no billbording //Corn
 			mWPmodified = false;
-			sceGuSetMatrix( GU_PROJECTION, reinterpret_cast< const ScePspFMatrix4 * >( &mat_world_project) );
+			SetProjectionMatrix(mat_world_project);
 		}
 		for (u32 i = v0; i < v0 + n; i++)
 		{
@@ -1784,7 +1784,7 @@ void BaseRenderer::SetProjection(const u32 address, bool bReplace)
 	}
 
 	mWorldProjectValid = false;
-	sceGuSetMatrix( GU_PROJECTION, reinterpret_cast< const ScePspFMatrix4 * >( &mProjectionMat) );
+	SetProjectionMatrix(mProjectionMat);
 
 	DL_PF(
 		"	 %#+12.5f %#+12.5f %#+12.7f %#+12.5f\n"
@@ -1893,7 +1893,7 @@ inline void BaseRenderer::UpdateWorldProject()
 		if( mReloadProj )
 		{
 			mReloadProj = false;
-			sceGuSetMatrix( GU_PROJECTION, reinterpret_cast< const ScePspFMatrix4 * >( &mProjectionMat) );
+			SetProjectionMatrix(mProjectionMat);
 		}
 		MatrixMultiplyAligned( &mWorldProject, &mModelViewStack[mModelViewTop], &mProjectionMat );
 	}
@@ -1914,11 +1914,15 @@ inline void BaseRenderer::PokeWorldProject()
 			mWorldProject.mRaw[8] *= HD_SCALE;
 			mWorldProject.mRaw[12] *= HD_SCALE;
 		}
-		sceGuSetMatrix( GU_PROJECTION, reinterpret_cast< const ScePspFMatrix4 * >( &mWorldProject ) );
+		SetProjectionMatrix(mWorldProject);
 		mModelViewStack[mModelViewTop] = gMatrixIdentity;
 	}
 }
 
+void BaseRenderer::SetProjectionMatrix(const Matrix4x4& mtx)
+{
+	mProjection = mtx;
+}
 
 //*****************************************************************************
 //

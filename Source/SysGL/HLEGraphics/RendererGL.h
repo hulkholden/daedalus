@@ -5,7 +5,7 @@
 
 class RendererGL : public BaseRenderer
 {
-public:
+  public:
 	virtual void		RestoreRenderStates();
 
 	virtual void		RenderTriangles(DaedalusVtx * p_vertices, u32 num_vertices, bool disable_zbuffer);
@@ -20,13 +20,14 @@ public:
 									   f32 x2, f32 y2, f32 x3, f32 y3,
 									   f32 s, f32 t);
 
-private:
+  private:
 	void 				MakeShaderConfigFromCurrentState(struct ShaderConfiguration * config) const;
 
-	void 				PrepareRenderState(const float (&mat_project)[16], bool disable_zbuffer);
+	void 				PrepareRenderState(const Matrix4x4& mat_project, bool disable_zbuffer);
 
 	void 				RenderDaedalusVtx(int prim, const DaedalusVtx * vertices, int count);
 	void 				RenderDaedalusVtxStreams(int prim, const float * positions, const TexCoord * uvs, const u32 * colours, int count);
+
 };
 
 // NB: this is equivalent to gRenderer, but points to the implementation class, for platform-specific functionality.

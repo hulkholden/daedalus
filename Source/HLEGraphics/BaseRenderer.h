@@ -368,8 +368,9 @@ private:
 	void				InitViewport();
 	void				UpdateViewport();
 
-	inline void			UpdateWorldProject();
-	inline void 		PokeWorldProject();
+	void				UpdateWorldProject();
+	void 				PokeWorldProject();
+	void				SetProjectionMatrix(const Matrix4x4& mtx);
 
 protected:
 	static const u32 kMaxN64Vertices = 80;		// F3DLP.Rej supports up to 80 verts!
@@ -428,6 +429,7 @@ protected:
 	u32					mModelViewTop;
 	u32					mMatStackSize;
 	mutable bool		mWorldProjectValid;
+	Matrix4x4			mProjection;
 	bool				mReloadProj;
 	bool				mWPmodified;
 	u32					mDKRMatIdx;

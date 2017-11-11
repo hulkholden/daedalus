@@ -23,11 +23,13 @@
 #ifndef CORE_SAVESTATE_H_
 #define CORE_SAVESTATE_H_
 
+#include <string>
+
 class RomID;
 
-bool SaveState_LoadFromFile( const char * filename );
-bool SaveState_SaveToFile( const char * filename );
-RomID SaveState_GetRomID( const char * filename );
-const char* SaveState_GetRom(const char * filename);
+bool SaveState_LoadFromFile(const std::string& filename);
+bool SaveState_SaveToFile(const std::string& filename);
+RomID SaveState_GetRomID(const std::string& filename);
+const char* SaveState_GetRom(const std::string& filename);
 
 #endif // CORE_SAVESTATE_H_

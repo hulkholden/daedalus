@@ -42,16 +42,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 const u32 SAVESTATE_PROJECT64_MAGIC_NUMBER = 0x23D8A6C8;
 
-class SaveState_ostream_gzip
+class SaveStateOutput
 {
 public:
-	SaveState_ostream_gzip( const char * filename )
+	SaveStateOutput( const std::string& filename )
 		: mStream( filename )
 	{
 	}
 
 	template<typename T>
-	inline SaveState_ostream_gzip& operator << (const T& data)
+	inline SaveStateOutput& operator << (const T& data)
 	{
 		write(&data, sizeof(T));
 		return *this;
@@ -109,10 +109,10 @@ private:
 	COutStream		mStream;
 };
 
-class SaveState_istream_gzip
+class SaveStateInput
 {
 public:
-	explicit SaveState_istream_gzip( const char * filename )
+	explicit SaveStateInput( const std::string& filename )
 		: mStream( filename )
 	{}
 
@@ -122,7 +122,7 @@ public:
 	}
 
 	template<typename T>
-	inline SaveState_istream_gzip& operator >> (T& data)
+	inline SaveStateInput& operator >> (T& data)
 	{
 		if (read(&data, sizeof(data)) != sizeof(data))
 		{
@@ -188,9 +188,9 @@ private:
 };
 
 
-bool SaveState_SaveToFile( const char * filename )
+bool SaveState_SaveToFile( const std::string& filename )
 {
-	SaveState_ostream_gzip stream( filename );
+	SaveStateOutput stream( filename );
 
 	if( !stream.IsValid() )
 		return false;
@@ -272,12 +272,14 @@ static void Swap_PIF()
 	}
 }
 
-bool SaveState_LoadFromFile( const char * filename )
+bool SaveState_LoadFromFile( const std::string& filename )
 {
-	SaveState_istream_gzip stream( filename );
+	SaveStateInput stream( filename );
 
 	if( !stream.IsValid() )
+	{
 		return false;
+	}
 
 	u32 value;
 	stream >> value;
@@ -396,12 +398,14 @@ bool SaveState_LoadFromFile( const char * filename )
 	return true;
 }
 
-RomID SaveState_GetRomID( const char * filename )
+RomID SaveState_GetRomID( const std::string& filename )
 {
-	SaveState_istream_gzip stream( filename );
+	SaveStateInput stream( filename );
 
 	if( !stream.IsValid() )
+	{
 		return RomID();
+	}
 
 	u32 value;
 	stream >> value;
@@ -418,12 +422,13 @@ RomID SaveState_GetRomID( const char * filename )
 	return RomID( rom_header.CRC1, rom_header.CRC2, rom_header.CountryID );
 }
 
-const char* SaveState_GetRom( const char * filename )
+const char* SaveState_GetRom( const std::string& filename )
 {
-	SaveState_istream_gzip stream( filename );
+	SaveStateInput stream( filename );
 
-	if( !stream.IsValid() )
+	if( !stream.IsValid() ) {
 		return NULL;
+	}
 
 	u32 value;
 	stream >> value;

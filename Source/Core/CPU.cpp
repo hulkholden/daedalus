@@ -456,7 +456,7 @@ static void HandleSaveStateOperationOnVerticalBlank()
 			break;
 		case SSO_SAVE:
 			DBGConsole_Msg(0, "Saving '%s'\n", gSaveStateFilename.c_str());
-			SaveState_SaveToFile(gSaveStateFilename.c_str());
+			SaveState_SaveToFile(gSaveStateFilename);
 			gSaveStateOperation = SSO_NONE;
 			break;
 		case SSO_LOAD:
@@ -467,7 +467,7 @@ static void HandleSaveStateOperationOnVerticalBlank()
 			// separate return code to check this case). In that case we
 			// stop the cpu and handle the load in
 			// HandleSaveStateOperationOnCPUStopRunning.
-			if (SaveState_LoadFromFile(gSaveStateFilename.c_str()))
+			if (SaveState_LoadFromFile(gSaveStateFilename))
 			{
 				CPU_ResetFragmentCache();
 				gSaveStateOperation = SSO_NONE;
