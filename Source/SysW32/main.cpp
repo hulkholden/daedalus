@@ -38,7 +38,7 @@ int __cdecl main(int argc, char **argv)
 	HMODULE hModule = GetModuleHandle(NULL);
 	if (hModule != NULL)
 	{
-		IO::Filename exe_path;
+		char exe_path[256];
 		GetModuleFileName(hModule, exe_path, ARRAYSIZE(exe_path));
 		gDaedalusExePath = exe_path;
 		IO::Path::RemoveFileSpec(&gDaedalusExePath);

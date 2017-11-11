@@ -53,7 +53,7 @@ bool ROMFileCompressed::Open(COutputStream& messages)
 
 	s32 err;
 	unz_file_info file_info;
-	IO::Filename rom_filename;
+	char rom_filename[256];
 
 	err = unzGoToFirstFile(mZipFile);
 	if (err != UNZ_OK)

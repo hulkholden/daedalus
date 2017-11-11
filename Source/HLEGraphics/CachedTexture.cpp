@@ -325,7 +325,7 @@ void CachedTexture::DumpTexture( const TextureInfo & ti, const CNativeTexture * 
 
 	if( texture != NULL && texture->HasData() )
 	{
-		IO::Filename filename;
+		char filename[256];
 		sprintf( filename, "%08x-%s_%dbpp-%dx%d-%dx%d.png",
 							ti.GetLoadAddress(), ti.GetFormatName(), ti.GetSizeInBits(),
 							0, 0,		// Left/Top

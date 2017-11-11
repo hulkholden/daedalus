@@ -37,10 +37,10 @@ int main(int argc, char **argv)
 
 	if (argc > 0)
 	{
-		IO::Filename exe_path;
-		realpath(argv[0], exe_path);
-
+		char* exe_path = realpath(argv[0], nullptr);
 		gDaedalusExePath = exe_path;
+		free(exe_path);
+
 		IO::Path::RemoveFileSpec(&gDaedalusExePath);
 	}
 	else
@@ -86,10 +86,9 @@ int main(int argc, char **argv)
 						const char *relative_path = argv[i + 1];
 						++i;
 
-						IO::Filename dir;
-						realpath(relative_path, dir);
-
+						char* dir = realpath(relative_path, nullptr);
 						CRomDB::Get()->AddRomDirectory(dir);
+						free(dir);
 					}
 				}
 			}

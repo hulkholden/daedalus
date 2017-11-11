@@ -43,8 +43,6 @@ bool IsDirectory(const std::string& path);
 
 namespace Path
 {
-const u32 kMaxPathLen = 260;
-
 std::string Join(absl::string_view a, absl::string_view b);
 std::string Join(absl::string_view a, absl::string_view b, absl::string_view c);
 
@@ -60,8 +58,6 @@ inline void SetExtension(std::string* path, absl::string_view ext)
 	AddExtension(path, ext);
 }
 }
-
-typedef char Filename[IO::Path::kMaxPathLen + 1];
 
 struct FindDataT
 {
