@@ -48,26 +48,24 @@ CRomDB::~CRomDB()
 class IRomDB : public CRomDB
 {
 	public:
-		IRomDB();
-		~IRomDB();
+		IRomDB() : mDirty( false ) {}
+		~IRomDB() override;
 
-		//
-		// CRomDB implementation
-		//
-		void			Reset();
-		bool			Commit();
+		bool			OpenDB(const std::string& filename) override;
 
-		void			AddRomDirectory(const char * directory);
+		void			Reset() override;
+		bool			Commit() override;
 
-		bool			QueryByFilename( const char * filename, RomID * id, u32 * rom_size, ECicType * cic_type );
-		bool			QueryByID( const RomID & id, u32 * rom_size, ECicType * cic_type ) const;
-		const char *	QueryFilenameFromID( const RomID & id ) const;
+		void			AddRomDirectory(const std::string& directory) override;
+
+		bool			QueryByFilename(const std::string& filename, RomID * id, u32 * rom_size, ECicType * cic_type) override;
+		bool			QueryByID(const RomID & id, u32 * rom_size, ECicType * cic_type) const override;
+		const char *	QueryFilenameFromID(const RomID & id) const override;
 
 	private:
-		void			AddRomFile(const char * filename);
+		void			AddRomFile(const std::string& filename);
 
-		void			AddRomEntry( const char * filename, const RomID & id, u32 rom_size, ECicType cic_type );
-		bool			OpenDB( const char * filename );
+		void			AddRomEntry(const char * filename, const RomID & id, u32 rom_size, ECicType cic_type );
 
 	private:
 
@@ -163,7 +161,7 @@ class IRomDB : public CRomDB
 		typedef std::vector< RomFilesKeyValue >	FilenameVec;
 		typedef std::vector< RomDetails >		DetailsVec;
 
-		IO::Filename					mRomDBFileName;
+		std::string						mRomDBFileName;
 		FilenameVec						mRomFiles;
 		DetailsVec						mRomDetails;
 		bool							mDirty;
@@ -171,22 +169,15 @@ class IRomDB : public CRomDB
 
 template<> bool	CSingleton< CRomDB >::Create()
 {
-	DAEDALUS_ASSERT_Q(mpInstance == NULL);
+	DAEDALUS_ASSERT_Q(mpInstance == nullptr);
 
 	mpInstance = new IRomDB();
 
-	IO::Filename romdb_filename;
-	IO::Path::Combine( romdb_filename, gDaedalusExePath, "rom.db" );
+	std::string romdb_filename = IO::Path::Join(gDaedalusExePath, "rom.db");
 	/*ret = */mpInstance->OpenDB( romdb_filename );
 	// Ignore failure - this file might not exist on first run.
 
 	return true;
-}
-
-IRomDB::IRomDB()
-:	mDirty( false )
-{
-	mRomDBFileName[ 0 ] = '\0';
 }
 
 IRomDB::~IRomDB()
@@ -201,25 +192,19 @@ void IRomDB::Reset()
 	mDirty = true;
 }
 
-bool IRomDB::OpenDB( const char * filename )
+bool IRomDB::OpenDB(const std::string& filename)
 {
 	u32 num_read;
 
-	//
-	// Remember the filename
-	//
-	IO::Path::Assign( mRomDBFileName, filename );
+	mRomDBFileName = filename;
 
-	FILE * fh = fopen( filename, "rb" );
+	FILE * fh = fopen( filename.c_str(), "rb" );
 	if ( !fh )
 	{
-		DBGConsole_Msg( 0, "Failed to open RomDB from %s\n", mRomDBFileName );
+		DBGConsole_Msg( 0, "Failed to open RomDB from %s\n", mRomDBFileName.c_str() );
 		return false;
 	}
 
-	//
-	// Check the magic number
-	//
 	u64 magic;
 	num_read = fread( &magic, sizeof( magic ), 1, fh );
 	if ( num_read != 1 || magic != ROMDB_MAGIC_NO )
@@ -228,9 +213,6 @@ bool IRomDB::OpenDB( const char * filename )
 		goto fail;
 	}
 
-	//
-	// Check the version number
-	//
 	u32 version;
 	num_read = fread( &version, sizeof( version ), 1, fh );
 	if ( num_read != 1 || version != ROMDB_CURRENT_VERSION )
@@ -294,18 +276,21 @@ fail:
 bool IRomDB::Commit()
 {
 	if( !mDirty )
+	{
 		return true;
+	}
 
-	//
-	// Check if we have a valid filename
-	//
-	if ( strlen( mRomDBFileName ) <= 0 )
+	if ( mRomDBFileName.empty() )
+	{
 		return false;
+	}
 
-	FILE * fh = fopen( mRomDBFileName, "wb" );
+	FILE * fh = fopen( mRomDBFileName.c_str(), "wb" );
 
 	if ( !fh )
+	{
 		return false;
+	}
 
 	//
 	// Write the magic
@@ -365,24 +350,20 @@ void IRomDB::AddRomEntry( const char * filename, const RomID & id, u32 rom_size,
 	mDirty = true;
 }
 
-void IRomDB::AddRomDirectory(const char * directory)
+void IRomDB::AddRomDirectory(const std::string& directory)
 {
-	DBGConsole_Msg(0, "Adding roms directory [C%s]", directory);
+	DBGConsole_Msg(0, "Adding roms directory [C%s]", directory.c_str());
 	std::string			full_path;
 
 	IO::FindHandleT		find_handle;
 	IO::FindDataT		find_data;
-	if(IO::FindFileOpen( directory, &find_handle, find_data ))
+	if(IO::FindFileOpen( directory.c_str(), &find_handle, find_data ))
 	{
 		do
 		{
-			const char * rom_filename = find_data.Name;
-			if(IsRomFilename( rom_filename ))
+			if(IsRomFilename( find_data.Name ))
 			{
-				IO::Filename full_path;
-				IO::Path::Combine(full_path, directory, rom_filename);
-
-				AddRomFile(full_path);
+				AddRomFile(IO::Path::Join(directory, find_data.Name));
 			}
 		}
 		while(IO::FindFileNext( find_handle, find_data ));
@@ -391,7 +372,7 @@ void IRomDB::AddRomDirectory(const char * directory)
 	}
 }
 
-void IRomDB::AddRomFile(const char * filename)
+void IRomDB::AddRomFile(const std::string& filename)
 {
 	RomID id;
 	u32 rom_size;
@@ -400,13 +381,11 @@ void IRomDB::AddRomFile(const char * filename)
 	QueryByFilename(filename, &id, &rom_size, &boot_type);
 }
 
-static bool GenerateRomDetails( const char * filename, RomID * id, u32 * rom_size, ECicType * cic_type )
+static bool GenerateRomDetails( const std::string& filename, RomID * id, u32 * rom_size, ECicType * cic_type )
 {
-	//
-	//	Haven't seen this rom before - try to add it to the database
-	//
-	ROMFile * rom_file( ROMFile::Create( filename ) );
-	if( rom_file == NULL )
+	// Haven't seen this rom before - try to add it to the database
+	ROMFile * rom_file = ROMFile::Create( filename.c_str() );
+	if( rom_file == nullptr )
 	{
 		return false;
 	}
@@ -462,13 +441,12 @@ static bool GenerateRomDetails( const char * filename, RomID * id, u32 * rom_siz
 	return true;
 }
 
-bool IRomDB::QueryByFilename( const char * filename, RomID * id, u32 * rom_size, ECicType * cic_type )
+bool IRomDB::QueryByFilename( const std::string& filename, RomID * id, u32 * rom_size, ECicType * cic_type )
 {
-	//
-	// First of all, check if we have these details cached in the rom database
-	//
-	FilenameVec::const_iterator fit( std::lower_bound( mRomFiles.begin(), mRomFiles.end(), filename, SSortByFilename() ) );
-	if( fit != mRomFiles.end() && strcmp( fit->FileName, filename ) == 0 )
+	const char * fn = filename.c_str();
+	// Check if we have these details cached in the rom database.
+	FilenameVec::const_iterator fit( std::lower_bound( mRomFiles.begin(), mRomFiles.end(), fn, SSortByFilename() ) );
+	if( fit != mRomFiles.end() && strcmp( fit->FileName, fn ) == 0 )
 	{
 		if( QueryByID( fit->ID, rom_size, cic_type ) )
 		{
@@ -479,10 +457,8 @@ bool IRomDB::QueryByFilename( const char * filename, RomID * id, u32 * rom_size,
 
 	if( GenerateRomDetails( filename, id, rom_size, cic_type ) )
 	{
-		//
-		// Store this information for future reference
-		//
-		AddRomEntry( filename, *id, *rom_size, *cic_type );
+		// Store this information for future reference.
+		AddRomEntry( fn, *id, *rom_size, *cic_type );
 		return true;
 	}
 
@@ -513,5 +489,5 @@ const char * IRomDB::QueryFilenameFromID( const RomID & id ) const
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
