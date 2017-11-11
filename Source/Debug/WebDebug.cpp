@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
-#include "WebDebug.h"
-#include "WebDebugTemplate.h"
+#include "Debug/WebDebug.h"
 
 #include "absl/strings/str_split.h"
 #include "third_party/webby/webby.h"
@@ -17,12 +16,13 @@
 #include <string>
 #include <vector>
 
-#include "Debug/DBGConsole.h"
-#include "Base/MathUtil.h"
-#include "System/Paths.h"
-#include "System/IO.h"
 #include "Base/Macros.h"
-#include "Utility/Thread.h"
+#include "Base/MathUtil.h"
+#include "Debug/DBGConsole.h"
+#include "Debug/WebDebugTemplate.h"
+#include "System/IO.h"
+#include "System/Paths.h"
+#include "System/Thread.h"
 
 enum
 {
@@ -445,7 +445,7 @@ bool WebDebug_Init()
 		return false;
 	}
 
-	std::string data_path = GetRunfilePath("SysOSX/Debug/Web");
+	std::string data_path = GetRunfilePath("Debug/Web");
 	DBGConsole_Msg(0, "Looking for static resource in [C%s]", data_path.c_str());
 	AddStaticContent(data_path, "");
 

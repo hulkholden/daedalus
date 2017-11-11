@@ -1,13 +1,12 @@
 #include "stdafx.h"
 
-#include "TextureCache.h"
+#include "HLEGraphics/TextureCache.h"
 
-#include "SysOSX/Debug/WebDebug.h"
-#include "SysOSX/Debug/WebDebugTemplate.h"
-
-#include "Utility/Mutex.h"
-#include "System/DataSink.h"
+#include "Debug/WebDebug.h"
+#include "Debug/WebDebugTemplate.h"
 #include "Graphics/PngUtil.h"
+#include "System/DataSink.h"
+#include "Utility/Mutex.h"
 
 
 static void TextureHandler(void * arg, WebDebugConnection * connection)

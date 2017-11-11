@@ -1,8 +1,7 @@
 #include "stdafx.h"
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-#include "WebDebugTemplate.h"
-#include "WebDebug.h"
+#include "Debug/WebDebugTemplate.h"
+#include "Debug/WebDebug.h"
 
 void WriteStandardHeader(WebDebugConnection* connection, const char* title)
 {
@@ -29,4 +28,3 @@ void WriteStandardFooter(WebDebugConnection* connection, const char* user_script
 		"</body>\n"
 		"</html>\n");
 }
-#endif

@@ -6,6 +6,8 @@ cc_library(
         "DebugConsoleImpl.cpp",
         "DebugLog.cpp",
         "Dump.cpp",
+        "WebDebug.cpp",
+        "WebDebugTemplate.cpp",
     ] + select({
         "//:darwin": [
             "Posix/Assert.cpp",
@@ -19,6 +21,8 @@ cc_library(
         "DebugConsoleImpl.h",
         "DebugLog.h",
         "Dump.h",
+        "WebDebug.h",
+        "WebDebugTemplate.h",
     ],
     deps = [
         "//:stdafx",

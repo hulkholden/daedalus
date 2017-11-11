@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Plugins/GraphicsPlugin.h"
 
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_W32)
-#include "SysOSX/Debug/WebDebug.h"
+#include "Debug/WebDebug.h"
 #include "HLEGraphics/TextureCacheWebDebug.h"
 #include "HLEGraphics/DisplayListDebugger.h"
 #endif
@@ -47,11 +47,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef DAEDALUS_GL
 #include "SysGL/Interface/UI.h"
 #endif
-
-#ifdef DAEDALUS_PSP
-#include "Utility/Translate.h"
-#endif
-
 
 CGraphicsPlugin* gGraphicsPlugin = NULL;
 CAudioPlugin* gAudioPlugin = NULL;
