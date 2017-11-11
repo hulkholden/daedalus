@@ -86,7 +86,7 @@
       $instr.css('background-color', 'rgb(255,255,204)');
 
       $.post('/dldebugger?scrub=' + t, function(data) {
-        $('#screen').attr({src: '/dldebugger?screen'});
+        $('#screen').attr({src: '/dldebugger?screen&time=' + new Date().getTime()});
 
         state               = data;
         state.rdpOtherModeH = parseInt(data.rdpOtherModeH, 16);
