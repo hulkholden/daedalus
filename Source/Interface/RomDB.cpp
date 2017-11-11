@@ -161,10 +161,10 @@ class IRomDB : public CRomDB
 		typedef std::vector< RomFilesKeyValue >	FilenameVec;
 		typedef std::vector< RomDetails >		DetailsVec;
 
-		std::string						mRomDBFileName;
-		FilenameVec						mRomFiles;
-		DetailsVec						mRomDetails;
-		bool							mDirty;
+		std::string mRomDBFileName;
+		FilenameVec mRomFiles;
+		DetailsVec mRomDetails;
+		bool mDirty;
 };
 
 template<> bool	CSingleton< CRomDB >::Create()
