@@ -33,6 +33,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Test/BatchTest.h"
 #include "Utility/Profiler.h"
 
+#pragma comment(lib, "dsound.lib")
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "gdi32.lib")
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "shell32.lib")
+#pragma comment(lib, "shlwapi.lib")
+#pragma comment(lib, "user32.lib")
+#pragma comment(lib, "ws2_32.lib")
+
 int __cdecl main(int argc, char **argv)
 {
 	HMODULE hModule = GetModuleHandle(NULL);
@@ -54,7 +63,10 @@ int __cdecl main(int argc, char **argv)
 	int result = 0;
 
 	if (!System_Init())
+	{
+		fprintf(stderr, "System_Init failed\n");
 		return 1;
+	}
 
 	if (argc > 1)
 	{
@@ -91,7 +103,7 @@ int __cdecl main(int argc, char **argv)
 		{
 			// Need absolute path when loading from Visual Studio
 			// This is ok when loading from console too, since arg0 will be empty, it'll just load file name (arg1)
-			std::string rom_path = IO::Path::Join(gDaedalusExePath, argv[1]);
+			std::string rom_path = filename;// IO::Path::Join(gDaedalusExePath, argv[1]);
 			fprintf(stderr, "Loading %s\n", rom_path.c_str());
 			System_Open(rom_path);
 			CPU_Run();
@@ -108,3 +120,42 @@ int __cdecl main(int argc, char **argv)
 	System_Finalize();
 	return result;
 }
+
+// TODO(strmnnrmn): Move DisplayListDebugger to common location?
+void DLDebugger_RequestDebug() {}
+bool DLDebugger_Process()
+{
+	return false;
+}
+bool DLDebugger_RegisterWebDebug()
+{
+	return true;
+}
+
+class IDebugConsole : public CDebugConsole
+{
+   public:
+	~IDebugConsole() override {}
+
+	void DAEDALUS_VARARG_CALL_TYPE Msg(u32 type, const char* format, ...) override {
+		va_list marker;
+		va_start(marker, format);
+		vprintf(format, marker);
+		va_end(marker);
+		printf("\n");
+	}
+
+	void MsgOverwriteStart() override {}
+	void DAEDALUS_VARARG_CALL_TYPE MsgOverwrite(u32 type, const char* format, ...) override {}
+	void MsgOverwriteEnd() override {}
+};
+
+template <>
+bool CSingleton<CDebugConsole>::Create()
+{
+	DAEDALUS_ASSERT(mpInstance == NULL, "Already initialised");
+	mpInstance = new IDebugConsole();
+	return true;
+}
+
+CDebugConsole::~CDebugConsole() {}

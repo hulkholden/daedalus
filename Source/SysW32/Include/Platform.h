@@ -33,8 +33,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define _DO_NOT_DECLARE_INTERLOCKED_INTRINSICS_IN_MEMORY
 #define __has_feature(x) 0
 
-
-#define DAEDALUS_ENABLE_DYNAREC
+// TODO(strmnnrmn): Fix dynarec.
+//#define DAEDALUS_ENABLE_DYNAREC
 #undef DAEDALUS_BREAKPOINTS_ENABLED
 #define DAEDALUS_ENABLE_OS_HOOKS
 #define DAEDALUS_GL

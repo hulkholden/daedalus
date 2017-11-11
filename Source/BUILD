@@ -61,6 +61,7 @@ cc_binary(
         "//Base",
         "//Core:CoreCpp",
         "//Debug",
+        "//DynaRec:DynaRecCpp",
         "//Graphics:GraphicsCpp",
         "//HLEAudio:HLEAudioCpp",
         "//HLEGraphics:HLEGraphicsCpp",
