@@ -12,8 +12,9 @@
 static void TextureHandler(void * arg, WebDebugConnection * connection)
 {
 	const char * params = connection->GetQueryString();
-	if (!params)
+	if (!params) {
 		return;
+	}
 
 	// Yes, this is pretty dodgy. Any random pointer can be passed in so we
 	// validated ptr against the list of textures below.
@@ -135,8 +136,8 @@ static void TextureCacheHandler(void * arg, WebDebugConnection * connection)
 
 bool TextureCache_RegisterWebDebug()
 {
-	WebDebug_Register( "/texture_cache", &TextureCacheHandler, NULL );
-	WebDebug_Register( "/texture", &TextureHandler, NULL );
+	WebDebug_Register( "/texture_cache", &TextureCacheHandler, nullptr );
+	WebDebug_Register( "/texture", &TextureHandler, nullptr );
 	return true;
 }
 

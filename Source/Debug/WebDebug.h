@@ -45,7 +45,7 @@ class WebDebugConnection : public DataSink
 	virtual void Flush();
 
    private:
-	struct WebbyConnection* mConnection;
+	WebbyConnection* mConnection;
 	State mState;
 
 	size_t mBytesExpected;

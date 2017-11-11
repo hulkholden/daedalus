@@ -28,9 +28,9 @@ static const int kMaxConnections = 8;
 
 struct WebDebugHandlerEntry
 {
-	const char *Request;
+	const char* Request;
 	WebDebugHandler Handler;
-	void *Arg;
+	void* Arg;
 };
 
 struct StaticResource
@@ -39,39 +39,39 @@ struct StaticResource
 	std::string FullPath;
 };
 
-static void *gServerMemory = NULL;
-static struct WebbyServer *gServer = NULL;
+static void* gServerMemory = NULL;
+static struct WebbyServer* gServer = NULL;
 static volatile bool gKeepRunning = false;
 static ThreadHandle gThread = kInvalidThreadHandle;
 
 static int ws_connection_count;
-static struct WebbyConnection *ws_connections[kMaxConnections];
+static struct WebbyConnection* ws_connections[kMaxConnections];
 static std::vector<WebDebugHandlerEntry> gHandlers;
 static std::vector<StaticResource> gStaticResources;
 
-const char *const kApplicationJavascript = "application/javascript";
-const char *const kApplicationJSON = "application/json";
-const char *const kImagePng = "image/png";
-const char *const kTextCSS = "text/css";
-const char *const kTextHTML = "text/html";
-const char *const kTextPlain = "text/plain";
+const char* const kApplicationJavascript = "application/javascript";
+const char* const kApplicationJSON = "application/json";
+const char* const kImagePng = "image/png";
+const char* const kTextCSS = "text/css";
+const char* const kTextHTML = "text/html";
+const char* const kTextPlain = "text/plain";
 
-void WebDebug_Register(const char *request, WebDebugHandler handler, void *arg)
+void WebDebug_Register(const char* request, WebDebugHandler handler, void* arg)
 {
 	WebDebugHandlerEntry entry = {request, handler, arg};
 	gHandlers.push_back(entry);
 }
 
-static void test_log(const char *text)
+static void test_log(const char* text)
 {
 	printf("[debug] %s\n", text);
 	fflush(stdout);
 }
 
-WebDebugConnection::WebDebugConnection(WebbyConnection *connection)
+WebDebugConnection::WebDebugConnection(WebbyConnection* connection)
 	: mConnection(connection), mState(kUnresponded), mBytesExpected(0), mBytesWritten(0)
 {
-	if (const char *params = connection->request.query_params)
+	if (const char* params = connection->request.query_params)
 	{
 		std::vector<std::string> args = absl::StrSplit(params, '&');
 
@@ -87,9 +87,9 @@ WebDebugConnection::WebDebugConnection(WebbyConnection *connection)
 	}
 }
 
-const char *WebDebugConnection::GetQueryString() const { return mConnection->request.query_params; }
+const char* WebDebugConnection::GetQueryString() const { return mConnection->request.query_params; }
 
-void WebDebugConnection::BeginResponse(int code, int content_length, const char *content_type)
+void WebDebugConnection::BeginResponse(int code, int content_length, const char* content_type)
 {
 	DAEDALUS_ASSERT(mState == kUnresponded, "Already responded to this request");
 
@@ -103,7 +103,7 @@ void WebDebugConnection::BeginResponse(int code, int content_length, const char 
 	mState = kResponding;
 }
 
-size_t WebDebugConnection::Write(const void *p, size_t len)
+size_t WebDebugConnection::Write(const void* p, size_t len)
 {
 	mBytesWritten += len;
 	return WebbyWrite(mConnection, p, len);
@@ -114,14 +114,14 @@ void WebDebugConnection::Flush()
 	// Ignore this, it's not useful for network connections.
 }
 
-void WebDebugConnection::WriteString(const char *str)
+void WebDebugConnection::WriteString(const char* str)
 {
 	DAEDALUS_ASSERT(mState == kResponding, "Should be in Responding state");
 
 	Write(str, strlen(str));
 }
 
-void WebDebugConnection::WriteF(const char *format, ...)
+void WebDebugConnection::WriteF(const char* format, ...)
 {
 	static const u32 kBufferLen = 1024;
 	char buffer[kBufferLen];
@@ -147,7 +147,7 @@ void WebDebugConnection::EndResponse()
 	mState = kResponded;
 }
 
-void Generate404(WebDebugConnection *connection, const char *request)
+void Generate404(WebDebugConnection* connection, const char* request)
 {
 	connection->BeginResponse(404, -1, kTextHTML);
 
@@ -168,7 +168,7 @@ void Generate404(WebDebugConnection *connection, const char *request)
 	connection->EndResponse();
 }
 
-void Generate500(WebDebugConnection *connection, const char *message)
+void Generate500(WebDebugConnection* connection, const char* message)
 {
 	connection->BeginResponse(500, -1, kTextHTML);
 
@@ -189,9 +189,9 @@ void Generate500(WebDebugConnection *connection, const char *message)
 	connection->EndResponse();
 }
 
-static const char *GetContentTypeForFilename(const char *filename)
+static const char* GetContentTypeForFilename(const char* filename)
 {
-	const char *ext = strrchr(filename, '.');
+	const char* ext = strrchr(filename, '.');
 	if (ext)
 	{
 		if (strcmp(ext, ".js") == 0) return kApplicationJavascript;
@@ -204,9 +204,9 @@ static const char *GetContentTypeForFilename(const char *filename)
 	return kTextPlain;
 }
 
-static void ServeFile(WebDebugConnection *connection, const char *filename)
+static void ServeFile(WebDebugConnection* connection, const char* filename)
 {
-	FILE *fh = fopen(filename, "rb");
+	FILE* fh = fopen(filename, "rb");
 	if (!fh)
 	{
 		Generate404(connection, filename);
@@ -228,11 +228,11 @@ static void ServeFile(WebDebugConnection *connection, const char *filename)
 	fclose(fh);
 }
 
-bool ServeResource(WebDebugConnection *connection, const char *resource_path)
+bool ServeResource(WebDebugConnection* connection, const char* resource_path)
 {
 	for (size_t i = 0; i < gStaticResources.size(); ++i)
 	{
-		const StaticResource &resource = gStaticResources[i];
+		const StaticResource& resource = gStaticResources[i];
 
 		if (strcmp(resource_path, resource.Resource.c_str()) == 0)
 		{
@@ -244,14 +244,14 @@ bool ServeResource(WebDebugConnection *connection, const char *resource_path)
 	return false;
 }
 
-static int WebDebugDispatch(struct WebbyConnection *connection)
+static int WebDebugDispatch(struct WebbyConnection* connection)
 {
 	WebDebugConnection dbg_connection(connection);
 
 	// Check dynamic handlers.
 	for (size_t i = 0; i < gHandlers.size(); ++i)
 	{
-		const WebDebugHandlerEntry &entry = gHandlers[i];
+		const WebDebugHandlerEntry& entry = gHandlers[i];
 		if (strcmp(connection->request.uri, entry.Request) == 0)
 		{
 			entry.Handler(entry.Arg, &dbg_connection);
@@ -272,7 +272,7 @@ static int WebDebugDispatch(struct WebbyConnection *connection)
 	return 1;
 }
 
-static int test_ws_connect(struct WebbyConnection *connection)
+static int test_ws_connect(struct WebbyConnection* connection)
 {
 	/* Allow websocket upgrades on /wstest */
 	if (0 == strcmp(connection->request.uri, "/wstest") && ws_connection_count < kMaxConnections)
@@ -281,13 +281,13 @@ static int test_ws_connect(struct WebbyConnection *connection)
 		return 1;
 }
 
-static void test_ws_connected(struct WebbyConnection *connection)
+static void test_ws_connected(struct WebbyConnection* connection)
 {
 	printf("WebSocket connected\n");
 	ws_connections[ws_connection_count++] = connection;
 }
 
-static void test_ws_closed(struct WebbyConnection *connection)
+static void test_ws_closed(struct WebbyConnection* connection)
 {
 	int i;
 	printf("WebSocket closed\n");
@@ -297,14 +297,14 @@ static void test_ws_closed(struct WebbyConnection *connection)
 		if (ws_connections[i] == connection)
 		{
 			int remain = ws_connection_count - i;
-			memmove(ws_connections + i, ws_connections + i + 1, remain * sizeof(struct WebbyConnection *));
+			memmove(ws_connections + i, ws_connections + i + 1, remain * sizeof(struct WebbyConnection*));
 			--ws_connection_count;
 			break;
 		}
 	}
 }
 
-static int test_ws_frame(struct WebbyConnection *connection, const struct WebbyWsFrame *frame)
+static int test_ws_frame(struct WebbyConnection* connection, const struct WebbyWsFrame* frame)
 {
 	int i = 0;
 
@@ -341,9 +341,9 @@ static int test_ws_frame(struct WebbyConnection *connection, const struct WebbyW
 	return 0;
 }
 
-static u32 DAEDALUS_THREAD_CALL_TYPE WebDebugThread(void *arg)
+static u32 DAEDALUS_THREAD_CALL_TYPE WebDebugThread(void* arg)
 {
-	WebbyServer *server = static_cast<WebbyServer *>(arg);
+	WebbyServer* server = static_cast<WebbyServer*>(arg);
 	int frame_counter = 0;
 
 	while (gKeepRunning)
