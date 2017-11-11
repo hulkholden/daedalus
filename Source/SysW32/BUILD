@@ -1,8 +1,8 @@
 cc_library(
     name = "SysW32",
-    hdrs = [
-        "Include/Platform.h",
-    ],
+    hdrs = glob([
+        "**/*.h",
+    ]),
     includes = ["Include"],
     visibility = ["//visibility:public"],
 )
@@ -15,5 +15,14 @@ cc_library(
     deps = [
         "//:stdafx",
         ":SysW32",
+        "//Config",
+        "//Core",
+        "//DynaRec",
+        "//Debug",
+        "//HLEAudio",
+        "//Interface",
+        "//System",
+        "//Test:BatchTest",
+        "//Utility",
     ],
 )

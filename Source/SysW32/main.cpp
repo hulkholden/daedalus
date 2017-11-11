@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Interface/RomDB.h"
 #include "System/IO.h"
 #include "System/Paths.h"
-#include "System/System.h"
+#include "System/SystemInit.h"
 #include "Test/BatchTest.h"
 #include "Utility/Profiler.h"
 
@@ -49,7 +49,7 @@ int __cdecl main(int argc, char **argv)
 		return 1;
 	}
 
-	//ReadConfiguration();
+	// ReadConfiguration();
 
 	int result = 0;
 
@@ -92,7 +92,7 @@ int __cdecl main(int argc, char **argv)
 			// Need absolute path when loading from Visual Studio
 			// This is ok when loading from console too, since arg0 will be empty, it'll just load file name (arg1)
 			std::string rom_path = IO::Path::Join(gDaedalusExePath, argv[1]);
-			fprintf(stderr, "Loading %s\n", rom_path).c_str();
+			fprintf(stderr, "Loading %s\n", rom_path.c_str());
 			System_Open(rom_path);
 			CPU_Run();
 			System_Close();
@@ -100,16 +100,11 @@ int __cdecl main(int argc, char **argv)
 	}
 	else
 	{
-//		result = RunMain();
+		// result = RunMain();
 	}
 
-	//
 	// Write current config out to the registry
-	//
-	//WriteConfiguration();
-
+	// WriteConfiguration();
 	System_Finalize();
-
-
 	return result;
 }

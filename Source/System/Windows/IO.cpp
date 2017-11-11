@@ -28,7 +28,7 @@ namespace IO
 {
 	namespace File
 	{
-		bool	Move( const std::string& from.c_str(), const std::string& to.c_str() )
+		bool	Move( const std::string& from, const std::string& to )
 		{
 			return ::MoveFile( from.c_str(), to.c_str() ) ? true : false;
 		}
