@@ -138,12 +138,6 @@ bool initgl()
 	return true;
 }
 
-
-void sceGuFog(f32 mn, f32 mx, u32 col)
-{
-	//DAEDALUS_ERROR( "%s: Not implemented", __FUNCTION__ );
-}
-
 // This defines all the state that is expressed by a given shader.
 // If any of these fields change, it requires building a different shader.
 struct ShaderConfiguration
@@ -547,11 +541,11 @@ void RendererGL::MakeShaderConfigFromCurrentState(ShaderConfiguration * config) 
 	// (NB: better fix for California Speed is just to force a point filter...)
 	if (config->BilerpFilter)
 	{
-		config->ClampS0 = mTexWrap[0].u == GU_CLAMP;
-		config->ClampT0 = mTexWrap[0].v == GU_CLAMP;
+		config->ClampS0 = mTexWrap[0].u == GL_CLAMP_TO_EDGE;
+		config->ClampT0 = mTexWrap[0].v == GL_CLAMP_TO_EDGE;
 
-		config->ClampS1 = mTexWrap[1].u == GU_CLAMP;
-		config->ClampT1 = mTexWrap[1].v == GU_CLAMP;
+		config->ClampS1 = mTexWrap[1].u == GL_CLAMP_TO_EDGE;
+		config->ClampT1 = mTexWrap[1].v == GL_CLAMP_TO_EDGE;
 	}
 }
 

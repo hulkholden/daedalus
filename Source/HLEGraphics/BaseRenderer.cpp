@@ -1585,8 +1585,8 @@ void BaseRenderer::UpdateTileSnapshot( u32 index, u32 tile_idx )
 
 	// Initialise the clamping state. When the mask is 0, it forces clamp mode.
 	//
-	u32 mode_u = (rdp_tile.clamp_s | (rdp_tile.mask_s == 0)) ? GU_CLAMP : GU_REPEAT;
-	u32 mode_v = (rdp_tile.clamp_t | (rdp_tile.mask_t == 0)) ? GU_CLAMP : GU_REPEAT;
+	u32 mode_u = (rdp_tile.clamp_s | (rdp_tile.mask_s == 0)) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+	u32 mode_v = (rdp_tile.clamp_t | (rdp_tile.mask_t == 0)) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
 
 	//	In CRDPStateManager::GetTextureDescriptor, we limit the maximum dimension of a
 	//	texture to that define by the mask_s/mask_t value.
@@ -1604,11 +1604,11 @@ void BaseRenderer::UpdateTileSnapshot( u32 index, u32 tile_idx )
 		// ToDo : Find a proper workaround for this, if this disabled the castle in Link's stage in SSB is broken :/
 		// Do a hack just for Zelda for now..
 		//
-		mode_u = g_ROM.ZELDA_HACK ? GU_CLAMP : GU_REPEAT;
+		mode_u = g_ROM.ZELDA_HACK ? GL_CLAMP_TO_EDGE : GL_REPEAT;
 	}
 
 	if( tile_size.GetHeight() > ti.GetHeight() )
-		mode_v = GU_REPEAT;
+		mode_v = GL_REPEAT;
 
 	mTexWrap[ index ].u = mode_u;
 	mTexWrap[ index ].v = mode_v;
@@ -1620,14 +1620,14 @@ void BaseRenderer::UpdateTileSnapshot( u32 index, u32 tile_idx )
 
 	DL_PF( "    Use Tile[%d] as Texture[%d] [%dx%d] [%s/%dbpp] [%s u, %s v] -> Adr[0x%08x] PAL[0x%x] Hash[0x%08x] Pitch[%d] TopLeft[%0.3f|%0.3f]",
 			tile_idx, index, ti.GetWidth(), ti.GetHeight(), ti.GetFormatName(), ti.GetSizeInBits(),
-			(mode_u==GU_CLAMP)? "Clamp" : "Repeat", (mode_v==GU_CLAMP)? "Clamp" : "Repeat",
+			(mode_u==GL_CLAMP_TO_EDGE)? "Clamp" : "Repeat", (mode_v==GL_CLAMP_TO_EDGE)? "Clamp" : "Repeat",
 			ti.GetLoadAddress(), ti.GetTlutAddress(), ti.GetHashCode(), ti.GetPitch(),
 			mTileTopLeft[ index ].s / 4.f, mTileTopLeft[ index ].t / 4.f );
 }
 
 
 // This transforms UVs so that they're positive. The aim is to ensure UVs are in the
-// range [(0,0),(w,h)]. If we can do this, we can specify GL_CLAMP_TO_EDGE/GU_CLAMP,
+// range [(0,0),(w,h)]. If we can do this, we can specify GL_CLAMP_TO_EDGE/GL_CLAMP_TO_EDGE,
 // which fixes some artifacts when rendering, such as bleed from wrapping at the edges
 // of textures. E.g. http://imgur.com/db3Adws,dX9vOWE#1
 // There are two inputs into the final uvs: the vertex UV and the mTileTopLeft value:
@@ -1639,7 +1639,7 @@ void BaseRenderer::UpdateTileSnapshot( u32 index, u32 tile_idx )
 // of the texture width, and so with GL_REPEAT the texrect rendered ok.
 // Anyway the fix is to subtract mTileTopLeft from the uvs, zero it, then add multiples
 // of the texture width/height until the uvs are positive. Then if the resulting UVs
-// are in the range [(0,0),(w,h)] we can update mTexWrap to GL_CLAMP_TO_EDGE/GU_CLAMP
+// are in the range [(0,0),(w,h)] we can update mTexWrap to GL_CLAMP_TO_EDGE/GL_CLAMP_TO_EDGE
 // and everything works correctly.
 inline void FixUV(u32 * wrap, s16 * c0_, s16 * c1_, s16 offset, u32 size)
 {
@@ -1650,8 +1650,8 @@ inline void FixUV(u32 * wrap, s16 * c0_, s16 * c1_, s16 offset, u32 size)
 	s16 c0 = *c0_ - offset_10_5;
 	s16 c1 = *c1_ - offset_10_5;
 
-	// Many texrects already have GU_CLAMP set, so avoid some work.
-	if (*wrap != GU_CLAMP && size > 0)
+	// Many texrects already have GL_CLAMP_TO_EDGE set, so avoid some work.
+	if (*wrap != GL_CLAMP_TO_EDGE && size > 0)
 	{
 		// Check if the coord is negative - if so, offset to the range [0,size]
 		if (c0 < 0)
@@ -1671,7 +1671,7 @@ inline void FixUV(u32 * wrap, s16 * c0_, s16 * c1_, s16 offset, u32 size)
 		if ((u16)c0 <= size &&
 			(u16)c1 <= size)
 		{
-			*wrap = GU_CLAMP;
+			*wrap = GL_CLAMP_TO_EDGE;
 		}
 	}
 
