@@ -35,9 +35,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
-        "//third_party/zlib",
-        "//third_party/zlib/contrib/minizip",
         "@com_google_absl//absl/strings",
+        "@zlib//:minizip",
+        "@zlib//:zlib",
     ],
 )
 

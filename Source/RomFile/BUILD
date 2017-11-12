@@ -18,9 +18,9 @@ cc_library(
         "//Debug",
         "//System",
         "//Utility",
-        "//third_party/zlib",
-        "//third_party/zlib/contrib/minizip",
         "@com_google_absl//absl/strings",
+        "@zlib//:minizip",
+        "@zlib//:zlib",
     ],
 )
 

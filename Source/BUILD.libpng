@@ -1,0 +1,21 @@
+licenses(["notice"])
+
+cc_library(
+    name = "libpng",
+    srcs = glob(["*.c"]),
+    hdrs = glob(["*.h"]) + [
+        "pnglibconf.h",
+    ],
+    includes = ["."],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@zlib//:zlib",
+    ],
+)
+
+genrule(
+    name = "copy_pnglibconf",
+    srcs = [":scripts/pnglibconf.h.prebuilt"],
+    outs = ["pnglibconf.h"],
+    cmd = "cp $(locations :scripts/pnglibconf.h.prebuilt) $@",
+)

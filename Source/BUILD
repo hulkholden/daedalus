@@ -55,6 +55,6 @@ cc_binary(
         "//System",
         "//System:SystemInit",
         "//Utility",
-        "//third_party/zlib",
+        "@zlib//:zlib",
     ],
 )

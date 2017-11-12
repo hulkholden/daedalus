@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/CompressedStream.h"
 
 #include <string.h>
-#include "third_party/zlib/zlib.h"
+#include "external/zlib/zlib.h"
 
 #include "Base/MathUtil.h"
 

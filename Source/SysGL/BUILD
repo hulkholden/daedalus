@@ -24,7 +24,7 @@ cc_library(
         "//Input",
         "//Interface",
         "//Plugins",
-        "//third_party/libpng",
+        "@libpng//:libpng",
     ],
 )
 

@@ -19,13 +19,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stdafx.h"
 #include "Graphics/NativeTexture.h"
-#include "Graphics/ColourValue.h"
-#include "Graphics/NativePixelFormat.h"
-
-#include "Base/MathUtil.h"
 
 #include <stdlib.h>
-#include <png.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "external/libpng/png.h"
+
+#include "Base/MathUtil.h"
+#include "Graphics/ColourValue.h"
+#include "Graphics/NativePixelFormat.h"
 
 static const u32 kPalette4BytesRequired = 16 * sizeof( NativePf8888 );
 static const u32 kPalette8BytesRequired = 256 * sizeof( NativePf8888 );

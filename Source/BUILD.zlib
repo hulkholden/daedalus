@@ -1,0 +1,39 @@
+licenses(["notice"])
+
+filegroup(
+    name = "srcs",
+    srcs = glob(["**"]),
+    visibility = ["//third_party:__pkg__"],
+)
+
+cc_library(
+    name = "zlib",
+    srcs = glob(["*.c"]),
+    hdrs = glob(["*.h"]),
+    # Use -Dverbose=-1 to turn off zlib's trace logging. (#3280)
+    copts = [
+        "-w",
+        "-Dverbose=-1",
+    ],
+    includes = ["."],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "minizip",
+    srcs = [
+        "contrib/minizip/ioapi.c",
+        "contrib/minizip/unzip.c",
+        "contrib/minizip/zip.c",
+    ],
+    hdrs = [
+        "contrib/minizip/crypt.h",
+        "contrib/minizip/ioapi.h",
+        "contrib/minizip/unzip.h",
+        "contrib/minizip/zip.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":zlib",
+    ],
+)
