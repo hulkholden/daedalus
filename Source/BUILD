@@ -24,7 +24,6 @@ config_setting(
 
 cc_library(
     name = "stdafx",
-    srcs = ["StdAfx.cpp"],
     hdrs = [
         "stdafx.h",
     ],
