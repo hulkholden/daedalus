@@ -18,14 +18,14 @@ new_http_archive(
     name = "glfw",
     url = "https://github.com/glfw/glfw/archive/master.zip",
     strip_prefix = "glfw-master",
-    build_file = "BUILD.glfw",
+    build_file = "third_party/BUILD.glfw",
 )
 
 new_http_archive(
     name = "webby",
     url = "https://github.com/deplinenoise/webby/archive/master.zip",
     strip_prefix = "webby-master",
-    build_file = "BUILD.webby",
+    build_file = "third_party/BUILD.webby",
 )
 
 new_http_archive(
@@ -33,7 +33,7 @@ new_http_archive(
     url = "http://prdownloads.sourceforge.net/libpng/lpng1634.zip?download",
     sha256 = "be7ea200705a3a3dde12df98562c9e96c560b42901686b1f7c38099217bf030c",
     strip_prefix = "lpng1634",
-    build_file = "BUILD.libpng",
+    build_file = "third_party/BUILD.libpng",
 )
 
 new_http_archive(
@@ -44,5 +44,5 @@ new_http_archive(
     ],
     sha256 = "d7510a8ee1918b7d0cad197a089c0a2cd4d6df05fee22389f67f115e738b178d",
     strip_prefix = "zlib-1.2.11",
-    build_file = "BUILD.zlib",
+    build_file = "third_party/BUILD.zlib",
 )
