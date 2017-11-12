@@ -18,11 +18,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
+
+#include "Core/DMA.h"
+#include "Core/Memory.h"
+#include "Core/ROM.h"
+#include "Core/Save.h"
 #include "Debug/DBGConsole.h"
-#include "Memory.h"
-#include "DMA.h"
-#include "ROM.h"
-#include "Save.h"
 
 u32 FlashStatus[2];
 u32 FlashRAM_Offset;

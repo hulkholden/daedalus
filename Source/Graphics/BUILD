@@ -5,9 +5,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//Base",
+        "//Math",
         "//SysGL",
         "//Utility",
-        "//Math",
         "@glfw//:glfw",
         "@libpng//:libpng",
     ],

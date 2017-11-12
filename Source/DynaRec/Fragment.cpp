@@ -38,8 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "DynaRec/FragmentCache.h"
 #include "DynaRec/IndirectExitMap.h"
 #include "DynaRec/StaticAnalysis.h"
-#include "OSHLE/patch.h"
-#include "OSHLE/ultra_R4300.h"
+#include "Ultra/ultra_R4300.h"
 #include "Utility/Profiler.h"
 
 //#define IMMEDIATE_COUNTER_UPDATE

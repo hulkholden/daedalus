@@ -1,7 +1,7 @@
 #ifndef OSHLE_OSMESGQUEUE_H_
 #define OSHLE_OSMESGQUEUE_H_
 
-#include "ultra_os.h"
+#include "Ultra/ultra_os.h"
 
 #include "Core/Memory.h"
 

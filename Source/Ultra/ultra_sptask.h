@@ -17,8 +17,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef OSHLE_ULTRA_SPTASK_H_
-#define OSHLE_ULTRA_SPTASK_H_
+#ifndef ULTRA_ULTRA_SPTASK_H_
+#define ULTRA_ULTRA_SPTASK_H_
 
 #include "Base/Types.h"
 
@@ -64,4 +64,4 @@ typedef union {
 #define OS_TASK_USR2			0x0040
 #define OS_TASK_USR3			0x0080
 
-#endif // OSHLE_ULTRA_SPTASK_H_
+#endif // ULTRA_ULTRA_SPTASK_H_

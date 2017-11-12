@@ -33,9 +33,9 @@
 
 #include <stdlib.h>
 
+#include "Core/Memory.h"
 #include "Debug/DBGConsole.h"
-#include "Memory.h"
-#include "OSHLE/ultra_sptask.h"
+#include "Ultra/ultra_sptask.h"
 
 #define SUBBLOCK_SIZE 64
 

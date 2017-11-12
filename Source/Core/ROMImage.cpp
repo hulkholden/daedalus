@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
-#include "ROMImage.h"
+#include "Core/ROMImage.h"
 
 // Find out the CIC type
 ECicType ROM_GenerateCICType( const u8 * p_rom_base )

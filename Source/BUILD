@@ -34,7 +34,7 @@ cc_binary(
         "//HLEGraphics:HLEGraphicsCpp",
         "//Interface:InterfaceCpp",
         "//Main",
-        "//OSHLE:OSHLECpp",
+        "//OSHLE",
         "//SysGL:SysGLCpp",
         "//System",
         "//System:SystemInit",

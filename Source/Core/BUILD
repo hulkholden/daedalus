@@ -7,7 +7,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//Base",
-        "//OSHLE",
+        "//Ultra",
         "@com_google_absl//absl/strings",
     ],
 )
@@ -24,7 +24,6 @@ cc_library(
         "//DynaRec",
         "//Input",
         "//Interface",
-        "//OSHLE",
         "//Plugins",
         "//RomFile",
         "//System:SystemInit",

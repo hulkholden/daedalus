@@ -17,9 +17,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-
-
-
 /*
     CPU: Instructions encoded by opcode field.
     31---------26---------------------------------------------------0

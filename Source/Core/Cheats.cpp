@@ -19,22 +19,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
-#include "Cheats.h"
+#include "Core/Cheats.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Memory.h"
-#include "ROM.h"
-#include "Config/ConfigOptions.h"
-
-#include "OSHLE/ultra_R4300.h"
-#include "System/Paths.h"
-#include "System/IO.h"
-
 #include "absl/strings/string_view.h"
 #include "absl/strings/strip.h"
 #include "absl/strings/numbers.h"
+
+#include "Config/ConfigOptions.h"
+#include "Memory.h"
+#include "ROM.h"
+#include "System/IO.h"
+#include "System/Paths.h"
+#include "Ultra/ultra_R4300.h"
 
 // Cheatcode routines and format based from 1964
 

@@ -31,7 +31,7 @@ Copyright (C) 2001 StrmnNrmn
 
 #include "Base/MathUtil.h"
 
-#include "OSHLE/ultra_gbi.h"
+#include "Ultra/ultra_gbi.h"
 
 namespace
 {

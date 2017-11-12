@@ -9,7 +9,7 @@
 #include "Core/ROM.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/Dump.h"
-#include "OSHLE/ultra_gbi.h"
+#include "Ultra/ultra_gbi.h"
 #include "System/IO.h"
 #include "Base/Macros.h"
 

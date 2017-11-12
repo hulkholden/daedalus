@@ -12,7 +12,7 @@
 #include "HLEGraphics/DLDebug.h"
 #include "HLEGraphics/RDPStateManager.h"
 #include "Interface/Preferences.h"
-#include "OSHLE/ultra_gbi.h"
+#include "Ultra/ultra_gbi.h"
 #include "SysGL/GL.h"
 #include "System/IO.h"
 #include "System/Paths.h"

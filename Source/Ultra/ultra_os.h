@@ -17,8 +17,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef OSHLE_ULTRA_OS_H_
-#define OSHLE_ULTRA_OS_H_
+#ifndef ULTRA_ULTRA_OS_H_
+#define ULTRA_ULTRA_OS_H_
 
 #include "Base/Types.h"
 
@@ -372,4 +372,4 @@ typedef struct OSTimer_s {
 #define OS_TV_NTSC		1
 #define OS_TV_MPAL		2
 
-#endif // OSHLE_ULTRA_OS_H_
+#endif // ULTRA_ULTRA_OS_H_

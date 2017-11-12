@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // Code to format opcodes and display them nicely
 #include "Base/Daedalus.h"
-#include "PrintOpCode.h"
+#include "Core/PrintOpCode.h"
 
 //
 //	Exclude this from public release builds to save a little on the elf size

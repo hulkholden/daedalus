@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEGraphics/ConvertTile.h"
 #include "HLEGraphics/TextureInfo.h"
 #include "Math/Math.h"
-#include "OSHLE/ultra_gbi.h"
+#include "Ultra/ultra_gbi.h"
 #include "System/IO.h"
 #include "Utility/Profiler.h"
 

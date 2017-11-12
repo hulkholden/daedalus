@@ -1,19 +1,10 @@
 cc_library(
     name = "OSHLE",
+    srcs = glob(["*.cpp"]),
     hdrs = glob([
         "*.h",
         "*.inl",
     ]),
-    visibility = ["//visibility:public"],
-    deps = [
-        "//Base",
-        "//Utility",
-    ],
-)
-
-cc_library(
-    name = "OSHLECpp",
-    srcs = glob(["*.cpp"]),
     visibility = ["//visibility:public"],
     deps = [
         "//Base",
@@ -22,7 +13,6 @@ cc_library(
         "//Debug",
         "//DynaRec",
         "//Math",
-        "//OSHLE",
         "//Plugins",
         "//Utility",
     ],
