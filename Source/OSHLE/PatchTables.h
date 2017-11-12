@@ -17,8 +17,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef OSHLE_PATCH_H_
-#define OSHLE_PATCH_H_
+#ifndef OSHLE_PATCHTABLES_H_
+#define OSHLE_PATCHTABLES_H_
 
 #include "Core/Registers.h"		// For SRHACK_???? etc
 #include "Core/CPU.h"		// Breakpoint stuff
@@ -41,8 +41,6 @@ enum PATCH_CROSSREF_TYPE
 };
 
 struct _PatchSymbol;
-
-
 
 typedef struct
 {
@@ -162,19 +160,4 @@ extern PatchVariable * g_PatchVariables[];
 
 #endif
 
-extern u32 gNumOfOSFunctions;
-void Patch_Reset();
-void Patch_ApplyPatches();
-void Patch_PatchAll();
-
-#ifndef DAEDALUS_SILENT
-const char * Patch_GetJumpAddressName(u32 jump);
-u32 Patch_GetSymbolAddress(const char * name);
-#endif
-#ifdef DUMPOSFUNCTIONS
-void Patch_DumpOsThreadInfo();
-void Patch_DumpOsQueueInfo();
-void Patch_DumpOsEventInfo();
-#endif
-
-#endif // OSHLE_PATCH_H_
+#endif // OSHLE_PATCHTABLES_H_

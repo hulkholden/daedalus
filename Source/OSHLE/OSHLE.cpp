@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
-#include "patch.h"
+#include "OSHLE/OSHLE.h"
 
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
 
@@ -41,13 +41,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Dump.h"
 #include "DynaRec/Fragment.h"
 #include "DynaRec/FragmentCache.h"
-#include "Math/Math.h"	// VFPU Math
+#include "Math/Math.h"
+#include "OSHLE/PatchTables.h"
+#include "Plugins/AudioPlugin.h"
+#include "System/Endian.h"
 #include "Ultra/ultra_os.h"
 #include "Ultra/ultra_R4300.h"
 #include "Ultra/ultra_rcp.h"
 #include "Ultra/ultra_sptask.h"
-#include "Plugins/AudioPlugin.h"
-#include "System/Endian.h"
 #include "Utility/CRC.h"
 #include "Utility/FastMemcpy.h"
 #include "Utility/Profiler.h"

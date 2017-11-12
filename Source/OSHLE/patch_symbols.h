@@ -1,3 +1,5 @@
+#include "OSHLE/PatchTables.h"
+
 extern PatchSymbol g_osStartThread_s;
 extern PatchSymbol g_osDestroyThread_s;
 extern PatchSymbol g_osContInit_s;

@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Synchroniser.h"
 #include "Interface/Preferences.h"
 #include "Interface/RomDB.h"
-#include "OSHLE/patch.h"
+#include "OSHLE/OSHLE.h"
 #include "Plugins/AudioPlugin.h"
 #include "Plugins/GraphicsPlugin.h"
 #include "RomFile/RomFile.h"

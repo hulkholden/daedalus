@@ -17,28 +17,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef OSHLE_OS_H_
-#define OSHLE_OS_H_
+#ifndef OSHLE_OSHLE_H_
+#define OSHLE_OSHLE_H_
 
-#include "OSHLE/patch_symbols.h"
+extern u32 gNumOfOSFunctions;
+void Patch_Reset();
+void Patch_ApplyPatches();
+void Patch_PatchAll();
 
-#include <vector>
-
-#define DAED_OS_MESSAGE_QUEUES
-
+#ifndef DAEDALUS_SILENT
+const char * Patch_GetJumpAddressName(u32 jump);
+u32 Patch_GetSymbolAddress(const char * name);
+#endif
 #ifdef DUMPOSFUNCTIONS
-#ifdef DAED_OS_MESSAGE_QUEUES
-typedef std::vector < u32 > QueueVector;
-extern QueueVector g_MessageQueues;
-#endif
-#endif
-
-void OS_Reset();
-
-u32 OS_HLE___osProbeTLB(u32 vaddr);
-
-#ifdef DAED_OS_MESSAGE_QUEUES
-void OS_HLE_osCreateMesgQueue(u32 queue, u32 msgBuffer, u32 msgCount);
+void Patch_DumpOsThreadInfo();
+void Patch_DumpOsQueueInfo();
+void Patch_DumpOsEventInfo();
 #endif
 
-#endif // OSHLE_OS_H_
+#endif // OSHLE_OSHLE_H_

@@ -32,8 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/Save.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
+#include "OSHLE/OSHLE.h"
 #include "OSHLE/OSTask.h"
-#include "OSHLE/patch.h"
 #include "Utility/FastMemcpy.h"
 
 bool gDMAUsed = false;

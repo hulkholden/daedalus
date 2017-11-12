@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/CPU.h"
 #include "Core/R4300OpCode.h"
 #include "Core/Registers.h"
-#include "OSHLE/patch.h"
+#include "OSHLE/OSHLE.h"
 
 static const char* Cop1BC1OpCodeNames[4] = {"BC1F", "BC1T", "BC1FL", "BC1TL"};
 
