@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef SYSLINUX_INCLUDE_PLATFORM_H_
-#define SYSLINUX_INCLUDE_PLATFORM_H_
+#ifndef PLATFORM_LINUX_PLATFORM_H_
+#define PLATFORM_LINUX_PLATFORM_H_
 
 //
 //	Make sure this platform is defined correctly
@@ -42,4 +42,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //#define DAEDALUS_HALT			__builtin_debugger()
 #define DAEDALUS_GL
 
-#endif // SYSLINUX_INCLUDE_PLATFORM_H_
+#endif // PLATFORM_LINUX_PLATFORM_H_
