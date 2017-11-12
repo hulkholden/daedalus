@@ -30,8 +30,6 @@ cc_library(
         "stdafx.h",
     ],
     defines = select({
-        # TODO(strmnnrmn): Use DAEDALUS_CONFIG_DEV for debug when
-        # compilation errors are fixed.
         ":release": ["DAEDALUS_CONFIG_RELEASE"],
         ":debug": ["DAEDALUS_CONFIG_DEV"],
     }),
