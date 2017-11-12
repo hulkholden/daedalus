@@ -1,18 +1,17 @@
 cc_library(
-    name = "SysOSX",
-    hdrs = glob(["**/*.h"]),
-    includes = ["Include", "."],
-    visibility = ["//visibility:public"],
-)
-
-cc_library(
     name = "Main",
-    srcs = glob(["**/*.cpp"]),
+    srcs = select({
+        "//:darwin": [
+            "OSX/main.cpp",
+        ],
+        "//:windows": [
+            "Windows/main.cpp",
+        ],
+    }),
     visibility = ["//visibility:public"],
     linkstatic = 1,
     deps = [
         "//:stdafx",
-        ":SysOSX",
         "//Core",
         "//Debug",
         "//DynaRec",

@@ -36,28 +36,15 @@ cc_library(
         ":release": ["DAEDALUS_CONFIG_RELEASE"],
         ":debug": ["DAEDALUS_CONFIG_DEV"],
     }),
-    deps = select({
-        ":darwin": [
-            "//SysOSX",
-        ],
-        ":windows": [
-            "//SysW32",
-        ],
-    }) + [
+    deps = [
         "//Base",
+        "//Platform",
     ],
 )
 
 cc_binary(
     name = "daedalus",
-    deps = select({
-        ":darwin": [
-           "//SysOSX:Main",
-        ],
-        ":windows": [
-           "//SysW32:Main",
-        ],
-    }) + [
+    deps = [
         "//Base",
         "//Core:CoreCpp",
         "//Debug",
@@ -66,6 +53,7 @@ cc_binary(
         "//HLEAudio:HLEAudioCpp",
         "//HLEGraphics:HLEGraphicsCpp",
         "//Interface:InterfaceCpp",
+        "//Main",
         "//OSHLE:OSHLECpp",
         "//SysGL:SysGLCpp",
         "//System",
