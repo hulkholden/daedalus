@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "DynaRec/CodeGenerator.h"
 #include "AssemblyWriterX86.h"
-#include "DynarecTargetX86.h"
+#include "DynaRec/Windows/x86/DynarecTargetX86.h"
 #include "DynaRec/TraceRecorder.h"
 
 // XXXX For GenerateCompare_S/D

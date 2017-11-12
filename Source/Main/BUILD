@@ -21,7 +21,10 @@ cc_library(
         "//System:SystemInit",
         "//Test:BatchTest",
     ],
-    linkopts = [
-      "-framework AudioToolbox",
-    ],
+    linkopts = select({
+        "//:darwin": [
+            "-framework AudioToolbox",
+        ],
+        "//conditions:default": [],
+    }),
 )

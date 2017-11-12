@@ -19,6 +19,7 @@ cc_library(
         ],
         "//:windows": [
             "Windows/x86/AssemblyWriterX86.h",
+            "Windows/x86/CodeGeneratorX86.h",
             "Windows/x86/DynarecTargetX86.h",
         ],
     }),
