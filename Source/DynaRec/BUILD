@@ -14,7 +14,14 @@ cc_library(
         "StaticAnalysis.h",
         "Trace.h",
         "TraceRecorder.h",
-    ],
+    ] + select({
+        "//:darwin": [
+        ],
+        "//:windows": [
+            "Windows/x86/AssemblyWriterX86.h",
+            "Windows/x86/DynarecTargetX86.h",
+        ],
+    }),
     deps = [
         "//:stdafx",
     ],
@@ -36,6 +43,10 @@ cc_library(
             "OSX/CodebufferManager.cpp",
         ],
         "//:windows": [
+            "Windows/x86/AssemblyUtilsX86.cpp",
+            "Windows/x86/AssemblyWriterX86.cpp",
+            "Windows/x86/CodeBufferManagerX86.cpp",
+            "Windows/x86/CodeGeneratorX86.cpp",
         ],
     }),
     deps = [
