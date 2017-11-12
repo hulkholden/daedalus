@@ -23,10 +23,10 @@ cc_library(
             "Windows/x86/DynarecTargetX86.h",
         ],
     }),
+    visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -51,14 +51,14 @@ cc_library(
             "Windows/x86/CodeGeneratorX86.cpp",
         ],
     }),
+    visibility = ["//visibility:public"],
     deps = [
         ":DynaRec",
         "//:stdafx",
+        "//Core",
         "//Debug",
         "//Debug:Synchroniser",
-        "//Core",
         "//System",
         "//Utility",
     ],
-    visibility = ["//visibility:public"],
 )

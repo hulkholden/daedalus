@@ -1,4 +1,4 @@
-package(default_visibility=["//visibility:public"])
+package(default_visibility = ["//visibility:public"])
 
 config_setting(
     name = "darwin",
@@ -14,14 +14,13 @@ config_setting(
 
 config_setting(
     name = "release",
-    values = {"compilation_mode": "opt"}
+    values = {"compilation_mode": "opt"},
 )
 
 config_setting(
     name = "debug",
-    values = {"compilation_mode": "fastbuild"}
+    values = {"compilation_mode": "fastbuild"},
 )
-
 
 cc_library(
     name = "stdafx",
@@ -55,7 +54,7 @@ cc_binary(
         "//SysGL:SysGLCpp",
         "//System",
         "//System:SystemInit",
-        "//third_party/zlib",
         "//Utility",
+        "//third_party/zlib",
     ],
 )

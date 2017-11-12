@@ -1,9 +1,9 @@
 cc_library(
     name = "HLEAudio",
-    hdrs =glob(["*.h"]),
+    hdrs = glob(["*.h"]),
+    visibility = ["//visibility:public"],
     deps = [
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -24,9 +24,10 @@ cc_library(
             "Windows/AudioPlugin.cpp",
         ],
     }),
+    visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
         ":HLEAudio",
+        "//:stdafx",
         "//Config",
         "//Core",
         "//Debug",
@@ -34,5 +35,4 @@ cc_library(
         "//System",
         "//Utility",
     ],
-    visibility = ["//visibility:public"],
 )

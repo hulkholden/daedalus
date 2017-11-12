@@ -3,7 +3,7 @@ licenses(["notice"])
 cc_library(
     name = "webby",
     srcs = [
-        "webby.c"
+        "webby.c",
     ],
     hdrs = [
         "webby.h",

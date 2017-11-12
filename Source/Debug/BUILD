@@ -1,4 +1,4 @@
-package(default_visibility=["//visibility:public"])
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "Debug",
@@ -25,14 +25,14 @@ cc_library(
         "WebDebug.h",
         "WebDebugTemplate.h",
     ],
+    data = [
+        ":static_content",
+    ],
     deps = [
         "//:stdafx",
         "//Base",
         "//System",
         "//third_party/webby",
-    ],
-    data = [
-        ":static_content",
     ],
 )
 
@@ -43,7 +43,7 @@ cc_library(
     deps = [
         ":Debug",
         "//:stdafx",
-        "//Core:Core",
+        "//Core",
     ],
 )
 

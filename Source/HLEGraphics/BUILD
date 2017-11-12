@@ -1,22 +1,29 @@
 cc_library(
     name = "HLEGraphics",
-    hdrs =glob(["*.h", "uCodes/*.h"]),
+    hdrs = glob([
+        "*.h",
+        "uCodes/*.h",
+    ]),
+    visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
         "//Interface",
         "//Math",
-        "//third_party/glfw",
         "//Utility",
+        "//third_party/glfw",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "HLEGraphicsCpp",
-    srcs = glob(["*.cpp", "uCodes/*.cpp"]),
+    srcs = glob([
+        "*.cpp",
+        "uCodes/*.cpp",
+    ]),
+    visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
         ":HLEGraphics",
+        "//:stdafx",
         "//Config",
         "//Core",
         "//Debug",
@@ -25,5 +32,4 @@ cc_library(
         "//Test:BatchTest",
         "//Utility",
     ],
-    visibility = ["//visibility:public"],
 )

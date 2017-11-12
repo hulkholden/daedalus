@@ -18,10 +18,6 @@ _DEFINES = [
 
 cc_library(
     name = "glfw",
-    hdrs = glob(["include/GLFW/*.h"]) + glob(["src/*.h"]) + [
-        #"deps/GL/glext.h",
-    ],
-    includes = ["include"],
     srcs = [
         "src/context.c",
         "src/egl_context.c",
@@ -35,8 +31,8 @@ cc_library(
         ":darwin": [
             "src/cocoa_time.c",
             "src/posix_thread.c",
-          ],
-          ":windows": [
+        ],
+        ":windows": [
             "src/wgl_context.c",
             "src/win32_init.c",
             "src/win32_joystick.c",
@@ -44,33 +40,30 @@ cc_library(
             "src/win32_thread.c",
             "src/win32_time.c",
             "src/win32_window.c",
-          ],
+        ],
     }),
+    hdrs = glob(["include/GLFW/*.h"]) + glob(["src/*.h"]) + [
+        #"deps/GL/glext.h",
+    ],
     defines = _DEFINES + select({
         ":darwin": [
             "_GLFW_COCOA=1",
             "_GLFW_NSGL=1",
         ],
         ":windows": [
-            '_GLFW_WIN32=1',
+            "_GLFW_WIN32=1",
         ],
     }),
+    includes = ["include"],
+    visibility = ["//visibility:public"],
     deps = select({
         ":darwin": [":osx_objc"],
         ":windows": [],
     }),
-    visibility = ["//visibility:public"],
 )
 
 objc_library(
     name = "osx_objc",
-    hdrs = glob(["include/GLFW/*.h"]) + glob(["src/*.h"]) + [
-    ],
-    includes = ["include"],
-    defines = _DEFINES + [
-        "_GLFW_COCOA=1",
-        "_GLFW_NSGL=1",
-    ],
     srcs = [
         "src/cocoa_init.m",
         "src/cocoa_joystick.m",
@@ -78,9 +71,16 @@ objc_library(
         "src/cocoa_window.m",
         "src/nsgl_context.m",
     ],
+    hdrs = glob(["include/GLFW/*.h"]) + glob(["src/*.h"]) + [
+    ],
     copts = [
         "-fno-objc-arc",
     ],
+    defines = _DEFINES + [
+        "_GLFW_COCOA=1",
+        "_GLFW_NSGL=1",
+    ],
+    includes = ["include"],
     sdk_frameworks = [
         "Cocoa",
         "CoreFoundation",

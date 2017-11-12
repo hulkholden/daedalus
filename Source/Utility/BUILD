@@ -4,6 +4,14 @@ package(
 
 cc_library(
     name = "Utility",
+    srcs = [
+        "CRC.cpp",
+        "FastMemcpy.cpp",
+        "Hash.cpp",
+        "IniFile.cpp",
+        "Profiler.cpp",
+        "Timer.cpp",
+    ],
     hdrs = [
         "CRC.h",
         "FastMemcpy.h",
@@ -13,14 +21,6 @@ cc_library(
         "RefCounted.h",
         "Stream.h",
         "Timer.h",
-    ],
-    srcs = [
-        "CRC.cpp",
-        "FastMemcpy.cpp",
-        "Hash.cpp",
-        "IniFile.cpp",
-        "Profiler.cpp",
-        "Timer.cpp",
     ],
     deps = [
         "//:stdafx",
@@ -63,4 +63,3 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
-

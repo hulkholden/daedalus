@@ -5,8 +5,8 @@ cc_library(
     srcs = glob(["*.c"]),
     hdrs = glob(["*.h"]),
     includes = ["."],
+    visibility = ["//visibility:public"],
     deps = [
         "//third_party/zlib",
     ],
-    visibility = ["//visibility:public"],
 )

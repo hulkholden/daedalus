@@ -10,10 +10,13 @@ cc_library(
 cc_library(
     name = "SysGLCpp",
     srcs = glob(["**/*.cpp"]),
+    data = [
+        ":shaders",
+    ],
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
         ":SysGL",
+        "//:stdafx",
         "//Core",
         "//Debug",
         "//Graphics",
@@ -22,9 +25,6 @@ cc_library(
         "//Interface",
         "//Plugins",
         "//third_party/libpng",
-    ],
-    data = [
-        ":shaders",
     ],
 )
 

@@ -1,4 +1,3 @@
-
 cc_library(
     name = "Base",
     srcs = glob(["*.cpp"]),
@@ -7,7 +6,7 @@ cc_library(
         "Profile/BuildConfig.h",
         "Release/BuildConfig.h",
     ]),
+    visibility = ["//visibility:public"],
     deps = [
     ],
-    visibility = ["//visibility:public"],
 )

@@ -12,6 +12,7 @@ cc_library(
         "RomFileCompressed.h",
         "RomFileUncompressed.h",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
         "//Debug",
@@ -21,7 +22,6 @@ cc_library(
         "//third_party/zlib/contrib/minizip",
         "@com_google_absl//absl/strings",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_test(

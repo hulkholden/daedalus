@@ -1,23 +1,23 @@
 cc_library(
     name = "Graphics",
-    hdrs =glob(["*.h"]),
+    hdrs = glob(["*.h"]),
+    visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
-        "//Utility",
         "//SysGL",
+        "//Utility",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "GraphicsCpp",
     srcs = glob(["*.cpp"]),
+    visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
-        "//third_party/libpng",
-        "//third_party/glfw",
         "//Graphics",
         "//Math",
+        "//third_party/glfw",
+        "//third_party/libpng",
     ],
-    visibility = ["//visibility:public"],
 )

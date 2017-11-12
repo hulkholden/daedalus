@@ -32,35 +32,35 @@ cc_library(
         "Thread.h",
         "Timing.h",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
         "//third_party/zlib",
         "//third_party/zlib/contrib/minizip",
         "@com_google_absl//absl/strings",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "SystemInit",
     srcs = ["SystemInit.cpp"],
     hdrs = ["SystemInit.h"],
+    visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
         ":System",
+        "//:stdafx",
         "//Core",
         "//Debug",
         "//Debug:Synchroniser",
         "//Graphics",
         "//HLEGraphics",
-        "//Interface",
         "//Input",
+        "//Interface",
         "//OSHLE",
         "//Plugins",
         "//SysGL",
         "//Utility",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_test(

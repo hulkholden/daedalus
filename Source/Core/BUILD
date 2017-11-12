@@ -1,25 +1,29 @@
 cc_library(
     name = "Core",
-    hdrs =glob(["*.h", "*.inl"]),
+    hdrs = glob([
+        "*.h",
+        "*.inl",
+    ]),
+    visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
         "//OSHLE",
         "@com_google_absl//absl/strings",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "CoreCpp",
-    srcs =glob(["*.cpp"]),
+    srcs = glob(["*.cpp"]),
+    visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
-        "//Core",
         "//Config",
+        "//Core",
         "//Debug",
         "//DynaRec",
-        "//Interface",
         "//Input",
+        "//Interface",
         "//OSHLE",
         "//Plugins",
         "//RomFile",
@@ -27,5 +31,4 @@ cc_library(
         "//Test:BatchTest",
         "//Utility",
     ],
-    visibility = ["//visibility:public"],
 )

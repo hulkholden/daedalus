@@ -4,7 +4,7 @@ cc_library(
         "BuildOptions.h",
     ] + select({
         "//:darwin": [
-            "OSX/Platform.h"
+            "OSX/Platform.h",
         ],
         "//:windows": [
             "Windows/Platform.h",

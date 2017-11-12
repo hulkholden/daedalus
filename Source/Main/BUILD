@@ -8,8 +8,14 @@ cc_library(
             "Windows/main.cpp",
         ],
     }),
-    visibility = ["//visibility:public"],
+    linkopts = select({
+        "//:darwin": [
+            "-framework AudioToolbox",
+        ],
+        "//conditions:default": [],
+    }),
     linkstatic = 1,
+    visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
         "//Core",
@@ -21,10 +27,4 @@ cc_library(
         "//System:SystemInit",
         "//Test:BatchTest",
     ],
-    linkopts = select({
-        "//:darwin": [
-            "-framework AudioToolbox",
-        ],
-        "//conditions:default": [],
-    }),
 )

@@ -1,10 +1,10 @@
 cc_library(
     name = "Input",
-    srcs =glob(["*.cpp"]),
-    hdrs =glob(["*.h"]),
+    srcs = glob(["*.cpp"]),
+    hdrs = glob(["*.h"]),
+    visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
         "//Math",
     ],
-    visibility = ["//visibility:public"],
 )

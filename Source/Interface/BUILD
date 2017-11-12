@@ -1,6 +1,7 @@
 cc_library(
     name = "Interface",
-    hdrs =glob(["*.h"]),
+    hdrs = glob(["*.h"]),
+    visibility = ["//visibility:public"],
     deps = [
         "//:stdafx",
         "//Core",
@@ -8,12 +9,12 @@ cc_library(
         "//System",
         "//Utility",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "InterfaceCpp",
-    srcs =glob(["*.cpp"]),
+    srcs = glob(["*.cpp"]),
+    visibility = ["//visibility:public"],
     deps = [
         ":Interface",
         "//:stdafx",
@@ -21,5 +22,4 @@ cc_library(
         "//RomFile",
         "//Utility",
     ],
-    visibility = ["//visibility:public"],
 )
