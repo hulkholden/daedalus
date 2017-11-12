@@ -25,12 +25,6 @@
 #error DAEDALUS_ENDIAN_MODE was not specified in Platform.h
 #endif
 
-// Calling convention for the R4300 instruction handlers.
-// This is only defined for W32, so provide a default if it's not set up
-#ifndef R4300_CALL_TYPE
-#define R4300_CALL_TYPE
-#endif
-
 // Calling convention for threads
 #ifndef DAEDALUS_THREAD_CALL_TYPE
 #define DAEDALUS_THREAD_CALL_TYPE

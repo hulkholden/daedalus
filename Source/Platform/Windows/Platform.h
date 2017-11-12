@@ -42,12 +42,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define DAEDALUS_ENDIAN_MODE DAEDALUS_ENDIAN_LITTLE
 
-
-// Calling convention for the R4300 instruction handlers.
-// These are called from dynarec so we need to ensure they're __fastcall,
-// even if the project is not compiled with that option in the project settings.
-#define R4300_CALL_TYPE						__fastcall
-
 // Thread functions need to be __stdcall to work with the W32 api
 #define DAEDALUS_THREAD_CALL_TYPE			__stdcall
 

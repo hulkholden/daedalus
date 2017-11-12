@@ -22,6 +22,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Types.h"
 
+#ifdef DAEDALUS_W32
+// Calling convention for the R4300 instruction handlers.
+// These are called from dynarec so we need to ensure they're __fastcall,
+// even if the project is not compiled with that option in the project settings.
+#define R4300_CALL_TYPE __fastcall
+#else
+#define R4300_CALL_TYPE
+#endif
+
 // Through various tests, it seems the compiler generates much better code by
 // passing the opcode as a primitive datatype (as it can stick the value directly
 // in a register rather than passing it via the stack). Unfortunately we have to
