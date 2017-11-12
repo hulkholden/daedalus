@@ -19,6 +19,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stdafx.h"
 
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+
 #ifndef DAEDALUS_SILENT
 /*==============================unasmt.h==============================*/
 /* Percent tokens in strings:
@@ -58,7 +62,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	1-8 - group number, esc value, etc
 */
 
-char *opmap1[] = {
+const char * const opmap1[] = {
 /* 0 */
   "add %Eb,%Gb", "add %Ev,%Gv", "add %Gb,%Eb", "add %Gv,%Ev",
   "add al,%Ib", "add %eax,%Iv", "push es", "pop es",
@@ -146,7 +150,7 @@ char *opmap1[] = {
   "cld", "std", "%g4", "%g5"
   };
 
-char *second[] = {
+const char * const second[] = {
 /* 0 */
   "%g6", "%g7", "lar %Gv,%Ew", "lsl %Gv,%Ew", 0, 0, "clts", 0,
   0, 0, 0, 0, 0, 0, 0, 0,
@@ -199,7 +203,7 @@ char *second[] = {
   0, 0, 0, 0, 0, 0, 0, 0,
   };
 
-char *groups[][8] = {   /* group 0 is group 3 for %Ev set */
+const char * const groups[][8] = {   /* group 0 is group 3 for %Ev set */
   { "test %Ev,%Iv", "test %Ev,%Iv,", "not %Ev", "neg %Ev",
     "mul %eax,%Ev", "imul %eax,%Ev", "div %eax,%Ev", "idiv %eax,%Ev" },
   { "add", "or", "adc", "sbb", "and", "sub", "xor", "cmp" },
@@ -218,39 +222,39 @@ char *groups[][8] = {   /* group 0 is group 3 for %Ev set */
 
 /* zero here means invalid.  If first entry starts with '*', use st(i) */
 /* no assumed %EFs here.  Indexed by rm(modrm()) */
-char *f0[] = {0, 0, 0, 0, 0, 0, 0, 0};
-char *fop_9[]  = { "*fxch st,%GF" };
-char *fop_10[] = { "fnop", 0, 0, 0, 0, 0, 0, 0 };
-char *fop_12[] = { "fchs", "fabs", 0, 0, "ftst", "fxam", 0, 0 };
-char *fop_13[] = { "fld1", "fldl2t", "fldl2e", "fldpi",
+const char * const f0[] = {0, 0, 0, 0, 0, 0, 0, 0};
+const char * const fop_9[]  = { "*fxch st,%GF" };
+const char * const fop_10[] = { "fnop", 0, 0, 0, 0, 0, 0, 0 };
+const char * const fop_12[] = { "fchs", "fabs", 0, 0, "ftst", "fxam", 0, 0 };
+const char * const fop_13[] = { "fld1", "fldl2t", "fldl2e", "fldpi",
                    "fldlg2", "fldln2", "fldz", 0 };
-char *fop_14[] = { "f2xm1", "fyl2x", "fptan", "fpatan",
+const char * const fop_14[] = { "f2xm1", "fyl2x", "fptan", "fpatan",
                    "fxtract", "fprem1", "fdecstp", "fincstp" };
-char *fop_15[] = { "fprem", "fyl2xp1", "fsqrt", "fsincos",
+const char * const fop_15[] = { "fprem", "fyl2xp1", "fsqrt", "fsincos",
                    "frndint", "fscale", "fsin", "fcos" };
-char *fop_21[] = { 0, "fucompp", 0, 0, 0, 0, 0, 0 };
-char *fop_28[] = { 0, 0, "fclex", "finit", 0, 0, 0, 0 };
-char *fop_32[] = { "*fadd %GF,st" };
-char *fop_33[] = { "*fmul %GF,st" };
-char *fop_36[] = { "*fsubr %GF,st" };
-char *fop_37[] = { "*fsub %GF,st" };
-char *fop_38[] = { "*fdivr %GF,st" };
-char *fop_39[] = { "*fdiv %GF,st" };
-char *fop_40[] = { "*ffree %GF" };
-char *fop_42[] = { "*fst %GF" };
-char *fop_43[] = { "*fstp %GF" };
-char *fop_44[] = { "*fucom %GF" };
-char *fop_45[] = { "*fucomp %GF" };
-char *fop_48[] = { "*faddp %GF,st" };
-char *fop_49[] = { "*fmulp %GF,st" };
-char *fop_51[] = { 0, "fcompp", 0, 0, 0, 0, 0, 0 };
-char *fop_52[] = { "*fsubrp %GF,st" };
-char *fop_53[] = { "*fsubp %GF,st" };
-char *fop_54[] = { "*fdivrp %GF,st" };
-char *fop_55[] = { "*fdivp %GF,st" };
-char *fop_60[] = { "fstsw ax", 0, 0, 0, 0, 0, 0, 0 };
+const char * const fop_21[] = { 0, "fucompp", 0, 0, 0, 0, 0, 0 };
+const char * const fop_28[] = { 0, 0, "fclex", "finit", 0, 0, 0, 0 };
+const char * const fop_32[] = { "*fadd %GF,st" };
+const char * const fop_33[] = { "*fmul %GF,st" };
+const char * const fop_36[] = { "*fsubr %GF,st" };
+const char * const fop_37[] = { "*fsub %GF,st" };
+const char * const fop_38[] = { "*fdivr %GF,st" };
+const char * const fop_39[] = { "*fdiv %GF,st" };
+const char * const fop_40[] = { "*ffree %GF" };
+const char * const fop_42[] = { "*fst %GF" };
+const char * const fop_43[] = { "*fstp %GF" };
+const char * const fop_44[] = { "*fucom %GF" };
+const char * const fop_45[] = { "*fucomp %GF" };
+const char * const fop_48[] = { "*faddp %GF,st" };
+const char * const fop_49[] = { "*fmulp %GF,st" };
+const char * const fop_51[] = { 0, "fcompp", 0, 0, 0, 0, 0, 0 };
+const char * const fop_52[] = { "*fsubrp %GF,st" };
+const char * const fop_53[] = { "*fsubp %GF,st" };
+const char * const fop_54[] = { "*fdivrp %GF,st" };
+const char * const fop_55[] = { "*fdivp %GF,st" };
+const char * const fop_60[] = { "fstsw ax", 0, 0, 0, 0, 0, 0, 0 };
 
-char **fspecial[] = { /* 0=use st(i), 1=undefined 0 in fop_* means undefined */
+const char * const * const fspecial[] = { /* 0=use st(i), 1=undefined 0 in fop_* means undefined */
   0, 0, 0, 0, 0, 0, 0, 0,
   0, fop_9, fop_10, 0, fop_12, fop_13, fop_14, fop_15,
   f0, f0, f0, f0, f0, fop_21, f0, f0,
@@ -261,7 +265,7 @@ char **fspecial[] = { /* 0=use st(i), 1=undefined 0 in fop_* means undefined */
   f0, f0, f0, f0, fop_60, f0, f0, f0,
   };
 
-char *floatops[] = { /* assumed " %EF" at end of each.  mod != 3 only */
+const char *floatops[] = { /* assumed " %EF" at end of each.  mod != 3 only */
 /*00*/ "fadd", "fmul", "fcom", "fcomp",
        "fsub", "fsubr", "fdiv", "fdivr",
 /*08*/ "fld", 0, "fst", "fstp",
@@ -300,8 +304,8 @@ static int bufp, bufe;
 static char ubuf[100], *ubufp, *ubufp2, *ubufp2end;
 static int col;
 
-char *hex1=""; // ="0x";
-char *hex2=""; // ="h";
+const char *hex1=""; // ="0x";
+const char *hex2=""; // ="h";
 
 unsigned char *codepnt;
 unsigned codeseg;
@@ -309,7 +313,7 @@ long codeoff;
 
 static void percent(char c, char t);
 
-void uprintf(char *s,...)
+void uprintf(const char *s,...)
 {
 	va_list va;
 	va_start(va,s);
@@ -318,7 +322,7 @@ void uprintf(char *s,...)
 	va_end(va);
 }
 
-static void ua_str(char *s)
+static void ua_str(const char *s)
 {
   int c;
   if (!s)
@@ -479,10 +483,10 @@ static void ohex(char c, int extend, int optional, int defsize)
   }
 }
 
-static char *reg_names[3][8]={
-  "al","cl","dl","bl","ah","ch","dh","bh",
-  "ax","cx","dx","bx","sp","bp","si","di",
-  "eax","ecx","edx","ebx","esp","ebp","esi","edi" };
+static const char *reg_names[3][8]={
+  {"al","cl","dl","bl","ah","ch","dh","bh"},
+  {"ax","cx","dx","bx","sp","bp","si","di"},
+  {"eax","ecx","edx","ebx","esp","ebp","esi","edi"} };
 
 void reg_name(int which, char size)
 {
