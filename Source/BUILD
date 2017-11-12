@@ -28,7 +28,6 @@ cc_library(
     srcs = ["StdAfx.cpp"],
     hdrs = [
         "stdafx.h",
-        "BuildOptions.h",
     ],
     defines = select({
         # TODO(strmnnrmn): Use DAEDALUS_CONFIG_DEV for debug when

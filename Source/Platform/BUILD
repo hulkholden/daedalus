@@ -1,6 +1,8 @@
 cc_library(
     name = "Platform",
-    hdrs = select({
+    hdrs = [
+        "BuildOptions.h",
+    ] + select({
         "//:darwin": [
             "OSX/Platform.h"
         ],
