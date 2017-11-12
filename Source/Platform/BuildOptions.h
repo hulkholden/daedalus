@@ -25,32 +25,6 @@
 #error DAEDALUS_ENDIAN_MODE was not specified in Platform.h
 #endif
 
-// Calling convention for threads
-#ifndef DAEDALUS_THREAD_CALL_TYPE
-#define DAEDALUS_THREAD_CALL_TYPE
-#endif
-
-// Calling convention for vararg functions
-#ifndef DAEDALUS_VARARG_CALL_TYPE
-#define DAEDALUS_VARARG_CALL_TYPE
-#endif
-
-#ifndef DAEDALUS_ZLIB_CALL_TYPE
-#define DAEDALUS_ZLIB_CALL_TYPE
-#endif
-
-//	Branch prediction
-#ifndef DAEDALUS_EXPECT_LIKELY
-#define DAEDALUS_EXPECT_LIKELY(c) (c)
-#endif
-#ifndef DAEDALUS_EXPECT_UNLIKELY
-#define DAEDALUS_EXPECT_UNLIKELY(c) (c)
-#endif
-
-#ifndef DAEDALUS_ATTRIBUTE_NOINLINE
-#define DAEDALUS_ATTRIBUTE_NOINLINE
-#endif
-
 #ifndef MAKE_UNCACHED_PTR
 #define MAKE_UNCACHED_PTR(x)	(x)
 #endif

@@ -42,15 +42,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define DAEDALUS_ENDIAN_MODE DAEDALUS_ENDIAN_LITTLE
 
-// Thread functions need to be __stdcall to work with the W32 api
-#define DAEDALUS_THREAD_CALL_TYPE			__stdcall
-
-// Vararg functions need to be __cdecl
-#define DAEDALUS_VARARG_CALL_TYPE			__cdecl
-
-// Zlib is compiled as __cdecl
-#define	DAEDALUS_ZLIB_CALL_TYPE				__cdecl
-
 // Breakpoint
 #define DAEDALUS_HALT					__debugbreak()
 
