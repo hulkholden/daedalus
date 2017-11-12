@@ -171,7 +171,7 @@ bool ROM_GetRomDetailsByFilename( const std::string& filename, RomID * id, u32 *
 bool ROM_GetRomDetailsByID( const RomID & id, u32 * rom_size, ECicType * boot_type );
 bool ROM_GetRomName( const char * filename, std::string & game_name );
 
-const char *	ROM_GetCountryNameFromID( u8 country_id ;
+const char *	ROM_GetCountryNameFromID( u8 country_id );
 u32				ROM_GetTvTypeFromID( u8 country_id );
 const char *	ROM_GetCicTypeName( ECicType cic_type );
 
