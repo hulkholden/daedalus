@@ -54,6 +54,13 @@
 #define DAEDALUS_FUNCTION_NAME __PRETTY_FUNCTION__
 #endif
 
+// Feature detection.
+#ifdef _MSC_VER
+#define DAEDALUS_COMPILER_HAS_FEATURE(x) 0
+#else
+#define DAEDALUS_COMPILER_HAS_FEATURE(x) __has_feature(x)
+#endif
+
 
 #ifdef DAEDALUS_ENABLE_ASSERTS
 

@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #undef  DAEDALUS_DEBUG_DYNAREC				// Enable to enable various debugging options for the dynarec
 #undef  DAEDALUS_ENABLE_SYNCHRONISATION		// Enable for sync testing
 #undef  DAEDALUS_LOG						// Enable various logging
-#undef DAEDALUS_ENABLE_ASSERTS				// Enable asserts
+#undef  DAEDALUS_ENABLE_ASSERTS				// Enable asserts
 #undef  DAEDALUS_DEBUG_DISPLAYLIST			// Enable the display list debugger
 #undef  DAEDALUS_ENABLE_PROFILING			// Enable the built-in profiler
 #undef  DAEDALUS_PROFILE_EXECUTION			// Enable to keep track of various execution stats
@@ -45,5 +45,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define DAEDALUS_SILENT						// Undef to enable debug messages
 #undef  DAEDALUS_IS_LEGACY					// Old code, unused etc.. Kept for reference, undef to save space on the elf. Will remove soon.
 #undef	DAEDALUS_DIALOGS					// Enable this to show dialogs in the gui
+#undef  DAEDALUS_BREAKPOINTS_ENABLED		// Whether breakpoint support is enabled.
 
 #endif // BASE_PROFILE_BUILDCONFIG_H_
