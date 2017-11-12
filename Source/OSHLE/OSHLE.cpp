@@ -211,7 +211,6 @@ void Patch_ApplyPatch(u32 i)
 #endif
 }
 
-#ifndef DAEDALUS_SILENT
 // Return the location of a symbol
 u32 Patch_GetSymbolAddress(const char * name)
 {
@@ -220,10 +219,14 @@ u32 Patch_GetSymbolAddress(const char * name)
 	{
 		// Skip symbol if already found, or if it is a variable
 		if (!g_PatchSymbols[p]->Found)
+		{
 			continue;
+		}
 
 		if (_strcmpi(g_PatchSymbols[p]->Name, name) == 0)
+		{
 			return PHYS_TO_K0(g_PatchSymbols[p]->Location);
+		}
 
 	}
 
@@ -264,7 +267,6 @@ const char * Patch_GetJumpAddressName(u32 jump)
 	// The patch was not found
 	return "?";
 }
-#endif //DAEDALUS_SILENT
 
 #ifdef DUMPOSFUNCTIONS
 
@@ -325,7 +327,6 @@ void Patch_DumpOsQueueInfo()
 #ifdef DAED_OS_MESSAGE_QUEUES
 	u32 dwQueue;
 
-
 	// List queue info:
 	u32 i;
 	u32 dwEmptyQ;
@@ -334,7 +335,6 @@ void Patch_DumpOsQueueInfo()
 	u32 dwFirst;
 	u32 dwMsgCount;
 	u32 dwMsg;
-
 
 	DBGConsole_Msg(0, "There are %d Queues", g_MessageQueues.size());
 	  DBGConsole_Msg(0, "Queues:   Empty     Full      Valid First MsgCount Msg");

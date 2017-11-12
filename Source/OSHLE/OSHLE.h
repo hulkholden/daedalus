@@ -25,10 +25,9 @@ void Patch_Reset();
 void Patch_ApplyPatches();
 void Patch_PatchAll();
 
-#ifndef DAEDALUS_SILENT
 const char * Patch_GetJumpAddressName(u32 jump);
 u32 Patch_GetSymbolAddress(const char * name);
-#endif
+
 #ifdef DUMPOSFUNCTIONS
 void Patch_DumpOsThreadInfo();
 void Patch_DumpOsQueueInfo();
