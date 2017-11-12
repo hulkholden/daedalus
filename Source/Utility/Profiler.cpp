@@ -2,7 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "Base/Daedalus.h"
 #include "Utility/Profiler.h"
 
 #ifdef DAEDALUS_ENABLE_PROFILING

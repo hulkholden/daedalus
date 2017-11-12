@@ -6,7 +6,7 @@ cc_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "//Utility",
     ],
 )
@@ -16,7 +16,7 @@ cc_library(
     srcs = glob(["*.cpp"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "//Config",
         "//Core",
         "//Debug",

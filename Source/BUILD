@@ -22,21 +22,6 @@ config_setting(
     values = {"compilation_mode": "fastbuild"},
 )
 
-cc_library(
-    name = "stdafx",
-    hdrs = [
-        "stdafx.h",
-    ],
-    defines = select({
-        ":release": ["DAEDALUS_CONFIG_RELEASE"],
-        ":debug": ["DAEDALUS_CONFIG_DEV"],
-    }),
-    deps = [
-        "//Base",
-        "//Platform",
-    ],
-)
-
 cc_binary(
     name = "daedalus",
     deps = [

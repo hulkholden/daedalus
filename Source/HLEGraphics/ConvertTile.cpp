@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "Base/Daedalus.h"
 
 #ifdef DAEDALUS_ACCURATE_TMEM
 #include "HLEGraphics/ConvertTile.h"

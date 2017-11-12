@@ -23,7 +23,6 @@ cc_library(
         "Timer.h",
     ],
     deps = [
-        "//:stdafx",
         "//Base",
         "//Config",
         "//Debug",
@@ -43,7 +42,7 @@ cc_test(
     visibility = ["//visibility:private"],
     deps = [
         ":Utility",
-        "//:stdafx",
+        "//Base",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -57,7 +56,7 @@ cc_test(
     visibility = ["//visibility:private"],
     deps = [
         ":Utility",
-        "//:stdafx",
+        "//Base",
         "//Test:TestUtil",
         "@com_google_googletest//:gtest_main",
     ],

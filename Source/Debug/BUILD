@@ -29,7 +29,6 @@ cc_library(
         ":static_content",
     ],
     deps = [
-        "//:stdafx",
         "//Base",
         "//System",
         "@webby//:webby",
@@ -42,7 +41,7 @@ cc_library(
     hdrs = ["Synchroniser.h"],
     deps = [
         ":Debug",
-        "//:stdafx",
+        "//Base",
         "//Core",
     ],
 )

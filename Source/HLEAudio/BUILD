@@ -27,7 +27,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":HLEAudio",
-        "//:stdafx",
+        "//Base",
         "//Config",
         "//Core",
         "//Debug",

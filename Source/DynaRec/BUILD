@@ -25,7 +25,7 @@ cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
     ],
 )
 
@@ -54,7 +54,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":DynaRec",
-        "//:stdafx",
+        "//Base",
         "//Core",
         "//Debug",
         "//Debug:Synchroniser",

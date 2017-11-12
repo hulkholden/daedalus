@@ -14,7 +14,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "//Debug",
         "//System",
         "//Utility",

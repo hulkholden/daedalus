@@ -6,7 +6,7 @@ cc_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "//OSHLE",
         "@com_google_absl//absl/strings",
     ],
@@ -17,7 +17,7 @@ cc_library(
     srcs = glob(["*.cpp"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "//Config",
         "//Core",
         "//Debug",

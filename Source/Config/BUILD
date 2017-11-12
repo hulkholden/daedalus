@@ -4,7 +4,7 @@ cc_library(
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "//System",
     ],
 )

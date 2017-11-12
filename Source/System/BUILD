@@ -34,7 +34,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "@com_google_absl//absl/strings",
         "@zlib//:minizip",
         "@zlib//:zlib",
@@ -48,7 +48,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":System",
-        "//:stdafx",
+        "//Base",
         "//Core",
         "//Debug",
         "//Debug:Synchroniser",

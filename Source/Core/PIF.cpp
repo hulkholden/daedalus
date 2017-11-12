@@ -85,7 +85,7 @@ area assignment does not change. After Tx/RxData assignment, this flag is reset 
 
 // Stuff to handle controllers
 
-#include "stdafx.h"
+#include "Base/Daedalus.h"
 #include "Core/PIF.h"
 
 #include "Base/MathUtil.h"

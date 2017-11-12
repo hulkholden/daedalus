@@ -17,7 +17,7 @@ Copyright (C) 2001 StrmnNrmn
 
 */
 
-#include "stdafx.h"
+#include "Base/Daedalus.h"
 #include "ConvertImage.h"
 #include "TextureInfo.h"
 

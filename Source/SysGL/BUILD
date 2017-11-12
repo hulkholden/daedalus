@@ -16,7 +16,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":SysGL",
-        "//:stdafx",
+        "//Base",
         "//Core",
         "//Debug",
         "//Graphics",

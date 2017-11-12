@@ -17,7 +17,7 @@ cc_library(
     linkstatic = 1,
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "//Core",
         "//Debug",
         "//DynaRec",

@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 // Display stuff like registers, instructions, memory usage and so on
-#include "stdafx.h"
+#include "Base/Daedalus.h"
 #include "Debug/Dump.h"
 
 #include "Debug/DBGConsole.h"

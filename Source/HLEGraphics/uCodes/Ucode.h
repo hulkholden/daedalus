@@ -19,7 +19,7 @@
 #ifndef HLEGRAPHICS_UCODES_UCODE_H_
 #define HLEGRAPHICS_UCODES_UCODE_H_
 
-#include "stdafx.h"
+#include "Base/Daedalus.h"
 #include "UcodeDefs.h"
 
 // Increase this everytime a new ucode table is added !

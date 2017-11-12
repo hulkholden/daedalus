@@ -3,7 +3,7 @@ cc_library(
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "//Core",
         "//Debug",
         "//System",
@@ -17,7 +17,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":Interface",
-        "//:stdafx",
+        "//Base",
         "//Input",
         "//RomFile",
         "//Utility",

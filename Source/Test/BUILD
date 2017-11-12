@@ -4,7 +4,7 @@ cc_library(
     hdrs = ["BatchTest.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "//Core",
         "//Debug",
         "//HLEGraphics",
@@ -20,7 +20,7 @@ cc_library(
     hdrs = ["TestUtil.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "@com_google_absl//absl/strings",
     ],
 )

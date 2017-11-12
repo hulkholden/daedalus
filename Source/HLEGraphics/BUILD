@@ -6,7 +6,7 @@ cc_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//:stdafx",
+        "//Base",
         "//Interface",
         "//Math",
         "//Utility",
@@ -23,7 +23,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":HLEGraphics",
-        "//:stdafx",
+        "//Base",
         "//Config",
         "//Core",
         "//Debug",
