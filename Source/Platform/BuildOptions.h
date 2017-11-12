@@ -4,8 +4,6 @@
 //
 //	Platform options
 //
-#undef  DAEDALUS_ENABLE_DYNAREC					// Define this is dynarec is supported on the platform
-#undef  DAEDALUS_ENABLE_OS_HOOKS				// Define this to enable OS HLE
 #undef  DAEDALUS_BREAKPOINTS_ENABLED			// Define this to enable breakpoint support
 #undef	DAEDALUS_ENDIAN_MODE					// Define this to specify whether the platform is big or little endian
 

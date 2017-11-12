@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 #include "HLEGraphics/RDPStateManager.h"
 
+#include <math.h>
+
 #include "Base/Alignment.h"
 #include "Base/Macros.h"
 #include "Base/MathUtil.h"

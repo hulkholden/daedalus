@@ -22,19 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef PLATFORM_OSX_PLATFORM_H_
 #define PLATFORM_OSX_PLATFORM_H_
 
-//
-//	Make sure this platform is defined correctly
-//
-#ifndef DAEDALUS_OSX
-#define DAEDALUS_OSX
-#endif
-
-#define DAEDALUS_ENABLE_OS_HOOKS
-
 #define DAEDALUS_ENDIAN_MODE DAEDALUS_ENDIAN_LITTLE
 
 #define DAEDALUS_HALT __builtin_trap()
-//#define DAEDALUS_HALT			__builtin_debugger()
-#define DAEDALUS_GL
 
 #endif  // PLATFORM_OSX_PLATFORM_H_
