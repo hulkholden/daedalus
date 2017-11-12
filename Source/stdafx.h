@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // Platform specifc #includes, externs, #defines etc
 #ifdef DAEDALUS_W32
-#include "DaedalusW32.h"
+#include "Platform/Windows/DaedalusW32.h"
 #endif
 
 #include "Base/Types.h"
