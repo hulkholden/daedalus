@@ -37,7 +37,7 @@ sub processFile
 	}
 
 	# Ignore third-party code.
-	if ($file =~ /third_party/) {
+	if ($file =~ /third_party/ or $file =~ /bazel-/) {
 		return;
 	}
 
@@ -76,7 +76,7 @@ sub processFile
 				if ($guard_text) {
 					$guard = quotemeta $guard_text;
 					if ($guard_text ne $expected_guard) {
-						print("Found guard $guard_text at line $line_no, expected $expected_guard\n");
+						print("$file:$line_no Found guard $guard_text, expected $expected_guard\n");
 					}
 				}
 			}
