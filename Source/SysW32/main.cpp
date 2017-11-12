@@ -132,30 +132,3 @@ bool DLDebugger_RegisterWebDebug()
 	return true;
 }
 
-class IDebugConsole : public CDebugConsole
-{
-   public:
-	~IDebugConsole() override {}
-
-	void DAEDALUS_VARARG_CALL_TYPE Msg(u32 type, const char* format, ...) override {
-		va_list marker;
-		va_start(marker, format);
-		vprintf(format, marker);
-		va_end(marker);
-		printf("\n");
-	}
-
-	void MsgOverwriteStart() override {}
-	void DAEDALUS_VARARG_CALL_TYPE MsgOverwrite(u32 type, const char* format, ...) override {}
-	void MsgOverwriteEnd() override {}
-};
-
-template <>
-bool CSingleton<CDebugConsole>::Create()
-{
-	DAEDALUS_ASSERT(mpInstance == NULL, "Already initialised");
-	mpInstance = new IDebugConsole();
-	return true;
-}
-
-CDebugConsole::~CDebugConsole() {}
