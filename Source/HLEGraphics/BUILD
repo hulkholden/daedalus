@@ -10,7 +10,7 @@ cc_library(
         "//Interface",
         "//Math",
         "//Utility",
-        "//third_party/glfw",
+        "@glfw//:glfw",
     ],
 )
 

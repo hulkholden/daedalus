@@ -17,7 +17,7 @@ cc_library(
         "//:stdafx",
         "//Graphics",
         "//Math",
-        "//third_party/glfw",
         "//third_party/libpng",
+        "@glfw//:glfw",
     ],
 )
