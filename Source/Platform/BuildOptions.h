@@ -1,5 +1,5 @@
-#ifndef BUILDOPTIONS_H_
-#define BUILDOPTIONS_H_
+#ifndef PLATFORM_BUILDOPTIONS_H_
+#define PLATFORM_BUILDOPTIONS_H_
 
 //
 //	Platform options
@@ -75,4 +75,4 @@
 #endif
 
 
-#endif // BUILDOPTIONS_H_
+#endif // PLATFORM_BUILDOPTIONS_H_

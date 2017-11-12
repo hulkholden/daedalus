@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef PLATFOWM_WINDOWS_PLATFORM_H_
-#define PLATFOWM_WINDOWS_PLATFORM_H_
+#ifndef PLATFORM_WINDOWS_PLATFORM_H_
+#define PLATFORM_WINDOWS_PLATFORM_H_
 
 //
 //	Make sure this platform is defined correctly
@@ -61,4 +61,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define DAEDALUS_HALT					__debugbreak()
 
 
-#endif // PLATFOWM_WINDOWS_PLATFORM_H_
+#endif // PLATFORM_WINDOWS_PLATFORM_H_

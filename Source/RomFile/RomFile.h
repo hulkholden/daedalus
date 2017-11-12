@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef UTILITY_ROMFILE_H_
-#define UTILITY_ROMFILE_H_
+#ifndef ROMFILE_ROMFILE_H_
+#define ROMFILE_ROMFILE_H_
 
 #include <string>
 
@@ -66,4 +66,4 @@ class ROMFile
 	u32 mHeaderMagic;
 };
 
-#endif  // UTILITY_ROMFILE_H_
+#endif  // ROMFILE_ROMFILE_H_

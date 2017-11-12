@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef UTILITY_ROM_PREFERENCES_H_
-#define UTILITY_ROM_PREFERENCES_H_
+#ifndef INTERFACE_ROMPREFERENCES_H_
+#define INTERFACE_ROMPREFERENCES_H_
 
 #include "Config/ConfigOptions.h"
 
@@ -84,4 +84,4 @@ struct SRomPreferences
 	void Apply() const;
 };
 
-#endif  // UTILITY_ROM_PREFERENCES_H_
+#endif  // INTERFACE_ROMPREFERENCES_H_

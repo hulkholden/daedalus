@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef CONFIG_DEV_BUILDCONFIG_H_
-#define CONFIG_DEV_BUILDCONFIG_H_
+#ifndef BASE_DEV_BUILDCONFIG_H_
+#define BASE_DEV_BUILDCONFIG_H_
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -45,4 +45,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //#define	DAEDALUS_SILENT						// Define to quiet Debug Messages
 //#define DAEDALUS_ACCURATE_TMEM				// Full tmem emulation(Very accurate, but slighty slower) When this defined, is irrelevant having DAEDALUS_FAST_TMEM defined or not
 
-#endif // CONFIG_DEV_BUILDCONFIG_H_
+#endif // BASE_DEV_BUILDCONFIG_H_

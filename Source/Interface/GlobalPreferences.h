@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef UTILITY_GLOBAL_PREFERENCES_H_
-#define UTILITY_GLOBAL_PREFERENCES_H_
+#ifndef INTERFACE_GLOBALPREFERENCES_H_
+#define INTERFACE_GLOBALPREFERENCES_H_
 
 enum EGuiColor
 {
@@ -81,4 +81,4 @@ struct SGlobalPreferences
 
 extern SGlobalPreferences gGlobalPreferences;
 
-#endif  // UTILITY_GLOBAL_PREFERENCES_H_
+#endif  // INTERFACE_GLOBALPREFERENCES_H_

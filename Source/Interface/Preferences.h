@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef UTILITY_PREFERENCES_H_
-#define UTILITY_PREFERENCES_H_
+#ifndef INTERFACE_PREFERENCES_H_
+#define INTERFACE_PREFERENCES_H_
 
 #include <string>
 
@@ -45,4 +45,4 @@ class CPreferences : public CSingleton<CPreferences>
 const char* Preferences_GetTextureHashFrequencyDescription(ETextureHashFrequency thf);
 const char* Preferences_GetFrameskipDescription(EFrameskipValue value);
 
-#endif  // UTILITY_PREFERENCES_H_
+#endif  // INTERFACE_PREFERENCES_H_

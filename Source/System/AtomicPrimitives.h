@@ -17,8 +17,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef UTILITY_ATOMICPRIMITIVES_H_
-#define UTILITY_ATOMICPRIMITIVES_H_
+#ifndef SYSTEM_ATOMICPRIMITIVES_H_
+#define SYSTEM_ATOMICPRIMITIVES_H_
 
 #include <stdlib.h>
 #include "Base/Types.h"
@@ -77,4 +77,4 @@ inline u32 AtomicBitSet(volatile u32* ptr, u32 and_bits, u32 or_bits)
 
 #endif
 
-#endif  // UTILITY_ATOMICPRIMITIVES_H_
+#endif  // SYSTEM_ATOMICPRIMITIVES_H_

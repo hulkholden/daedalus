@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef CONFIG_RELEASE_BUILDCONFIG_H_
-#define CONFIG_RELEASE_BUILDCONFIG_H_
+#ifndef BASE_RELEASE_BUILDCONFIG_H_
+#define BASE_RELEASE_BUILDCONFIG_H_
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -45,4 +45,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	DAEDALUS_SILENT							// Undef to enable debug messages. Define this to turn off various debugging features for public release.
 //#define DAEDALUS_ACCURATE_TMEM					// Full tmem emulation(Very accurate, but slighty slower) When this defined, is irrelevant having DAEDALUS_FAST_TMEM defined or not
 
-#endif // CONFIG_RELEASE_BUILDCONFIG_H_
+#endif // BASE_RELEASE_BUILDCONFIG_H_

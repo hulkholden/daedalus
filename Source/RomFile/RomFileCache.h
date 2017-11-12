@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef UTILITY_ROMFILECACHE_H_
-#define UTILITY_ROMFILECACHE_H_
+#ifndef ROMFILE_ROMFILECACHE_H_
+#define ROMFILE_ROMFILECACHE_H_
 
 #include "Base/Types.h"
 
@@ -59,4 +59,4 @@ class ROMFileCache
 	static const CacheIdx INVALID_IDX = CacheIdx(-1);
 };
 
-#endif  // UTILITY_ROMFILECACHE_H_
+#endif  // ROMFILE_ROMFILECACHE_H_

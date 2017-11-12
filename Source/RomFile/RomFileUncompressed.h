@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef UTILITY_ROMFILEUNCOMPRESSED_H_
-#define UTILITY_ROMFILEUNCOMPRESSED_H_
+#ifndef ROMFILE_ROMFILEUNCOMPRESSED_H_
+#define ROMFILE_ROMFILEUNCOMPRESSED_H_
 
 #include <stdio.h>
 
@@ -45,4 +45,4 @@ class ROMFileUncompressed : public ROMFile
 	u32 mRomSize;
 };
 
-#endif  // UTILITY_ROMFILEUNCOMPRESSED_H_
+#endif  // ROMFILE_ROMFILEUNCOMPRESSED_H_

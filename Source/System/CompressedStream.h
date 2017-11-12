@@ -17,8 +17,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef SYSTEM_COMPRESSED_STREAM_H_
-#define SYSTEM_COMPRESSED_STREAM_H_
+#ifndef SYSTEM_COMPRESSEDSTREAM_H_
+#define SYSTEM_COMPRESSEDSTREAM_H_
 
 #include <string>
 
@@ -62,4 +62,4 @@ class CInStream
 	void* const mFile;
 };
 
-#endif  // SYSTEM_COMPRESSED_STREAM_H_
+#endif  // SYSTEM_COMPRESSEDSTREAM_H_
