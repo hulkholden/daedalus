@@ -24,19 +24,26 @@ cc_library(
     includes = ["include"],
     srcs = [
         "src/context.c",
+        "src/egl_context.c",
         "src/init.c",
         "src/input.c",
         "src/monitor.c",
+        "src/osmesa_context.c",
         "src/vulkan.c",
         "src/window.c",
     ] + select({
         ":darwin": [
             "src/cocoa_time.c",
             "src/posix_thread.c",
-            "src/egl_context.c",
-            "src/osmesa_context.c",
           ],
           ":windows": [
+            "src/wgl_context.c",
+            "src/win32_init.c",
+            "src/win32_joystick.c",
+            "src/win32_monitor.c",
+            "src/win32_thread.c",
+            "src/win32_time.c",
+            "src/win32_window.c",
           ],
     }),
     defines = _DEFINES + select({
