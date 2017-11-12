@@ -72,24 +72,6 @@ struct TempVerts
 	u32				Count;
 };
 
-
-
-
-extern "C"
-{
-void	_TnLVFPU( const Matrix4x4 * world_matrix, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out, u32 num_vertices, const TnLParams * params );
-void	_TnLVFPU_Plight( const Matrix4x4 * world_matrix, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out, u32 num_vertices, const TnLParams * params );
-void	_TnLVFPUDKR( u32 num_vertices, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out );
-void	_TnLVFPUDKRB( u32 num_vertices, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out );
-void	_TnLVFPUCBFD( const Matrix4x4 * world_matrix, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out, u32 num_vertices, const TnLParams * params, const s8 * model_norm, u32 v0 );
-void	_TnLVFPUPD( const Matrix4x4 * world_matrix, const Matrix4x4 * projection_matrix, const FiddledVtxPD * p_in, const DaedalusVtx4 * p_out, u32 num_vertices, const TnLParams * params, const u8 * model_norm );
-
-void	_ConvertVertice( DaedalusVtx * dest, const DaedalusVtx4 * source );
-void	_ConvertVerticesIndexed( DaedalusVtx * dest, const DaedalusVtx4 * source, u32 num_vertices, const u16 * indices );
-
-u32		_ClipToHyperPlane( DaedalusVtx4 * dest, const DaedalusVtx4 * source, const v4 * plane, u32 num_verts );
-}
-
 #define GL_TRUE                           1
 #define GL_FALSE                          0
 
@@ -1454,15 +1436,6 @@ void BaseRenderer::UpdateTileSnapshots( u32 tile_idx )
 {
 	UpdateTileSnapshot( 0, tile_idx );
 
-#if defined(DAEDALUS_PSP)
-	if ( g_ROM.LOAD_T1_HACK & !gRDPOtherMode.text_lod )
-	{
-		// LOD is disabled - use two textures
-		UpdateTileSnapshot( 1, tile_idx + 1 );
-	}
-#elif defined(DAEDALUS_GL) || defined(RDP_USE_TEXEL1)
-// FIXME(strmnnrmn): What's RDP_USE_TEXEL1? Can we remove it?
-
 	if (gRDPOtherMode.cycle_type == CYCLE_2CYCLE)
 	{
 		u32 t1_tile = (tile_idx + 1) & 7;
@@ -1487,51 +1460,7 @@ void BaseRenderer::UpdateTileSnapshots( u32 tile_idx )
 
 		UpdateTileSnapshot( 1, t1_tile );
 	}
-#endif
 }
-
-#ifdef DAEDALUS_PSP
-static void T1Hack(const TextureInfo & ti0, CNativeTexture * texture0,
-				   const TextureInfo & ti1, CNativeTexture * texture1)
-{
-	if((ti0.GetFormat() == G_IM_FMT_RGBA) &&
-	   (ti1.GetFormat() == G_IM_FMT_I) &&
-	   (ti1.GetWidth()  == ti0.GetWidth()) &&
-	   (ti1.GetHeight() == ti0.GetHeight()))
-	{
-		if( g_ROM.T1_HACK )
-		{
-			const u32 * src = static_cast<const u32*>(texture0->GetData());
-			u32 * dst       = static_cast<      u32*>(texture1->GetData());
-
-			//Merge RGB + I -> RGBA in texture 1
-			//We do two pixels in one go since its 16bit (RGBA_4444) //Corn
-			u32 size = texture1->GetWidth() * texture1->GetHeight() >> 1;
-			for(u32 i=0; i < size ; i++)
-			{
-				*dst = (*dst & 0xF000F000) | (*src & 0x0FFF0FFF);
-				dst++;
-				src++;
-			}
-		}
-		else
-		{
-			const u32* src = static_cast<const u32*>(texture1->GetData());
-			u32* dst       = static_cast<      u32*>(texture0->GetData());
-
-			//Merge RGB + I -> RGBA in texture 0
-			//We do two pixels in one go since its 16bit (RGBA_4444) //Corn
-			u32 size = texture1->GetWidth() * texture1->GetHeight() >> 1;
-			for(u32 i=0; i < size ; i++)
-			{
-				*dst = (*dst & 0x0FFF0FFF) | (*src & 0xF000F000);
-				dst++;
-				src++;
-			}
-		}
-	}
-}
-#endif // DAEDALUS_PSP
 
 //*****************************************************************************
 // This captures the state of the RDP tiles in:
@@ -1570,15 +1499,6 @@ void BaseRenderer::UpdateTileSnapshot( u32 index, u32 tile_idx )
 			{
 				mBoundTextureInfo[index] = ti;
 				mBoundTexture[index]     = texture;
-
-#ifdef DAEDALUS_PSP
-				//If second texture is loaded try to merge two textures RGB(T0) + A(T1) into one RGBA(T1) //Corn
-				//If T1 Hack is not enabled index can never be other than 0
-				if(index)
-				{
-					T1Hack(mBoundTextureInfo[0], mBoundTexture[0], mBoundTextureInfo[1], mBoundTexture[1]);
-				}
-#endif
 			}
 		}
 	}

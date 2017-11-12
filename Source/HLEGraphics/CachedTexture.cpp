@@ -50,51 +50,6 @@ static NativePf8888			gPaletteBuffer[ 256 ];
 // regardless of whether they've actually changed.
 static const bool kUpdateTexturesEveryFrame = true;
 
-// TODO(strmnnrmn): Remove all the native format conversions.
-#if defined(DAEDALUS_GL) || 1
-static ETextureFormat SelectNativeFormat(const TextureInfo & ti)
-{
-	// On OSX, always use RGBA 8888 textures.
-	return TexFmt_8888;
-}
-
-#else
-
-#define DEFTEX	TexFmt_8888
-
-static const ETextureFormat TFmt[ 32 ] =
-{
-//	4bpp				8bpp				16bpp				32bpp
-	DEFTEX,				DEFTEX,				TexFmt_5551,		TexFmt_8888,		// RGBA
-	DEFTEX,				DEFTEX,				DEFTEX,				DEFTEX,				// YUV
-	TexFmt_CI4_8888,	TexFmt_CI8_8888,	DEFTEX,				DEFTEX,				// CI
-	TexFmt_4444,		TexFmt_4444,		TexFmt_8888,		DEFTEX,				// IA
-	TexFmt_4444,		TexFmt_8888,		DEFTEX,				DEFTEX,				// I
-	DEFTEX,				DEFTEX,				DEFTEX,				DEFTEX,				// ?
-	DEFTEX,				DEFTEX,				DEFTEX,				DEFTEX,				// ?
-	DEFTEX,				DEFTEX,				DEFTEX,				DEFTEX				// ?
-};
-
-static const ETextureFormat TFmt_hack[ 32 ] =
-{
-//	4bpp				8bpp				16bpp				32bpp
-	DEFTEX,				DEFTEX,				TexFmt_4444,		TexFmt_8888,		// RGBA
-	DEFTEX,				DEFTEX,				DEFTEX,				DEFTEX,				// YUV
-	TexFmt_CI4_8888,	TexFmt_CI8_8888,	DEFTEX,				DEFTEX,				// CI
-	TexFmt_4444,		TexFmt_4444,		TexFmt_8888,		DEFTEX,				// IA
-	TexFmt_4444,		TexFmt_4444,		DEFTEX,				DEFTEX,				// I
-	DEFTEX,				DEFTEX,				DEFTEX,				DEFTEX,				// ?
-	DEFTEX,				DEFTEX,				DEFTEX,				DEFTEX,				// ?
-	DEFTEX,				DEFTEX,				DEFTEX,				DEFTEX				// ?
-};
-
-static ETextureFormat SelectNativeFormat(const TextureInfo & ti)
-{
-	u32 idx = (ti.GetFormat() << 2) | ti.GetSize();
-	return g_ROM.LOAD_T1_HACK ? TFmt_hack[idx] : TFmt[idx];
-}
-#endif
-
 static bool GenerateTexels(void ** p_texels,
 						   void ** p_palette,
 						   const TextureInfo & ti,
@@ -221,7 +176,7 @@ bool CachedTexture::Initialise()
 	if (mTextureInfo.GetEmulateMirrorS()) width  *= 2;
 	if (mTextureInfo.GetEmulateMirrorT()) height *= 2;
 
-	mpTexture = CNativeTexture::Create( width, height, SelectNativeFormat(mTextureInfo) );
+	mpTexture = CNativeTexture::Create( width, height, TexFmt_8888 );
 	if( mpTexture != NULL )
 	{
 		// If this we're performing Texture updated checks, randomly offset the

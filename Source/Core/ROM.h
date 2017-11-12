@@ -138,7 +138,7 @@ struct RomInfo
 		struct
 		{
 			EGameHacks	GameHacks:16;			// Hacks for specific games
-			u32			LOAD_T1_HACK:1;			//LOAD T1 texture hack
+			u32			Pad0:1;
 			u32			T1_HACK:1;				//T1 texture hack
 			u32			ZELDA_HACK:1;			//for both MM and OOT
 			u32			TLUT_HACK:1;			//Texture look up table hack for palette
