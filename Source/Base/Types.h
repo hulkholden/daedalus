@@ -22,6 +22,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Assert.h"
 
+// DAEDALUS_ENDIAN_MODE should be defined via //Platform as one of:
+#define DAEDALUS_ENDIAN_LITTLE 1
+#define DAEDALUS_ENDIAN_BIG 2
+
+// The endianness should really be defined
+#ifndef DAEDALUS_ENDIAN_MODE
+#error DAEDALUS_ENDIAN_MODE was not specified in //Platform
+#endif
+
 
 #if !defined(DAEDALUS_W32) || _MSC_VER >= 1600
 #include <stdint.h>
