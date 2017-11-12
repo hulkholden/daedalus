@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef PLATFORM_WINDOWS_DAEDALUSW32_H_
 #define PLATFORM_WINDOWS_DAEDALUSW32_H_
 
+#define _DO_NOT_DECLARE_INTERLOCKED_INTRINSICS_IN_MEMORY
+
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #include <windows.h>
 #include <intrin.h>
