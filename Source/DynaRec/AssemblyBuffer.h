@@ -74,11 +74,7 @@ class CAssemblyBuffer
 		void				SetBuffer( u8 * pbuffer )
 		{
 			mpCodeBuffer = pbuffer;
-
-			// For the PSP we don't want to cache our writes, ToDo:why?
-			mpWritePointer = (u8*)MAKE_UNCACHED_PTR(mpCodeBuffer);
-			//ToDo: Test this
-			//mpWritePointer = mpCodeBuffer;
+			mpWritePointer = mpCodeBuffer;
 			mCurrentPos = 0;
 		}
 

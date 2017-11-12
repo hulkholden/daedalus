@@ -61,10 +61,7 @@ public:
 	const u8 *		GetTargetU8P() const		{ return reinterpret_cast< const u8 * >( mpLocation ); }
 	u8 *			GetWritableU8P() const
 	{
-		//Todo: PSP
-		return reinterpret_cast< u8 * >( MAKE_UNCACHED_PTR(mpLocation) );
-		//Todo: Check this
-		//return reinterpret_cast< u8 * >( mpLocation );
+		return reinterpret_cast< u8 * >(mpLocation);
 	}
 
 

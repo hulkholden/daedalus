@@ -15,10 +15,6 @@
 #error DAEDALUS_ENDIAN_MODE was not specified in Platform.h
 #endif
 
-#ifndef MAKE_UNCACHED_PTR
-#define MAKE_UNCACHED_PTR(x)	(x)
-#endif
-
 //
 //	Configuration options. These are not really platform-specific, but control various features
 //
