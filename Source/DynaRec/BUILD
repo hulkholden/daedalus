@@ -1,6 +1,6 @@
 cc_library(
     name = "DynaRec",
-    hdrs =glob(["*.h"]),
+    hdrs = glob(["*.h"]),
     deps = [
         "//:stdafx",
     ],

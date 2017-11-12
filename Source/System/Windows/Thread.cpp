@@ -45,7 +45,7 @@ struct SDaedThreadDetails
 // The real thread is passed in as an argument. We call it and return the result
 static DWORD WINAPI StartThreadFunc( LPVOID arg )
 {
-	SDaedThreadDetails * thread_details( reinterpret_cast< SDaedThreadDetails * >( arg ) );
+	SDaedThreadDetails * thread_details = reinterpret_cast< SDaedThreadDetails * >( arg );
 
 	DWORD result = thread_details->ThreadFunction( thread_details->Argument );
 
@@ -57,10 +57,10 @@ static DWORD WINAPI StartThreadFunc( LPVOID arg )
 ThreadHandle CreateThread( const char * name, DaedThread function, void * argument )
 {
 	DWORD					id;
-	SDaedThreadDetails *	thread_details( new SDaedThreadDetails( function, argument ) );
-	HANDLE					h( ::CreateThread( NULL, 0, StartThreadFunc, thread_details, CREATE_SUSPENDED, &id ) );
+	SDaedThreadDetails *	thread_details = new SDaedThreadDetails( function, argument );
+	HANDLE					h = ::CreateThread( nullptr, 0, StartThreadFunc, thread_details, CREATE_SUSPENDED, &id );
 
-	if(h != NULL)
+	if (h != nullptr)
 	{
 		ResumeThread( h );
 		return reinterpret_cast< s32 >( h );
@@ -71,8 +71,8 @@ ThreadHandle CreateThread( const char * name, DaedThread function, void * argume
 
 void SetThreadPriority( ThreadHandle handle, EThreadPriority pri )
 {
-	HANDLE	h( reinterpret_cast< HANDLE >( handle ) );
-	if(h != NULL)
+	HANDLE	h = reinterpret_cast< HANDLE >( handle );
+	if (h != nullptr)
 	{
 		::SetThreadPriority( h, gThreadPriorities[ pri ] );
 	}
@@ -80,8 +80,8 @@ void SetThreadPriority( ThreadHandle handle, EThreadPriority pri )
 
 void ReleaseThreadHandle( ThreadHandle handle )
 {
-	HANDLE	h( reinterpret_cast< HANDLE >( handle ) );
-	if(h != NULL)
+	HANDLE	h = reinterpret_cast< HANDLE >( handle );
+	if (h != nullptr)
 	{
 		CloseHandle(h);
 	}
@@ -91,11 +91,11 @@ void ReleaseThreadHandle( ThreadHandle handle )
 // Returns false if the thread didn't terminate
 bool JoinThread( ThreadHandle handle, s32 timeout )
 {
-	u32		delay( timeout > 0 ? timeout : INFINITE );
-	bool	signalled( true );
+	u32		delay = timeout > 0 ? timeout : INFINITE;
+	bool	signalled = true;
 
-	HANDLE	h( reinterpret_cast< HANDLE >( handle ) );
-	if(h != NULL)
+	HANDLE	h = reinterpret_cast< HANDLE >( handle );
+	if (h != nullptr)
 	{
 		// Wait forever for it to finish.
 		switch(WaitForSingleObject(h, delay))
