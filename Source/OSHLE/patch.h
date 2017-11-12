@@ -162,21 +162,6 @@ extern PatchVariable * g_PatchVariables[];
 
 #endif
 
-inline OpCode GetCorrectOp( OpCode op_code )
-{
-#ifdef DAEDALUS_BREAKPOINTS_ENABLED
-	if (op_code.op == OP_DBG_BKPT)
-	{
-		u32 bp_index = op_code.bp_index;
-
-		if (bp_index < g_BreakPoints.size())
-		{
-			op_code = g_BreakPoints[bp_index].mOriginalOp;
-		}
-	}
-#endif
-	return op_code;
-}
 extern u32 gNumOfOSFunctions;
 void Patch_Reset();
 void Patch_ApplyPatches();

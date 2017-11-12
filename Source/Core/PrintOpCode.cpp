@@ -28,9 +28,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 
+#include "Core/CPU.h"
 #include "Core/R4300OpCode.h"
-
-#include "OSHLE/patch.h"  // For Definition of GetCorrectOp
+#include "Core/Registers.h"
+#include "OSHLE/patch.h"
 
 static const char* Cop1BC1OpCodeNames[4] = {"BC1F", "BC1T", "BC1FL", "BC1TL"};
 
