@@ -3,7 +3,7 @@
 #include "Debug/WebDebug.h"
 
 #include "absl/strings/str_split.h"
-#include "third_party/webby/webby.h"
+#include "external/webby/webby.h"
 
 #ifdef DAEDALUS_W32
 #include <winsock2.h>

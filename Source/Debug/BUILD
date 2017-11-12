@@ -32,7 +32,7 @@ cc_library(
         "//:stdafx",
         "//Base",
         "//System",
-        "//third_party/webby",
+        "@webby//:webby",
     ],
 )
 

@@ -20,3 +20,10 @@ new_http_archive(
     strip_prefix = "glfw-master",
     build_file = "BUILD.glfw",
 )
+
+new_http_archive(
+    name = "webby",
+    url = "https://github.com/deplinenoise/webby/archive/master.zip",
+    strip_prefix = "webby-master",
+    build_file = "BUILD.webby",
+)
