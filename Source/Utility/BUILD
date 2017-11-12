@@ -30,7 +30,6 @@ cc_library(
         "//Input",
         "//Math",
         "//System",
-        "//third_party/gtest",
         "@com_google_absl//absl/strings",
     ],
 )
