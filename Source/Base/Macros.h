@@ -3,7 +3,7 @@
 #ifndef BASE_MACROS_H_
 #define BASE_MACROS_H_
 
-// Branch prediction
+// Branch prediction.
 #ifdef _MSC_VER
 
 #define DAEDALUS_FORCEINLINE __forceinline
@@ -21,7 +21,7 @@
 #endif
 
 
-// Calling conventions
+// Calling conventions.
 #ifdef _MSC_VER
 
 // Thread functions need to be __stdcall to work with the W32 api
@@ -37,6 +37,14 @@
 #define DAEDALUS_VARARG_CALL_TYPE
 #define DAEDALUS_ZLIB_CALL_TYPE
 
+#endif
+
+
+// Breakpoints.
+#ifdef _MSC_VER
+#define DAEDALUS_HALT __debugbreak()
+#else
+#define DAEDALUS_HALT __builtin_trap()
 #endif
 
 
