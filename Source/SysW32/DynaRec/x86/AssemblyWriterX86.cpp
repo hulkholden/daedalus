@@ -70,7 +70,7 @@ void	CAssemblyWriterX86::MUL_EAX_MEM(void * mem)
 {
 	EmitBYTE(0xf7);
 	EmitBYTE(0x25);
-	EmitDWORD((u32)mem);
+	EmitPtrAsDWORD(mem);
 }
 
 //*****************************************************************************
@@ -90,7 +90,7 @@ void	CAssemblyWriterX86::ADD_REG_MEM_IDXx4( EIntelReg destreg, void * mem, EInte
 	EmitBYTE(0x03);
 	EmitBYTE(0x04 | (destreg << 3));
 	EmitBYTE(0x85 | (idxreg<<3));
-	EmitDWORD((u32)mem);
+	EmitPtrAsDWORD(mem);
 }
 
 //*****************************************************************************
@@ -165,7 +165,6 @@ void CAssemblyWriterX86::ADDI(EIntelReg reg, s32 data)
 		EmitBYTE(0xc0 | reg);
 		EmitDWORD(data);
 	}
-	
 }
 
 //*****************************************************************************
@@ -324,7 +323,7 @@ void CAssemblyWriterX86::CMP_MEM32_I32(const void *p_mem, u32 data)
 {
 	EmitBYTE(0x81);
 	EmitBYTE(0x3d);
-	EmitDWORD(reinterpret_cast< u32 >( p_mem ));
+	EmitPtrAsDWORD(p_mem);
 	EmitDWORD(data);
 }
 
@@ -335,7 +334,7 @@ void CAssemblyWriterX86::CMP_MEM32_I8(const void *p_mem, u8 data)
 {
 	EmitBYTE(0x83);
 	EmitBYTE(0x3d);
-	EmitDWORD(reinterpret_cast< u32 >( p_mem ));
+	EmitPtrAsDWORD(p_mem);
 	EmitBYTE(data);
 }
 
@@ -536,7 +535,7 @@ void	CAssemblyWriterX86::CALL_MEM_PLUS_REGx4( void * mem, EIntelReg reg )
 	EmitBYTE(0xFF);
 	EmitBYTE(0x14);
 	EmitBYTE(0x85 | (reg<<3));
-	EmitDWORD((u32)mem);
+	EmitPtrAsDWORD(mem);
 }
 
 //*****************************************************************************
@@ -591,7 +590,7 @@ void	CAssemblyWriterX86::MOV_MEM_REG(void * mem, EIntelReg isrc)
 		EmitBYTE(0x89);
 		EmitBYTE((isrc<<3) | 0x05);
 	}
-	EmitDWORD((u32)mem);
+	EmitPtrAsDWORD(mem);
 }
 
 //*****************************************************************************
@@ -607,7 +606,7 @@ void	CAssemblyWriterX86::MOV_REG_MEM(EIntelReg reg, const void * mem)
 		EmitBYTE((reg<<3) | 0x05);
 	}
 
-	EmitDWORD((u32)mem);
+	EmitPtrAsDWORD(mem);
 }
 
 //*****************************************************************************
@@ -763,7 +762,7 @@ void	CAssemblyWriterX86::MOVI_MEM(void * mem, u32 data)
 {
 	EmitBYTE(0xc7);
 	EmitBYTE(0x05);
-	EmitDWORD((u32)mem);
+	EmitPtrAsDWORD(mem);
 	EmitDWORD(data);
 }
 
@@ -774,7 +773,7 @@ void	CAssemblyWriterX86::MOVI_MEM8(void * mem, u8 data)
 {
 	EmitBYTE(0xc6);
 	EmitBYTE(0x05);
-	EmitDWORD((u32)mem);
+	EmitPtrAsDWORD(mem);
 	EmitBYTE(data);
 }
 
@@ -821,7 +820,7 @@ void	CAssemblyWriterX86::FCHS()
 void	CAssemblyWriterX86::FILD_MEM( void * pmem )
 {
 	EmitWORD(0x05db);
-	EmitDWORD( u32(pmem) );
+	EmitPtrAsDWORD( pmem );
 }
 
 //*****************************************************************************
@@ -830,7 +829,7 @@ void	CAssemblyWriterX86::FILD_MEM( void * pmem )
 void	CAssemblyWriterX86::FLD_MEMp32( void * pmem )
 {
 	EmitWORD(0x05d9);
-	EmitDWORD( u32(pmem) );
+	EmitPtrAsDWORD( pmem );
 }
 
 //*****************************************************************************
@@ -839,7 +838,7 @@ void	CAssemblyWriterX86::FLD_MEMp32( void * pmem )
 void	CAssemblyWriterX86::FSTP_MEMp32( void * pmem )
 {
 	EmitWORD( 0x1dd9);
-	EmitDWORD( u32(pmem) );
+	EmitPtrAsDWORD( pmem );
 }
 
 //*****************************************************************************
@@ -854,7 +853,7 @@ void	CAssemblyWriterX86::FLD_MEMp64( void * memlo, void * memhi )
 	MOV_MEM_REG(((u8*)&longtemp) + 0, EAX_CODE);
 	MOV_MEM_REG(((u8*)&longtemp) + 4, EDX_CODE);
 	EmitWORD(0x05dd);
-	EmitDWORD( u32(&longtemp) );
+	EmitPtrAsDWORD( &longtemp );
 }
 
 //*****************************************************************************
@@ -865,7 +864,7 @@ void	CAssemblyWriterX86::FSTP_MEMp64( void * memlo, void * memhi )
 	static s64 longtemp;
 
 	EmitWORD(0x1ddd);
-	EmitDWORD( u32(&longtemp) );
+	EmitPtrAsDWORD( &longtemp );
 	MOV_REG_MEM(EAX_CODE, ((u8*)(&longtemp))+0);
 	MOV_REG_MEM(EDX_CODE, ((u8*)(&longtemp))+4);
 	MOV_MEM_REG(((u8*)(memlo)), EAX_CODE);
@@ -878,7 +877,7 @@ void	CAssemblyWriterX86::FSTP_MEMp64( void * memlo, void * memhi )
 void	CAssemblyWriterX86::FISTP_MEMp( void * pmem )
 {
 	EmitWORD( 0x1ddb );
-	EmitDWORD((u32)pmem);
+	EmitPtrAsDWORD(pmem);
 }
 
 //*****************************************************************************

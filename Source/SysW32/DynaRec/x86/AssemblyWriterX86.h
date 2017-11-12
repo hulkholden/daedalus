@@ -200,6 +200,19 @@ class CAssemblyWriterX86
 			mpAssemblyBuffer->EmitDWORD( dword );
 		}
 
+		// TODO(strmnnrmn): DynaRec needs completely reworking for 64 bit.
+		inline void EmitPtrAsDWORD(const void* mem)
+		{
+			if (sizeof(mem) == sizeof(u32))
+			{
+				mpAssemblyBuffer->EmitDWORD( static_cast<u32>(reinterpret_cast<uintptr_t>(mem)) );
+			}
+			else
+			{
+				DAEDALUS_ERROR("DynaRec not supported for 64 bit");
+			}
+		}
+
 	private:
 		CAssemblyBuffer *				mpAssemblyBuffer;
 };
