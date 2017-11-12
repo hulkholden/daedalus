@@ -43,7 +43,7 @@ cc_library(
             "OSX/CodebufferManager.cpp",
         ],
         "//:windows": [
-            "Windows/DISASM86.cpp",
+            "Windows/x86/DISASM86.cpp",
             "Windows/x86/AssemblyUtilsX86.cpp",
             "Windows/x86/AssemblyWriterX86.cpp",
             "Windows/x86/CodeBufferManagerX86.cpp",
