@@ -3,6 +3,7 @@ package(default_visibility=["//visibility:public"])
 cc_library(
     name = "Debug",
     srcs = [
+        "DebugConsole.cpp",
         "DebugConsoleImpl.cpp",
         "DebugLog.cpp",
         "Dump.cpp",
