@@ -24,6 +24,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef SYSTEM_ENDIAN_H_
 #define SYSTEM_ENDIAN_H_
 
+// DAEDALUS_ENDIAN_MODE should be defined via //Platform as one of:
+#define DAEDALUS_ENDIAN_LITTLE 1
+#define DAEDALUS_ENDIAN_BIG 2
+
+// The endianness should really be defined
+#ifndef DAEDALUS_ENDIAN_MODE
+#error DAEDALUS_ENDIAN_MODE was not specified in //Platform
+#endif
+
 #if (DAEDALUS_ENDIAN_MODE == DAEDALUS_ENDIAN_BIG)
 
 #define U8_TWIDDLE 0x0

@@ -1,8 +1,11 @@
 cc_library(
     name = "Platform",
-    hdrs = [
-        "BuildOptions.h",
-    ],
+    hdrs = select({
+        "//:windows": [
+            "Windows/DaedalusW32.h",
+        ],
+        "//conditions:default": [],
+    }),
     defines = select({
         "//:darwin": [
             "DAEDALUS_OSX",

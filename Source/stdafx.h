@@ -22,10 +22,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef STDAFX_H_
 #define STDAFX_H_
 
-//*****************************************************************************
-//	These are our various compilation options
-//*****************************************************************************
-#include "Platform/BuildOptions.h"
+#if defined(DAEDALUS_CONFIG_RELEASE)
+#include "Base/Release/BuildConfig.h"
+#elif defined(DAEDALUS_CONFIG_PROFILE)
+#include "Base/Profile/BuildConfig.h"
+#elif defined(DAEDALUS_CONFIG_DEV)
+#include "Base/Dev/BuildConfig.h"
+#else
+#error Unknown compilation mode
+#endif
 
 // Platform specifc #includes, externs, #defines etc
 #ifdef DAEDALUS_W32
