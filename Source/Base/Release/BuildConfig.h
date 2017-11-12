@@ -42,8 +42,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #undef	ALLOW_TRACES_WHICH_EXCEPT
 #undef	DAEDALUS_LOG						// Enable various logging
 #define	DAEDALUS_DIALOGS					// Enable this to ask confimation dialogs in the GUI
-#define	DAEDALUS_SILENT						// Undef to enable debug messages. Define this to turn off various debugging features for public release.
-#undef  DAEDALUS_ACCURATE_TMEM				// Full tmem emulation(Very accurate, but slighty slower) When this defined, is irrelevant having DAEDALUS_FAST_TMEM defined or not
 #undef  DAEDALUS_BREAKPOINTS_ENABLED		// Whether breakpoint support is enabled.
 
 #endif // BASE_RELEASE_BUILDCONFIG_H_

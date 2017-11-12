@@ -551,9 +551,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 			trace[1].OpCode._u32 == 0x5420FFFE &&
 			trace[2].OpCode._u32 == 0x8C4F0000)
 		{
-#ifndef DAEDALUS_SILENT
-			printf("Speedhack complex %08x\n", trace[0].Address );
-#endif
+			DBGConsole_Msg(0, "Speedhack complex %08x\n", trace[0].Address);
 			p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( CPU_SkipToNextEvent ) ) );
 		}
 	}
@@ -594,7 +592,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 			DAEDALUS_ASSERT( branch_idx < branch_details.size(), "Branch index is out of bounds" );
 			p_branch = &branch_details[ branch_idx ];
 
-#ifndef DAEDALUS_SILENT
+#ifdef DAEDALUS_DEBUG_DYNAREC
 			switch(p_branch->SpeedHack)
 			{
 				case SHACK_SKIPTOEVENT:

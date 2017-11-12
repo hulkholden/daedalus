@@ -50,7 +50,8 @@ static NativePf8888			gPaletteBuffer[ 256 ];
 // regardless of whether they've actually changed.
 static const bool kUpdateTexturesEveryFrame = true;
 
-#if defined(DAEDALUS_GL) || defined(DAEDALUS_ACCURATE_TMEM)
+// TODO(strmnnrmn): Remove all the native format conversions.
+#if defined(DAEDALUS_GL) || 1
 static ETextureFormat SelectNativeFormat(const TextureInfo & ti)
 {
 	// On OSX, always use RGBA 8888 textures.
@@ -112,7 +113,6 @@ static bool GenerateTexels(void ** p_texels,
 	void *			texels  = &gTexelBuffer[0];
 	NativePf8888 *	palette = IsTextureFormatPalettised( texture_format ) ? gPaletteBuffer : NULL;
 
-#ifdef DAEDALUS_ACCURATE_TMEM
 	// NB: if line is 0, it implies this is a direct load from ram (e.g. DLParser_Sprite2DDraw etc)
 	// This check isn't robust enough, SSV set ti.Line == 0 in game without calling Sprite2D
 	if (ti.GetLine() > 0)
@@ -123,12 +123,8 @@ static bool GenerateTexels(void ** p_texels,
 			*p_palette = palette;
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
-#endif
 
 	if (ConvertTexture(ti, texels, palette, texture_format, pitch))
 	{

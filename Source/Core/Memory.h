@@ -89,10 +89,7 @@ void			Memory_Cleanup();
 
 typedef void * (*MemFastFunction )( u32 address );
 typedef void (*MemWriteValueFunction )( u32 address, u32 value );
-
-#ifndef DAEDALUS_SILENT
 typedef bool (*InternalMemFastFunction)( u32 address, void ** p_translated );
-#endif
 
 extern MemFuncRead  				g_MemoryLookupTableRead[0x4000];
 extern MemFuncWrite 				g_MemoryLookupTableWrite[0x4000];
@@ -124,10 +121,7 @@ inline void WriteAddress( u32 address, u32 value )
 	m.WriteFunc( address, value );
 }
 
-#ifndef DAEDALUS_SILENT
 bool Memory_GetInternalReadAddress(u32 address, void ** p_translated);
-#endif
-
 
 //////////////////////////////////////////////////////////////
 // Quick Read/Write methods that require a base returned by

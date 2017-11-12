@@ -101,9 +101,7 @@ void R4300_CALL_TYPE CPU_InvalidateICacheRange( u32 address, u32 length )
 {
 	if( gFragmentCache.ShouldInvalidateOnWrite( address, length ) )
 	{
-#ifndef DAEDALUS_SILENT
-		printf( "Write to %08x (%d bytes) overlaps fragment cache entries\n", address, length );
-#endif
+		DBGConsole_Msg(0, "Write to %08x (%d bytes) overlaps fragment cache entries\n", address, length);
 		CPU_ResetFragmentCache();
 	}
 }

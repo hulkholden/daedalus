@@ -1,6 +1,5 @@
 #include "Base/Daedalus.h"
 
-#ifdef DAEDALUS_ACCURATE_TMEM
 #include "HLEGraphics/ConvertTile.h"
 
 #include "Base/Alignment.h"
@@ -598,4 +597,3 @@ bool ConvertTile(const TextureInfo & ti,
 	DAEDALUS_ERROR("Unhandled format %d/%d", ti.GetFormat(), ti.GetSize());
 	return false;
 }
-#endif //DAEDALUS_ACCURATE_TMEM

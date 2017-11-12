@@ -212,10 +212,8 @@ static inline CRefPtr<CNativeTexture> Load_ObjSprite(const uObjSprite* sprite, c
 	{
 		// Get ti info from TextureDescriptor since there's no txtr for tile or block (txtr = NULL)
 		ti = gRDPStateManager.GetUpdatedTextureDescriptor(gRenderer->GetTextureTile());
-#ifdef DAEDALUS_ACCURATE_TMEM
 		// TLUT is loaded from ObjLoadTxtr ucode, so this is a direct load from ram (line = 0)
 		ti.SetLine(0);
-#endif
 	}
 	else
 	{
@@ -246,7 +244,7 @@ static inline CRefPtr<CNativeTexture> Load_ObjSprite(const uObjSprite* sprite, c
 
 		ti.SetSwapped(0);
 		ti.SetPalette(sprite->imagePal);
-		ti.SetTlutAddress(TLUT_BASE);
+		ti.SetTlutAddress(gTlutLoadAddresses[0]);
 		ti.SetTLutFormat(kTT_RGBA16);
 	}
 
@@ -600,7 +598,7 @@ void DLParser_S2DEX_BgCopy(MicroCodeCommand command)
 	ti.SetSwapped(0);
 
 	ti.SetPalette(objBg->imagePal);
-	ti.SetTlutAddress(TLUT_BASE);
+	ti.SetTlutAddress(gTlutLoadAddresses[0]);
 	ti.SetTLutFormat(kTT_RGBA16);
 
 	CRefPtr<CNativeTexture> texture = gRenderer->LoadTextureDirectly(ti);
@@ -643,7 +641,7 @@ void DLParser_S2DEX_Bg1cyc(MicroCodeCommand command)
 	ti.SetSwapped(0);
 
 	ti.SetPalette(objBg->imagePal);
-	ti.SetTlutAddress(TLUT_BASE);
+	ti.SetTlutAddress(gTlutLoadAddresses[0]);
 	ti.SetTLutFormat(kTT_RGBA16);
 
 	CRefPtr<CNativeTexture> texture = gRenderer->LoadTextureDirectly(ti);

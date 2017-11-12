@@ -21,11 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Daedalus.h"
 #include "Core/PrintOpCode.h"
 
-//
-//	Exclude this from public release builds to save a little on the elf size
-//
-#ifndef DAEDALUS_SILENT
-
 #include <stdio.h>
 
 #include "Core/CPU.h"
@@ -2000,5 +1995,3 @@ void SprintOpCodeInfo(char* str, u32 address, OpCode op)
 }
 
 void SprintRSPOpCodeInfo(char* str, u32 address, OpCode op) { SprintRSPOp_Instructions[op.op](str, address, op); }
-
-#endif  // DAEDALUS_SILENT

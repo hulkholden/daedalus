@@ -112,10 +112,7 @@ void * 			g_pMemoryBuffers[NUM_MEM_BUFFERS];
 
 #include "Memory_Read.inl"
 #include "Memory_WriteValue.inl"
-
-#ifndef DAEDALUS_SILENT
 #include "Memory_ReadInternal.inl"
-#endif
 
 bool Memory_Init()
 {
@@ -585,9 +582,7 @@ void Memory_InitTables()
 	Flash_Init();
 
 	// Debug only
-#ifndef DAEDALUS_SILENT
 	Memory_InitInternalTables( ram_size );
-#endif
 }
 
 void MemoryUpdateSPStatus( u32 flags )
