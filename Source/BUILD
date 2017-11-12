@@ -29,7 +29,7 @@ cc_binary(
         "//Core:CoreCpp",
         "//Debug",
         "//DynaRec:DynaRecCpp",
-        "//Graphics:GraphicsCpp",
+        "//Graphics",
         "//HLEAudio:HLEAudioCpp",
         "//HLEGraphics:HLEGraphicsCpp",
         "//Interface:InterfaceCpp",
