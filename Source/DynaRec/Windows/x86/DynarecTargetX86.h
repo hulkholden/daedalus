@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef SYSW32_DYNAREC_X86_DYNARECTARGETX86_H_
-#define SYSW32_DYNAREC_X86_DYNARECTARGETX86_H_
+#ifndef DYNAREC_WINDOWS_X86_DYNARECTARGETX86_H_
+#define DYNAREC_WINDOWS_X86_DYNARECTARGETX86_H_
 
 // Intel register codes. Odd ordering is for intel bytecode
 enum EIntelReg {
@@ -38,4 +38,4 @@ enum EIntelReg {
 };
 
 
-#endif // SYSW32_DYNAREC_X86_DYNARECTARGETX86_H_
+#endif // DYNAREC_WINDOWS_X86_DYNARECTARGETX86_H_

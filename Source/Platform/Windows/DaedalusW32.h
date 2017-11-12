@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef SYSW32_INCLUDE_DAEDALUSW32_H_
-#define SYSW32_INCLUDE_DAEDALUSW32_H_
+#ifndef PLATFORM_WINDOWS_DAEDALUSW32_H_
+#define PLATFORM_WINDOWS_DAEDALUSW32_H_
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #include <windows.h>
@@ -47,4 +47,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //We link glew statically, so define this
 #define GLEW_STATIC
 
-#endif // SYSW32_INCLUDE_DAEDALUSW32_H_
+#endif // PLATFORM_WINDOWS_DAEDALUSW32_H_
