@@ -120,15 +120,3 @@ int __cdecl main(int argc, char **argv)
 	System_Finalize();
 	return result;
 }
-
-// TODO(strmnnrmn): Move DisplayListDebugger to common location?
-void DLDebugger_RequestDebug() {}
-bool DLDebugger_Process()
-{
-	return false;
-}
-bool DLDebugger_RegisterWebDebug()
-{
-	return true;
-}
-
