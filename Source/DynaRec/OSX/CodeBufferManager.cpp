@@ -22,10 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdlib.h>
 
-class CCodeBufferManagerOSX : public CCodeBufferManager
+class ICodeBufferManager : public CCodeBufferManager
 {
    public:
-	CCodeBufferManagerOSX() {}
+	ICodeBufferManager() {}
 
 	virtual bool Initialise();
 	virtual void Reset();
@@ -35,25 +35,25 @@ class CCodeBufferManagerOSX : public CCodeBufferManager
 	virtual u32 FinaliseCurrentBlock();
 };
 
-CCodeBufferManager *CCodeBufferManager::Create() { return new CCodeBufferManagerOSX; }
+CCodeBufferManager *CCodeBufferManager::Create() { return new ICodeBufferManager; }
 
-bool CCodeBufferManagerOSX::Initialise()
+bool ICodeBufferManager::Initialise()
 {
 	DAEDALUS_ASSERT(false, "Unimplemented");
 	return true;
 }
 
-void CCodeBufferManagerOSX::Reset() { DAEDALUS_ASSERT(false, "Unimplemented"); }
+void ICodeBufferManager::Reset() { DAEDALUS_ASSERT(false, "Unimplemented"); }
 
-void CCodeBufferManagerOSX::Finalise() { DAEDALUS_ASSERT(false, "Unimplemented"); }
+void ICodeBufferManager::Finalise() { DAEDALUS_ASSERT(false, "Unimplemented"); }
 
-CCodeGenerator *CCodeBufferManagerOSX::StartNewBlock()
+CCodeGenerator *ICodeBufferManager::StartNewBlock()
 {
 	DAEDALUS_ASSERT(false, "Unimplemented");
 	return NULL;
 }
 
-u32 CCodeBufferManagerOSX::FinaliseCurrentBlock()
+u32 ICodeBufferManager::FinaliseCurrentBlock()
 {
 	DAEDALUS_ASSERT(false, "Unimplemented");
 	return 0;
