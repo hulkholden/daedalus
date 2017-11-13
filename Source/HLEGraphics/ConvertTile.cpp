@@ -116,7 +116,7 @@ static u32 I4(u8 v)
 static u32 IA4(u8 v)
 {
 	u32 i = ThreeToEight[(v & 0x0f) >> 1];
-	u32 a = OneToEight[(v & 0x01)];	
+	u32 a = OneToEight[(v & 0x01)];
 
 	return (a<<24) | (i<<16) | (i<<8) | i;
 }

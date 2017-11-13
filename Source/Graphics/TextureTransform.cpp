@@ -6,17 +6,6 @@
 #include "ColourValue.h"
 #include "NativePixelFormat.h"
 
-template< typename T >
-T * AddByteOffset( T * p, s32 offset )
-{
-	return reinterpret_cast< T * >( reinterpret_cast< u8 * >( p ) + offset );
-}
-template< typename T >
-const T * AddByteOffset( const T * p, s32 offset )
-{
-	return reinterpret_cast< const T * >( reinterpret_cast< const u8 * >( p ) + offset );
-}
-
 // This is intended for use with swizzled and unswizzled textures, the
 // assumption being that 2 and 4 byte pixels are swizzled around in
 // such a way that their bytes remain in the same order in memory.

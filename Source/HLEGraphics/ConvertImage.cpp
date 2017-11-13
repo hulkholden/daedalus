@@ -138,7 +138,7 @@ static void ConvertGeneric( const TextureDestInfo & dsti,
 			}
 
 			src_offset += src_pitch;
-			dst = reinterpret_cast< NativePf8888 * >( (u8*)dst + dsti.Pitch );
+			dst = AddByteOffset( dst, dsti.Pitch );
 		}
 	}
 	else
@@ -148,7 +148,7 @@ static void ConvertGeneric( const TextureDestInfo & dsti,
 			unswapped_fn( dst, src, src_offset, ti.GetWidth() );
 
 			src_offset += src_pitch;
-			dst = reinterpret_cast< NativePf8888 * >( (u8*)dst + dsti.Pitch );
+			dst = AddByteOffset( dst, dsti.Pitch );
 		}
 	}
 }
@@ -179,7 +179,7 @@ static void ConvertPalettisedTo8888( const TextureDestInfo & dsti, const Texture
 			}
 
 			src_offset += src_pitch;
-			dst = reinterpret_cast< NativePf8888 * >( (u8*)dst + dsti.Pitch );
+			dst = AddByteOffset( dst, dsti.Pitch );
 		}
 	}
 	else
@@ -189,7 +189,7 @@ static void ConvertPalettisedTo8888( const TextureDestInfo & dsti, const Texture
 			unswapped_fn( dst, src, src_offset, ti.GetWidth(), palette );
 
 			src_offset += src_pitch;
-			dst = reinterpret_cast< NativePf8888 * >( (u8*)dst + dsti.Pitch );
+			dst = AddByteOffset( dst, dsti.Pitch );
 		}
 	}
 }
@@ -218,7 +218,7 @@ static void ConvertPalettisedToCI( const TextureDestInfo & dsti, const TextureIn
 			}
 
 			src_offset += src_pitch;
-			dst = reinterpret_cast< OutT * >( (u8*)dst + dsti.Pitch );
+			dst = AddByteOffset( dst, dsti.Pitch );
 		}
 	}
 	else
@@ -228,7 +228,7 @@ static void ConvertPalettisedToCI( const TextureDestInfo & dsti, const TextureIn
 			unswapped_fn( dst, src, src_offset, ti.GetWidth() );
 
 			src_offset += src_pitch;
-			dst = reinterpret_cast< OutT * >( (u8*)dst + dsti.Pitch );
+			dst = AddByteOffset( dst, dsti.Pitch );
 		}
 	}
 }

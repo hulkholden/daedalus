@@ -87,4 +87,15 @@ struct NativePf8888
 };
 DAEDALUS_STATIC_ASSERT( sizeof( NativePf8888 ) == 4 );
 
+template< typename T >
+T * AddByteOffset( T * p, s32 offset )
+{
+	return reinterpret_cast< T * >( reinterpret_cast< u8 * >( p ) + offset );
+}
+template< typename T >
+const T * AddByteOffset( const T * p, s32 offset )
+{
+	return reinterpret_cast< const T * >( reinterpret_cast< const u8 * >( p ) + offset );
+}
+
 #endif // GRAPHICS_NATIVEPIXELFORMAT_H_
