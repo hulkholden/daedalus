@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class v4;
 
-class c32 /*: public NativePf8888*/
+class c32
 {
 	public:
 		c32() {}
@@ -46,47 +46,11 @@ class c32 /*: public NativePf8888*/
 				float	GetBf() const				{ return float(GetB()) / 255.f; }
 				float	GetAf() const				{ return float(GetA()) / 255.f; }
 
-				c32		Add( c32 colour ) const;
-				c32		AddRGB( c32 colour ) const;
-				c32		AddA( c32 colour ) const;
-
-				c32		Sub( c32 colour ) const;
-				c32		SubRGB( c32 colour ) const;
-				c32		SubA( c32 colour ) const;
-
-				c32		Modulate( c32 colour ) const;
-				c32		ModulateRGB( c32 colour ) const;
-				c32		ModulateA( c32 colour ) const;
-
-				c32		Interpolate( c32 colour, float factor ) const;
-				c32		Interpolate( c32 colour, c32 factor ) const;
-
-				c32		ReplicateAlpha() const;
-
-				void	SetBits( c32 colour, u32 mask )		{ mColour = (mColour &(~mask)) | (colour.mColour & mask); }
-
 		static	u32		Make( u8 r, u8 g, u8 b, u8 a )
 		{
 			return (u32(a) << 24) | (u32(b)<<16) | (u32(g)<<8) | u32(r);
 		}
 
-	public:
-		static const u32 MASK_A = 0xff000000;
-		static const u32 MASK_RGB = 0x00ffffff;
-		static const u32 MASK_RGBA = 0xffffffff;
-
-	public:
-		static const c32	Black;
-		static const c32	White;
-		static const c32	Red;
-		static const c32	Green;
-		static const c32	Blue;
-		static const c32	Gold;
-		static const c32	Magenta;
-		static const c32	Turquoise;
-		static const c32	Orange;
-		static const c32	Purple;
-		static const c32	Grey;
 	private:
 		u32		mColour;
 };
