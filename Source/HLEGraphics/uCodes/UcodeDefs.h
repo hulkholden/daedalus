@@ -23,29 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Types.h"
 
-/*
-struct MicroCodeCommand
-{
-	union
-	{
-		u64		_u64;
-
-		struct
-		{
-			u32		cmd1;
-			u32		cmd0;
-		};
-
-		struct
-		{
-			int		: 32;
-			int		: 24;
-			unsigned int		cmd : 8;
-		};
-	};
-};
-*/
-
 struct Instruction
 {
 	union
@@ -78,6 +55,7 @@ struct GBI1_Matrix
 	u32 cmd : 8;
 	u32 addr;
 };
+
 /*
 struct GBI1_PopMatrix
 {
@@ -87,6 +65,7 @@ struct GBI1_PopMatrix
 	u32	:31;
 };
 */
+
 struct GBI2_Matrix
 {
 	union

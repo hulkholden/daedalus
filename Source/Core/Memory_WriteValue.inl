@@ -223,10 +223,7 @@ static void WriteValue_8440_844F( u32 address, u32 value )
 		}
 		else
 		{
-			// Builtin video plugin already calls UpdateScreen in DLParser_Process
-#ifndef DAEDALUS_GL
 			gGraphicsPlugin->UpdateScreen();
-#endif
 		}
 		break;
 

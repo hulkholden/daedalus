@@ -437,9 +437,7 @@ protected:
 	float				mScreenWidth;
 	float				mScreenHeight;
 
-#if defined(DAEDALUS_GL)
 	Matrix4x4			mScreenToDevice;					// Used by OSX renderer - scales screen coords (0..640 etc) to device coords (-1..+1)
-#endif
 
 	static const u32 	kMaxIndices = 320;					// We need at least 80 verts * 3 = 240? But Flying Dragon uses more than 256 //Corn
 	u16					mIndexBuffer[kMaxIndices];

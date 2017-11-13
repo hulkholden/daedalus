@@ -23,13 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Graphics/NativePixelFormat.h"
 #include "Math/Vector2.h"
-#include "Utility/RefCounted.h"
-
-#ifdef DAEDALUS_GL
 #include "SysGL/GL.h"
-#endif
-
-class c32;
+#include "Utility/RefCounted.h"
 
 class CNativeTexture : public CRefCounted
 {
@@ -68,9 +63,7 @@ class CNativeTexture : public CRefCounted
 
 		NativePf8888 *		mpData;
 
-#ifdef DAEDALUS_GL
 		GLuint				mTextureId;
-#endif
 };
 
 #endif // GRAPHICS_NATIVETEXTURE_H_

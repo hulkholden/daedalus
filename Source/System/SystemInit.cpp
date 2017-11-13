@@ -37,6 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Interface/RomDB.h"
 #include "Plugins/AudioPlugin.h"
 #include "Plugins/GraphicsPlugin.h"
+#include "SysGL/Interface/UI.h"
 
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_W32)
 #include "Debug/WebDebug.h"
@@ -44,9 +45,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEGraphics/DisplayListDebugger.h"
 #endif
 
-#ifdef DAEDALUS_GL
-#include "SysGL/Interface/UI.h"
-#endif
 
 CGraphicsPlugin* gGraphicsPlugin = NULL;
 CAudioPlugin* gAudioPlugin = NULL;
@@ -168,9 +166,7 @@ static const SysEntityEntry gSysInitTable[] = {
 #endif
 #endif
 
-#ifdef DAEDALUS_GL
 	{"UI", UI_Init, UI_Finalise},
-#endif
 };
 
 struct RomEntityEntry

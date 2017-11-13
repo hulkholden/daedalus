@@ -52,17 +52,13 @@ struct TempVerts
 
 	~TempVerts()
 	{
-#ifdef DAEDALUS_GL
 		free(Verts);
-#endif
 	}
 
 	DaedalusVtx * Alloc(u32 count)
 	{
 		u32 bytes = count * sizeof(DaedalusVtx);
-#ifdef DAEDALUS_GL
 		Verts = static_cast<DaedalusVtx*>(malloc(bytes));
-#endif
 
 		Count = count;
 		return Verts;
@@ -285,7 +281,6 @@ void BaseRenderer::InitViewport()
 		mN64ToScreenTranslate.y += (FastRand() & 3);
 	}
 
-#if defined(DAEDALUS_GL)
 	f32 w = mScreenWidth;
 	f32 h = mScreenHeight;
 
@@ -295,7 +290,6 @@ void BaseRenderer::InitViewport()
 		    0.f,       0.f,     1.f,     0.f,
 		  -1.0f,       1.f,     0.f,     1.f
 	);
-#endif
 
 	UpdateViewport();
 }
@@ -340,11 +334,7 @@ void BaseRenderer::UpdateViewport()
 
 	//DBGConsole_Msg(0, "[WViewport Changed (%d) (%d)]",vp_w,vp_h );
 
-#if defined(DAEDALUS_GL)
 	glViewport(vp_x, (s32)mScreenHeight - (vp_h + vp_y), vp_w, vp_h);
-#else
-	DAEDALUS_ERROR("Code to set viewport not implemented on this platform");
-#endif
 }
 
 //*****************************************************************************
@@ -1612,13 +1602,11 @@ void BaseRenderer::PrepareTexRectUVs(TexCoord * puv0, TexCoord * puv1)
 	if (rdp_tile.mirror_s)	size_x *= 2;
 	if (rdp_tile.mirror_t)	size_y *= 2;
 
-#ifdef DAEDALUS_GL
 	// If using shift, we need to take it into account here.
 	offset.s = ApplyShift(offset.s, rdp_tile.shift_s);
 	offset.t = ApplyShift(offset.t, rdp_tile.shift_t);
 	size_x   = ApplyShift(size_x,   rdp_tile.shift_s);
 	size_y   = ApplyShift(size_y,   rdp_tile.shift_t);
-#endif
 
 	FixUV(&mTexWrap[0].u, &puv0->s, &puv1->s, offset.s, size_x);
 	FixUV(&mTexWrap[0].v, &puv0->t, &puv1->t, offset.t, size_y);
@@ -1666,14 +1654,10 @@ void BaseRenderer::SetScissor( u32 x0, u32 y0, u32 x1, u32 y1 )
 	s32 r =           s32(screen_br.x);
 	s32 b =           s32(screen_br.y);
 
-#if defined(DAEDALUS_GL)
 	// NB: OpenGL is x,y,w,h. Errors if width or height is negative, so clamp this.
 	s32 w = Max<s32>( r - l, 0 );
 	s32 h = Max<s32>( b - t, 0 );
 	glScissor( l, (s32)mScreenHeight - (t + h), w, h );
-#else
-	DAEDALUS_ERROR("Need to implement scissor for this platform.")
-#endif
 }
 
 extern void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
