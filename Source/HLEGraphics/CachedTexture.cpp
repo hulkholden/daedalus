@@ -90,14 +90,6 @@ static void UpdateTexture( const TextureInfo & ti, CNativeTexture * texture )
 		if( GenerateTexels( &texels, ti, stride, texture->GetBytesRequired() ) )
 		{
 			//
-			//	Recolour the texels
-			//
-			if( ti.GetWhite() )
-			{
-				Recolour( texels, ti.GetWidth(), ti.GetHeight(), stride, c32::White );
-			}
-
-			//
 			//	Clamp edges. We do this so that non power-of-2 textures whose whose width/height
 			//	is less than the mask value clamp correctly. It still doesn't fix those
 			//	textures with a width which is greater than the power-of-2 size.
@@ -180,8 +172,6 @@ void CachedTexture::UpdateIfNecessary()
 	if( !IsFresh() )
 	{
 		UpdateTexture( mTextureInfo, mpTexture );
-
-		// FIXME(strmnrmn): should probably recreate mpWhiteTexture if it exists, else it may have stale data.
 
 		mFrameLastUpToDate = gRDPFrame;
 	}

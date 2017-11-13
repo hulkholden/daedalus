@@ -6,36 +6,14 @@
 #include "ColourValue.h"
 #include "NativePixelFormat.h"
 
-// This is intended for use with swizzled and unswizzled textures, the
-// assumption being that 2 and 4 byte pixels are swizzled around in
-// such a way that their bytes remain in the same order in memory.
-void Recolour( NativePf8888 * data, u32 width, u32 height, u32 stride, c32 colour )
-{
-	u8		r = colour.GetR();
-	u8		g = colour.GetG();
-	u8		b = colour.GetB();
-
-	for( u32 y = 0; y < height; ++y )
-	{
-		for( u32 x = 0; x < width; ++x )
-		{
-			data[x] = NativePf8888( r, g, b, data[x].GetA() );
-		}
-
-		data = AddByteOffset( data, stride );
-	}
-}
-
 void ClampTexels( NativePf8888 * data, u32 n64_width, u32 n64_height, u32 native_width, u32 native_height, u32 native_stride )
 {
 	DAEDALUS_ASSERT( native_stride >= native_width * sizeof( NativePf8888 ), "Native stride isn't big enough" );
 	DAEDALUS_ASSERT( n64_width <= native_width, "n64 width greater than native width?" );
 	DAEDALUS_ASSERT( n64_height <= native_height, "n64 height greater than native height?" );
 
-	//
-	//	If any of the rows are short, we need to duplicate the last pixel on the row
-	//	Stick this in an outer predicate incase they match
-	//
+	// If any of the rows are short, we need to duplicate the last pixel on the row
+	// Stick this in an outer predicate incase they match
 	NativePf8888 * p = data;
 	if( native_width > n64_width )
 	{
