@@ -23,20 +23,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/MathUtil.h"
 #include "Math/Vector4.h"
 
-// Around 463,000 ticks/million
-inline u32 Vector2ColourClampedCPU( const v4 * col_in )
-{
-	u8 r = u8( Clamp<s32>( s32(col_in->x * 255.0f), 0, 255 ) );
-	u8 g = u8( Clamp<s32>( s32(col_in->y * 255.0f), 0, 255 ) );
-	u8 b = u8( Clamp<s32>( s32(col_in->z * 255.0f), 0, 255 ) );
-	u8 a = u8( Clamp<s32>( s32(col_in->w * 255.0f), 0, 255 ) );
-
-	return c32::Make( r, g, b, a );
-}
-
 inline u32 Vector2ColourClamped( const v4 & colour )
 {
-	return Vector2ColourClampedCPU( &colour );
+	u8 r = u8( Clamp<s32>( s32(colour.x * 255.0f), 0, 255 ) );
+	u8 g = u8( Clamp<s32>( s32(colour.y * 255.0f), 0, 255 ) );
+	u8 b = u8( Clamp<s32>( s32(colour.z * 255.0f), 0, 255 ) );
+	u8 a = u8( Clamp<s32>( s32(colour.w * 255.0f), 0, 255 ) );
+
+	return c32::Make( r, g, b, a );
 }
 
 inline u8 AddComponent( u8 a, u8 b )
