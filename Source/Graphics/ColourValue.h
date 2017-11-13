@@ -26,35 +26,31 @@ class v4;
 
 class c32
 {
-	public:
-		c32() {}
-		c32( u8 r, u8 g, u8 b ) : mColour( Make( r, g, b, 255 ) ) {}
-		c32( u8 r, u8 g, u8 b, u8 a ) : mColour( Make( r, g, b, a ) ) {}
-		explicit c32( u32 colour ) : mColour( colour ) {}
-		explicit c32( const v4 & colour );
+   public:
+	c32() {}
+	c32(u8 r, u8 g, u8 b) : mColour(Make(r, g, b, 255)) {}
+	c32(u8 r, u8 g, u8 b, u8 a) : mColour(Make(r, g, b, a)) {}
+	explicit c32(u32 colour) : mColour(colour) {}
+	explicit c32(const v4& colour);
 
-				u32		GetColour() const			{ return mColour; }
-				v4		GetColourV4() const;
+	u32 GetColour() const { return mColour; }
+	v4 GetColourV4() const;
 
-				u8		GetR() const				{ return u8(mColour      ); }
-				u8		GetG() const				{ return u8(mColour >>  8); }
-				u8		GetB() const				{ return u8(mColour >> 16); }
-				u8		GetA() const				{ return u8(mColour >> 24); }
+	u8 GetR() const { return u8(mColour); }
+	u8 GetG() const { return u8(mColour >> 8); }
+	u8 GetB() const { return u8(mColour >> 16); }
+	u8 GetA() const { return u8(mColour >> 24); }
 
-				float	GetRf() const				{ return float(GetR()) / 255.f; }
-				float	GetGf() const				{ return float(GetG()) / 255.f; }
-				float	GetBf() const				{ return float(GetB()) / 255.f; }
-				float	GetAf() const				{ return float(GetA()) / 255.f; }
+	float GetRf() const { return float(GetR()) / 255.f; }
+	float GetGf() const { return float(GetG()) / 255.f; }
+	float GetBf() const { return float(GetB()) / 255.f; }
+	float GetAf() const { return float(GetA()) / 255.f; }
 
-		static	u32		Make( u8 r, u8 g, u8 b, u8 a )
-		{
-			return (u32(a) << 24) | (u32(b)<<16) | (u32(g)<<8) | u32(r);
-		}
+	static u32 Make(u8 r, u8 g, u8 b, u8 a) { return (u32(a) << 24) | (u32(b) << 16) | (u32(g) << 8) | u32(r); }
 
-	private:
-		u32		mColour;
+   private:
+	u32 mColour;
 };
-DAEDALUS_STATIC_ASSERT( sizeof( c32 ) == 4 );
+DAEDALUS_STATIC_ASSERT(sizeof(c32) == 4);
 
-
-#endif // GRAPHICS_COLOURVALUE_H_
+#endif  // GRAPHICS_COLOURVALUE_H_
