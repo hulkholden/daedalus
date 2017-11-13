@@ -162,8 +162,6 @@ static const char ** gUcodeName = gNormalInstructionName[ 0 ];
 static const char * gCustomInstructionName[256];
 #endif
 
-bool					gFrameskipActive = false;
-
 #ifdef DAEDALUS_ENABLE_PROFILING
 SProfileItemHandle * gpProfileItemHandles[ 256 ];
 
@@ -197,7 +195,6 @@ inline void	DLParser_FetchNextCommand( MicroCodeCommand * p_command )
 	pc+= 8;
 }
 
-
 inline void DLParser_PopDL()
 {
 	DL_PF("    Returning from DisplayList: level=%d", gDlistStackPointer+1);
@@ -214,7 +211,6 @@ void DLParser_DumpVtxInfo(u32 address, u32 v0_idx, u32 num_verts);
 u32			gNumDListsCulled;
 u32			gNumVertices;
 u32			gNumRectsClipped;
-u32			gNumInstructionsExecuted = 0;
 #endif
 
 u32 gRDPFrame		= 0;
@@ -507,20 +503,14 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 
 	DL_PF("DP: Firing up RDP!");
 
-	u32 count = 0;
-
-	if(!gFrameskipActive)
-	{
-		gRenderer->SetVIScales();
-		gRenderer->ResetMatrices(stack_size);
-		gRenderer->Reset();
-		gRenderer->BeginScene();
-		count = DLParser_ProcessDList(instruction_limit);
-		gRenderer->EndScene();
-	}
+	gRenderer->SetVIScales();
+	gRenderer->ResetMatrices(stack_size);
+	gRenderer->Reset();
+	gRenderer->BeginScene();
+	u32 count = DLParser_ProcessDList(instruction_limit);
+	gRenderer->EndScene();
 
 	// Hack for Chameleon Twist 2, only works if screen is update at last
-	//
 	if( g_ROM.GameHacks == CHAMELEON_TWIST_2 ) gGraphicsPlugin->UpdateScreen();
 
 	// Do this regardless!
@@ -528,17 +518,14 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DLDebug_SetOutput(NULL);
-
-	// NB: only update gNumInstructionsExecuted when we rendered something.
-	// I'd really like to get rid of gNumInstructionsExecuted.
-	if (!gFrameskipActive)
-		gNumInstructionsExecuted = count;
 #endif
 
 #ifdef DAEDALUS_BATCH_TEST_ENABLED
 	CBatchTestEventHandler * handler( BatchTest_GetHandler() );
 	if( handler )
+	{
 		handler->OnDisplayListComplete();
+	}
 #endif
 
 	return count;
