@@ -217,11 +217,7 @@ public:
 
 	// Various rendering states
 	// Don't think we need to updateshademodel, it breaks tiger's honey hunt
-#ifdef DAEDALUS_PSP
-	inline void			SetTnLMode(u32 mode)					{ mTnL.Flags.Modes = mode; /*UpdateFogEnable(); UpdateShadeModel();*/ }
-#else
 	inline void			SetTnLMode(u32 mode)					{ mTnL.Flags.Modes = mode; UpdateFogEnable(); /*UpdateShadeModel();*/ }
-#endif
 	inline void			SetTextureEnable(bool enable)			{ mTnL.Flags.Texture = enable; }
 	inline void			SetTextureTile(u32 tile)				{ mTextureTile = tile; }
 	inline u32			GetTextureTile() const					{ return mTextureTile; }
@@ -232,12 +228,7 @@ public:
 	inline void			SetFogMinMax(f32 fog_near, f32 fog_far)	{ /* TODO(strmnnrmn) */ }
 	inline void			SetFogColour( c32 colour )				{ mFogColour = colour; }
 
-	// PrimDepth will replace the z value if depth_source=1 (z range 32767-0 while PSP depthbuffer range 0-65535)//Corn
-#ifdef DAEDALUS_PSP
-	inline void			SetPrimitiveDepth( u32 z )				{ mPrimDepth = (f32)( ( ( 32767 - z ) << 1) + 1 ); }
-#else
 	inline void			SetPrimitiveDepth( u32 z )				{ mPrimDepth = (f32)(z - 0x4000) / (f32)0x4000;}
-#endif
 	inline void			SetPrimitiveLODFraction( f32 f )		{ mPrimLODFraction = f; }
 	inline void			SetPrimitiveColour( c32 colour )		{ mPrimitiveColour = colour; }
 	inline void			SetEnvColour( c32 colour )				{ mEnvColour = colour; }
@@ -277,7 +268,6 @@ public:
 	void				SetDKRMat(const u32 address, bool mul, u32 idx);
 	void				SetProjection(const u32 address, bool bReplace);
 	void				SetWorldView(const u32 address, bool bPush, bool bReplace);
-	//inline void			PopProjection() {if (mProjectionTop > 0) --mProjectionTop;	mWorldProjectValid = false;}
 	inline void			PopWorldView(u32 num = 1)	{if (mModelViewTop > (num-1))	 mModelViewTop-=num;	mWorldProjectValid = false;}
 	void				InsertMatrix(u32 w0, u32 w1);
 	void				ForceMatrix(const u32 address);
@@ -300,7 +290,6 @@ public:
 
 	// Render our current triangle list to screen
 	void				FlushTris();
-	//void				Line3D( u32 v0, u32 v1, u32 width );
 
 	// Returns true if bounding volume is visible within NDC box, false if culled
 	inline bool			TestVerts( u32 v0, u32 vn ) const		{ u32 f=mVtxProjected[v0].ClipFlags; for( u32 i=v0+1; i<=vn; i++ ) f&=mVtxProjected[i].ClipFlags; return f==0; }
@@ -354,9 +343,9 @@ protected:
 	virtual void		RenderTriangles( DaedalusVtx * p_vertices, u32 num_vertices, bool disable_zbuffer ) = 0;
 
 	void 				TestVFPUVerts( u32 v0, u32 num, const FiddledVtx * verts, const Matrix4x4 & mat_world );
-	template< bool FogEnable, int TextureMode >
-	void ProcessVerts( u32 v0, u32 num, const FiddledVtx * verts, const Matrix4x4 & mat_world );
 
+	template< bool FogEnable, int TextureMode >
+	void 				ProcessVerts( u32 v0, u32 num, const FiddledVtx * verts, const Matrix4x4 & mat_world );
 
 	void				PrepareTrisClipped( TempVerts * temp_verts ) const;
 	void				PrepareTrisUnclipped( TempVerts * temp_verts ) const;
@@ -395,6 +384,7 @@ protected:
 	c32					mEnvColour;				// Combiner
 	c32					mBlendColour;			// Blender
 	u32					mFillColour;			// RDP. NB u32 not c32 as this is typically 2 16-bit colour values.
+
 	// Texturing
 	struct TextureWrap
 	{
@@ -417,9 +407,8 @@ protected:
 	// Index of the corresponding tile state.
 	u8						mActiveTile[ kNumBoundTextures ];
 
-
-	//Max is 18 according to the manual //Corn
-	//I think we should make this more deep to avoid any issues //Salvy
+	// Max is 18 according to the manual //Corn
+	// I think we should make this more deep to avoid any issues //Salvy
 	static const u32 MATRIX_STACK_SIZE = 20;
 
 	mutable Matrix4x4	mWorldProject;
@@ -449,9 +438,7 @@ protected:
 
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	//
 	// Stats
-	//
 	u32					mNumTrisRendered;
 	u32					mNumTrisClipped;
 	u32					mNumRect;
