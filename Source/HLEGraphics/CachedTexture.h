@@ -58,7 +58,6 @@ class CachedTexture
 
 		CRefPtr<CNativeTexture>			mpTexture;
 
-		u32								mTextureContentsHash;
 		u32								mFrameLastUpToDate;	// Frame # that this was last updated
 		u32								mFrameLastUsed;		// Frame # that this was last used
 };

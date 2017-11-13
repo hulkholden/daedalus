@@ -42,17 +42,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 static std::vector<u8>		gTexelBuffer;
 
-// NB: On the PSP we generate a lightweight hash of the texture data before
-// updating the native texture. This avoids some expensive work where possible.
-// On other platforms (e.g. OSX) updating textures is relatively inexpensive, so
-// we just skip the hashing process entirely, and update textures every frame
-// regardless of whether they've actually changed.
-static const bool kUpdateTexturesEveryFrame = true;
-
 static bool GenerateTexels(NativePf8888 ** p_texels, const TextureInfo & ti,
 						   u32 pitch, u32 buffer_size)
 {
-	if( gTexelBuffer.size() < buffer_size ) //|| gTexelBuffer.size() > (128 * 1024))//Cut off for downsizing may need to be adjusted to prevent some thrashing
+	if( gTexelBuffer.size() < buffer_size )
 	{
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 		printf( "Resizing texel buffer to %d bytes. Texture is %dx%d\n", buffer_size, ti.GetWidth(), ti.GetHeight() );
@@ -146,7 +139,6 @@ CachedTexture * CachedTexture::Create( const TextureInfo & ti )
 CachedTexture::CachedTexture( const TextureInfo & ti )
 :	mTextureInfo( ti )
 ,	mpTexture(NULL)
-,	mTextureContentsHash( 0 )
 ,	mFrameLastUpToDate( gRDPFrame )
 ,	mFrameLastUsed( gRDPFrame )
 {
@@ -177,37 +169,17 @@ bool CachedTexture::Initialise()
 		{
 			mFrameLastUpToDate = gRDPFrame + (FastRand() & (gCheckTextureHashFrequency - 1));
 		}
-		UpdateTextureHash();
 		UpdateTexture( mTextureInfo, mpTexture );
 	}
 
 	return mpTexture != NULL;
 }
 
-// Update the hash of the texture. Returns true if the texture should be updated.
-bool CachedTexture::UpdateTextureHash()
-{
-	if (kUpdateTexturesEveryFrame)
-	{
-		// NB always assume we need updating.
-		return true;
-	}
-
-	u32 new_hash_value = mTextureInfo.GenerateHashValue();
-	bool changed       = new_hash_value != mTextureContentsHash;
-
-	mTextureContentsHash = new_hash_value;
-	return changed;
-}
-
 void CachedTexture::UpdateIfNecessary()
 {
 	if( !IsFresh() )
 	{
-		if (UpdateTextureHash())
-		{
-			UpdateTexture( mTextureInfo, mpTexture );
-		}
+		UpdateTexture( mTextureInfo, mpTexture );
 
 		// FIXME(strmnrmn): should probably recreate mpWhiteTexture if it exists, else it may have stale data.
 
@@ -217,43 +189,14 @@ void CachedTexture::UpdateIfNecessary()
 	mFrameLastUsed = gRDPFrame;
 }
 
-// IsFresh - has this cached texture been updated recently?
+// Has this cached texture been updated recently?
 bool CachedTexture::IsFresh() const
 {
-	if (gRDPFrame == mFrameLastUsed)
-		return true;
-
-	// If we're not updating textures every frame, check how long it's been
-	// since we last updated it.
-	if (!kUpdateTexturesEveryFrame)
-	{
-		return (gCheckTextureHashFrequency == 0 ||
-				gRDPFrame < mFrameLastUpToDate + gCheckTextureHashFrequency);
-	}
-
-	return false;
+	return gRDPFrame == mFrameLastUsed;
 }
 
 bool CachedTexture::HasExpired() const
 {
-	if (!kUpdateTexturesEveryFrame)
-	{
-		if (!IsFresh())
-		{
-			//Hack to make WONDER PROJECT J2 work (need to reload some textures every frame!) //Corn
-			if( (g_ROM.GameHacks == WONDER_PROJECTJ2) && (mTextureInfo.GetTLutFormat() == kTT_RGBA16) && (mTextureInfo.GetSize() == G_IM_SIZ_8b) ) return true;
-
-			//Hack for Worms Armageddon
-			if( (g_ROM.GameHacks == WORMS_ARMAGEDDON) && (mTextureInfo.GetSize() == G_IM_SIZ_8b) && (mTextureContentsHash != mTextureInfo.GenerateHashValue()) ) return true;
-
-			//Hack for Zelda OOT & MM text (only needed if there is not a general hash check) //Corn
-			if( g_ROM.ZELDA_HACK && (mTextureInfo.GetSize() == G_IM_SIZ_4b) && mTextureContentsHash != mTextureInfo.GenerateHashValue() ) return true;
-
-			//Check if texture has changed
-			//if( mTextureContentsHash != mTextureInfo.GenerateHashValue() ) return true;
-		}
-	}
-
 	//Otherwise we wait 20+random(0-3) frames before trashing the texture if unused
 	//Spread trashing them over time so not all get killed at once (lower value uses less VRAM) //Corn
 	return gRDPFrame - mFrameLastUsed > (20 + (FastRand() & 0x3));
