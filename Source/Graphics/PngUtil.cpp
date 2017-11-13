@@ -23,58 +23,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include <png.h>
 
-#include "Graphics/TextureFormat.h"
 #include "Graphics/NativePixelFormat.h"
 #include "Graphics/NativeTexture.h"
 #include "System/DataSink.h"
 
-template< typename T >
-static void WritePngRow( u8 * line, const void * src, u32 width )
+static void WritePngRow( u8 * line, const NativePf8888 * src, u32 width )
 {
 	u32 i = 0;
-
-	const T *	p_src( reinterpret_cast< const T * >( src ) );
-
+	const NativePf8888 *	p_src = src;
 	for ( u32 x = 0; x < width; x++ )
 	{
-		T	color( p_src[ x ] );
-
-		line[i++] = color.GetR();
-		line[i++] = color.GetG();
-		line[i++] = color.GetB();
-		line[i++] = color.GetA();
-	}
-}
-
-static void WritePngRowPal4( u8 * line, const void * src, u32 width, const NativePf8888 * palette )
-{
-	u32 i = 0;
-
-	const NativePfCI44 * p_src = reinterpret_cast< const NativePfCI44 * >( src );
-
-	for ( u32 x = 0; x < width; x++ )
-	{
-		NativePfCI44	colors( p_src[ x / 2 ] );
-		u8				color_idx( (x&1) ? colors.GetIdxB() : colors.GetIdxA() );	// FIXME(strmnnrmn): A/B should be swapped? NativeTextureOSX is broken with this ordering.
-		NativePf8888	color( palette[ color_idx ] );
-
-		line[i++] = color.GetR();
-		line[i++] = color.GetG();
-		line[i++] = color.GetB();
-		line[i++] = color.GetA();
-	}
-}
-
-static void WritePngRowPal8( u8 * line, const void * src, u32 width, const NativePf8888 * palette )
-{
-	u32 i = 0;
-
-	const NativePfCI8 * p_src = reinterpret_cast< const NativePfCI8 * >( src );
-
-	for ( u32 x = 0; x < width; x++ )
-	{
-		u8				color_idx( p_src[ x ].Bits );
-		NativePf8888	color( palette[ color_idx ] );
+		NativePf8888	color( p_src[ x ] );
 
 		line[i++] = color.GetR();
 		line[i++] = color.GetG();
@@ -99,10 +58,8 @@ static void DAEDALUS_ZLIB_CALL_TYPE PngFlush(png_structp png_ptr)
 // Save texture as PNG
 // From Shazz/71M - thanks guys!
 //*****************************************************************************
-void PngSaveImage( DataSink * sink, const void * data, const void * palette, ETextureFormat pixelformat, s32 pitch, u32 width, u32 height, bool use_alpha )
+void PngSaveImage( DataSink * sink, const void * data, s32 pitch, u32 width, u32 height, bool use_alpha )
 {
-	DAEDALUS_ASSERT( !IsTextureFormatPalettised( pixelformat ) || palette, "No palette specified" );
-
 	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png_ptr)
 		return;
@@ -120,8 +77,7 @@ void PngSaveImage( DataSink * sink, const void * data, const void * palette, ETe
 
 	u8* line = (u8*) malloc(width * 4);
 
-	const u8 *				p       = reinterpret_cast< const u8 * >( data );
-	const NativePf8888 *	pal8888 = reinterpret_cast< const NativePf8888 * >( palette );
+	const u8 * p = reinterpret_cast< const u8 * >( data );
 
 	// If the pitch is negative (i.e for a screenshot), start at the last row and work backwards.
 	if (pitch < 0)
@@ -131,15 +87,7 @@ void PngSaveImage( DataSink * sink, const void * data, const void * palette, ETe
 
 	for ( u32 y = 0; y < height; y++ )
 	{
-		switch (pixelformat)
-		{
-		case TexFmt_5650:		WritePngRow< NativePf5650 >( line, p, width );	break;
-		case TexFmt_5551:		WritePngRow< NativePf5551 >( line, p, width );	break;
-		case TexFmt_4444:		WritePngRow< NativePf4444 >( line, p, width );	break;
-		case TexFmt_8888:		WritePngRow< NativePf8888 >( line, p, width );	break;
-		case TexFmt_CI4_8888:	WritePngRowPal4( line, p, width, pal8888 );		break;
-		case TexFmt_CI8_8888:	WritePngRowPal8( line, p, width, pal8888 );		break;
-		}
+		WritePngRow( line, reinterpret_cast< const NativePf8888 * >(p), width );
 
 		//
 		//	Set alpha to full if it's not required.
@@ -163,9 +111,8 @@ void PngSaveImage( DataSink * sink, const void * data, const void * palette, ETe
 	png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
 }
 
-void PngSaveImage( const std::string& filename, const void * data, const void * palette,
-				   ETextureFormat format, s32 stride,
-				   u32 width, u32 height, bool use_alpha )
+void PngSaveImage( const std::string& filename, const void * data,
+				   s32 stride, u32 width, u32 height, bool use_alpha )
 {
 	FileSink sink;
 	if (!sink.Open(filename, "wb"))
@@ -174,24 +121,22 @@ void PngSaveImage( const std::string& filename, const void * data, const void * 
 		return;
 	}
 
-	PngSaveImage(&sink, data, palette, format, stride, width, height, use_alpha);
+	PngSaveImage(&sink, data, stride, width, height, use_alpha);
 }
 
 void PngSaveImage( DataSink * sink, const CNativeTexture * texture )
 {
 	DAEDALUS_ASSERT(texture->HasData(), "Should have a texture");
 
-	PngSaveImage( sink, texture->GetData(), texture->GetPalette(),
-		texture->GetFormat(), texture->GetStride(),
-		texture->GetWidth(), texture->GetHeight(), true );
+	PngSaveImage( sink, texture->GetData(),
+		texture->GetStride(), texture->GetWidth(), texture->GetHeight(), true );
 }
 
 // Utility function to flatten a native texture into an array of NativePf8888 values.
 // Should live elsewhere, but need to share WritePngRow.
 void FlattenTexture(const CNativeTexture * texture, void * dst, size_t len)
 {
-	const u8 *           p       = reinterpret_cast< const u8 * >( texture->GetData() );
-	const NativePf8888 * pal8888 = reinterpret_cast< const NativePf8888 * >( texture->GetPalette() );
+	const u8 * p = reinterpret_cast< const u8 * >( texture->GetData() );
 
 	u32 width  = texture->GetWidth();
 	u32 height = texture->GetHeight();
@@ -202,16 +147,7 @@ void FlattenTexture(const CNativeTexture * texture, void * dst, size_t len)
 	u8 * line = static_cast<u8 *>( dst );
 	for ( u32 y = 0; y < height; y++ )
 	{
-		switch (texture->GetFormat())
-		{
-		case TexFmt_5650:		WritePngRow< NativePf5650 >( line, p, width );	break;
-		case TexFmt_5551:		WritePngRow< NativePf5551 >( line, p, width );	break;
-		case TexFmt_4444:		WritePngRow< NativePf4444 >( line, p, width );	break;
-		case TexFmt_8888:		WritePngRow< NativePf8888 >( line, p, width );	break;
-		case TexFmt_CI4_8888:	WritePngRowPal4( line, p, width, pal8888 );		break;
-		case TexFmt_CI8_8888:	WritePngRowPal8( line, p, width, pal8888 );		break;
-		}
-
+		WritePngRow(line, reinterpret_cast< const NativePf8888 * >(p), width);
 		p    += pitch;
 		line += width * sizeof(NativePf8888);
 	}

@@ -20,15 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_CONVERTIMAGE_H_
 #define HLEGRAPHICS_CONVERTIMAGE_H_
 
-#include "Graphics/TextureFormat.h"
-
 struct TextureInfo;
 struct NativePf8888;
 
-bool ConvertTexture(const TextureInfo & ti,
-					void * texels,
-					NativePf8888 * palette,
-					ETextureFormat texture_format,
-					u32 pitch);
+bool ConvertTexture(const TextureInfo & ti, NativePf8888 * texels, u32 pitch);
 
 #endif // HLEGRAPHICS_CONVERTIMAGE_H_

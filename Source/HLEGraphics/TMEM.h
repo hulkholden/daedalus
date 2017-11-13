@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 StrmnNrmn
+Copyright (C) 2006,2007 StrmnNrmn
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -17,20 +17,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef GRAPHICS_PNGUTIL_H_
-#define GRAPHICS_PNGUTIL_H_
+#ifndef HLEGRAPHICS_TMEM_H_
+#define HLEGRAPHICS_TMEM_H_
 
-#include <stdlib.h>
+#include "Base/Types.h"
 
-#include <string>
+void CopyLineQwords(void * dst, const void * src, u32 qwords);
+void CopyLineQwordsSwap(void * dst, const void * src, u32 qwords);
+void CopyLineQwordsSwap32(void * dst, const void * src, u32 qwords);
+void CopyLine(void * dst, const void * src, u32 bytes);
+void CopyLine16(u16 * dst16, const u16 * src16, u32 words);
+void CopyLineSwap(void * dst, const void * src, u32 bytes);
+void CopyLineSwap32(void * dst, const void * src, u32 bytes);
 
-class DataSink;
-class CNativeTexture;
-
-void PngSaveImage( const std::string& filename, const void * data, s32 pitch, u32 width, u32 height, bool use_alpha );
-void PngSaveImage( DataSink * sink, const void * data, s32 pitch, u32 width, u32 height, bool use_alpha );
-void PngSaveImage( DataSink * sink, const CNativeTexture * texture );
-
-void FlattenTexture(const CNativeTexture * texture, void * dst, size_t len);
-
-#endif // GRAPHICS_PNGUTIL_H_
+#endif // HLEGRAPHICS_TMEM_H_

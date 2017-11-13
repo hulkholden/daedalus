@@ -41,7 +41,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Profiler.h"
 
 static std::vector<u8>		gTexelBuffer;
-static NativePf8888			gPaletteBuffer[ 256 ];
 
 // NB: On the PSP we generate a lightweight hash of the texture data before
 // updating the native texture. This avoids some expensive work where possible.
@@ -50,12 +49,8 @@ static NativePf8888			gPaletteBuffer[ 256 ];
 // regardless of whether they've actually changed.
 static const bool kUpdateTexturesEveryFrame = true;
 
-static bool GenerateTexels(void ** p_texels,
-						   void ** p_palette,
-						   const TextureInfo & ti,
-						   ETextureFormat texture_format,
-						   u32 pitch,
-						   u32 buffer_size)
+static bool GenerateTexels(NativePf8888 ** p_texels, const TextureInfo & ti,
+						   u32 pitch, u32 buffer_size)
 {
 	if( gTexelBuffer.size() < buffer_size ) //|| gTexelBuffer.size() > (128 * 1024))//Cut off for downsizing may need to be adjusted to prevent some thrashing
 	{
@@ -65,30 +60,27 @@ static bool GenerateTexels(void ** p_texels,
 		gTexelBuffer.resize( buffer_size );
 	}
 
-	void *			texels  = &gTexelBuffer[0];
-	NativePf8888 *	palette = IsTextureFormatPalettised( texture_format ) ? gPaletteBuffer : NULL;
+	NativePf8888 * texels = reinterpret_cast<NativePf8888*>(&gTexelBuffer[0]);
 
 	// NB: if line is 0, it implies this is a direct load from ram (e.g. DLParser_Sprite2DDraw etc)
 	// This check isn't robust enough, SSV set ti.Line == 0 in game without calling Sprite2D
 	if (ti.GetLine() > 0)
 	{
-		if (ConvertTile(ti, texels, palette, texture_format, pitch))
+		if (!ConvertTile(ti, texels, pitch))
 		{
-			*p_texels  = texels;
-			*p_palette = palette;
-			return true;
+			return false;
 		}
-		return false;
 	}
-
-	if (ConvertTexture(ti, texels, palette, texture_format, pitch))
+	else
 	{
-		*p_texels  = texels;
-		*p_palette = palette;
-		return true;
+		if (!ConvertTexture(ti, texels, pitch))
+		{
+			return false;
+		}
 	}
 
-	return false;
+	*p_texels = texels;
+	return true;
 }
 
 static void UpdateTexture( const TextureInfo & ti, CNativeTexture * texture )
@@ -99,19 +91,17 @@ static void UpdateTexture( const TextureInfo & ti, CNativeTexture * texture )
 
 	if ( texture != NULL && texture->HasData() )
 	{
-		ETextureFormat	format = texture->GetFormat();
-		u32 			stride = texture->GetStride();
+		u32 stride = texture->GetStride();
 
-		void *	texels;
-		void *	palette;
-		if( GenerateTexels( &texels, &palette, ti, format, stride, texture->GetBytesRequired() ) )
+		NativePf8888 *	texels;
+		if( GenerateTexels( &texels, ti, stride, texture->GetBytesRequired() ) )
 		{
 			//
 			//	Recolour the texels
 			//
 			if( ti.GetWhite() )
 			{
-				Recolour( texels, palette, ti.GetWidth(), ti.GetHeight(), stride, format, c32::White );
+				Recolour( texels, ti.GetWidth(), ti.GetHeight(), stride, c32::White );
 			}
 
 			//
@@ -119,7 +109,7 @@ static void UpdateTexture( const TextureInfo & ti, CNativeTexture * texture )
 			//	is less than the mask value clamp correctly. It still doesn't fix those
 			//	textures with a width which is greater than the power-of-2 size.
 			//
-			ClampTexels( texels, ti.GetWidth(), ti.GetHeight(), texture->GetCorrectedWidth(), texture->GetCorrectedHeight(), stride, format );
+			ClampTexels( texels, ti.GetWidth(), ti.GetHeight(), texture->GetCorrectedWidth(), texture->GetCorrectedHeight(), stride );
 
 			//
 			//	Mirror the texels if required (in-place)
@@ -128,10 +118,10 @@ static void UpdateTexture( const TextureInfo & ti, CNativeTexture * texture )
 			bool mirror_t = ti.GetEmulateMirrorT();
 			if( mirror_s || mirror_t )
 			{
-				MirrorTexels( mirror_s, mirror_t, texels, stride, texels, stride, format, ti.GetWidth(), ti.GetHeight() );
+				MirrorTexels( mirror_s, mirror_t, texels, stride, texels, stride, ti.GetWidth(), ti.GetHeight() );
 			}
 
-			texture->SetData( texels, palette );
+			texture->SetData( texels );
 		}
 	}
 }
@@ -176,7 +166,7 @@ bool CachedTexture::Initialise()
 	if (mTextureInfo.GetEmulateMirrorS()) width  *= 2;
 	if (mTextureInfo.GetEmulateMirrorT()) height *= 2;
 
-	mpTexture = CNativeTexture::Create( width, height, TexFmt_8888 );
+	mpTexture = CNativeTexture::Create( width, height );
 	if( mpTexture != NULL )
 	{
 		// If this we're performing Texture updated checks, randomly offset the
@@ -285,22 +275,14 @@ void CachedTexture::DumpTexture( const TextureInfo & ti, const CNativeTexture * 
 		std::string dumpdir = IO::Path::Join(g_ROM.settings.GameName, "Textures");
 		std::string filepath = IO::Path::Join(Dump_GetDumpDirectory(dumpdir), filename);
 
-		void *	texels;
-		void *	palette;
+		NativePf8888 *	texels;
 
 		// Note that we re-convert the texels because those in the native texture may well already
 		// be swizzle. Maybe we should just have an unswizzle routine?
-		if( GenerateTexels( &texels, &palette, ti, texture->GetFormat(), texture->GetStride(), texture->GetBytesRequired() ) )
+		if( GenerateTexels( &texels, ti, texture->GetStride(), texture->GetBytesRequired() ) )
 		{
 			// NB - this does not include the mirrored texels
-
-			// NB we use the palette from the native texture. This is a total hack.
-			// We have to do this because the palette texels come from emulated tmem, rather
-			// than ram. This means that when we dump out the texture here, tmem won't necessarily
-			// contain our pixels.
-			const void * native_palette = texture->GetPalette();
-
-			PngSaveImage( filepath, texels, native_palette, texture->GetFormat(), texture->GetStride(), ti.GetWidth(), ti.GetHeight(), true );
+			PngSaveImage( filepath, texels, texture->GetStride(), ti.GetWidth(), ti.GetHeight(), true );
 		}
 	}
 }

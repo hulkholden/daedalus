@@ -21,11 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef GRAPHICS_NATIVETEXTURE_H_
 #define GRAPHICS_NATIVETEXTURE_H_
 
-#include "Utility/RefCounted.h"
-
-#include "TextureFormat.h"
-
+#include "Graphics/NativePixelFormat.h"
 #include "Math/Vector2.h"
+#include "Utility/RefCounted.h"
 
 #ifdef DAEDALUS_GL
 #include "SysGL/GL.h"
@@ -37,16 +35,16 @@ class CNativeTexture : public CRefCounted
 {
 	friend class CRefPtr<CNativeTexture>::_NoAddRefRelease<CNativeTexture>;
 
-		CNativeTexture( u32 w, u32 h, ETextureFormat texture_format );
+		CNativeTexture( u32 w, u32 h );
 		~CNativeTexture();
 
 	public:
-		static	CRefPtr<CNativeTexture>		Create( u32 width, u32 height, ETextureFormat texture_format );
-		static	CRefPtr<CNativeTexture>		CreateFromPng( const char * p_filename, ETextureFormat texture_format );
+		static	CRefPtr<CNativeTexture>		Create( u32 width, u32 height );
+		static	CRefPtr<CNativeTexture>		CreateFromPng( const char * p_filename );
 
 		void							InstallTexture() const;
 
-		void							SetData( void * data, void * palette );
+		void							SetData( NativePf8888 * data );
 
 		inline u32						GetBlockWidth() const			{ return mTextureBlockWidth; }
 		inline u32						GetWidth() const				{ return mWidth; }
@@ -54,25 +52,21 @@ class CNativeTexture : public CRefCounted
 		inline u32						GetCorrectedWidth() const		{ return mCorrectedWidth; }
 		inline u32						GetCorrectedHeight() const		{ return mCorrectedHeight; }
 		u32								GetStride() const;
-		inline ETextureFormat			GetFormat() const				{ return mTextureFormat; }
 
-		inline const void *				GetPalette() const				{ return mpPalette; }
-		inline const void *				GetData() const					{ return mpData; }
-		inline void *					GetData()						{ return mpData; }
+		inline const NativePf8888 *		GetData() const					{ return mpData; }
+		inline NativePf8888 *			GetData()						{ return mpData; }
 
 		u32								GetBytesRequired() const;
 		bool							HasData() const;				// If we run out of texture memory, this will return true
 
 	private:
-		ETextureFormat		mTextureFormat;
 		u32					mWidth;
 		u32					mHeight;
 		u32					mCorrectedWidth;
 		u32					mCorrectedHeight;
 		u32					mTextureBlockWidth;		// Multiple of 16 bytes
 
-		void *				mpData;
-		void *				mpPalette;
+		NativePf8888 *		mpData;
 
 #ifdef DAEDALUS_GL
 		GLuint				mTextureId;

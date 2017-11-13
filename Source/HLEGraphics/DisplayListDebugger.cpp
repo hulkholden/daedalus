@@ -249,7 +249,7 @@ void DLDebugger_ProcessDebugTask()
 				// NB, pass a negative pitch, to render the screenshot the right way up.
 				s32 pitch = -static_cast<s32>(width * 4);
 
-				PngSaveImage(connection, pixels, NULL, TexFmt_8888, pitch, width, height, false);
+				PngSaveImage(connection, pixels, pitch, width, height, false);
 
 				free(pixels);
 

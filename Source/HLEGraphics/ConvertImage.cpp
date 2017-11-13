@@ -38,22 +38,18 @@ namespace
 
 struct TextureDestInfo
 {
-	explicit TextureDestInfo( ETextureFormat tex_fmt )
-		:	Format( tex_fmt )
-		,	Width( 0 )
+	TextureDestInfo()
+		:	Width( 0 )
 		,	Height( 0 )
 		,	Pitch( 0 )
 		,	Data( NULL )
-		,	Palette( NULL )
 	{
 	}
 
-	ETextureFormat		Format;
 	u32					Width;			// Describes the width of the locked area. Use lPitch to move between successive lines
 	u32					Height;			// Describes the height of the locked area
 	s32					Pitch;			// Specifies the number of bytes on each row (not necessarily bitdepth*width/8)
-	void *				Data;			// Pointer to the top left pixel of the image
-	NativePf8888 *		Palette;
+	NativePf8888 *		Data;			// Pointer to the top left pixel of the image
 };
 
 static const u8 OneToEight[2] =
@@ -116,18 +112,14 @@ template<> struct SSwizzleInfo< 4 >
 	enum { Swizzle = 2 };
 };
 
-template < typename OutT >
-struct SConvertGeneric
-{
-typedef void (*ConvertRowFunction)( OutT * dst, const u8 * src, u32 src_offset, u32 width );
-
+typedef void (*ConvertRowFunction)( NativePf8888 * dst, const u8 * src, u32 src_offset, u32 width );
 
 static void ConvertGeneric( const TextureDestInfo & dsti,
 							const TextureInfo & ti,
 							ConvertRowFunction swapped_fn,
 							ConvertRowFunction unswapped_fn )
 {
-	OutT *		dst        = reinterpret_cast< OutT * >( dsti.Data );
+	NativePf8888 * dst = reinterpret_cast< NativePf8888 * >( dsti.Data );
 	const u8 *	src        = g_pu8RamBase;
 	u32			src_offset = ti.GetLoadAddress();
 	u32			src_pitch  = ti.GetPitch();
@@ -146,7 +138,7 @@ static void ConvertGeneric( const TextureDestInfo & dsti,
 			}
 
 			src_offset += src_pitch;
-			dst = reinterpret_cast< OutT * >( (u8*)dst + dsti.Pitch );
+			dst = reinterpret_cast< NativePf8888 * >( (u8*)dst + dsti.Pitch );
 		}
 	}
 	else
@@ -156,12 +148,10 @@ static void ConvertGeneric( const TextureDestInfo & dsti,
 			unswapped_fn( dst, src, src_offset, ti.GetWidth() );
 
 			src_offset += src_pitch;
-			dst = reinterpret_cast< OutT * >( (u8*)dst + dsti.Pitch );
+			dst = reinterpret_cast< NativePf8888 * >( (u8*)dst + dsti.Pitch );
 		}
 	}
 }
-
-};
 
 typedef void (*ConvertPalettisedRowFunction)( NativePf8888 * dst, const u8 * src, u32 src_offset, u32 width, const NativePf8888 * palette );
 
@@ -252,8 +242,8 @@ struct SConvert
 	//
 	//	This routine converts from any format which is > 1 byte to any Psp format.
 	//
-	template < typename OutT, u32 InFiddle, u32 OutFiddle >
-	static inline void ConvertRow( OutT * dst, const u8 * src, u32 src_offset, u32 width )
+	template < u32 InFiddle, u32 OutFiddle >
+	static inline void ConvertRow( NativePf8888 * dst, const u8 * src, u32 src_offset, u32 width )
 	{
 		DAEDALUS_DL_ASSERT( IsAligned( src_offset, sizeof( InT ) ), "Offset should be correctly aligned" );
 
@@ -273,35 +263,15 @@ struct SConvert
 		{
 			InT	colour( *reinterpret_cast< const InT * >( &src[src_offset ^ InFiddle] ) );
 
-			dst[x ^ OutFiddle] = ConvertPixelFormat< OutT, InT >( colour );
+			dst[x ^ OutFiddle] = ConvertPixelFormat< NativePf8888, InT >( colour );
 
 			src_offset += sizeof( InT );
 		}
 	}
 
-	template < typename OutT >
-	static inline void ConvertTextureT( const TextureDestInfo & dsti, const TextureInfo & ti )
-	{
-		SConvertGeneric< OutT >::ConvertGeneric( dsti, ti,
-												 ConvertRow< OutT, Fiddle, Swizzle >,
-												 ConvertRow< OutT, Fiddle, 0 > );
-	}
-
 	static void ConvertTexture( const TextureDestInfo & dsti, const TextureInfo & ti )
 	{
-		switch( dsti.Format )
-		{
-		case TexFmt_5650:	ConvertTextureT< NativePf5650 >( dsti, ti ); return;
-		case TexFmt_5551:	ConvertTextureT< NativePf5551 >( dsti, ti ); return;
-		case TexFmt_4444:	ConvertTextureT< NativePf4444 >( dsti, ti ); return;
-		case TexFmt_8888:	ConvertTextureT< NativePf8888 >( dsti, ti ); return;
-
-		case TexFmt_CI4_8888: break;
-		case TexFmt_CI8_8888: break;
-
-		}
-
-		DAEDALUS_DL_ERROR( "Unhandled format" );
+		ConvertGeneric( dsti, ti, ConvertRow< Fiddle, Swizzle >, ConvertRow< Fiddle, 0 > );
 	}
 };
 
@@ -309,8 +279,8 @@ struct SConvertIA4
 {
 	enum { Fiddle = 0x3 };
 
-	template < typename OutT, u32 F >
-	static inline void ConvertRow( OutT * dst, const u8 * src, u32 src_offset, u32 width )
+	template < u32 F >
+	static inline void ConvertRow( NativePf8888 * dst, const u8 * src, u32 src_offset, u32 width )
 	{
 		// Do two pixels at a time
 		for (u32 x = 0; x < width; x+=2)
@@ -318,15 +288,15 @@ struct SConvertIA4
 			u8 b = src[src_offset ^ F];
 
 			// Even
-			dst[x + 0] = OutT( ThreeToEight[(b & 0xE0) >> 5],
-							   ThreeToEight[(b & 0xE0) >> 5],
-							   ThreeToEight[(b & 0xE0) >> 5],
-							     OneToEight[(b & 0x10) >> 4]);
+			dst[x + 0] = NativePf8888(ThreeToEight[(b & 0xE0) >> 5],
+									  ThreeToEight[(b & 0xE0) >> 5],
+									  ThreeToEight[(b & 0xE0) >> 5],
+									    OneToEight[(b & 0x10) >> 4]);
 			// Odd
-			dst[x + 1] = OutT( ThreeToEight[(b & 0x0E) >> 1],
-							   ThreeToEight[(b & 0x0E) >> 1],
-							   ThreeToEight[(b & 0x0E) >> 1],
-							     OneToEight[(b & 0x01)     ] );
+			dst[x + 1] = NativePf8888(ThreeToEight[(b & 0x0E) >> 1],
+									  ThreeToEight[(b & 0x0E) >> 1],
+									  ThreeToEight[(b & 0x0E) >> 1],
+									    OneToEight[(b & 0x01)     ]);
 			src_offset++;
 		}
 
@@ -335,34 +305,16 @@ struct SConvertIA4
 			u8 b = src[src_offset ^ F];
 
 			// Even
-			dst[width-1] = OutT( ThreeToEight[(b & 0xE0) >> 5],
-								 ThreeToEight[(b & 0xE0) >> 5],
-								 ThreeToEight[(b & 0xE0) >> 5],
-								   OneToEight[(b & 0x10) >> 4]);
+			dst[width-1] = NativePf8888(ThreeToEight[(b & 0xE0) >> 5],
+										ThreeToEight[(b & 0xE0) >> 5],
+										ThreeToEight[(b & 0xE0) >> 5],
+										  OneToEight[(b & 0x10) >> 4]);
 		}
-	}
-
-	template < typename OutT >
-	static inline void ConvertTextureT( const TextureDestInfo & dsti, const TextureInfo & ti )
-	{
-		SConvertGeneric< OutT >::ConvertGeneric( dsti, ti, ConvertRow< OutT, 0x4 | Fiddle >, ConvertRow< OutT, Fiddle > );
 	}
 
 	static void ConvertTexture( const TextureDestInfo & dsti, const TextureInfo & ti )
 	{
-		switch( dsti.Format )
-		{
-		case TexFmt_5650:	ConvertTextureT< NativePf5650 >( dsti, ti ); return;
-		case TexFmt_5551:	ConvertTextureT< NativePf5551 >( dsti, ti ); return;
-		case TexFmt_4444:	ConvertTextureT< NativePf4444 >( dsti, ti ); return;
-		case TexFmt_8888:	ConvertTextureT< NativePf8888 >( dsti, ti ); return;
-
-		case TexFmt_CI4_8888: break;
-		case TexFmt_CI8_8888: break;
-
-		}
-
-		DAEDALUS_DL_ERROR( "Unhandled format" );
+		ConvertGeneric( dsti, ti, ConvertRow< 0x4 | Fiddle >, ConvertRow< Fiddle > );
 	}
 };
 
@@ -370,8 +322,8 @@ struct SConvertI4
 {
 	enum { Fiddle = 0x3 };
 
-	template< typename OutT, u32 F >
-	static inline void ConvertRow( OutT * dst, const u8 * src, u32 src_offset, u32 width )
+	template< u32 F >
+	static inline void ConvertRow( NativePf8888 * dst, const u8 * src, u32 src_offset, u32 width )
 	{
 		// Do two pixels at a time
 		for ( u32 x = 0; x+1 < width; x+=2 )
@@ -379,15 +331,15 @@ struct SConvertI4
 			u8 b = src[src_offset ^ F];
 
 			// Even
-			dst[x + 0] = OutT( FourToEight[(b & 0xF0)>>4],
-							   FourToEight[(b & 0xF0)>>4],
-							   FourToEight[(b & 0xF0)>>4],
-							   FourToEight[(b & 0xF0)>>4] );
+			dst[x + 0] = NativePf8888(FourToEight[(b & 0xF0)>>4],
+									  FourToEight[(b & 0xF0)>>4],
+									  FourToEight[(b & 0xF0)>>4],
+									  FourToEight[(b & 0xF0)>>4] );
 			// Odd
-			dst[x + 1] = OutT( FourToEight[(b & 0x0F)],
-							   FourToEight[(b & 0x0F)],
-							   FourToEight[(b & 0x0F)],
-							   FourToEight[(b & 0x0F)] );
+			dst[x + 1] = NativePf8888(FourToEight[(b & 0x0F)],
+									  FourToEight[(b & 0x0F)],
+									  FourToEight[(b & 0x0F)],
+									  FourToEight[(b & 0x0F)] );
 
 			src_offset++;
 		}
@@ -397,35 +349,17 @@ struct SConvertI4
 			u8 b = src[src_offset ^ F];
 
 			// Even
-			dst[width-1] = OutT( FourToEight[(b & 0xF0)>>4],
-								 FourToEight[(b & 0xF0)>>4],
-								 FourToEight[(b & 0xF0)>>4],
-								 FourToEight[(b & 0xF0)>>4] );
+			dst[width-1] = NativePf8888(FourToEight[(b & 0xF0)>>4],
+										FourToEight[(b & 0xF0)>>4],
+										FourToEight[(b & 0xF0)>>4],
+										FourToEight[(b & 0xF0)>>4] );
 
 		}
-	}
-
-	template < typename OutT >
-	static inline void ConvertTextureT( const TextureDestInfo & dsti, const TextureInfo & ti )
-	{
-		SConvertGeneric< OutT >::ConvertGeneric( dsti, ti, ConvertRow< OutT, 0x4 | Fiddle >, ConvertRow< OutT, Fiddle > );
 	}
 
 	static void ConvertTexture( const TextureDestInfo & dsti, const TextureInfo & ti )
 	{
-		switch( dsti.Format )
-		{
-		case TexFmt_5650:	ConvertTextureT< NativePf5650 >( dsti, ti ); return;
-		case TexFmt_5551:	ConvertTextureT< NativePf5551 >( dsti, ti ); return;
-		case TexFmt_4444:	ConvertTextureT< NativePf4444 >( dsti, ti ); return;
-		case TexFmt_8888:	ConvertTextureT< NativePf8888 >( dsti, ti ); return;
-
-		case TexFmt_CI4_8888: break;
-		case TexFmt_CI8_8888: break;
-
-		}
-
-		DAEDALUS_DL_ERROR( "Unhandled format" );
+		ConvertGeneric( dsti, ti, ConvertRow< 0x4 | Fiddle >, ConvertRow< Fiddle > );
 	}
 };
 
@@ -449,27 +383,6 @@ static void ConvertPalette(ETLutFmt tlut_format, NativePf8888 * dst, const void 
 		{
 			dst[ i ] = NativePf8888::Make( palette[ i ^ U16H_TWIDDLE ] );
 		}
-	}
-}
-
-template< u32 F >
-static void ConvertCI4_Row( NativePfCI44 * dst, const u8 * src, u32 src_offset, u32 width )
-{
-	for (u32 x = 0; x+1 < width; x+=2)
-	{
-		u8 b = src[src_offset ^ F];
-
-		dst[ x/2 ].Bits = (b >> 4) | (b << 4);
-
-		src_offset++;
-	}
-
-	// Handle any remaining odd pixels
-	if( width & 1 )
-	{
-		u8 b = src[src_offset ^ F];
-
-		dst[ width/2 ].Bits = (b >> 4) | 0;
 	}
 }
 
@@ -499,16 +412,6 @@ static void ConvertCI4_Row_To_8888( NativePf8888 * dst, const u8 * src, u32 src_
 		u8 bhi = (b&0xf0)>>4;
 
 		dst[width-1] = palette[ bhi ];	// Remember palette has already been swapped
-	}
-}
-
-template< u32 F >
-static void ConvertCI8_Row( NativePfCI8 * dst, const u8 * src, u32 src_offset, u32 width )
-{
-	for (u32 x = 0; x < width; x++)
-	{
-		dst[ x ].Bits = src[src_offset ^ F];
-		src_offset++;
 	}
 }
 
@@ -563,60 +466,24 @@ static void ConvertI8(const TextureDestInfo & dsti, const TextureInfo & ti)
 
 static void ConvertCI8(const TextureDestInfo & dsti, const TextureInfo & ti)
 {
-	NativePf8888 temp_palette[256];
-
-	NativePf8888 *	dst_palette = dsti.Palette ? reinterpret_cast< NativePf8888 * >( dsti.Palette ) : temp_palette;
+	NativePf8888	dst_palette[256];
 	const void * 	src_palette = g_pu8RamBase + ti.GetTlutAddress();
 
 	ConvertPalette(ti.GetTLutFormat(), dst_palette, src_palette, 256);
-
-	switch( dsti.Format )
-	{
-	case TexFmt_8888:
-		ConvertPalettisedTo8888( dsti, ti, dst_palette,
-								 ConvertCI8_Row_To_8888< 0x4 | 0x3 >,
-								 ConvertCI8_Row_To_8888< 0x3 > );
-		break;
-
-	case TexFmt_CI8_8888:
-		ConvertPalettisedToCI( dsti, ti,
-							   ConvertCI8_Row< 0x4 | 0x3 >,
-							   ConvertCI8_Row< 0x3 > );
-		break;
-
-	default:
-		DAEDALUS_ERROR( "Unhandled format for CI8 textures" );
-		break;
-	}
+	ConvertPalettisedTo8888( dsti, ti, dst_palette,
+							 ConvertCI8_Row_To_8888< 0x4 | 0x3 >,
+							 ConvertCI8_Row_To_8888< 0x3 > );
 }
 
 static void ConvertCI4(const TextureDestInfo & dsti, const TextureInfo & ti)
 {
-	NativePf8888 temp_palette[16];
-
-	NativePf8888 *	dst_palette = dsti.Palette ? reinterpret_cast< NativePf8888 * >( dsti.Palette ) : temp_palette;
+	NativePf8888	dst_palette[16];
 	const void * 	src_palette = g_pu8RamBase + ti.GetTlutAddress();
 
 	ConvertPalette(ti.GetTLutFormat(), dst_palette, src_palette, 16);
-
-	switch( dsti.Format )
-	{
-	case TexFmt_8888:
-		ConvertPalettisedTo8888( dsti, ti, dst_palette,
-								 ConvertCI4_Row_To_8888< 0x4 | 0x3 >,
-								 ConvertCI4_Row_To_8888< 0x3 > );
-		break;
-
-	case TexFmt_CI4_8888:
-		ConvertPalettisedToCI( dsti, ti,
-							   ConvertCI4_Row< 0x4 | 0x3 >,
-							   ConvertCI4_Row< 0x3 > );
-		break;
-
-	default:
-		DAEDALUS_ERROR( "Unhandled format for CI4 textures" );
-		break;
-	}
+	ConvertPalettisedTo8888( dsti, ti, dst_palette,
+							 ConvertCI4_Row_To_8888< 0x4 | 0x3 >,
+							 ConvertCI4_Row_To_8888< 0x3 > );
 }
 
 } // anonymous namespace
@@ -635,11 +502,7 @@ static const ConvertFunction gConvertFunctions[ 32 ] =
 	NULL,			NULL,			NULL,				NULL					// ?
 };
 
-bool ConvertTexture(const TextureInfo & ti,
-					void * texels,
-					NativePf8888 * palette,
-					ETextureFormat texture_format,
-					u32 pitch)
+bool ConvertTexture(const TextureInfo & ti, NativePf8888 * texels, u32 pitch)
 {
 	// TODO(strmnnrmn): Check this - it's probably because we were storing addresses in
 	// system memory here rather than offsets into n64 ram.
@@ -651,12 +514,11 @@ bool ConvertTexture(const TextureInfo & ti,
 
 	//memset( texels, 0, buffer_size );
 
-	TextureDestInfo dsti( texture_format );
+	TextureDestInfo dsti;
 	dsti.Data    = texels;
 	dsti.Width   = ti.GetWidth();
 	dsti.Height  = ti.GetHeight();
 	dsti.Pitch   = pitch;
-	dsti.Palette = palette;
 
 	const ConvertFunction fn = gConvertFunctions[ (ti.GetFormat() << 2) | ti.GetSize() ];
 	if( fn )

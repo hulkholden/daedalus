@@ -20,8 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_TEXTUREINFO_H_
 #define HLEGRAPHICS_TEXTUREINFO_H_
 
-#include "Graphics/TextureFormat.h"
-
 #include <string.h>
 
 enum ETLutFmt

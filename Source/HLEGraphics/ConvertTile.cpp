@@ -13,22 +13,18 @@
 
 struct TileDestInfo
 {
-	explicit TileDestInfo( ETextureFormat tex_fmt )
-		:	Format( tex_fmt )
-		,	Width( 0 )
+	TileDestInfo()
+		:	Width( 0 )
 		,	Height( 0 )
 		,	Pitch( 0 )
 		,	Data( NULL )
-		//,	Palette( NULL )
 	{
 	}
 
-	ETextureFormat		Format;
 	u32					Width;			// Describes the width of the locked area. Use lPitch to move between successive lines
 	u32					Height;			// Describes the height of the locked area
 	s32					Pitch;			// Specifies the number of bytes on each row (not necessarily bitdepth*width/8)
-	void *				Data;			// Pointer to the top left pixel of the image
-	//NativePf8888 *		Palette;
+	NativePf8888 *		Data;			// Pointer to the top left pixel of the image
 };
 
 static const u8 OneToEight[] = {
@@ -130,7 +126,7 @@ static void ConvertRGBA32(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u8 * dst = static_cast<u8*>(dsti.Data);
+	u8 * dst = reinterpret_cast<u8*>(dsti.Data);
 	u32 dst_row_stride = dsti.Pitch;
 	u32 dst_row_offset = 0;
 
@@ -170,7 +166,7 @@ static void ConvertRGBA16(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u32 * dst = static_cast<u32*>(dsti.Data);
+	u32 * dst = reinterpret_cast<u32*>(dsti.Data);
 	u32 dst_row_stride = dsti.Pitch / sizeof(u32);
 	u32 dst_row_offset = 0;
 
@@ -205,7 +201,7 @@ static void ConvertCI8T(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u32 * dst = static_cast<u32*>(dsti.Data);
+	u32 * dst = reinterpret_cast<u32*>(dsti.Data);
 	u32 dst_row_stride = dsti.Pitch / sizeof(u32);
 	u32 dst_row_offset = 0;
 
@@ -250,7 +246,7 @@ static void ConvertCI4T(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u32 * dst = static_cast<u32*>(dsti.Data);
+	u32 * dst = reinterpret_cast<u32*>(dsti.Data);
 	u32 dst_row_stride = dsti.Pitch / sizeof(u32);
 	u32 dst_row_offset = 0;
 
@@ -345,7 +341,7 @@ static void ConvertIA16(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u8 * dst = static_cast<u8*>(dsti.Data);
+	u8 * dst = reinterpret_cast<u8*>(dsti.Data);
 	u32 dst_row_stride = dsti.Pitch;
 	u32 dst_row_offset = 0;
 
@@ -385,7 +381,7 @@ static void ConvertIA8(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u8 * dst = static_cast<u8*>(dsti.Data);
+	u8 * dst = reinterpret_cast<u8*>(dsti.Data);
 	u32 dst_row_stride = dsti.Pitch;
 	u32 dst_row_offset = 0;
 
@@ -425,7 +421,7 @@ static void ConvertIA4(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u32 * dst = static_cast<u32*>(dsti.Data);
+	u32 * dst = reinterpret_cast<u32*>(dsti.Data);
 	u32 dst_row_stride = dsti.Pitch / sizeof(u32);
 	u32 dst_row_offset = 0;
 
@@ -474,7 +470,7 @@ static void ConvertI8(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u8 * dst = static_cast<u8*>(dsti.Data);
+	u8 * dst = reinterpret_cast<u8*>(dsti.Data);
 	u32 dst_row_stride = dsti.Pitch;
 	u32 dst_row_offset = 0;
 
@@ -511,7 +507,7 @@ static void ConvertI4(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 width = dsti.Width;
 	u32 height = dsti.Height;
 
-	u32 * dst = static_cast<u32*>(dsti.Data);
+	u32 * dst = reinterpret_cast<u32*>(dsti.Data);
 	u32 dst_row_stride = dsti.Pitch / sizeof(u32);
 	u32 dst_row_offset = 0;
 
@@ -570,20 +566,13 @@ static const ConvertFunction gConvertFunctions[ 32 ] =
 	NULL,			NULL,			NULL,				NULL					// ?
 };
 
-bool ConvertTile(const TextureInfo & ti,
-				 void * texels,
-				 NativePf8888 * palette,
-				 ETextureFormat texture_format,
-				 u32 pitch)
+bool ConvertTile(const TextureInfo & ti, NativePf8888 * texels, u32 pitch)
 {
-	DAEDALUS_ASSERT(texture_format == TexFmt_8888, "OSX should only use RGBA 8888 textures");
-
-	TileDestInfo dsti( texture_format );
+	TileDestInfo dsti;
 	dsti.Data    = texels;
 	dsti.Width   = ti.GetWidth();
 	dsti.Height  = ti.GetHeight();
 	dsti.Pitch   = pitch;
-	//dsti.Palette = palette;
 
 	DAEDALUS_ASSERT(ti.GetLine() != 0, "No line");
 
