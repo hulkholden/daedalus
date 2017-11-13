@@ -43,12 +43,12 @@ static const char * const kTLUTTypeName[] = {"None", "?", "RGBA16", "IA16"};
 
 RDP_OtherMode		gRDPOtherMode;
 
-#define MAX_TMEM_ADDRESS 4096
+static const u32 kMaxTmemAddress = 4096;
 
 // Granularity down to 24bytes is good enuff also only need to address the upper half of TMEM for palettes//Corn
-u32 gTlutLoadAddresses[ MAX_TMEM_ADDRESS >> 6 ];
+u32 gTlutLoadAddresses[ kMaxTmemAddress >> 6 ];
 
-ALIGNED_GLOBAL(u8, gTMEM[ MAX_TMEM_ADDRESS ], 16);	// 4Kb
+ALIGNED_GLOBAL(u8, gTMEM[ kMaxTmemAddress ], 16);	// 4Kb
 
 
 CRDPStateManager::CRDPStateManager()
@@ -139,7 +139,7 @@ void CRDPStateManager::LoadBlock(const SetLoadTile & load)
 	u32 tmem_offset = (rdp_tile.tmem << 3);
 	u32 ram_offset  = address;
 
-	if (( (address + bytes) > MAX_RAM_ADDRESS) || (tmem_offset + bytes) > MAX_TMEM_ADDRESS )
+	if (( (address + bytes) > MAX_RAM_ADDRESS) || (tmem_offset + bytes) > kMaxTmemAddress )
 	{
 		DBGConsole_Msg(0, "[WWarning LoadBlock address is invalid]" );
 		return;
@@ -227,7 +227,7 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 	u32 bytes       = ((h * w) << g_TI.Size) >> 1;
 
 	DAEDALUS_USE(bytes);
-	DAEDALUS_DL_ASSERT( bytes <= MAX_TMEM_ADDRESS,
+	DAEDALUS_DL_ASSERT( bytes <= kMaxTmemAddress,
 		"Suspiciously large texture load: %d bytes (%dx%d, %dbpp)",
 		bytes, w, h, (1<<(g_TI.Size+2)) );
 
@@ -248,7 +248,7 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 	}
 
 	u32 bytes_to_copy = (bytes_per_tmem_line * h);
-	if ((address + bytes_to_copy) > MAX_RAM_ADDRESS || (tmem_offset + bytes_to_copy) > MAX_TMEM_ADDRESS)
+	if ((address + bytes_to_copy) > MAX_RAM_ADDRESS || (tmem_offset + bytes_to_copy) > kMaxTmemAddress)
 	{
 		DBGConsole_Msg(0, "[WWarning LoadTile address is invalid]" );
 		return;
@@ -303,7 +303,7 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 	DL_PF("    TLut Addr[0x%08x] TMEM[0x%03x] Tile[%d] Count[%d] Format[%s] (%d,%d)->(%d,%d)",
 		address, rdp_tile.tmem, tile_idx, count, kTLUTTypeName[gRDPOtherMode.text_tlut], uls >> 2, ult >> 2, lrs >> 2, lrt >> 2);
 
-	DAEDALUS_DL_ASSERT( (rdp_tile.tmem + count) <= (MAX_TMEM_ADDRESS/8), "LoadTlut address is invalid" );
+	DAEDALUS_DL_ASSERT( (rdp_tile.tmem + count) <= (kMaxTmemAddress/8), "LoadTlut address is invalid" );
 
 	u16* dst = (u16*)(((u64*)gTMEM) + rdp_tile.tmem);
 	u16* src = (u16*)(address);
