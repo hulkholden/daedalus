@@ -157,10 +157,8 @@ static SImageDescriptor g_DI = { G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, 0 };
 const MicroCodeInstruction *gUcodeFunc = NULL;
 MicroCodeInstruction gCustomInstruction[256];
 
-#if defined(DAEDALUS_DEBUG_DISPLAYLIST) || defined(DAEDALUS_ENABLE_PROFILING)
 static const char ** gUcodeName = gNormalInstructionName[ 0 ];
 static const char * gCustomInstructionName[256];
-#endif
 
 #ifdef DAEDALUS_ENABLE_PROFILING
 SProfileItemHandle * gpProfileItemHandles[ 256 ];
@@ -291,6 +289,7 @@ bool DLParser_Initialise()
 
 	GBIMicrocode_Reset();
 
+	// TODO(strmnnrmn): Should we zero more state here?
 #ifdef DAEDALUS_FAST_TMEM
 	//Clear pointers in TMEM block //Corn
 	memset(gTlutLoadAddresses, 0, sizeof(gTlutLoadAddresses));
@@ -302,12 +301,11 @@ void DLParser_Finalise()
 {
 }
 
-
-#if defined(DAEDALUS_DEBUG_DISPLAYLIST) || defined(DAEDALUS_ENABLE_PROFILING)
-#define SetCommand( cmd, func, name )	gCustomInstruction[ cmd ] = func;	gCustomInstructionName[ cmd ] = name;
-#else
-#define SetCommand( cmd, func, name )	gCustomInstruction[ cmd ] = func;
-#endif
+static void SetCommand( u8 cmd, MicroCodeInstruction func, const char* name )
+{
+	gCustomInstruction[ cmd ] = func;
+	gCustomInstructionName[ cmd ] = name;
+}
 
 // This is called from Microcode.cpp after a custom ucode has been detected and cached
 // This function is only called once per custom ucode set
@@ -317,10 +315,7 @@ void DLParser_Finalise()
 static void DLParser_SetCustom( u32 ucode, u32 offset )
 {
 	memcpy( &gCustomInstruction, &gNormalInstruction[offset], 1024 ); // sizeof(gNormalInstruction)/MAX_UCODE
-
-#if defined(DAEDALUS_DEBUG_DISPLAYLIST) || defined(DAEDALUS_ENABLE_PROFILING)
 	memcpy( gCustomInstructionName, gNormalInstructionName[ offset ], 1024 );
-#endif
 
 	// Start patching to create our custom ucode table ;)
 	switch( ucode )
@@ -389,9 +384,7 @@ void DLParser_InitMicrocode( u32 code_base, u32 code_size, u32 data_base, u32 da
 	gUcodeFunc	   = IS_CUSTOM_UCODE(ucode) ? gCustomInstruction : gNormalInstruction[ucode];
 
 	// Used for fetching ucode names (Debug Only)
-#if defined(DAEDALUS_DEBUG_DISPLAYLIST) || defined(DAEDALUS_ENABLE_PROFILING)
 	gUcodeName = IS_CUSTOM_UCODE(ucode) ? gCustomInstructionName : gNormalInstructionName[ucode];
-#endif
 }
 
 // Process the entire display list in one go
@@ -497,7 +490,9 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 	gNumVertices = 0;
 	gNumRectsClipped = 0;
 	if (debug_output)
+	{
 		DLDebug_SetOutput(debug_output);
+	}
 	DLDebug_DumpTaskInfo( pTask );
 #endif
 

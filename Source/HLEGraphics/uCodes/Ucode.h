@@ -35,9 +35,7 @@ typedef void (*MicroCodeInstruction)(MicroCodeCommand);
 extern const u32 ucode_stride[];
 extern const MicroCodeInstruction gNormalInstruction[MAX_UCODE_TABLE][256];
 
-#if defined(DAEDALUS_DEBUG_DISPLAYLIST) || defined(DAEDALUS_ENABLE_PROFILING)
 extern const char* gNormalInstructionName[MAX_UCODE_TABLE][256];
-#endif
 
 UcodeFunc(DLParser_GBI1_CullDL);
 UcodeFunc(DLParser_GBI1_DL);
