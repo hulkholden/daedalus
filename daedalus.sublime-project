@@ -32,7 +32,13 @@
 				"osx": {
 					"cmd": ["bazel test //... --test_output=errors --apple_platform_type=macos"],
 				},
-			}, ],
+			},{
+				"name": "test opt",
+				"cmd": ["bazel test -c opt //... --test_output=errors"],
+				"osx": {
+					"cmd": ["bazel test -c opt //... --test_output=errors --apple_platform_type=macos"],
+				},
+			},],
 		},
 	]
 }

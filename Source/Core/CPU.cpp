@@ -291,9 +291,11 @@ void SCPUState::Dump()
 	{
 		for (int i = 0; i < 32; i += 4)
 		{
-			DBGConsole_Msg(0, "%s:%08X %s:%08X %s:%08X %s:%08X", kRegisterNames[i + 0], gCPUState.CPU[i + 0]._u32_0,
-						   kRegisterNames[i + 1], gCPUState.CPU[i + 1]._u32_0, kRegisterNames[i + 2],
-						   gCPUState.CPU[i + 2]._u32_0, kRegisterNames[i + 3], gCPUState.CPU[i + 3]._u32_0);
+			DBGConsole_Msg(0, "%s:%08X %s:%08X %s:%08X %s:%08X",
+						   kRegisterNames[i + 0], gCPUState.CPU[i + 0]._u32_0,
+						   kRegisterNames[i + 1], gCPUState.CPU[i + 1]._u32_0,
+						   kRegisterNames[i + 2], gCPUState.CPU[i + 2]._u32_0,
+						   kRegisterNames[i + 3], gCPUState.CPU[i + 3]._u32_0);
 		}
 
 		DBGConsole_Msg(0, "TargetPC: %08x", gCPUState.TargetPC);

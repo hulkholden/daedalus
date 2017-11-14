@@ -43,4 +43,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef void (R4300_CALL_TYPE *CPU_Instruction )( R4300_CALL_SIGNATURE );
 
 
+void R4300_CALL_TYPE R4300_Special_ADD( R4300_CALL_SIGNATURE );
+void R4300_CALL_TYPE R4300_Special_ADDU( R4300_CALL_SIGNATURE );
+
 #endif // CORE_R4300INSTRUCTION_H_
