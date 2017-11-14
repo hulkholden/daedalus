@@ -10,9 +10,6 @@ cc_library(
 cc_library(
     name = "SysGLCpp",
     srcs = glob(["**/*.cpp"]),
-    data = [
-        ":shaders",
-    ],
     visibility = ["//visibility:public"],
     deps = [
         ":SysGL",
@@ -25,12 +22,5 @@ cc_library(
         "//Interface",
         "//Plugins",
         "@libpng//:libpng",
-    ],
-)
-
-filegroup(
-    name = "shaders",
-    srcs = [
-        "HLEGraphics/n64.psh",
     ],
 )

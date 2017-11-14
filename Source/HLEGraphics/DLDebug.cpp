@@ -175,39 +175,6 @@ void DLDebug_DumpMux( u64 mux )
 	DL_PF("    A1  : (%s - %s) * %s + %s", kSubInputAlpha[aA1],  kSubInputAlpha[bA1],  kMulInputAlpha[cA1], kAddInputAlpha[dA1]);
 }
 
-void DLDebug_PrintMux( FILE * fh, u64 mux )
-{
-	u32 mux0 = (u32)(mux>>32);
-	u32 mux1 = (u32)(mux);
-
-	u32 aRGB0  = (mux0>>20)&0x0F;	// c1 c1		// a0
-	u32 bRGB0  = (mux1>>28)&0x0F;	// c1 c2		// b0
-	u32 cRGB0  = (mux0>>15)&0x1F;	// c1 c3		// c0
-	u32 dRGB0  = (mux1>>15)&0x07;	// c1 c4		// d0
-
-	u32 aA0    = (mux0>>12)&0x07;	// c1 a1		// Aa0
-	u32 bA0    = (mux1>>12)&0x07;	// c1 a2		// Ab0
-	u32 cA0    = (mux0>>9 )&0x07;	// c1 a3		// Ac0
-	u32 dA0    = (mux1>>9 )&0x07;	// c1 a4		// Ad0
-
-	u32 aRGB1  = (mux0>>5 )&0x0F;	// c2 c1		// a1
-	u32 bRGB1  = (mux1>>24)&0x0F;	// c2 c2		// b1
-	u32 cRGB1  = (mux0    )&0x1F;	// c2 c3		// c1
-	u32 dRGB1  = (mux1>>6 )&0x07;	// c2 c4		// d1
-
-	u32 aA1    = (mux1>>21)&0x07;	// c2 a1		// Aa1
-	u32 bA1    = (mux1>>3 )&0x07;	// c2 a2		// Ab1
-	u32 cA1    = (mux1>>18)&0x07;	// c2 a3		// Ac1
-	u32 dA1    = (mux1    )&0x07;	// c2 a4		// Ad1
-
-	fprintf(fh, "//case 0x%08x%08xLL:\n", mux0, mux1);
-	fprintf(fh, "//aRGB0: (%s - %s) * %s + %s\n", kSubAInputRGB[aRGB0], kSubBInputRGB[bRGB0], kMulInputRGB[cRGB0], kAddInputRGB[dRGB0]);
-	fprintf(fh, "//aA0  : (%s - %s) * %s + %s\n", kSubInputAlpha[aA0],  kSubInputAlpha[bA0],  kMulInputAlpha[cA0], kAddInputAlpha[dA0]);
-	fprintf(fh, "//aRGB1: (%s - %s) * %s + %s\n", kSubAInputRGB[aRGB1], kSubBInputRGB[bRGB1], kMulInputRGB[cRGB1], kAddInputRGB[dRGB1]);
-	fprintf(fh, "//aA1  : (%s - %s) * %s + %s\n", kSubInputAlpha[aA1],  kSubInputAlpha[bA1],  kMulInputAlpha[cA1], kAddInputAlpha[dA1]);
-	fprintf(fh, "void BlendMode_0x%08x%08xLL( BLEND_MODE_ARGS )\n{\n}\n\n", mux0, mux1);
-}
-
 static const char * const kBlendCl[]				= { "In",  "Mem",  "Bl",     "Fog" };
 static const char * const kBlendA1[]				= { "AIn", "AFog", "AShade", "0" };
 static const char * const kBlendA2[]				= { "1-A", "AMem", "1",      "?" };
@@ -440,61 +407,5 @@ void DLDebug_DumpTaskInfo( const OSTask * pTask )
 	DL_PF( "YieldData:    %08x", (u32)pTask->t.yield_data_ptr );
 	DL_PF( "YieldDataSize:%08x",      pTask->t.yield_data_size );
 }
-
-class DLDebugOutputFile : public DLDebugOutput
-{
-public:
-	DLDebugOutputFile() : Sink(new FileSink)
-	{
-	}
-	~DLDebugOutputFile()
-	{
-		delete Sink;
-	}
-
-	bool Open(const std::string& filename)
-	{
-		return Sink->Open(filename, "w");
-	}
-
-	size_t Write(const void * p, size_t len) override
-	{
-		return Sink->Write(p, len);
-	}
-
-	void BeginInstruction(u32 idx, u32 cmd0, u32 cmd1, u32 depth, const char * name) override
-	{
-		Print("[%05d] %08x %08x %-10s\n", idx, cmd0, cmd1, name);
-	}
-
-	void EndInstruction() override
-	{
-	}
-
-	FileSink * Sink;
-};
-
-DLDebugOutput * DLDebug_CreateFileOutput()
-{
-	static u32 count = 0;
-
-	char filename[64];
-	sprintf(filename, "dl%04d.txt", count++);
-
-	std::string dumpdir = IO::Path::Join(g_ROM.settings.GameName, "DisplayLists");
-	std::string filepath = IO::Path::Join(Dump_GetDumpDirectory(dumpdir), filename);
-
-	DLDebugOutputFile * output = new DLDebugOutputFile();
-	if (!output->Open(filepath))
-	{
-		delete output;
-		DBGConsole_Msg(0, "RDP: Couldn't create dumpfile %s", filepath.c_str());
-		return NULL;
-	}
-
-	DBGConsole_Msg(0, "RDP: Dumping Display List as %s", filepath.c_str());
-	return output;
-}
-
 
 #endif // DAEDALUS_DEBUG_DISPLAYLIST

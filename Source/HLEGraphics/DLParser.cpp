@@ -489,11 +489,8 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 	gNumDListsCulled = 0;
 	gNumVertices = 0;
 	gNumRectsClipped = 0;
-	if (debug_output)
-	{
-		DLDebug_SetOutput(debug_output);
-	}
-	DLDebug_DumpTaskInfo( pTask );
+	DLDebug_SetOutput(debug_output);
+	DLDebug_DumpTaskInfo(pTask);
 #endif
 
 	DL_PF("DP: Firing up RDP!");
@@ -512,7 +509,7 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 	FinishRDPJob();
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	DLDebug_SetOutput(NULL);
+	DLDebug_SetOutput(nullptr);
 #endif
 
 #ifdef DAEDALUS_BATCH_TEST_ENABLED
@@ -1058,8 +1055,8 @@ void DLParser_SetFogColor( MicroCodeCommand command )
 {
 	DL_PF("    RGBA: %d %d %d %d", command.color.r, command.color.g, command.color.b, command.color.a);
 
-	//c32	fog_colour( command.color.r, command.color.g, command.color.b, command.color.a );
-	c32	fog_colour( command.color.r, command.color.g, command.color.b, 0 );	//alpha is always 0
+	// Ignore alpha from the command, and always set it to 0.
+	c32	fog_colour( command.color.r, command.color.g, command.color.b, 0 );
 
 	gRenderer->SetFogColour( fog_colour );
 }

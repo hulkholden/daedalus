@@ -43,7 +43,6 @@ public:
 	void		DropTextures();
 
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	Mutex * 	GetDebugMutex()		{ return &mDebugMutex; }
 	struct STextureInfoSnapshot
 	{
@@ -58,10 +57,6 @@ public:
 
 	// You must have a valid lock to call Snapshot.
 	void		Snapshot(const MutexLock & lock, std::vector< STextureInfoSnapshot > & snapshot) const;
-#else
-	// Don't bother locking if we're not debugging.
-	Mutex * 	GetDebugMutex()		{ return NULL; }
-#endif
 
 private:
 	CachedTexture * GetOrCreateCachedTexture(const TextureInfo & ti);
@@ -81,9 +76,7 @@ private:
 	typedef std::vector< CachedTexture * >	TextureVec;
 	TextureVec			mTextures;
 	CachedTexture *		mpCacheHashTable[HASH_TABLE_SIZE];
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	Mutex				mDebugMutex;
-#endif
 };
 
 #endif // HLEGRAPHICS_TEXTURECACHE_H_

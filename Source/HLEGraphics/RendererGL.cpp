@@ -92,7 +92,7 @@ bool initgl()
 
 	// FIXME(strmnnrmn): need a nicer 'load file' utility function.
 	{
-		std::string shader_path = GetRunfilePath("SysGL/HLEGraphics/n64.psh");
+		std::string shader_path = GetRunfilePath("HLEGraphics/n64.psh");
 
 		FILE * fh = fopen(shader_path.c_str(), "r");
 		if (!fh)

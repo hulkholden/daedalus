@@ -46,23 +46,14 @@ private:
 	char	mBuffer[kBufferLen];
 };
 
-
 extern DLDebugOutput * gDLDebugOutput;
 
-inline bool DLDebug_IsActive() { return gDLDebugOutput != NULL; }
+inline bool DLDebug_IsActive() { return gDLDebugOutput != nullptr; }
 
 #define DL_PF(...)										\
 	do {												\
 		if( gDLDebugOutput )							\
 			gDLDebugOutput->PrintLine( __VA_ARGS__ );	\
-	} while(0)
-
-
-// Ugh - print out without newlines (needed for HTML <pre> output)
-#define DL_PF_(...)									\
-	do {											\
-		if( gDLDebugOutput )						\
-			gDLDebugOutput->Print( __VA_ARGS__ );	\
 	} while(0)
 
 #define DL_BEGIN_INSTR(idx, c0, c1, depth, nm) 		\
@@ -78,13 +69,10 @@ inline bool DLDebug_IsActive() { return gDLDebugOutput != NULL; }
 	} while(0)
 
 
-DLDebugOutput *	DLDebug_CreateFileOutput();
-
 void 		DLDebug_SetOutput(DLDebugOutput * output);
 
 void		DLDebug_DumpTaskInfo( const OSTask * pTask );
 void		DLDebug_DumpMux(u64 mux);
-void		DLDebug_PrintMux( FILE * fh, u64 mux );
 void		DLDebug_DumpRDPOtherMode(const RDP_OtherMode & mode);
 
 void		DLDebug_DumpRDPOtherModeL(u32 mask, u32 data);
@@ -94,7 +82,6 @@ void		DLDebug_DumpRDPOtherModeH(u32 mask, u32 data);
 #else
 
 #define DL_PF(...)								do { DAEDALUS_USE(__VA_ARGS__); } while(0)
-#define DL_PF_(...)								do { DAEDALUS_USE(__VA_ARGS__); } while(0)
 
 #define DL_BEGIN_INSTR(idx, c0, c1, depth, nm)  do { } while(0)
 #define DL_END_INSTR()							do { } while(0)

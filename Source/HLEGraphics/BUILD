@@ -20,6 +20,9 @@ cc_library(
         "*.cpp",
         "uCodes/*.cpp",
     ]),
+    data = [
+        ":shaders",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":HLEGraphics",
@@ -31,5 +34,12 @@ cc_library(
         "//Plugins",
         "//Test:BatchTest",
         "//Utility",
+    ],
+)
+
+filegroup(
+    name = "shaders",
+    srcs = [
+        "n64.psh",
     ],
 )
