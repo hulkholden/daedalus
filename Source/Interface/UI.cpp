@@ -7,7 +7,7 @@
 
 #include "Core/CPU.h"
 #include "Core/ROM.h"
-#include "SysGL/GL.h"
+#include "Graphics/GL.h"
 #include "System/IO.h"
 #include "System/Paths.h"
 #include "System/Thread.h"

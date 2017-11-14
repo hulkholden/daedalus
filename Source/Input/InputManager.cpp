@@ -20,8 +20,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Daedalus.h"
 #include "Input/InputManager.h"
 
+#include <GLFW/glfw3.h>
+
 #include "Core/CPU.h"
-#include "SysGL/GL.h"
+
+// TODO(strmnnrmn): Avoid dependency cycles with Graphics.
+extern GLFWwindow * gWindow;
+
 
 class IInputManager : public CInputManager
 {

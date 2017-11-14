@@ -35,9 +35,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Input/InputManager.h"
 #include "Interface/Preferences.h"
 #include "Interface/RomDB.h"
+#include "Interface/UI.h"
 #include "Plugins/AudioPlugin.h"
 #include "Plugins/GraphicsPlugin.h"
-#include "SysGL/Interface/UI.h"
 
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_W32)
 #include "Debug/WebDebug.h"

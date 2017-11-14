@@ -26,7 +26,6 @@ cc_library(
         "//Base",
         "//Config",
         "//Debug",
-        "//Input",
         "//Math",
         "//System",
         "@com_google_absl//absl/strings",

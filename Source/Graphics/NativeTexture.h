@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Graphics/NativePixelFormat.h"
 #include "Math/Vector2.h"
-#include "SysGL/GL.h"
+#include "Graphics/GL.h"
 #include "Utility/RefCounted.h"
 
 class CNativeTexture : public CRefCounted

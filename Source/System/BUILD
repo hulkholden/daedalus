@@ -58,7 +58,6 @@ cc_library(
         "//Interface",
         "//OSHLE",
         "//Plugins",
-        "//SysGL",
         "//Utility",
     ],
 )

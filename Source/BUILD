@@ -35,7 +35,6 @@ cc_binary(
         "//Interface:InterfaceCpp",
         "//Main",
         "//OSHLE",
-        "//SysGL:SysGLCpp",
         "//System",
         "//System:SystemInit",
         "//Utility",

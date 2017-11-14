@@ -5,6 +5,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//Base",
+        "//Core",
         "//Math",
+        "//Ultra",
+        "@glfw//:glfw",
     ],
 )

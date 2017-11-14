@@ -4,6 +4,7 @@
 
 #include "Core/Memory.h"
 #include "Debug/DBGConsole.h"
+#include "Graphics/GL.h"
 #include "Graphics/GraphicsContext.h"
 #include "HLEGraphics/BaseRenderer.h"
 #include "HLEGraphics/DisplayListDebugger.h"
@@ -11,7 +12,6 @@
 #include "HLEGraphics/TextureCache.h"
 #include "Interface/Preferences.h"
 #include "Plugins/GraphicsPlugin.h"
-#include "SysGL/GL.h"
 #include "System/Timing.h"
 
 EFrameskipValue     gFrameskipValue = FV_DISABLED;

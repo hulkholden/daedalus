@@ -3,17 +3,13 @@
 
 #include <stdio.h>
 
-#include "SysGL/GL.h"
+#include "Graphics/GL.h"
 #include "Graphics/GraphicsContext.h"
 
 #include "Graphics/ColourValue.h"
 
-
 static u32 SCR_WIDTH = 640;
 static u32 SCR_HEIGHT = 480;
-
-// FIXME: This is global to lots of SysGL stuff. Wrap it up elsewhere, and keep this file for the graphics side of things.
-GLFWwindow * gWindow = NULL;
 
 class GraphicsContextGL : public CGraphicsContext
 {

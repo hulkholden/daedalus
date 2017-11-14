@@ -5,6 +5,7 @@
 
 #include "Debug/WebDebug.h"
 #include "Debug/WebDebugTemplate.h"
+#include "Graphics/GL.h"
 #include "Graphics/GraphicsContext.h"
 #include "Graphics/NativeTexture.h"
 #include "Graphics/PngUtil.h"
@@ -15,7 +16,6 @@
 #include "HLEGraphics/RDP.h"
 #include "HLEGraphics/RDPStateManager.h"
 #include "HLEGraphics/TextureCache.h"
-#include "SysGL/GL.h"
 #include "System/Condition.h"
 #include "System/Mutex.h"
 #include "System/Thread.h"

@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Config/ConfigOptions.h"
 #include "Graphics/ColourValue.h"
+#include "Graphics/GL.h"
 #include "HLEGraphics/DaedalusVtx.h"
 #include "HLEGraphics/TextureInfo.h"
 #include "Math/Matrix4x4.h"
@@ -29,8 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Math/Vector3.h"
 #include "Math/Vector4.h"
 #include "Utility/RefCounted.h"
-
-#include "SysGL/GL.h"
 
 #define HD_SCALE                          0.754166f
 

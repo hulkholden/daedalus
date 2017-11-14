@@ -18,6 +18,8 @@ cc_library(
     deps = [
         ":Interface",
         "//Base",
+        "//Graphics",
+        "//Graphics:GL",
         "//Input",
         "//RomFile",
         "//Utility",
