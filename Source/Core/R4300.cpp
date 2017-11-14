@@ -1759,7 +1759,7 @@ void R4300_CALL_TYPE R4300_Special_ADDU( R4300_CALL_SIGNATURE ) 			// ADD Unsign
 	gGPR[ op_code.rd ]._s64 = (s64)(s32)( gGPR[ op_code.rs ]._u32_0 + gGPR[ op_code.rt ]._u32_0 );
 }
 
-static void R4300_CALL_TYPE R4300_Special_SUB( R4300_CALL_SIGNATURE ) 			// SUB Signed - may throw exception
+void R4300_CALL_TYPE R4300_Special_SUB( R4300_CALL_SIGNATURE ) 			// SUB Signed - may throw exception
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1770,7 +1770,7 @@ static void R4300_CALL_TYPE R4300_Special_SUB( R4300_CALL_SIGNATURE ) 			// SUB 
 }
 
 
-static void R4300_CALL_TYPE R4300_Special_SUBU( R4300_CALL_SIGNATURE ) 			// SUB Unsigned - doesn't throw exception
+void R4300_CALL_TYPE R4300_Special_SUBU( R4300_CALL_SIGNATURE ) 			// SUB Unsigned - doesn't throw exception
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1779,7 +1779,7 @@ static void R4300_CALL_TYPE R4300_Special_SUBU( R4300_CALL_SIGNATURE ) 			// SUB
 	gGPR[ op_code.rd ]._s64 = (s64)(s32)( gGPR[ op_code.rs ]._s32_0 - gGPR[ op_code.rt ]._s32_0 );
 }
 
-static void R4300_CALL_TYPE R4300_Special_AND( R4300_CALL_SIGNATURE ) 				// logical AND
+void R4300_CALL_TYPE R4300_Special_AND( R4300_CALL_SIGNATURE ) 				// logical AND
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1788,7 +1788,7 @@ static void R4300_CALL_TYPE R4300_Special_AND( R4300_CALL_SIGNATURE ) 				// log
 	gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rs ]._u64 & gGPR[ op_code.rt ]._u64;
 }
 
-static void R4300_CALL_TYPE R4300_Special_OR( R4300_CALL_SIGNATURE ) 				// logical OR
+void R4300_CALL_TYPE R4300_Special_OR( R4300_CALL_SIGNATURE ) 				// logical OR
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1797,7 +1797,7 @@ static void R4300_CALL_TYPE R4300_Special_OR( R4300_CALL_SIGNATURE ) 				// logi
 	gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rs ]._u64 | gGPR[ op_code.rt ]._u64;
 }
 
-static void R4300_CALL_TYPE R4300_Special_XOR( R4300_CALL_SIGNATURE ) 				// logical XOR
+void R4300_CALL_TYPE R4300_Special_XOR( R4300_CALL_SIGNATURE ) 				// logical XOR
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1806,7 +1806,7 @@ static void R4300_CALL_TYPE R4300_Special_XOR( R4300_CALL_SIGNATURE ) 				// log
 	gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rs ]._u64 ^ gGPR[ op_code.rt ]._u64;
 }
 
-static void R4300_CALL_TYPE R4300_Special_NOR( R4300_CALL_SIGNATURE ) 				// logical Not OR
+void R4300_CALL_TYPE R4300_Special_NOR( R4300_CALL_SIGNATURE ) 				// logical Not OR
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1815,7 +1815,7 @@ static void R4300_CALL_TYPE R4300_Special_NOR( R4300_CALL_SIGNATURE ) 				// log
 	gGPR[ op_code.rd ]._u64 = ~( gGPR[ op_code.rs ]._u64 | gGPR[ op_code.rt ]._u64 );
 }
 
-static void R4300_CALL_TYPE R4300_Special_SLT( R4300_CALL_SIGNATURE ) 				// Set on Less Than
+void R4300_CALL_TYPE R4300_Special_SLT( R4300_CALL_SIGNATURE ) 				// Set on Less Than
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1832,7 +1832,7 @@ static void R4300_CALL_TYPE R4300_Special_SLT( R4300_CALL_SIGNATURE ) 				// Set
 	}
 }
 
-static void R4300_CALL_TYPE R4300_Special_SLTU( R4300_CALL_SIGNATURE ) 				// Set on Less Than Unsigned
+void R4300_CALL_TYPE R4300_Special_SLTU( R4300_CALL_SIGNATURE ) 				// Set on Less Than Unsigned
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1847,11 +1847,10 @@ static void R4300_CALL_TYPE R4300_Special_SLTU( R4300_CALL_SIGNATURE ) 				// Se
 	{
 		gGPR[ op_code.rd ]._u64 = 0;
 	}
-
 }
 
 
-static void R4300_CALL_TYPE R4300_Special_DADD( R4300_CALL_SIGNATURE )//CYRUS64
+void R4300_CALL_TYPE R4300_Special_DADD( R4300_CALL_SIGNATURE )//CYRUS64
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1860,7 +1859,7 @@ static void R4300_CALL_TYPE R4300_Special_DADD( R4300_CALL_SIGNATURE )//CYRUS64
 	gGPR[ op_code.rd ]._s64 = gGPR[ op_code.rs ]._s64 + gGPR[ op_code.rt ]._s64;
 }
 
-static void R4300_CALL_TYPE R4300_Special_DADDU( R4300_CALL_SIGNATURE )//CYRUS64
+void R4300_CALL_TYPE R4300_Special_DADDU( R4300_CALL_SIGNATURE )//CYRUS64
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1871,11 +1870,10 @@ static void R4300_CALL_TYPE R4300_Special_DADDU( R4300_CALL_SIGNATURE )//CYRUS64
 	//BUG FIX for Excite Bike - Salvy
 	// I don't know why Excite bike only works if the operand is 32bit.. this for sure is wrong as docs say.
 	// Also this causes Conker to fail to display a cutscene in the final boss!
-	//gGPR[ op_code.rd ]._s64 = (s64)( gGPR[ op_code.rt ]._s32_0 + gGPR[ op_code.rs ]._s32_0 );
-
+	//gGPR[ op_code.rd ]._s64 = (s64)( gGPR[ op_code.rs ]._s32_0 + gGPR[ op_code.rt ]._s32_0 );
 }
 
-static void R4300_CALL_TYPE R4300_Special_DSUB( R4300_CALL_SIGNATURE )
+void R4300_CALL_TYPE R4300_Special_DSUB( R4300_CALL_SIGNATURE )
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1884,7 +1882,7 @@ static void R4300_CALL_TYPE R4300_Special_DSUB( R4300_CALL_SIGNATURE )
 	gGPR[ op_code.rd ]._s64 = gGPR[ op_code.rs ]._s64 - gGPR[ op_code.rt ]._s64;
 }
 
-static void R4300_CALL_TYPE R4300_Special_DSUBU( R4300_CALL_SIGNATURE )
+void R4300_CALL_TYPE R4300_Special_DSUBU( R4300_CALL_SIGNATURE )
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1892,11 +1890,10 @@ static void R4300_CALL_TYPE R4300_Special_DSUBU( R4300_CALL_SIGNATURE )
 
 	// The order of rs and rt was wrong! It should be rs - rt, not rt - rs!!
 	// It caused several lock ups in games ex Animal Crossing, and Conker to crash in last boss
-	// Also signed extended to be safe
 	gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rs ]._u64 - gGPR[ op_code.rt ]._u64;
 }
 
-static void R4300_CALL_TYPE R4300_Special_DSLL( R4300_CALL_SIGNATURE )
+void R4300_CALL_TYPE R4300_Special_DSLL( R4300_CALL_SIGNATURE )
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1906,7 +1903,7 @@ static void R4300_CALL_TYPE R4300_Special_DSLL( R4300_CALL_SIGNATURE )
 	gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rt ]._u64 << op_code.sa;
 }
 
-static void R4300_CALL_TYPE R4300_Special_DSRL( R4300_CALL_SIGNATURE )
+void R4300_CALL_TYPE R4300_Special_DSRL( R4300_CALL_SIGNATURE )
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1916,7 +1913,7 @@ static void R4300_CALL_TYPE R4300_Special_DSRL( R4300_CALL_SIGNATURE )
     gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rt ]._u64 >> op_code.sa;
 }
 
-static void R4300_CALL_TYPE R4300_Special_DSRA( R4300_CALL_SIGNATURE )
+void R4300_CALL_TYPE R4300_Special_DSRA( R4300_CALL_SIGNATURE )
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1926,7 +1923,7 @@ static void R4300_CALL_TYPE R4300_Special_DSRA( R4300_CALL_SIGNATURE )
 	gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rt ]._s64 >> op_code.sa;
 }
 
-static void R4300_CALL_TYPE R4300_Special_DSLL32( R4300_CALL_SIGNATURE ) 			// Double Shift Left Logical 32
+void R4300_CALL_TYPE R4300_Special_DSLL32( R4300_CALL_SIGNATURE ) 			// Double Shift Left Logical 32
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1936,7 +1933,7 @@ static void R4300_CALL_TYPE R4300_Special_DSLL32( R4300_CALL_SIGNATURE ) 			// D
 	gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rt ]._u64 << ( 32 + op_code.sa );
 }
 
-static void R4300_CALL_TYPE R4300_Special_DSRL32( R4300_CALL_SIGNATURE ) 			// Double Shift Right Logical 32
+void R4300_CALL_TYPE R4300_Special_DSRL32( R4300_CALL_SIGNATURE ) 			// Double Shift Right Logical 32
 {
 	R4300_CALL_MAKE_OP( op_code );
 
@@ -1946,7 +1943,7 @@ static void R4300_CALL_TYPE R4300_Special_DSRL32( R4300_CALL_SIGNATURE ) 			// D
 	gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rt ]._u64 >> ( 32 + op_code.sa );
 }
 
-static void R4300_CALL_TYPE R4300_Special_DSRA32( R4300_CALL_SIGNATURE ) 			// Double Shift Right Arithmetic 32
+void R4300_CALL_TYPE R4300_Special_DSRA32( R4300_CALL_SIGNATURE ) 			// Double Shift Right Arithmetic 32
 {
 	R4300_CALL_MAKE_OP( op_code );
 
