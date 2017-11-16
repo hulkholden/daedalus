@@ -141,7 +141,7 @@ void CGraphicsPlugin::UpdateScreen()
 	}
 }
 
-void CGraphicsPlugin::RomClosed()
+void CGraphicsPlugin::Finalise()
 {
 	DBGConsole_Msg(0, "Finalising GLGraphics");
 	DLParser_Finalise();

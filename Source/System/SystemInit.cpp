@@ -76,7 +76,7 @@ static void DisposeGraphicsPlugin()
 {
 	if (gGraphicsPlugin != NULL)
 	{
-		gGraphicsPlugin->RomClosed();
+		gGraphicsPlugin->Finalise();
 		delete gGraphicsPlugin;
 		gGraphicsPlugin = NULL;
 	}

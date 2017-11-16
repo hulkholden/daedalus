@@ -30,7 +30,7 @@ class CGraphicsPlugin
 		bool		Initialise();
 		void		ProcessDList();
 		void		UpdateScreen();
-		void		RomClosed();
+		void		Finalise();
 
 	private:
 		u32					LastOrigin;
