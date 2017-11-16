@@ -30,9 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Config/ConfigOptions.h"
 #include "Core/CPU.h"
-#include "Core/ROM.h"
 #include "Debug/Dump.h"
-#include "HLEGraphics/DLParser.h"
 #include "RomFile/RomFile.h"
 #include "System/IO.h"
 #include "System/SystemInit.h"

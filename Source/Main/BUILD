@@ -23,7 +23,6 @@ cc_library(
         "//DynaRec",
         "//HLEAudio",
         "//Interface",
-        "//Plugins",
         "//System:SystemInit",
         "//Test:BatchTest",
     ],

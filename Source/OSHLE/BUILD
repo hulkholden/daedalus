@@ -12,8 +12,8 @@ cc_library(
         "//Core",
         "//Debug",
         "//DynaRec",
+        "//HLEAudio",
         "//Math",
-        "//Plugins",
         "//Utility",
     ],
 )

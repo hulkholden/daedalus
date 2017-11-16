@@ -53,11 +53,11 @@ cc_library(
         "//Debug",
         "//Debug:Synchroniser",
         "//Graphics",
+        "//HLEAudio",
         "//HLEGraphics",
         "//Input",
         "//Interface",
         "//OSHLE",
-        "//Plugins",
         "//Utility",
     ],
 )

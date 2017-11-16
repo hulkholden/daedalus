@@ -31,7 +31,6 @@ cc_library(
         "//Config",
         "//Core",
         "//Debug",
-        "//Plugins",
         "//System",
         "//Utility",
     ],

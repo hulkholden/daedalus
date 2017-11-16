@@ -9,9 +9,9 @@
 #include "HLEGraphics/BaseRenderer.h"
 #include "HLEGraphics/DisplayListDebugger.h"
 #include "HLEGraphics/DLParser.h"
+#include "HLEGraphics/GraphicsPlugin.h"
 #include "HLEGraphics/TextureCache.h"
 #include "Interface/Preferences.h"
-#include "Plugins/GraphicsPlugin.h"
 #include "System/Timing.h"
 
 EFrameskipValue     gFrameskipValue = FV_DISABLED;
@@ -104,6 +104,10 @@ class CGraphicsPluginImpl : public CGraphicsPlugin
 	private:
 		u32					LastOrigin;
 };
+
+CGraphicsPlugin::~CGraphicsPlugin()
+{
+}
 
 CGraphicsPluginImpl::CGraphicsPluginImpl()
 :	LastOrigin( 0 )

@@ -31,7 +31,6 @@ cc_library(
         "//Core",
         "//Debug",
         "//Graphics",
-        "//Plugins",
         "//Test:BatchTest",
         "//Utility",
     ],

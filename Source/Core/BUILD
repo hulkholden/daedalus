@@ -50,7 +50,6 @@ cc_library(
         "//HLEGraphics",
         "//Input",
         "//Interface",
-        "//Plugins",
         "//RomFile",
         "//System:SystemInit",
         "//Test:BatchTest",
