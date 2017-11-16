@@ -64,18 +64,18 @@ TEST(R4300, SUB) {
 	EXPECT_EQ(TestSpecial(R4300_Special_SUB, 1, 2), -1);
 	EXPECT_EQ(TestSpecial(R4300_Special_SUB, 1, -1), 2);
 	EXPECT_EQ(TestSpecial(R4300_Special_SUB, -1, 1), -2);
-	EXPECT_EQ(TestSpecial(R4300_Special_SUB, 0x70000000, -0x20000000), 0x90000000);
+	EXPECT_EQ(TestSpecial(R4300_Special_SUB, 0x70000000, -0x20000000), 0xffffffff90000000);
 	// Upper bits should be ignored.
-	EXPECT_EQ(TestSpecial(R4300_Special_SUB, 0xdead70000000, -0x20000000), 0x90000000);
+	EXPECT_EQ(TestSpecial(R4300_Special_SUB, 0xdead70000000, -0x20000000), 0xffffffff90000000);
 }
 
 TEST(R4300, SUBU) {
 	EXPECT_EQ(TestSpecial(R4300_Special_SUBU, 1, 2), -1);
 	EXPECT_EQ(TestSpecial(R4300_Special_SUBU, 1, -1), 2);
 	EXPECT_EQ(TestSpecial(R4300_Special_SUBU, -1, 1), -2);
-	EXPECT_EQ(TestSpecial(R4300_Special_SUBU, 0x70000000, -0x20000000), 0x90000000);
+	EXPECT_EQ(TestSpecial(R4300_Special_SUBU, 0x70000000, -0x20000000), 0xffffffff90000000);
 	// Upper bits should be ignored.
-	EXPECT_EQ(TestSpecial(R4300_Special_SUBU, 0xdead70000000, -0x20000000), 0x90000000);
+	EXPECT_EQ(TestSpecial(R4300_Special_SUBU, 0xdead70000000, -0x20000000), 0xffffffff90000000);
 }
 
 TEST(R4300, AND) {
