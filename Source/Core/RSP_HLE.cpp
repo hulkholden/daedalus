@@ -36,10 +36,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Ultra/ultra_sptask.h"
 #include "Utility/Profiler.h"
 
-static const bool	gGraphicsEnabled = true;
-static const bool	gAudioEnabled	 = true;
-
-
 #if 0
 static void RDP_DumpRSPCode(char * name, u32 crc, u32 * mem_base, u32 pc_base, u32 len)
 {
@@ -141,7 +137,7 @@ static EProcessResult RSP_HLE_Graphics()
 {
 	DAEDALUS_PROFILE( "HLE: Graphics" );
 
-	if (gGraphicsEnabled && gGraphicsPlugin != NULL)
+	if (gGraphicsPlugin != NULL)
 	{
 		gGraphicsPlugin->ProcessDList();
 	}
@@ -170,7 +166,7 @@ static EProcessResult RSP_HLE_Audio()
 {
 	DAEDALUS_PROFILE( "HLE: Audio" );
 
-	if (gAudioEnabled && gAudioPlugin != NULL)
+	if (gAudioPlugin != NULL)
 	{
 		return gAudioPlugin->ProcessAList();
 	}
