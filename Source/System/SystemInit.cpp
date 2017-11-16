@@ -68,16 +68,7 @@ static bool InitAudioPlugin()
 static bool InitGraphicsPlugin()
 {
 	DAEDALUS_ASSERT(gGraphicsPlugin == NULL, "The graphics plugin should not be initialised at this point");
-	CGraphicsPlugin* graphics_plugin = CreateGraphicsPlugin();
-	if (graphics_plugin != NULL)
-	{
-		if (!graphics_plugin->StartEmulation())
-		{
-			delete graphics_plugin;
-			graphics_plugin = NULL;
-		}
-		gGraphicsPlugin = graphics_plugin;
-	}
+	gGraphicsPlugin = CreateGraphicsPlugin();
 	return true;
 }
 

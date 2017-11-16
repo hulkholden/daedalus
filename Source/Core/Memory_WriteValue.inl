@@ -207,10 +207,6 @@ static void WriteValue_8440_844F( u32 address, u32 value )
 #ifdef DAEDALUS_LOG
 		DisplayVIControlInfo(value);
 #endif
-		if (gGraphicsPlugin != NULL)
-		{
-			gGraphicsPlugin->ViStatusChanged();
-		}
 		break;
 
 	case 0x4:	// VI_ORIGIN_REG
@@ -229,10 +225,6 @@ static void WriteValue_8440_844F( u32 address, u32 value )
 
 	case 0x8:	// VI_WIDTH_REG
 		DPF( DEBUG_VI, "VI_WIDTH_REG set to %d pixels", value );
-		if (gGraphicsPlugin != NULL)
-		{
-			gGraphicsPlugin->ViWidthChanged();
-		}
 		break;
 
 	case 0x10:	// VI_CURRENT_REG

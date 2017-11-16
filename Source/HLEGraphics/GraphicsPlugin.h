@@ -19,29 +19,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef PLUGINS_GRAPHICSPLUGIN_H_
-#define PLUGINS_GRAPHICSPLUGIN_H_
+#ifndef HLEGRAPHICS_GRAPHICSPLUGIN_H_
+#define HLEGRAPHICS_GRAPHICSPLUGIN_H_
 
 class CGraphicsPlugin
 {
 	public:
-		virtual ~CGraphicsPlugin();
+		CGraphicsPlugin() : LastOrigin(0) {}
 
-		virtual bool		StartEmulation() = 0;
+		bool		Initialise();
+		void		ProcessDList();
+		void		UpdateScreen();
+		void		RomClosed();
 
-		virtual void		ViStatusChanged() = 0;
-		virtual void		ViWidthChanged() = 0;
-		virtual void		ProcessDList() = 0;
-
-		virtual void		UpdateScreen() = 0;
-
-		virtual void		RomClosed() = 0;
+	private:
+		u32					LastOrigin;
 };
 
-//
-//	This needs to be defined for all targets.
-//
 CGraphicsPlugin *		CreateGraphicsPlugin();
 extern CGraphicsPlugin * gGraphicsPlugin;
 
-#endif // PLUGINS_GRAPHICSPLUGIN_H_
+#endif // HLEGRAPHICS_GRAPHICSPLUGIN_H_
