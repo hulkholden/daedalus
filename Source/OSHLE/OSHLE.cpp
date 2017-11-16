@@ -888,53 +888,58 @@ fail_find:
 static void Patch_FlushCache()
 {
 	std::string name = Save_GetDirectory(".hle");
-	DBGConsole_Msg(0, "Write OSHLE cache: %s", name.c_str());
 
 	FILE *fp = fopen(name.c_str(), "wb");
-	if (fp != NULL)
+	if (!fp)
 	{
-		u32 data = MAGIC_HEADER;
-		fwrite(&data, 1, sizeof(data), fp);
+		DBGConsole_Msg(0, "Failed to write OSHLE cache: %s", name.c_str());
+		return;
+	}
 
-		for (u32 i = 0; i < nPatchSymbols; i++)
+	DBGConsole_Msg(0, "Write OSHLE cache: %s", name.c_str());
+
+	u32 data = MAGIC_HEADER;
+	fwrite(&data, 1, sizeof(data), fp);
+
+	for (u32 i = 0; i < nPatchSymbols; i++)
+	{
+		if (g_PatchSymbols[i]->Found )
 		{
-			if (g_PatchSymbols[i]->Found )
+			data = g_PatchSymbols[i]->Location;
+			fwrite(&data, 1, sizeof(data), fp);
+			for(data = 0; ;data++)
 			{
-				data = g_PatchSymbols[i]->Location;
-				fwrite(&data, 1, sizeof(data), fp);
-				for(data = 0; ;data++)
-				{
-					if (g_PatchSymbols[i]->Signatures[data].Function ==
-						g_PatchSymbols[i]->Function)
-						break;
-				}
-				fwrite(&data, 1, sizeof(data), fp);
+				if (g_PatchSymbols[i]->Signatures[data].Function ==
+					g_PatchSymbols[i]->Function)
+					break;
 			}
-			else
-			{
-				data = 0;
-				fwrite(&data, 1, sizeof(data), fp);
-			}
-
-
+			fwrite(&data, 1, sizeof(data), fp);
 		}
-
-		for (u32 i = 0; i < nPatchVariables; i++)
+		else
 		{
-			if (g_PatchVariables[i]->Found )
-			{
-				data = g_PatchVariables[i]->Location;
-			}
-			else
-			{
-				data = 0;
-			}
-
+			data = 0;
 			fwrite(&data, 1, sizeof(data), fp);
 		}
 
-		fclose(fp);
+
 	}
+
+	for (u32 i = 0; i < nPatchVariables; i++)
+	{
+		if (g_PatchVariables[i]->Found )
+		{
+			data = g_PatchVariables[i]->Location;
+		}
+		else
+		{
+			data = 0;
+		}
+
+		fwrite(&data, 1, sizeof(data), fp);
+	}
+
+	fclose(fp);
+	DBGConsole_Msg(0, "Wrote OSHLE cache: %s", name.c_str());
 }
 
 
@@ -942,52 +947,53 @@ static bool Patch_GetCache()
 {
 	std::string name = Save_GetDirectory(".hle");
 	FILE *fp = fopen(name.c_str(), "rb");
-	if (fp != NULL)
+	if (!fp)
 	{
-		DBGConsole_Msg(0, "Read from OSHLE cache: %s", name.c_str());
-		u32 data;
-
-		fread(&data, 1, sizeof(data), fp);
-		if (data != MAGIC_HEADER)
-		{
-			fclose(fp);
-			return false;
-		}
-
-		for (u32 i = 0; i < nPatchSymbols; i++)
-		{
-			fread(&data, 1, sizeof(data), fp);
-			if (data != 0)
-			{
-				g_PatchSymbols[i]->Found = true;
-				g_PatchSymbols[i]->Location = data;
-				fread(&data, 1, sizeof(data), fp);
-				g_PatchSymbols[i]->Function = g_PatchSymbols[i]->Signatures[data].Function;
-			}
-			else
-				g_PatchSymbols[i]->Found = false;
-		}
-
-		for (u32 i = 0; i < nPatchVariables; i++)
-		{
-			fread(&data, 1, sizeof(data), fp);
-			if (data != 0)
-			{
-				g_PatchVariables[i]->Found = true;
-				g_PatchVariables[i]->Location = data;
-			}
-			else
-			{
-				g_PatchVariables[i]->Found = false;
-				g_PatchVariables[i]->Location = 0;
-			}
-		}
-
-		fclose(fp);
-		return true;
+		return false;
 	}
 
-	return false;
+	DBGConsole_Msg(0, "Read from OSHLE cache: %s", name.c_str());
+	u32 data;
+
+	fread(&data, 1, sizeof(data), fp);
+	if (data != MAGIC_HEADER)
+	{
+		fclose(fp);
+		return false;
+	}
+
+	for (u32 i = 0; i < nPatchSymbols; i++)
+	{
+		fread(&data, 1, sizeof(data), fp);
+		if (data != 0)
+		{
+			g_PatchSymbols[i]->Found = true;
+			g_PatchSymbols[i]->Location = data;
+			fread(&data, 1, sizeof(data), fp);
+			g_PatchSymbols[i]->Function = g_PatchSymbols[i]->Signatures[data].Function;
+		}
+		else
+			g_PatchSymbols[i]->Found = false;
+	}
+
+	for (u32 i = 0; i < nPatchVariables; i++)
+	{
+		fread(&data, 1, sizeof(data), fp);
+		if (data != 0)
+		{
+			g_PatchVariables[i]->Found = true;
+			g_PatchVariables[i]->Location = data;
+		}
+		else
+		{
+			g_PatchVariables[i]->Found = false;
+			g_PatchVariables[i]->Location = 0;
+		}
+	}
+
+	fclose(fp);
+	DBGConsole_Msg(0, "Read completed from OSHLE cache: %s", name.c_str());
+	return true;
 }
 
 static u32 RET_NOT_PROCESSED(PatchSymbol* ps)
