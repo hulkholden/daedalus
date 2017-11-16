@@ -52,7 +52,6 @@ cc_library(
         "//Interface",
         "//RomFile",
         "//System:SystemInit",
-        "//Test:BatchTest",
         "//Utility",
     ],
 )

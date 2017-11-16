@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Config/ConfigOptions.h"
 #include "Core/CPU.h"
+#include "Core/RSP_HLE.h"
 #include "Debug/Dump.h"
 #include "RomFile/RomFile.h"
 #include "System/IO.h"
@@ -78,14 +79,14 @@ static EAssertResult BatchAssertHook( const char * expression, const char * file
 	return AR_IGNORE;
 }
 
-CBatchTestEventHandler * BatchTest_GetHandler()
-{
-	return gBatchTestEventHandler;
-}
-
 static void BatchVblHandler( void * arg )
 {
 	gBatchTestEventHandler->OnVerticalBlank();
+}
+
+static void BatchDisplayListHandler( void * arg )
+{
+	gBatchTestEventHandler->OnDisplayListComplete();
 }
 
 static std::string MakeNewLogFilename( const std::string& rundir )
@@ -199,7 +200,9 @@ void BatchTestMain( int argc, char* argv[] )
 
 	u64 time;
 	if( NTiming::GetPreciseTime( &time ) )
+	{
 		srand( (int)time );
+	}
 
 	CTimer	timer;
 
@@ -207,7 +210,8 @@ void BatchTestMain( int argc, char* argv[] )
 	SetAssertHook( BatchAssertHook );
 
 	// Hook in our Vbl handler.
-	CPU_RegisterVblCallback( &BatchVblHandler, NULL );
+	CPU_RegisterVblCallback( &BatchVblHandler, nullptr );
+	RSP_HLE_RegisterDisplayListCallback( &BatchDisplayListHandler, nullptr );
 
 	std::string tmpfilepath = IO::Path::Join(rundir, "tmp.tmp");
 
@@ -280,6 +284,7 @@ void BatchTestMain( int argc, char* argv[] )
 
 	}
 
+	RSP_HLE_UnregisterDisplayListCallback( &BatchDisplayListHandler, nullptr );
 	CPU_UnregisterVblCallback( &BatchVblHandler, nullptr );
 	SetAssertHook( nullptr );
 

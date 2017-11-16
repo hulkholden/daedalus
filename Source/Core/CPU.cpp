@@ -100,7 +100,6 @@ ALIGNED_GLOBAL(SCPUState, gCPUState, CACHE_ALIGN);
 static bool CPU_IsStateSimple();
 void (*g_pCPUCore)();
 
-typedef void (*VblCallbackFn)(void* arg);
 struct VblCallback
 {
 	VblCallbackFn Fn;

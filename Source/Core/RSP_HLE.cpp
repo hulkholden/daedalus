@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Daedalus.h"
 #include "Core/RSP_HLE.h"
 
+#include <vector>
+
 #include "Base/MathUtil.h"
 #include "Core/Interrupt.h"
 #include "Core/Memory.h"
@@ -30,7 +32,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEAudio/AudioPlugin.h"
 #include "HLEGraphics/GraphicsPlugin.h"
 #include "System/IO.h"
-#include "Test/BatchTest.h"
 #include "Ultra/ultra_mbi.h"
 #include "Ultra/ultra_rcp.h"
 #include "Ultra/ultra_sptask.h"
@@ -87,9 +88,7 @@ static void RDP_DumpRSPData(char * name, u32 crc, u32 * mem_base, u32 pc_base, u
 }
 #endif
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 #if 0
 static void	RSP_HLE_DumpTaskInfo( const OSTask * pTask )
 {
@@ -107,9 +106,34 @@ static void	RSP_HLE_DumpTaskInfo( const OSTask * pTask )
 }
 #endif
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
+typedef void (*DisplayListCallback)(void* arg);
+struct DLCallback
+{
+	DisplayListCallback Fn;
+	void* Arg;
+};
+
+static std::vector<DLCallback> gDLCallbacks;
+
+void RSP_HLE_RegisterDisplayListCallback(DisplayListCallback fn, void* arg)
+{
+	DLCallback callback = {fn, arg};
+	gDLCallbacks.push_back(callback);
+}
+
+void RSP_HLE_UnregisterDisplayListCallback(DisplayListCallback fn, void* arg)
+{
+	for (std::vector<DLCallback>::iterator it = gDLCallbacks.begin(); it != gDLCallbacks.end(); ++it)
+	{
+		if (it->Fn == fn && it->Arg == arg)
+		{
+			gDLCallbacks.erase(it);
+			break;
+		}
+	}
+}
+
 void RSP_HLE_Finished(u32 setbits)
 {
 	// Need to point to last instr?
@@ -130,9 +154,7 @@ void RSP_HLE_Finished(u32 setbits)
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 static EProcessResult RSP_HLE_Graphics()
 {
 	DAEDALUS_PROFILE( "HLE: Graphics" );
@@ -148,20 +170,15 @@ static EProcessResult RSP_HLE_Graphics()
 		R4300_Interrupt_UpdateCause3();
 	}
 
-
-#ifdef DAEDALUS_BATCH_TEST_ENABLED
-	if (CBatchTestEventHandler * handler = BatchTest_GetHandler())
+	for (auto callback : gDLCallbacks)
 	{
-		handler->OnDisplayListComplete();
+		callback.Fn(callback.Arg);
 	}
-#endif
 
 	return PR_COMPLETED;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 static EProcessResult RSP_HLE_Audio()
 {
 	DAEDALUS_PROFILE( "HLE: Audio" );
@@ -173,9 +190,7 @@ static EProcessResult RSP_HLE_Audio()
 	return PR_COMPLETED;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 // RSP_HLE_Jpeg and RSP_HLE_CICX105 were borrowed from Mupen64plus
 static u32 sum_bytes(const u8 *bytes, u32 size)
 {
@@ -188,9 +203,7 @@ static u32 sum_bytes(const u8 *bytes, u32 size)
     return sum;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 EProcessResult RSP_HLE_Jpeg(OSTask * task)
 {
 void jpeg_decode_PS(OSTask *task);
@@ -214,9 +227,7 @@ void jpeg_decode_OB(OSTask *task);
 	return PR_COMPLETED;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 EProcessResult RSP_HLE_CICX105(OSTask * task)
 {
     const u32 sum = sum_bytes(g_pu8SpImemBase, 0x1000 >> 1);
@@ -249,9 +260,7 @@ EProcessResult RSP_HLE_CICX105(OSTask * task)
 
 	return PR_COMPLETED;
 }
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void RSP_HLE_ProcessTask()
 {
 	OSTask * pTask = (OSTask *)(g_pu8SpMemBase + 0x0FC0);

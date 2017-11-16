@@ -36,4 +36,8 @@ enum EProcessResult
 
 void RSP_HLE_ProcessTask();
 
+typedef void (*DisplayListCallback)(void* arg);
+void RSP_HLE_RegisterDisplayListCallback(DisplayListCallback fn, void* arg);
+void RSP_HLE_UnregisterDisplayListCallback(DisplayListCallback fn, void* arg);
+
 #endif // CORE_RSP_HLE_H_

@@ -44,7 +44,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Ultra/ultra_gbi.h"
 #include "Ultra/ultra_rcp.h"
 #include "Ultra/ultra_sptask.h"
-#include "Test/BatchTest.h"
 #include "System/IO.h"
 #include "Utility/Profiler.h"
 
@@ -510,14 +509,6 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DLDebug_SetOutput(nullptr);
-#endif
-
-#ifdef DAEDALUS_BATCH_TEST_ENABLED
-	CBatchTestEventHandler * handler( BatchTest_GetHandler() );
-	if( handler )
-	{
-		handler->OnDisplayListComplete();
-	}
 #endif
 
 	return count;

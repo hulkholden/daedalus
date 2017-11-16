@@ -63,8 +63,6 @@ private:
 	std::vector<u32>	mAsserts;
 };
 
-CBatchTestEventHandler * BatchTest_GetHandler();
-
 void BatchTestMain( int argc, char* argv[] );
 
 #endif
