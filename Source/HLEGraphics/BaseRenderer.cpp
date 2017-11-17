@@ -1592,8 +1592,6 @@ void BaseRenderer::SetProjection(const u32 address, bool bReplace)
 		//
 		if( g_ROM.ZELDA_HACK )
 			mProjectionMat.mRaw[14] += 0.4f;
-		if( gGlobalPreferences.ViewportType == VT_FULLSCREEN_HD )
-			mProjectionMat.mRaw[0] *= HD_SCALE;	//proper 16:9 scale
 	}
 	else
 	{
@@ -1718,13 +1716,6 @@ inline void BaseRenderer::PokeWorldProject()
 	{
 		mWPmodified = false;
 		mReloadProj = true;
-		if( gGlobalPreferences.ViewportType == VT_FULLSCREEN_HD )
-		{	//proper 16:9 scale
-			mWorldProject.mRaw[0] *= HD_SCALE;
-			mWorldProject.mRaw[4] *= HD_SCALE;
-			mWorldProject.mRaw[8] *= HD_SCALE;
-			mWorldProject.mRaw[12] *= HD_SCALE;
-		}
 		SetProjectionMatrix(mWorldProject);
 		mModelViewStack[mModelViewTop] = gMatrixIdentity;
 	}

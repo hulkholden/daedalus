@@ -109,43 +109,8 @@ bool IPreferences::OpenPreferencesFile(const std::string& filename)
 	if (section != nullptr)
 	{
 		std::string str_value;
-		section->GetProperty("DisplayFramerate", &gGlobalPreferences.DisplayFramerate);
 		section->GetProperty("ForceLinearFilter", &gGlobalPreferences.ForceLinearFilter);
 		section->GetProperty("RumblePak", &gGlobalPreferences.RumblePak);
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-		section->GetProperty("HighlightInexactBlendModes", &gGlobalPreferences.HighlightInexactBlendModes);
-		section->GetProperty("CustomBlendModes", &gGlobalPreferences.CustomBlendModes);
-#endif
-		section->GetProperty("BatteryWarning", &gGlobalPreferences.BatteryWarning);
-		section->GetProperty("LargeROMBuffer", &gGlobalPreferences.LargeROMBuffer);
-		section->GetProperty("StickMinDeadzone", &gGlobalPreferences.StickMinDeadzone);
-		section->GetProperty("StickMaxDeadzone", &gGlobalPreferences.StickMaxDeadzone);
-		int int_value;
-		if (section->GetProperty("GuiColor", &int_value))
-		{
-			if (int_value >= 0 && int_value < NUM_COLOR_TYPES)
-			{
-				gGlobalPreferences.GuiColor = EGuiColor(int_value);
-			}
-		}
-
-		if (section->GetProperty("ViewportType", &int_value))
-		{
-			if (int_value >= 0 && int_value < NUM_VIEWPORT_TYPES)
-			{
-				gGlobalPreferences.ViewportType = EViewportType(int_value);
-			}
-		}
-
-		section->GetProperty("TVEnable", &gGlobalPreferences.TVEnable);
-		section->GetProperty("TVLaced", &gGlobalPreferences.TVLaced);
-		if (section->GetProperty("TVType", &int_value))
-		{
-			if (int_value >= 0 && int_value < 2)
-			{
-				gGlobalPreferences.TVType = ETVType(int_value);
-			}
-		}
 	}
 
 	for (u32 section_idx = 0; section_idx < inifile->GetNumSections(); ++section_idx)
@@ -220,22 +185,8 @@ void IPreferences::Commit()
 #define OUTPUT_BOOL(b, nm, def) fprintf(fh, "%s=%s\n", #nm, b.nm ? "yes" : "no");
 #define OUTPUT_FLOAT(b, nm, def) fprintf(fh, "%s=%f\n", #nm, b.nm);
 #define OUTPUT_INT(b, nm, def) fprintf(fh, "%s=%d\n", #nm, b.nm);
-		OUTPUT_INT(gGlobalPreferences, DisplayFramerate, defaults);
 		OUTPUT_BOOL(gGlobalPreferences, ForceLinearFilter, defaults);
 		OUTPUT_BOOL(gGlobalPreferences, RumblePak, defaults);
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-		OUTPUT_BOOL(gGlobalPreferences, HighlightInexactBlendModes, defaults);
-		OUTPUT_BOOL(gGlobalPreferences, CustomBlendModes, defaults);
-#endif
-		OUTPUT_BOOL(gGlobalPreferences, BatteryWarning, defaults);
-		OUTPUT_BOOL(gGlobalPreferences, LargeROMBuffer, defaults);
-		OUTPUT_INT(gGlobalPreferences, GuiColor, defaults)
-		OUTPUT_FLOAT(gGlobalPreferences, StickMinDeadzone, defaults);
-		OUTPUT_FLOAT(gGlobalPreferences, StickMaxDeadzone, defaults);
-		OUTPUT_INT(gGlobalPreferences, ViewportType, defaults);
-		OUTPUT_BOOL(gGlobalPreferences, TVEnable, defaults);
-		OUTPUT_BOOL(gGlobalPreferences, TVLaced, defaults);
-		OUTPUT_INT(gGlobalPreferences, TVType, defaults);
 		fprintf(fh, "\n\n");  // Spacer to go before Rom Settings
 
 		for (const auto& it : mPreferences)
@@ -281,22 +232,8 @@ void IPreferences::SetRomPreferences(const RomID& id, const SRomPreferences& pre
 }
 
 SGlobalPreferences::SGlobalPreferences()
-	: DisplayFramerate(0),
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	  HighlightInexactBlendModes(false),
-	  CustomBlendModes(true),
-#endif
-	  BatteryWarning(false),
-	  LargeROMBuffer(true),
-	  ForceLinearFilter(false),
-	  RumblePak(false),
-	  GuiColor(BLACK),
-	  StickMinDeadzone(0.28f),
-	  StickMaxDeadzone(1.0f),
-	  ViewportType(VT_FULLSCREEN),
-	  TVEnable(false),
-	  TVLaced(false),
-	  TVType(TT_4_3)
+	: ForceLinearFilter(false),
+	  RumblePak(false)
 {
 }
 

@@ -22,57 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef INTERFACE_GLOBALPREFERENCES_H_
 #define INTERFACE_GLOBALPREFERENCES_H_
 
-enum EGuiColor
-{
-	BLACK = 0,  // Default..
-	RED,
-	GREEN,
-	MAGENTA,
-	BLUE,
-	TURQUOISE,
-	ORANGE,
-	PURPLE,
-	GREY,
-};
-const u32 NUM_COLOR_TYPES = GREY + 1;
-
-enum EViewportType
-{
-	VT_UNSCALED_4_3 = 0,
-	VT_SCALED_4_3,
-	VT_FULLSCREEN,
-	VT_FULLSCREEN_HD,
-};
-const u32 NUM_VIEWPORT_TYPES = VT_FULLSCREEN_HD + 1;
-
-enum ETVType
-{
-	TT_4_3 = 0,
-	TT_WIDESCREEN,
-};
-
 struct SGlobalPreferences
 {
-	u32 DisplayFramerate;
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	bool HighlightInexactBlendModes;
-	bool CustomBlendModes;
-#endif
-	bool BatteryWarning;
-	bool LargeROMBuffer;
 	bool ForceLinearFilter;
 	bool RumblePak;
-
-	EGuiColor GuiColor;
-
-	float StickMinDeadzone;
-	float StickMaxDeadzone;
-
-	EViewportType ViewportType;
-
-	bool TVEnable;
-	bool TVLaced;
-	ETVType TVType;
 
 	SGlobalPreferences();
 
