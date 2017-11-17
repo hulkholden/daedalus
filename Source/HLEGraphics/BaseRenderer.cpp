@@ -82,7 +82,7 @@ static f32 fViHeight = 240.0f;
 u32 uViWidth = 320;
 u32 uViHeight = 240;
 
-f32 gZoomX=1.0;	//Default is 1.0f
+static f32 gZoomX = 1.0f;
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 // General purpose variable used for debugging

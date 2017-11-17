@@ -35,15 +35,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Paths.h"
 #include "Utility/IniFile.h"
 
-static u32 GetTexureHashFrequencyAsFrames(ETextureHashFrequency thf);
-static ETextureHashFrequency GetTextureHashFrequencyFromFrames(u32 frames);
-
-static u32 GetFrameskipValueAsInt(EFrameskipValue value);
-static EFrameskipValue GetFrameskipValueFromInt(u32 value);
-
-extern EFrameskipValue gFrameskipValue;
-extern f32 gZoomX;
-
 SGlobalPreferences gGlobalPreferences;
 
 class IPreferences : public CPreferences
@@ -175,14 +166,6 @@ bool IPreferences::OpenPreferencesFile(const std::string& filename)
 		section->GetProperty("AudioRateMatch", &preferences.AudioRateMatch);
 		section->GetProperty("VideoRateMatch", &preferences.VideoRateMatch);
 		section->GetProperty("FogEnabled", &preferences.FogEnabled);
-		if (section->GetProperty("CheckTextureHashFrequency", &int_value))
-		{
-			preferences.CheckTextureHashFrequency = GetTextureHashFrequencyFromFrames(int_value);
-		}
-		if (section->GetProperty("Frameskip", &int_value))
-		{
-			preferences.Frameskip = GetFrameskipValueFromInt(int_value);
-		}
 		if (section->GetProperty("AudioEnabled", &int_value))
 		{
 			if (int_value >= APM_DISABLED && int_value <= APM_ENABLED_SYNC)
@@ -190,7 +173,6 @@ bool IPreferences::OpenPreferencesFile(const std::string& filename)
 				preferences.AudioEnabled = static_cast<EAudioPluginMode>(int_value);
 			}
 		}
-		section->GetProperty("ZoomX", &preferences.ZoomX);
 		section->GetProperty("MemoryAccessOptimisation", &preferences.MemoryAccessOptimisation);
 		section->GetProperty("CheatsEnabled", &preferences.CheatsEnabled);
 		mPreferences[id] = preferences;
@@ -220,11 +202,7 @@ void IPreferences::OutputSectionDetails(const RomID& id, const SRomPreferences& 
 	fprintf(fh, "AudioRateMatch=%d\n", preferences.AudioRateMatch);
 	fprintf(fh, "VideoRateMatch=%d\n", preferences.VideoRateMatch);
 	fprintf(fh, "FogEnabled=%d\n", preferences.FogEnabled);
-	fprintf(fh, "CheckTextureHashFrequency=%d\n",
-			GetTexureHashFrequencyAsFrames(preferences.CheckTextureHashFrequency));
-	fprintf(fh, "Frameskip=%d\n", GetFrameskipValueAsInt(preferences.Frameskip));
 	fprintf(fh, "AudioEnabled=%d\n", preferences.AudioEnabled);
-	fprintf(fh, "ZoomX=%f\n", preferences.ZoomX);
 	fprintf(fh, "MemoryAccessOptimisation=%d\n", preferences.MemoryAccessOptimisation);
 	fprintf(fh, "CheatsEnabled=%d\n", preferences.CheatsEnabled);
 	fprintf(fh, "\n");  // Spacer
@@ -302,13 +280,11 @@ void IPreferences::SetRomPreferences(const RomID& id, const SRomPreferences& pre
 }
 
 SGlobalPreferences::SGlobalPreferences()
-	: DisplayFramerate(0)
+	: DisplayFramerate(0),
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	  ,
 	  HighlightInexactBlendModes(false),
-	  CustomBlendModes(true)
+	  CustomBlendModes(true),
 #endif
-	  ,
 	  BatteryWarning(false),
 	  LargeROMBuffer(true),
 	  ForceLinearFilter(false),
@@ -339,10 +315,7 @@ void SRomPreferences::Reset()
 	FogEnabled = false;
 	MemoryAccessOptimisation = false;
 	CheatsEnabled = false;
-	CheckTextureHashFrequency = THF_EVERY_FRAME;
-	Frameskip = FV_DISABLED;
 	AudioEnabled = APM_ENABLED_SYNC;
-	ZoomX = 1.0f;
 	SpeedSyncEnabled = 0;
 }
 
@@ -359,116 +332,8 @@ void SRomPreferences::Apply() const
 	gClearDepthFrameBuffer = g_ROM.settings.ClearDepthFrameBuffer || ClearDepthFrameBuffer;
 	gAudioRateMatch = g_ROM.settings.AudioRateMatch || AudioRateMatch;
 	gFogEnabled = g_ROM.settings.FogEnabled || FogEnabled;
-	gCheckTextureHashFrequency = GetTexureHashFrequencyAsFrames(CheckTextureHashFrequency);
 	gMemoryAccessOptimisation = g_ROM.settings.MemoryAccessOptimisation || MemoryAccessOptimisation;
-	gFrameskipValue = Frameskip;
-	gZoomX = ZoomX;
 	gCheatsEnabled = g_ROM.settings.CheatsEnabled || CheatsEnabled;
 	gAudioPluginEnabled = AudioEnabled;
 }
 
-static const u32 gTextureHashFreqeuncies[] = {
-	0,   // THF_DISABLED = 0,
-	1,   // THF_EVERY_FRAME,
-	2,   // THF_EVERY_2,
-	4,   // THF_EVERY_4,
-	8,   // THF_EVERY_8,
-	16,  // THF_EVERY_16,
-	32,  // THF_EVERY_32,
-};
-
-static const char* const gTextureHashFreqeuncyDescriptions[] = {
-	"Disabled",			// THF_DISABLED = 0,
-	"Every Frame",		// THF_EVERY_FRAME,
-	"Every 2 Frames",   // THF_EVERY_2,
-	"Every 4 Frames",   // THF_EVERY_4,
-	"Every 8 Frames",   // THF_EVERY_8,
-	"Every 16 Frames",  // THF_EVERY_16,
-	"Every 32 Frames",  // THF_EVERY_32,
-};
-
-static u32 GetTexureHashFrequencyAsFrames(ETextureHashFrequency thf)
-{
-	if (thf >= 0 && thf < NUM_THF)
-	{
-		return gTextureHashFreqeuncies[thf];
-	}
-
-	return 0;
-}
-
-static ETextureHashFrequency GetTextureHashFrequencyFromFrames(u32 frames)
-{
-	for (u32 i = 0; i < NUM_THF; ++i)
-	{
-		if (frames <= gTextureHashFreqeuncies[i])
-		{
-			return ETextureHashFrequency(i);
-		}
-	}
-
-	return THF_EVERY_32;  // Return the maximum
-}
-
-const char* Preferences_GetTextureHashFrequencyDescription(ETextureHashFrequency thf)
-{
-	if (thf >= 0 && thf < NUM_THF)
-	{
-		return gTextureHashFreqeuncyDescriptions[thf];
-	}
-
-	return "?";
-}
-
-u32 GetFrameskipValueAsInt(EFrameskipValue value) { return value; }
-
-EFrameskipValue GetFrameskipValueFromInt(u32 value)
-{
-	//  This is always False
-	//	if( value < FV_DISABLED )
-	//		return FV_DISABLED;
-
-	//	if( value > FV_10 )
-	//		return FV_10;
-
-	return EFrameskipValue(value);
-}
-
-const char* Preferences_GetFrameskipDescription(EFrameskipValue value)
-{
-	switch (value)
-	{
-		case FV_DISABLED:
-			return "Disabled";
-		case FV_AUTO1:
-			return "Auto 1";
-		case FV_AUTO2:
-			return "Auto 2";
-		case FV_1:
-			return "1";
-		case FV_2:
-			return "2";
-		case FV_3:
-			return "3";
-		case FV_4:
-			return "4";
-		case FV_5:
-			return "5";
-		case FV_6:
-			return "6";
-		case FV_7:
-			return "7";
-		case FV_8:
-			return "8";
-		case FV_9:
-			return "9";
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-		case FV_99:
-			return "99";
-#endif
-		case NUM_FRAMESKIP_VALUES:
-			break;
-	}
-	DAEDALUS_ERROR("Unhandled frameskip value");
-	return "?";
-}

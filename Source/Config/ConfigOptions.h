@@ -49,7 +49,6 @@ extern bool gCheatsEnabled;
 // ToDo: Needs moving to Graphics plugin config
 extern bool gCleanSceneEnabled;
 extern bool gClearDepthFrameBuffer;
-extern u32 gCheckTextureHashFrequency;
 
 // ToDo: Need moving to Audio plugin config
 enum EAudioPluginMode

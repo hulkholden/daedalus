@@ -153,14 +153,6 @@ bool CachedTexture::Initialise()
 	mpTexture = CNativeTexture::Create( width, height );
 	if( mpTexture != NULL )
 	{
-		// If this we're performing Texture updated checks, randomly offset the
-		// 'FrameLastUpToDate' time. This ensures when lots of textures are
-		// created on the same frame we update them over a nice distribution of frames.
-
-		if(gCheckTextureHashFrequency > 0)
-		{
-			mFrameLastUpToDate = gRDPFrame + (FastRand() & (gCheckTextureHashFrequency - 1));
-		}
 		UpdateTexture( mTextureInfo, mpTexture );
 	}
 

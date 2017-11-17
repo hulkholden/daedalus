@@ -24,39 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Config/ConfigOptions.h"
 
-enum ETextureHashFrequency
-{
-	THF_DISABLED = 0,
-	THF_EVERY_FRAME,
-	THF_EVERY_2,
-	THF_EVERY_4,
-	THF_EVERY_8,
-	THF_EVERY_16,
-	THF_EVERY_32,
-
-	NUM_THF,
-};
-
-enum EFrameskipValue
-{
-	FV_DISABLED = 0,
-	FV_AUTO1,
-	FV_AUTO2,
-	FV_1,
-	FV_2,
-	FV_3,
-	FV_4,
-	FV_5,
-	FV_6,
-	FV_7,
-	FV_8,
-	FV_9,
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	FV_99,
-#endif
-	NUM_FRAMESKIP_VALUES,
-};
-
 struct SRomPreferences
 {
 	bool PatchesEnabled;
@@ -71,10 +38,7 @@ struct SRomPreferences
 	bool FogEnabled;
 	bool MemoryAccessOptimisation;
 	bool CheatsEnabled;
-	ETextureHashFrequency CheckTextureHashFrequency;
-	EFrameskipValue Frameskip;
 	EAudioPluginMode AudioEnabled;
-	f32 ZoomX;
 	u32 SpeedSyncEnabled;
 	u32 ControllerIndex;
 

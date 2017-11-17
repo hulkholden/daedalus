@@ -14,7 +14,6 @@
 #include "Interface/Preferences.h"
 #include "System/Timing.h"
 
-EFrameskipValue     gFrameskipValue = FV_DISABLED;
 bool                gTakeScreenshot = false;
 
 namespace

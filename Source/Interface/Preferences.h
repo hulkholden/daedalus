@@ -42,7 +42,4 @@ class CPreferences : public CSingleton<CPreferences>
 	virtual void SetRomPreferences(const RomID& id, const SRomPreferences& preferences) = 0;
 };
 
-const char* Preferences_GetTextureHashFrequencyDescription(ETextureHashFrequency thf);
-const char* Preferences_GetFrameskipDescription(EFrameskipValue value);
-
 #endif  // INTERFACE_PREFERENCES_H_
