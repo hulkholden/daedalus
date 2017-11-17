@@ -15,7 +15,6 @@
 #include "System/Timing.h"
 
 EFrameskipValue     gFrameskipValue = FV_DISABLED;
-u32                 gVISyncRate     = 1500;
 bool                gTakeScreenshot = false;
 
 namespace

@@ -358,7 +358,6 @@ void SRomPreferences::Apply() const
 	gCleanSceneEnabled = g_ROM.settings.CleanSceneEnabled || CleanSceneEnabled;
 	gClearDepthFrameBuffer = g_ROM.settings.ClearDepthFrameBuffer || ClearDepthFrameBuffer;
 	gAudioRateMatch = g_ROM.settings.AudioRateMatch || AudioRateMatch;
-	gVideoRateMatch = g_ROM.settings.VideoRateMatch || VideoRateMatch;
 	gFogEnabled = g_ROM.settings.FogEnabled || FogEnabled;
 	gCheckTextureHashFrequency = GetTexureHashFrequencyAsFrames(CheckTextureHashFrequency);
 	gMemoryAccessOptimisation = g_ROM.settings.MemoryAccessOptimisation || MemoryAccessOptimisation;
