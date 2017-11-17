@@ -27,8 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-DaedalusAssertHook gAssertHook = NULL;
-
 EAssertResult DaedalusAssert(const char* expression, const char* file, unsigned int line, const char* msg, ...)
 {
 	char buffer[1024];

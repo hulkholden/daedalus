@@ -50,8 +50,6 @@ cc_test(
     visibility = ["//visibility:private"],
     deps = [
         ":System",
-        # Shouldn't need this.
-        "//Debug",
         "@com_google_googletest//:gtest_main",
     ],
 )
