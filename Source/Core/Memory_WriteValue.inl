@@ -17,6 +17,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+VIOriginChangedEventHandler::~VIOriginChangedEventHandler() {}
+
+static std::vector<VIOriginChangedEventHandler*> gVIOriginChangedEventHandlers;
+
+void Memory_RegisterVIOriginChangedEventHandler(VIOriginChangedEventHandler* handler)
+{
+	gVIOriginChangedEventHandlers.push_back(handler);
+}
+
+void Memory_UnregisterVIOriginChangedEventHandler(VIOriginChangedEventHandler* handler)
+{
+	auto it = std::find(gVIOriginChangedEventHandlers.begin(), gVIOriginChangedEventHandlers.end(), handler);
+	if (it != gVIOriginChangedEventHandlers.end())
+	{
+		gVIOriginChangedEventHandlers.erase(it);
+	}
+}
+
 static void WriteValueInvalid( u32 address, u32 value )
 {
 	DPF( DEBUG_MEMORY, "Illegal Memory Access Tried to Write To 0x%08x PC: 0x%08x", address, gCPUState.CurrentPC );
@@ -219,7 +237,10 @@ static void WriteValue_8440_844F( u32 address, u32 value )
 		}
 		else
 		{
-			gGraphicsPlugin->UpdateScreen();
+			for (auto handler : gVIOriginChangedEventHandlers)
+			{
+				handler->OnOriginChanged();
+			}
 		}
 		break;
 

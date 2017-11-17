@@ -119,12 +119,14 @@ bool CGraphicsPlugin::Initialise()
 	}
 
 	RSP_HLE_RegisterDisplayListProcessor(this);
+	Memory_RegisterVIOriginChangedEventHandler(this);
 	return true;
 }
 
 void CGraphicsPlugin::Finalise()
 {
 	DBGConsole_Msg(0, "Finalising GLGraphics");
+	Memory_UnregisterVIOriginChangedEventHandler(this);
 	RSP_HLE_UnregisterDisplayListProcessor(this);
 	DLParser_Finalise();
 	CTextureCache::Destroy();

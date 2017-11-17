@@ -47,7 +47,6 @@ cc_library(
         "//Core",
         "//Debug",
         "//DynaRec",
-        "//HLEGraphics",
         "//Input",
         "//Interface",
         "//RomFile",

@@ -656,7 +656,7 @@ void DLParser_RDPFullSync( MicroCodeCommand command )
 {
 	// We now do this regardless
 	// This is done after DLIST processing anyway
-	//FinishRDPJob();
+	// FinishRDPJob();
 
 	/*DL_PF("    FullSync: (Generating Interrupt)");*/
 }
