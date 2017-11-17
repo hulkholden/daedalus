@@ -326,7 +326,7 @@ class VIOriginChangedEventHandler
 {
   public:
 	virtual ~VIOriginChangedEventHandler();
-	virtual void OnOriginChanged() = 0;
+	virtual void OnOriginChanged(u32 value) = 0;
 };
 
 void Memory_RegisterVIOriginChangedEventHandler(VIOriginChangedEventHandler* handler);

@@ -145,8 +145,25 @@ void CGraphicsPlugin::ProcessDisplayList()
 #endif
 }
 
+extern void RenderFrameBuffer(u32);
+extern u32 gRDPFrame;
+
+void CGraphicsPlugin::OnOriginChanged(u32 origin)
+{
+	// NB: if no display lists executed, interpret framebuffer
+	if( gRDPFrame == 0 )
+	{
+		RenderFrameBuffer(origin & 0x7FFFFF);
+	}
+	else
+	{
+		UpdateScreen();
+	}
+}
+
 void CGraphicsPlugin::UpdateScreen()
 {
+	// TODO: this is actually lagging a frame behind
 	u32 current_origin = Memory_VI_GetRegister(VI_ORIGIN_REG);
 
 	if (current_origin != LastOrigin)

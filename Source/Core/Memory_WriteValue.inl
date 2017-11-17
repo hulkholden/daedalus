@@ -198,22 +198,6 @@ static void WriteValue_8430_843F( u32 address, u32 value )
 }
 
 // 0x0440 0000 to 0x044F FFFF Video Interface (VI) Registers
-#ifdef DAEDALUS_PSP	// This is out of spec but only writes to VI_CURRENT_REG do something.. /Salvy
-static void WriteValue_8440_844F( u32 address, u32 value )
-{
-	u32 offset = address & 0xFF;
-	if (offset == 0x10)
-	{
-		Memory_MI_ClrRegisterBits(MI_INTR_REG, MI_INTR_VI);
-		R4300_Interrupt_UpdateCause3();
-		return;
-	}
-
-	*(u32 *)((u8 *)g_pMemoryBuffers[MEM_VI_REG] + offset) = value;
-}
-#else
-extern void RenderFrameBuffer(u32);
-extern u32 gRDPFrame;
 static void WriteValue_8440_844F( u32 address, u32 value )
 {
 	u32 offset = address & 0xFF;
@@ -229,18 +213,9 @@ static void WriteValue_8440_844F( u32 address, u32 value )
 
 	case 0x4:	// VI_ORIGIN_REG
 		DPF( DEBUG_VI, "VI_ORIGIN_REG set to %d", value );
-
-		 // NB: if no display lists executed, interpret framebuffer
-		if( gRDPFrame == 0 )
+		for (auto handler : gVIOriginChangedEventHandlers)
 		{
-			RenderFrameBuffer(value & 0x7FFFFF);
-		}
-		else
-		{
-			for (auto handler : gVIOriginChangedEventHandlers)
-			{
-				handler->OnOriginChanged();
-			}
+			handler->OnOriginChanged(value);
 		}
 		break;
 
@@ -261,7 +236,6 @@ static void WriteValue_8440_844F( u32 address, u32 value )
 
 	*(u32 *)((u8 *)g_pMemoryBuffers[MEM_VI_REG] + offset) = value;
 }
-#endif
 
 // 0x0450 0000 to 0x045F FFFF Audio Interface (AI) Registers
 static void WriteValue_8450_845F( u32 address, u32 value )

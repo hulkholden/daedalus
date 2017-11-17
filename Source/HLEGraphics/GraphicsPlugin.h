@@ -36,7 +36,7 @@ class CGraphicsPlugin : public DisplayListProcessor, public VIOriginChangedEvent
 		void		Finalise();
 
 		void		ProcessDisplayList() override;
-		void		OnOriginChanged() override { UpdateScreen(); }
+		void		OnOriginChanged(u32 origin) override;
 
 	private:
 		u32					LastOrigin;

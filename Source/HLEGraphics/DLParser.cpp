@@ -279,6 +279,7 @@ void DLParser_DumpVtxInfo(u32 address, u32 v0_idx, u32 num_verts)
 bool DLParser_Initialise()
 {
 	gFirstCall = true;
+	gRDPFrame = 0;
 
 	// Reset scissor to default
 	scissors.top = 0;
