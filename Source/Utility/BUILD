@@ -41,7 +41,6 @@ cc_test(
     visibility = ["//visibility:private"],
     deps = [
         ":Utility",
-        "//Base",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -55,7 +54,6 @@ cc_test(
     visibility = ["//visibility:private"],
     deps = [
         ":Utility",
-        "//Base",
         "//Test:TestUtil",
         "@com_google_googletest//:gtest_main",
     ],
