@@ -314,8 +314,11 @@ static void SetCommand( u8 cmd, MicroCodeInstruction func, const char* name )
 //	offset:			offset to normal ucode this custom ucode is based of ex GBI0
 static void DLParser_SetCustom( u32 ucode, u32 offset )
 {
-	memcpy( &gCustomInstruction, &gNormalInstruction[offset], 1024 ); // sizeof(gNormalInstruction)/MAX_UCODE
-	memcpy( gCustomInstructionName, gNormalInstructionName[ offset ], 1024 );
+	for (int i = 0; i < 256; i++)
+	{
+		gCustomInstruction[i] = gNormalInstruction[offset][i];
+		gCustomInstructionName[i] = gNormalInstructionName[offset][i];
+	}
 
 	// Start patching to create our custom ucode table ;)
 	switch( ucode )
