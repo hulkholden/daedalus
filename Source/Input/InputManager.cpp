@@ -28,26 +28,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern GLFWwindow * gWindow;
 
 
-class IInputManager : public CInputManager
+class IInputManager : public CInputManager, public VblEventHandler
 {
 public:
 	IInputManager();
-	virtual ~IInputManager();
+	virtual ~IInputManager() override;
 
-	virtual bool				Initialise();
-	virtual void				Finalise();
+	bool				Initialise() override;
+	void				Finalise() override;
 
-	virtual void				GetState( OSContPad pPad[4] );
+	void				GetState( OSContPad pPad[4] ) override;
 
-	virtual u32					GetNumConfigurations() const;
-	virtual const char *		GetConfigurationName( u32 configuration_idx ) const;
-	virtual const char *		GetConfigurationDescription( u32 configuration_idx ) const;
-	virtual void				SetConfiguration( u32 configuration_idx );
-	virtual u32					GetConfigurationFromName( const char * name ) const;
+	u32					GetNumConfigurations() const override;
+	const char *		GetConfigurationName( u32 configuration_idx ) const override;
+	const char *		GetConfigurationDescription( u32 configuration_idx ) const override;
+	void				SetConfiguration( u32 configuration_idx ) override;
+	u32					GetConfigurationFromName( const char * name ) const override;
 
-	void						GetGamePadStatus();
+	void OnVerticalBlank() override;
 
 private:
+	void GetGamePadStatus();
 	void GetJoyPad(OSContPad *pPad);
 	bool mGamePadAvailable;
 };
@@ -61,30 +62,27 @@ IInputManager::~IInputManager()
 {
 }
 
-static void CheckPadStatusVblHandler( void * arg )
+void IInputManager::OnVerticalBlank()
 {
-	IInputManager * manager = static_cast< IInputManager * >( arg );
-
 	// Only check the pad status every 60 vbls, otherwise it's too expensive.
 	static u32 count = 0;
 	if ((count % 60) == 0)
 	{
-		manager->GetGamePadStatus();
+		GetGamePadStatus();
 	}
 	++count;
 }
 
 bool IInputManager::Initialise()
 {
-	CPU_RegisterVblCallback( &CheckPadStatusVblHandler, this );
+	CPU_RegisterVblCallback( this );
 	return true;
 }
 
 void IInputManager::Finalise()
 {
-	CPU_UnregisterVblCallback( &CheckPadStatusVblHandler, this );
+	CPU_UnregisterVblCallback( this );
 }
-
 
 void IInputManager::GetGamePadStatus()
 {

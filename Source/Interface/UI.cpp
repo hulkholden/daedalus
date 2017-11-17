@@ -104,22 +104,29 @@ static void HandleKeys(GLFWwindow * window, int key, int scancode, int action, i
 	}
 }
 
-static void PollKeyboard(void * arg)
+class PollKeyboardVblEventHandler : public VblEventHandler
 {
-	glfwPollEvents();
-	if (glfwWindowShouldClose(gWindow))
-		CPU_Halt("Window Closed");
-}
+	void OnVerticalBlank() override
+	{
+		glfwPollEvents();
+		if (glfwWindowShouldClose(gWindow))
+		{
+			CPU_Halt("Window Closed");
+		}
+	}
+};
+static PollKeyboardVblEventHandler gPollKeyboard;
+
 
 bool UI_Init()
 {
 	DAEDALUS_ASSERT(gWindow != NULL, "The GLFW window should already have been initialised");
 	glfwSetKeyCallback(gWindow, &HandleKeys);
-	CPU_RegisterVblCallback(&PollKeyboard, NULL);
+	CPU_RegisterVblCallback(&gPollKeyboard);
 	return true;
 }
 
 void UI_Finalise()
 {
-	CPU_UnregisterVblCallback(&PollKeyboard, NULL);
+	CPU_UnregisterVblCallback(&gPollKeyboard);
 }

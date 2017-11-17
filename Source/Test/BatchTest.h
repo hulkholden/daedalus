@@ -23,9 +23,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <vector>
 
+#include "Core/CPU.h"
+#include "Core/RSP_HLE.h"
 #include "Utility/Timer.h"
 
-class CBatchTestEventHandler
+class CBatchTestEventHandler : public VblEventHandler, public DisplayListEventHandler
 {
 public:
 	CBatchTestEventHandler();
@@ -42,8 +44,8 @@ public:
 
 	void				Terminate( ETerminationReason reason );
 
-	void				OnDisplayListComplete();
-	void				OnVerticalBlank();
+	void				OnDisplayListComplete() override;
+	void				OnVerticalBlank() override;
 	void				OnDebugMessage( const char * msg );
 
 	EAssertResult		OnAssert( const char * expression, const char * file, unsigned int line, const char * formatted_msg );
