@@ -104,7 +104,7 @@ static void HandleKeys(GLFWwindow * window, int key, int scancode, int action, i
 	}
 }
 
-class PollKeyboardVblEventHandler : public VblEventHandler
+class PollKeyboardCpuEventHandler : public CpuEventHandler
 {
 	void OnVerticalBlank() override
 	{
@@ -115,18 +115,18 @@ class PollKeyboardVblEventHandler : public VblEventHandler
 		}
 	}
 };
-static PollKeyboardVblEventHandler gPollKeyboard;
+static PollKeyboardCpuEventHandler gPollKeyboard;
 
 
 bool UI_Init()
 {
 	DAEDALUS_ASSERT(gWindow != NULL, "The GLFW window should already have been initialised");
 	glfwSetKeyCallback(gWindow, &HandleKeys);
-	CPU_RegisterVblCallback(&gPollKeyboard);
+	CPU_RegisterCpuEventHandler(&gPollKeyboard);
 	return true;
 }
 
 void UI_Finalise()
 {
-	CPU_UnregisterVblCallback(&gPollKeyboard);
+	CPU_UnregisterCpuEventHandler(&gPollKeyboard);
 }

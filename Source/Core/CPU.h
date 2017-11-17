@@ -185,16 +185,15 @@ void CPU_AddEvent(s32 count, ECPUEventType event_type);
 void CPU_SkipToNextEvent();
 bool CPU_CheckStuffToDo();
 
-class VblEventHandler
+class CpuEventHandler
 {
   public:
-	virtual ~VblEventHandler();
-	virtual void OnVerticalBlank() = 0;
+	virtual ~CpuEventHandler();
+	virtual void OnVerticalBlank() {}
 };
 
-void CPU_RegisterVblCallback(VblEventHandler* handler);
-void CPU_UnregisterVblCallback(VblEventHandler* handler);
-
+void CPU_RegisterCpuEventHandler(CpuEventHandler* handler);
+void CPU_UnregisterCpuEventHandler(CpuEventHandler* handler);
 
 #define CPU_KeepRunning() (CPU_IsRunning())
 

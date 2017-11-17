@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern GLFWwindow * gWindow;
 
 
-class IInputManager : public CInputManager, public VblEventHandler
+class IInputManager : public CInputManager, public CpuEventHandler
 {
 public:
 	IInputManager();
@@ -75,13 +75,13 @@ void IInputManager::OnVerticalBlank()
 
 bool IInputManager::Initialise()
 {
-	CPU_RegisterVblCallback( this );
+	CPU_RegisterCpuEventHandler( this );
 	return true;
 }
 
 void IInputManager::Finalise()
 {
-	CPU_UnregisterVblCallback( this );
+	CPU_UnregisterCpuEventHandler( this );
 }
 
 void IInputManager::GetGamePadStatus()

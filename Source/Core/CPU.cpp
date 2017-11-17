@@ -103,21 +103,21 @@ static bool CPU_IsStateSimple();
 void (*g_pCPUCore)();
 
 
-static std::vector<VblEventHandler*> gVblCallbacks;
+static std::vector<CpuEventHandler*> gCpuEventHandlers;
 
-VblEventHandler::~VblEventHandler() {}
+CpuEventHandler::~CpuEventHandler() {}
 
-void CPU_RegisterVblCallback(VblEventHandler* handler)
+void CPU_RegisterCpuEventHandler(CpuEventHandler* handler)
 {
-	gVblCallbacks.push_back(handler);
+	gCpuEventHandlers.push_back(handler);
 }
 
-void CPU_UnregisterVblCallback(VblEventHandler* handler)
+void CPU_UnregisterCpuEventHandler(CpuEventHandler* handler)
 {
-	auto it = std::find(gVblCallbacks.begin(), gVblCallbacks.end(), handler);
-	if (it != gVblCallbacks.end())
+	auto it = std::find(gCpuEventHandlers.begin(), gCpuEventHandlers.end(), handler);
+	if (it != gCpuEventHandlers.end())
 	{
-		gVblCallbacks.erase(it);
+		gCpuEventHandlers.erase(it);
 	}
 }
 
@@ -643,11 +643,11 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			//   Alternatively, we could add a special-purpose CPU even that triggers every
 			//   N cycles, but that would have a small impact on framerate (it would
 			//   interrupt the dynamo tracer for instance)
-			// TODO(strmnnrmn): should register this with CPU_RegisterVblCallback.
+			// TODO(strmnnrmn): should register this with CPU_RegisterCpuEventHandler.
 			if ((gVerticalInterrupts & 0x3F) == 0)  // once every 60 VBLs
 				Save_Flush();
 
-			for (VblEventHandler* handler : gVblCallbacks)
+			for (CpuEventHandler* handler : gCpuEventHandlers)
 			{
 				handler->OnVerticalBlank();
 			}

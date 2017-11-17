@@ -200,7 +200,7 @@ void BatchTestMain( int argc, char* argv[] )
 	SetAssertHook( BatchAssertHook );
 
 	// Hook in our handlers.
-	CPU_RegisterVblCallback( gBatchTestEventHandler );
+	CPU_RegisterCpuEventHandler( gBatchTestEventHandler );
 	RSP_HLE_RegisterDisplayListEventHandler( gBatchTestEventHandler );
 
 	std::string tmpfilepath = IO::Path::Join(rundir, "tmp.tmp");
@@ -275,7 +275,7 @@ void BatchTestMain( int argc, char* argv[] )
 	}
 
 	RSP_HLE_UnregisterDisplayListEventHandler( gBatchTestEventHandler );
-	CPU_UnregisterVblCallback( gBatchTestEventHandler );
+	CPU_UnregisterCpuEventHandler( gBatchTestEventHandler );
 	SetAssertHook( nullptr );
 
 	fclose( gBatchFH );
