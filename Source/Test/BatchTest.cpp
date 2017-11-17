@@ -245,7 +245,7 @@ void BatchTestMain( int argc, char* argv[] )
 			{
 				fflush( gBatchFH );
 
-				// TODO: use ROM_GetRomDetailsByFilename and the alternative form of ROM_LoadFile with overridden preferences (allows us to test if roms break by changing prefs)
+				// TODO: use CRomDB::Get()->QueryByFilename and the alternative form of ROM_LoadFile with overridden preferences (allows us to test if roms break by changing prefs)
 				System_Open( rom_to_load );
 
 				CPU_Run();

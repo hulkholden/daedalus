@@ -11,7 +11,6 @@
 #include "HLEGraphics/DLParser.h"
 #include "HLEGraphics/GraphicsPlugin.h"
 #include "HLEGraphics/TextureCache.h"
-#include "Interface/Preferences.h"
 #include "System/Timing.h"
 
 CGraphicsPlugin* 	gGraphicsPlugin = NULL;

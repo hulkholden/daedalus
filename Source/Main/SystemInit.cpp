@@ -76,6 +76,40 @@ static void Profiler_Fini()
 }
 #endif
 
+static bool LoadROM()
+{
+	RomID		rom_id;
+	u32			rom_size;
+	ECicType	boot_type;
+
+	if (!CRomDB::Get()->QueryByFilename(g_ROM.FileName, &rom_id, &rom_size, &boot_type ))
+	{
+		return false;
+	}
+
+	RomSettings			settings;
+	SRomPreferences		preferences;
+
+	if (!CRomSettingsDB::Get()->GetSettings( rom_id, &settings ))
+	{
+		settings.Reset();
+	}
+	if (!CPreferences::Get()->GetRomPreferences( rom_id, &preferences ))
+	{
+		preferences.Reset();
+	}
+
+	return ROM_LoadFile( rom_id, settings, preferences );
+}
+
+static void UnloadROM()
+{
+	// Copy across various bits
+	g_ROM.mRomID = RomID();
+	g_ROM.settings = RomSettings();
+}
+
+
 static const SysEntityEntry gSysInitTable[] = {
 #ifdef DAEDALUS_DEBUG_CONSOLE
 	{"DebugConsole", CDebugConsole::Create, CDebugConsole::Destroy},
@@ -120,7 +154,7 @@ struct RomEntityEntry
 
 static const RomEntityEntry gRomInitTable[] = {
 	{"RomBuffer", RomBuffer::Open, RomBuffer::Close},
-	{"Settings", ROM_LoadFile, ROM_UnloadFile},
+	{"Settings", LoadROM, UnloadROM},
 	{"Memory", Memory_Reset, Memory_Cleanup},
 	{"Audio", CreateAudioPlugin, DestroyAudioPlugin},
 	{"Graphics", CreateGraphicsPlugin, DestroyGraphicsPlugin},

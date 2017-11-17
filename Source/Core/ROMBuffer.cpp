@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/DMA.h"
 #include "Core/ROM.h"
 #include "Debug/DBGConsole.h"
-#include "Interface/Preferences.h"
 #include "RomFile/RomFile.h"
 #include "RomFile/RomFileCache.h"
 #include "System/IO.h"

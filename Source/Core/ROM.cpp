@@ -36,8 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DebugLog.h"
 #include "Debug/Synchroniser.h"
 #include "HLEAudio/AudioPlugin.h"
-#include "Interface/Preferences.h"
-#include "Interface/RomDB.h"
+#include "Interface/RomPreferences.h"
 #include "OSHLE/OSHLE.h"
 #include "RomFile/RomFile.h"
 #include "System/IO.h"
@@ -435,53 +434,6 @@ void SpecificGameHacks( const ROMHeader & id )
 	}
 }
 
-// Copy across text, null terminate, and strip spaces
-void ROM_GetRomNameFromHeader( std::string & rom_name, const ROMHeader & header )
-{
-	char	buffer[20+1];
-	memcpy( buffer, header.Name, 20 );
-	buffer[20] = '\0';
-
-	rom_name = buffer;
-
-	const char * whitespace_chars = " \t\r\n";
-	rom_name.erase( 0, rom_name.find_first_not_of(whitespace_chars) );
-	rom_name.erase( rom_name.find_last_not_of(whitespace_chars)+1 );
-}
-
-bool ROM_LoadFile()
-{
-	RomID		rom_id;
-	u32			rom_size;
-	ECicType	boot_type;
-
-	if (ROM_GetRomDetailsByFilename(g_ROM.FileName, &rom_id, &rom_size, &boot_type ))
-	{
-		RomSettings			settings;
-		SRomPreferences		preferences;
-
-		if (!CRomSettingsDB::Get()->GetSettings( rom_id, &settings ))
-		{
-			settings.Reset();
-		}
-		if (!CPreferences::Get()->GetRomPreferences( rom_id, &preferences ))
-		{
-			preferences.Reset();
-		}
-
-		return ROM_LoadFile( rom_id, settings, preferences );
-	}
-
-	return false;
-}
-
-void ROM_UnloadFile()
-{
-	// Copy across various bits
-	g_ROM.mRomID = RomID();
-	g_ROM.settings = RomSettings();
-}
-
 bool ROM_LoadFile(const RomID & rom_id, const RomSettings & settings, const SRomPreferences & preferences )
 {
 	DBGConsole_Msg(0, "Reading rom image: [C%s]", g_ROM.FileName.c_str());
@@ -526,58 +478,6 @@ bool ROM_LoadFile(const RomID & rom_id, const RomSettings & settings, const SRom
 	//Patch_ApplyPatches();
 
 	return true;
-}
-
-bool ROM_GetRomName( const char * filename, std::string & game_name )
-{
-	ROMFile * p_rom_file = ROMFile::Create( filename );
-	if (p_rom_file == NULL)
-	{
-		return false;
-	}
-
-	CNullOutputStream messages;
-
-	if (!p_rom_file->Open( messages ))
-	{
-		delete p_rom_file;
-		return false;
-	}
-
-	// Only read in the header
-	const u32	bytes_to_read = sizeof(ROMHeader);
-	u32			size_aligned = AlignPow2( bytes_to_read, 4 );	// Needed?
-	u8 *		p_bytes = new u8[size_aligned];
-
-	if (!p_rom_file->LoadData( bytes_to_read, p_bytes, messages ))
-	{
-		// Lots of files don't have any info - don't worry about it
-		delete [] p_bytes;
-		delete p_rom_file;
-		return false;
-	}
-
-	//	Swap into native format
-	ROMFile::ByteSwap_3210( p_bytes, bytes_to_read );
-
-	// Get the address of the rom header
-	// Setup the rom id and size
-	const ROMHeader * prh = reinterpret_cast<const ROMHeader *>( p_bytes );
-	ROM_GetRomNameFromHeader( game_name, *prh );
-
-	delete [] p_bytes;
-	delete p_rom_file;
-	return true;
-}
-
-bool ROM_GetRomDetailsByFilename( const std::string& filename, RomID * id, u32 * rom_size, ECicType * boot_type )
-{
-	return CRomDB::Get()->QueryByFilename( filename, id, rom_size, boot_type );
-}
-
-bool ROM_GetRomDetailsByID( const RomID & id, u32 * rom_size, ECicType * boot_type )
-{
-	return CRomDB::Get()->QueryByID( id, rom_size, boot_type );
 }
 
 // Association between a country id value, tv type and name
