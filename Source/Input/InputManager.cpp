@@ -28,41 +28,41 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern GLFWwindow * gWindow;
 
 
-class IInputManager : public CInputManager, public CpuEventHandler
+class InputManager : public CpuEventHandler
 {
-public:
-	IInputManager();
-	virtual ~IInputManager() override;
+  public:
+	InputManager() : mGamePadAvailable(false) {}
 
-	bool				Initialise() override;
-	void				Finalise() override;
-
-	void				GetState( OSContPad pPad[4] ) override;
-
-	u32					GetNumConfigurations() const override;
-	const char *		GetConfigurationName( u32 configuration_idx ) const override;
-	const char *		GetConfigurationDescription( u32 configuration_idx ) const override;
-	void				SetConfiguration( u32 configuration_idx ) override;
-	u32					GetConfigurationFromName( const char * name ) const override;
+	void GetState( OSContPad (&pPad)[4] );
 
 	void OnVerticalBlank() override;
 
-private:
+  private:
 	void GetGamePadStatus();
 	void GetJoyPad(OSContPad *pPad);
+
 	bool mGamePadAvailable;
 };
 
-IInputManager::IInputManager()
-:	mGamePadAvailable(false)
+static InputManager gInputManager;
+
+bool InputManager_Create()
 {
+	CPU_RegisterCpuEventHandler( &gInputManager );
+	return true;
 }
 
-IInputManager::~IInputManager()
+void InputManager_Destroy()
 {
+	CPU_UnregisterCpuEventHandler( &gInputManager );
 }
 
-void IInputManager::OnVerticalBlank()
+void InputManager_GetState( OSContPad (&pPad)[4] )
+{
+	return gInputManager.GetState(pPad);
+}
+
+void InputManager::OnVerticalBlank()
 {
 	// Only check the pad status every 60 vbls, otherwise it's too expensive.
 	static u32 count = 0;
@@ -73,23 +73,12 @@ void IInputManager::OnVerticalBlank()
 	++count;
 }
 
-bool IInputManager::Initialise()
-{
-	CPU_RegisterCpuEventHandler( this );
-	return true;
-}
-
-void IInputManager::Finalise()
-{
-	CPU_UnregisterCpuEventHandler( this );
-}
-
-void IInputManager::GetGamePadStatus()
+void InputManager::GetGamePadStatus()
 {
 	mGamePadAvailable = glfwJoystickPresent(GLFW_JOYSTICK_1) ? true : false;
 }
 
-void IInputManager::GetJoyPad(OSContPad *pPad)
+void InputManager::GetJoyPad(OSContPad *pPad)
 {
 	static const s32 N64_ANALOGUE_STICK_RANGE =  80;
 
@@ -146,7 +135,7 @@ void IInputManager::GetJoyPad(OSContPad *pPad)
 	pPad->stick_y =  s8(axes[1] * N64_ANALOGUE_STICK_RANGE);
 }
 
-void IInputManager::GetState( OSContPad pPad[4] )
+void InputManager::GetState( OSContPad (&pPad)[4] )
 {
 	// Clear the initial state
 	for(u32 cont = 0; cont < 4; cont++)
@@ -187,48 +176,4 @@ void IInputManager::GetState( OSContPad pPad[4] )
 		if (glfwGetKey( window, GLFW_KEY_UP ))			pPad[0].stick_y = +80;
 		if (glfwGetKey( window, GLFW_KEY_DOWN ))		pPad[0].stick_y = -80;
 	}
-}
-
-template<> bool	CSingleton< CInputManager >::Create()
-{
-	DAEDALUS_ASSERT_Q(mpInstance == NULL);
-
-	IInputManager * manager = new IInputManager();
-
-	if(manager->Initialise())
-	{
-		mpInstance = manager;
-		return true;
-	}
-
-	delete manager;
-	return false;
-}
-
-u32	 IInputManager::GetNumConfigurations() const
-{
-	return 0;
-}
-
-const char * IInputManager::GetConfigurationName( u32 configuration_idx ) const
-{
-	DAEDALUS_ERROR( "Invalid controller config" );
-	return "?";
-}
-
-const char * IInputManager::GetConfigurationDescription( u32 configuration_idx ) const
-{
-	DAEDALUS_ERROR( "Invalid controller config" );
-	return "?";
-}
-
-void IInputManager::SetConfiguration( u32 configuration_idx )
-{
-	DAEDALUS_ERROR( "Invalid controller config" );
-}
-
-u32		IInputManager::GetConfigurationFromName( const char * name ) const
-{
-	// Return the default controller config
-	return 0;
 }

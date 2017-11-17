@@ -1,30 +1,11 @@
 #ifndef INPUT_INPUTMANAGER_H_
 #define INPUT_INPUTMANAGER_H_
 
-#include "Base/Singleton.h"
 #include "Ultra/ultra_os.h"
 
-#include "Math/Vector2.h"
+bool InputManager_Create();
+void InputManager_Destroy();
 
-class CInputManager : public CSingleton< CInputManager >
-{
-	public:
-		virtual ~CInputManager() {}
-
-		virtual u32				GetNumConfigurations() const = 0;
-		virtual const char *	GetConfigurationName( u32 configuration_idx ) const = 0;
-		virtual const char *	GetConfigurationDescription( u32 configuration_idx ) const = 0;
-		virtual void			SetConfiguration( u32 configuration_idx ) = 0;
-
-		virtual u32				GetConfigurationFromName( const char * name ) const = 0;
-
-		virtual bool Initialise() = 0;
-		virtual void Finalise() = 0;
-
-		virtual void GetState( OSContPad pPad[4] ) = 0;
-
-		static bool Init() { return CInputManager::Get()->Initialise();}
-		static void Fini() { CInputManager::Get()->Finalise();}
-};
+void InputManager_GetState( OSContPad (&pPad)[4] );
 
 #endif // INPUT_INPUTMANAGER_H_

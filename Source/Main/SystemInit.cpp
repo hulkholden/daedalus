@@ -88,7 +88,7 @@ static const SysEntityEntry gSysInitTable[] = {
 #endif
 	{"ROM Database", CRomDB::Create, CRomDB::Destroy},
 	{"ROM Settings", CRomSettingsDB::Create, CRomSettingsDB::Destroy},
-	{"InputManager", CInputManager::Create, CInputManager::Destroy},
+	{"InputManager", InputManager_Create, InputManager_Destroy},
 	{"GraphicsContext", CGraphicsContext::Create, CGraphicsContext::Destroy},
 #ifdef DAEDALUS_PSP
 	{"Language", Translate_Init, NULL},
@@ -121,7 +121,6 @@ struct RomEntityEntry
 static const RomEntityEntry gRomInitTable[] = {
 	{"RomBuffer", RomBuffer::Open, RomBuffer::Close},
 	{"Settings", ROM_LoadFile, ROM_UnloadFile},
-	{"InputManager", CInputManager::Init, CInputManager::Fini},
 	{"Memory", Memory_Reset, Memory_Cleanup},
 	{"Audio", CreateAudioPlugin, DestroyAudioPlugin},
 	{"Graphics", CreateGraphicsPlugin, DestroyGraphicsPlugin},

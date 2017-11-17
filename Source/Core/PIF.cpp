@@ -341,7 +341,7 @@ void IController::Process()
 	}
 
 	// Read controller data here (here gets called fewer times than CONT_READ_CONTROLLER)
-	CInputManager::Get()->GetState( mContPads );
+	InputManager_GetState( mContPads );
 
 	while(count < 64)
 	{
