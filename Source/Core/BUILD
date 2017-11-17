@@ -37,7 +37,6 @@ cc_library(
         "Registers.cpp",
         "RomSettings.cpp",
         "Save.cpp",
-        "SaveState.cpp",
         "TLB.cpp",
     ],
     visibility = ["//visibility:public"],
@@ -52,7 +51,6 @@ cc_library(
         "//Interface",
         "//OSHLE",
         "//RomFile",
-        "//System:SystemInit",
         "//Utility",
     ],
 )
