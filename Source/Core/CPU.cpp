@@ -110,13 +110,12 @@ static std::vector<VblCallback> gVblCallbacks;
 
 void CPU_RegisterVblCallback(VblCallbackFn fn, void* arg)
 {
-	VblCallback callback = {fn, arg};
-	gVblCallbacks.push_back(callback);
+	gVblCallbacks.push_back({fn, arg});
 }
 
 void CPU_UnregisterVblCallback(VblCallbackFn fn, void* arg)
 {
-	for (std::vector<VblCallback>::iterator it = gVblCallbacks.begin(); it != gVblCallbacks.end(); ++it)
+	for (auto it = gVblCallbacks.begin(); it != gVblCallbacks.end(); ++it)
 	{
 		if (it->Fn == fn && it->Arg == arg)
 		{

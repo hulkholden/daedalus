@@ -118,13 +118,12 @@ static std::vector<DLCallback> gDLCallbacks;
 
 void RSP_HLE_RegisterDisplayListCallback(DisplayListCallback fn, void* arg)
 {
-	DLCallback callback = {fn, arg};
-	gDLCallbacks.push_back(callback);
+	gDLCallbacks.push_back({fn, arg});
 }
 
 void RSP_HLE_UnregisterDisplayListCallback(DisplayListCallback fn, void* arg)
 {
-	for (std::vector<DLCallback>::iterator it = gDLCallbacks.begin(); it != gDLCallbacks.end(); ++it)
+	for (auto it = gDLCallbacks.begin(); it != gDLCallbacks.end(); ++it)
 	{
 		if (it->Fn == fn && it->Arg == arg)
 		{
