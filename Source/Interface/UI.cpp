@@ -5,6 +5,7 @@
 
 #include "absl/strings/str_cat.h"
 
+#include "Core/SaveState.h"
 #include "Core/CPU.h"
 #include "Core/ROM.h"
 #include "Graphics/GL.h"
@@ -33,13 +34,13 @@ static void HandleKeys(GLFWwindow * window, int key, int scancode, int action, i
 
 			if (ctrl_down)
 			{
-				CPU_RequestSaveState(filename);
+				SaveState_RequestSave(filename);
 			}
 			else
 			{
 				if (IO::File::Exists(filename))
 				{
-					CPU_RequestLoadState(filename);
+					SaveState_RequestLoad(filename);
 				}
 			}
 		}

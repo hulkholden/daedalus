@@ -39,13 +39,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/ROMBuffer.h"
 #include "Core/RSP_HLE.h"
 #include "Core/Save.h"
-#include "Core/SaveState.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
 #include "Debug/Synchroniser.h"
 #include "System/AtomicPrimitives.h"
-#include "System/Mutex.h"
-#include "System/SystemInit.h"
 #include "System/Thread.h"
 #include "Ultra/ultra_R4300.h"
 #include "Utility/Hash.h"
@@ -72,20 +69,9 @@ volatile u32 eventQueueLocked = 0;
 
 static bool gCPURunning = false;  // CPU is actively running
 u8* gLastAddress = NULL;
-static std::string gSaveStateFilename = "";
 
 // When stopping, try to stop in a 'simple' state (i.e. no RSP running and not in a branch delay slot)
 static bool gCPUStopOnSimpleState = false;
-static Mutex gSaveStateMutex;
-
-enum ESaveStateOperation
-{
-	SSO_NONE,
-	SSO_SAVE,
-	SSO_LOAD,
-};
-
-static ESaveStateOperation gSaveStateOperation = SSO_NONE;
 
 const u32 kInitialVIInterruptCycles = 62500;
 static u32 gVerticalInterrupts = 0;
@@ -396,112 +382,6 @@ void CPU_SelectCore()
 	}
 }
 
-bool CPU_RequestSaveState(const std::string& filename)
-{
-	// Call SaveState_SaveToFile directly if the CPU is not running.
-	DAEDALUS_ASSERT(gCPURunning, "Expecting the CPU to be running at this point");
-
-	MutexLock lock(&gSaveStateMutex);
-
-	// Abort if already in the process of loading/saving
-	if (gSaveStateOperation != SSO_NONE)
-	{
-		return false;
-	}
-
-	gSaveStateOperation = SSO_SAVE;
-	gSaveStateFilename = filename;
-	gCPUState.AddJob(CPU_CHANGE_CORE);
-
-	return true;
-}
-
-bool CPU_RequestLoadState(const std::string& filename)
-{
-	// Call SaveState_SaveToFile directly if the CPU is not running.
-	DAEDALUS_ASSERT(gCPURunning, "Expecting the CPU to be running at this point");
-
-	MutexLock lock(&gSaveStateMutex);
-
-	// Abort if already in the process of loading/saving
-	if (gSaveStateOperation != SSO_NONE)
-	{
-		return false;
-	}
-
-	gSaveStateOperation = SSO_LOAD;
-	gSaveStateFilename = filename;
-	gCPUState.AddJob(CPU_CHANGE_CORE);
-
-	return true;  // XXXX could fail
-}
-
-static void HandleSaveStateOperationOnVerticalBlank()
-{
-	DAEDALUS_ASSERT(gCPURunning, "Expecting the CPU to be running at this point");
-
-	if (gSaveStateOperation == SSO_NONE) return;
-
-	MutexLock lock(&gSaveStateMutex);
-
-	// Handle the save state
-	switch (gSaveStateOperation)
-	{
-		case SSO_NONE:
-			DAEDALUS_ERROR("Unreachable");
-			break;
-		case SSO_SAVE:
-			DBGConsole_Msg(0, "Saving '%s'\n", gSaveStateFilename.c_str());
-			SaveState_SaveToFile(gSaveStateFilename);
-			gSaveStateOperation = SSO_NONE;
-			break;
-		case SSO_LOAD:
-			DBGConsole_Msg(0, "Loading '%s'\n", gSaveStateFilename.c_str());
-
-			// Try to load the savestate immediately. If this fails, it
-			// usually means that we're running the correct rom (we should have a
-			// separate return code to check this case). In that case we
-			// stop the cpu and handle the load in
-			// HandleSaveStateOperationOnCPUStopRunning.
-			if (SaveState_LoadFromFile(gSaveStateFilename))
-			{
-				CPU_ResetFragmentCache();
-				gSaveStateOperation = SSO_NONE;
-			}
-			else
-			{
-				// Halt the CPU so that we can swap the rom safely and load the savesate.
-				CPU_Halt("Load SaveSate");
-				// NB: return without clearing gSaveStateOperation
-			}
-			break;
-	}
-}
-
-// Returns true if we handled a load request and should keep running.
-static bool HandleSaveStateOperationOnCPUStopRunning()
-{
-	if (gSaveStateOperation != SSO_LOAD) return false;
-
-	MutexLock lock(&gSaveStateMutex);
-
-	gSaveStateOperation = SSO_NONE;
-
-	if (const char* rom_filename = SaveState_GetRom(gSaveStateFilename.c_str()))
-	{
-		System_Close();
-		System_Open(rom_filename);
-		SaveState_LoadFromFile(gSaveStateFilename.c_str());
-	}
-	else
-	{
-		DBGConsole_Msg(0, "Couldn't find matching rom for %s\n", gSaveStateFilename.c_str());
-		// Keep running with the current rom.
-	}
-
-	return true;
-}
-
 bool CPU_Run()
 {
 	if (!RomBuffer::IsRomLoaded()) return false;
@@ -510,7 +390,7 @@ bool CPU_Run()
 	{
 		gCPURunning = true;
 		gCPUStopOnSimpleState = false;
-		DAEDALUS_ASSERT(gSaveStateOperation == SSO_NONE, "Shouldn't have a save state operation queued.");
+		//DAEDALUS_ASSERT(gSaveStateOperation == SSO_NONE, "Shouldn't have a save state operation queued.");
 
 		RESET_EVENT_QUEUE_LOCK();
 
@@ -519,7 +399,15 @@ bool CPU_Run()
 			g_pCPUCore();
 		}
 
-		if (!HandleSaveStateOperationOnCPUStopRunning()) break;
+		bool keep_running = false;
+		for (CpuEventHandler* handler : gCpuEventHandlers)
+		{
+			keep_running |= handler->OnCpuStopped();
+		}
+		if (!keep_running)
+		{
+			break;
+		}
 	}
 
 	DAEDALUS_ASSERT(!gCPURunning, "gCPURunning should be false by now.");
@@ -651,8 +539,6 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			{
 				handler->OnVerticalBlank();
 			}
-
-			HandleSaveStateOperationOnVerticalBlank();
 		}
 		break;
 		case CPU_EVENT_COMPARE:

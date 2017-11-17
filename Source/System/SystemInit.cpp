@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/ROMBuffer.h"
 #include "Core/RomSettings.h"
 #include "Core/Save.h"
+#include "Core/SaveState.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
 #include "Debug/Synchroniser.h"
@@ -106,6 +107,7 @@ static const SysEntityEntry gSysInitTable[] = {
 #endif
 #endif
 
+	{"SaveState", SaveState_Initialise, SaveState_Finalise},
 	{"UI", UI_Init, UI_Finalise},
 };
 

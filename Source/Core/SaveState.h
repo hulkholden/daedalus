@@ -25,11 +25,10 @@
 
 #include <string>
 
-class RomID;
+bool SaveState_Initialise();
+void SaveState_Finalise();
 
-bool SaveState_LoadFromFile(const std::string& filename);
-bool SaveState_SaveToFile(const std::string& filename);
-RomID SaveState_GetRomID(const std::string& filename);
-const char* SaveState_GetRom(const std::string& filename);
+bool SaveState_RequestSave(const std::string& filename);
+bool SaveState_RequestLoad(const std::string& filename);
 
 #endif // CORE_SAVESTATE_H_

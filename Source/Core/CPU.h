@@ -166,8 +166,6 @@ void CPU_RomClose();
 void CPU_Step();
 void CPU_Skip();
 bool CPU_Run();
-bool CPU_RequestSaveState(const std::string& filename);
-bool CPU_RequestLoadState(const std::string& filename);
 void CPU_Halt(const char* reason);
 void CPU_SelectCore();
 u32 CPU_GetVideoInterruptEventCount();
@@ -189,7 +187,12 @@ class CpuEventHandler
 {
   public:
 	virtual ~CpuEventHandler();
+
+	// Called on a vertical blank.
 	virtual void OnVerticalBlank() {}
+
+	// Called when the CPU stop running. Return true to keep running.
+	virtual bool OnCpuStopped() { return false; }
 };
 
 void CPU_RegisterCpuEventHandler(CpuEventHandler* handler);

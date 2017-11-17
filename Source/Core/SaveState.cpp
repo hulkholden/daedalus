@@ -18,13 +18,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
+#include "Core/SaveState.h"
 
 #include <stdio.h>
 
-#include "Core/SaveState.h"
-
 #include "Base/MathUtil.h"
 #include "Core/CPU.h"
+#include "Core/Dynamo.h"
 #include "Core/Memory.h"
 #include "Core/R4300.h"
 #include "Core/ROM.h"
@@ -33,6 +33,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "OSHLE/OSHLE.h"
 #include "RomFile/RomFile.h"
 #include "System/CompressedStream.h"
+#include "System/Mutex.h"
+#include "System/SystemInit.h"
 #include "Ultra/ultra_R4300.h"
 
 //
@@ -41,6 +43,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 
 const u32 SAVESTATE_PROJECT64_MAGIC_NUMBER = 0x23D8A6C8;
+
+static Mutex gSaveStateMutex;
+static std::string gSaveStateFilename = "";
+
+enum ESaveStateOperation
+{
+	SSO_NONE,
+	SSO_SAVE,
+	SSO_LOAD,
+};
+
+static ESaveStateOperation gSaveStateOperation = SSO_NONE;
 
 class SaveStateOutput
 {
@@ -188,7 +202,7 @@ private:
 };
 
 
-bool SaveState_SaveToFile( const std::string& filename )
+static bool SaveStateToFile( const std::string& filename )
 {
 	SaveStateOutput stream( filename );
 
@@ -272,7 +286,7 @@ static void Swap_PIF()
 	}
 }
 
-bool SaveState_LoadFromFile( const std::string& filename )
+static bool LoadStateFromFile( const std::string& filename )
 {
 	SaveStateInput stream( filename );
 
@@ -398,31 +412,31 @@ bool SaveState_LoadFromFile( const std::string& filename )
 	return true;
 }
 
-RomID SaveState_GetRomID( const std::string& filename )
-{
-	SaveStateInput stream( filename );
+// static RomID GetRomIDFromSaveState( const std::string& filename )
+// {
+// 	SaveStateInput stream( filename );
 
-	if( !stream.IsValid() )
-	{
-		return RomID();
-	}
+// 	if( !stream.IsValid() )
+// 	{
+// 		return RomID();
+// 	}
 
-	u32 value;
-	stream >> value;
-	if(value != SAVESTATE_PROJECT64_MAGIC_NUMBER)
-		return RomID();
+// 	u32 value;
+// 	stream >> value;
+// 	if(value != SAVESTATE_PROJECT64_MAGIC_NUMBER)
+// 		return RomID();
 
-	u32 ram_size;
-	stream >> ram_size;
+// 	u32 ram_size;
+// 	stream >> ram_size;
 
-	ROMHeader rom_header;
-	stream >> rom_header;
-	ROMFile::ByteSwap_3210(&rom_header, 64);
+// 	ROMHeader rom_header;
+// 	stream >> rom_header;
+// 	ROMFile::ByteSwap_3210(&rom_header, 64);
 
-	return RomID( rom_header.CRC1, rom_header.CRC2, rom_header.CountryID );
-}
+// 	return RomID( rom_header.CRC1, rom_header.CRC2, rom_header.CountryID );
+// }
 
-const char* SaveState_GetRom( const std::string& filename )
+static const char* GetRomFromSaveState( const std::string& filename )
 {
 	SaveStateInput stream( filename );
 
@@ -446,3 +460,136 @@ const char* SaveState_GetRom( const std::string& filename )
 		RomID( rom_header.CRC1, rom_header.CRC2, rom_header.CountryID ));
 }
 
+bool SaveState_RequestSave(const std::string& filename)
+{
+	// Call SaveStateToFile directly if the CPU is not running.
+	DAEDALUS_ASSERT(CPU_IsRunning(), "Expecting the CPU to be running at this point");
+
+	MutexLock lock(&gSaveStateMutex);
+
+	// Abort if already in the process of loading/saving
+	if (gSaveStateOperation != SSO_NONE)
+	{
+		return false;
+	}
+
+	gSaveStateOperation = SSO_SAVE;
+	gSaveStateFilename = filename;
+	gCPUState.AddJob(CPU_CHANGE_CORE);
+
+	return true;
+}
+
+bool SaveState_RequestLoad(const std::string& filename)
+{
+	// Call SaveStateToFile directly if the CPU is not running.
+	DAEDALUS_ASSERT(CPU_IsRunning(), "Expecting the CPU to be running at this point");
+
+	MutexLock lock(&gSaveStateMutex);
+
+	// Abort if already in the process of loading/saving
+	if (gSaveStateOperation != SSO_NONE)
+	{
+		return false;
+	}
+
+	gSaveStateOperation = SSO_LOAD;
+	gSaveStateFilename = filename;
+	gCPUState.AddJob(CPU_CHANGE_CORE);
+
+	return true;  // XXXX could fail
+}
+
+static void HandleSaveStateOperationOnVerticalBlank()
+{
+	DAEDALUS_ASSERT(CPU_IsRunning(), "Expecting the CPU to be running at this point");
+
+	if (gSaveStateOperation == SSO_NONE) return;
+
+	MutexLock lock(&gSaveStateMutex);
+
+	// Handle the save state
+	switch (gSaveStateOperation)
+	{
+		case SSO_NONE:
+			DAEDALUS_ERROR("Unreachable");
+			break;
+		case SSO_SAVE:
+			DBGConsole_Msg(0, "Saving '%s'\n", gSaveStateFilename.c_str());
+			SaveStateToFile(gSaveStateFilename);
+			gSaveStateOperation = SSO_NONE;
+			break;
+		case SSO_LOAD:
+			DBGConsole_Msg(0, "Loading '%s'\n", gSaveStateFilename.c_str());
+
+			// Try to load the savestate immediately. If this fails, it
+			// usually means that we're running the correct rom (we should have a
+			// separate return code to check this case). In that case we
+			// stop the cpu and handle the load in
+			// HandleSaveStateOperationOnCPUStopRunning.
+			if (LoadStateFromFile(gSaveStateFilename))
+			{
+				CPU_ResetFragmentCache();
+				gSaveStateOperation = SSO_NONE;
+			}
+			else
+			{
+				// Halt the CPU so that we can swap the rom safely and load the savesate.
+				CPU_Halt("Load SaveSate");
+				// NB: return without clearing gSaveStateOperation
+			}
+			break;
+	}
+}
+
+// Returns true if we handled a load request and should keep running.
+static bool HandleSaveStateOperationOnCPUStopRunning()
+{
+	if (gSaveStateOperation != SSO_LOAD) return false;
+
+	MutexLock lock(&gSaveStateMutex);
+
+	gSaveStateOperation = SSO_NONE;
+
+	if (const char* rom_filename = GetRomFromSaveState(gSaveStateFilename.c_str()))
+	{
+		System_Close();
+		System_Open(rom_filename);
+		LoadStateFromFile(gSaveStateFilename.c_str());
+	}
+	else
+	{
+		DBGConsole_Msg(0, "Couldn't find matching rom for %s\n", gSaveStateFilename.c_str());
+		// Keep running with the current rom.
+	}
+
+	return true;
+}
+
+
+class SaveStateCpuEventHandler : public CpuEventHandler
+{
+	void OnVerticalBlank() override
+	{
+		HandleSaveStateOperationOnVerticalBlank();
+	}
+
+	bool OnCpuStopped() override
+	{
+		return HandleSaveStateOperationOnCPUStopRunning();
+	}
+};
+static SaveStateCpuEventHandler gSaveStateEventHandler;
+
+
+
+bool SaveState_Initialise()
+{
+	CPU_RegisterCpuEventHandler(&gSaveStateEventHandler);
+	return true;
+}
+
+void SaveState_Finalise()
+{
+	CPU_UnregisterCpuEventHandler(&gSaveStateEventHandler);
+}
