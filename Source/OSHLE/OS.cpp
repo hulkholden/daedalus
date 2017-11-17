@@ -64,10 +64,12 @@ void OS_HLE_osCreateMesgQueue(u32 queue, u32 msgBuffer, u32 msgCount)
 	//DBGConsole_Msg(0, "osCreateMsgQueue(0x%08x, 0x%08x, %d)",
 	//	queue, msgBuffer, msgCount);
 #ifdef DUMPOSFUNCTIONS
-	for ( u32 i = 0; i < g_MessageQueues.size(); i++)
+	for (u32 existing_queue : g_MessageQueues)
 	{
-		if (g_MessageQueues[i] == queue)
+		if (existing_queue == queue)
+		{
 			return;		// Already in list
+		}
 
 	}
 	g_MessageQueues.push_back(queue);

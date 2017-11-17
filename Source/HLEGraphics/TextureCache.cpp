@@ -108,9 +108,9 @@ void CTextureCache::DropTextures()
 {
 	MutexLock lock(GetDebugMutex());
 
-	for( u32 i = 0; i < mTextures.size(); ++i)
+	for (CachedTexture * texture : mTextures)
 	{
-		delete mTextures[i];
+		delete texture;
 	}
 	mTextures.clear();
 	for( u32 i = 0; i < HASH_TABLE_SIZE; ++i )

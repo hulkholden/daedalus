@@ -322,37 +322,37 @@ static void DLDebugHandler(void *arg, WebDebugConnection *connection)
 	{
 		bool ok = false;
 
-		for (size_t i = 0; i < params.size(); ++i)
+		for (const auto& param : params)
 		{
-			if (params[i].Key == "action")
+			if (param.Key == "action")
 			{
-				if (params[i].Value == "break")
+				if (param.Value == "break")
 				{
 					DoTask(connection, kBreakExecution);
 					return;
 				}
-				else if (params[i].Value == "resume")
+				else if (param.Value == "resume")
 				{
 					DoTask(connection, kResumeExecution);
 					return;
 				}
 			}
-			else if (params[i].Key == "scrub")
+			else if (param.Key == "scrub")
 			{
-				if (!absl::SimpleAtoi(params[i].Value, &gInstructionCountLimit))
+				if (!absl::SimpleAtoi(param.Value, &gInstructionCountLimit))
 				{
 					// Ignore errors and use the default value.
 				}
 				DoTask(connection, kTaskScrub);
 				return;
 			}
-			else if (params[i].Key == "screen")
+			else if (param.Key == "screen")
 			{
-				// int cmd = atoi(params[i].Value);
+				// int cmd = atoi(param.Value);
 				DoTask(connection, kTaskTakeScreenshot);
 				return;
 			}
-			else if (params[i].Key == "dump")
+			else if (param.Key == "dump")
 			{
 				// int cmd = atoi(params[i].Value);
 				DoTask(connection, kTaskDumpDList);

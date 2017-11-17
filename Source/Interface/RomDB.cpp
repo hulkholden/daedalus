@@ -481,11 +481,11 @@ bool IRomDB::QueryByID( const RomID & id, u32 * rom_size, ECicType * cic_type ) 
 
 const char * IRomDB::QueryFilenameFromID( const RomID & id ) const
 {
-	for( u32 i = 0; i < mRomFiles.size(); ++i )
+	for (const auto& romfile : mRomFiles)
 	{
-		if( mRomFiles[ i ].ID == id )
+		if (romfile.ID == id)
 		{
-			return mRomFiles[ i ].FileName;
+			return romfile.FileName;
 		}
 	}
 

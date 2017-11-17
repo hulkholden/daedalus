@@ -100,9 +100,9 @@ IniFile::~IniFile()
 {
 	delete mpDefaultSection;
 
-	for (u32 i = 0; i < mSections.size(); ++i)
+	for (IniFileSection* section : mSections)
 	{
-		delete mSections[i];
+		delete section;
 	}
 }
 
@@ -196,12 +196,12 @@ const IniFileSection* IniFile::GetSection(u32 section_idx) const
 
 const IniFileSection* IniFile::GetSectionByName(const char* section_name) const
 {
-	// TODO: Could use a map for this if it starts to prove expensive
-	for (u32 i = 0; i < mSections.size(); ++i)
+	// TODO: Use a map for this if it starts to prove expensive
+	for (const IniFileSection* section : mSections)
 	{
-		if (mSections[i]->name() == section_name)
+		if (section->name() == section_name)
 		{
-			return mSections[i];
+			return section;
 		}
 	}
 

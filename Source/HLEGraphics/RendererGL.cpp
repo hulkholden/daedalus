@@ -553,9 +553,8 @@ static ShaderProgram * GetShaderForConfig(const ShaderConfiguration & config)
 {
 	DAEDALUS_ASSERT( gN64FramentLibrary != NULL, "Haven't initialised the n64 fragment library" );
 
-	for (u32 i = 0; i < gShaders.size(); ++i)
+	for (ShaderProgram* program : gShaders)
 	{
-		ShaderProgram * program = gShaders[i];
 		if (program->config == config)
 			return program;
 	}

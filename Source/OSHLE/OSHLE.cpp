@@ -325,36 +325,23 @@ void Patch_DumpOsThreadInfo()
 void Patch_DumpOsQueueInfo()
 {
 #ifdef DAED_OS_MESSAGE_QUEUES
-	u32 dwQueue;
-
-	// List queue info:
-	u32 i;
-	u32 dwEmptyQ;
-	u32 dwFullQ;
-	u32 dwValidCount;
-	u32 dwFirst;
-	u32 dwMsgCount;
-	u32 dwMsg;
-
 	DBGConsole_Msg(0, "There are %d Queues", g_MessageQueues.size());
 	  DBGConsole_Msg(0, "Queues:   Empty     Full      Valid First MsgCount Msg");
 	//DBGConsole_Msg(0, "01234567, 01234567, 01234567, xxxx, xxxx, xxxx, 01234567",
-	for (i = 0; i <	g_MessageQueues.size(); i++)
+	for (u32 queue : g_MessageQueues)
 	{
 		char fullqueue_buffer[30];
 		char emptyqueue_buffer[30];
 		char type_buffer[60] = "";
 
-		dwQueue = g_MessageQueues[i];
+		COSMesgQueue q(queue);
 
-		COSMesgQueue q(dwQueue);
-
-		dwEmptyQ	 = q.GetEmptyQueue();
-		dwFullQ		 = q.GetFullQueue();
-		dwValidCount = q.GetValidCount();
-		dwFirst      = q.GetFirst();
-		dwMsgCount   = q.GetMsgCount();
-		dwMsg        = q.GetMesgArray();
+		u32 dwEmptyQ	 = q.GetEmptyQueue();
+		u32 dwFullQ		 = q.GetFullQueue();
+		u32 dwValidCount = q.GetValidCount();
+		u32 dwFirst      = q.GetFirst();
+		u32 dwMsgCount   = q.GetMsgCount();
+		u32 dwMsg        = q.GetMesgArray();
 
 		if ((s32)dwFirst < 0 ||
 			(s32)dwValidCount < 0 ||
@@ -373,12 +360,12 @@ void Patch_DumpOsQueueInfo()
 		else
 			sprintf(emptyqueue_buffer, "%08x", dwEmptyQ);
 
-		if (dwQueue == VAR_ADDRESS(osSiAccessQueue))
+		if (queue == VAR_ADDRESS(osSiAccessQueue))
 		{
 			sprintf(type_buffer, "<- Si Access");
 
 		}
-		else if (dwQueue == VAR_ADDRESS(osPiAccessQueue))
+		else if (queue == VAR_ADDRESS(osPiAccessQueue))
 		{
 			sprintf(type_buffer, "<- Pi Access");
 		}
@@ -389,7 +376,7 @@ void Patch_DumpOsQueueInfo()
 		{
 			for (u32 j = 0; j <	23; j++)
 			{
-				if (dwQueue == Read32Bits(VAR_ADDRESS(osEventMesgArray) + (j * 8) + 0x0))
+				if (queue == Read32Bits(VAR_ADDRESS(osEventMesgArray) + (j * 8) + 0x0))
 				{
 					sprintf(type_buffer, "<- %s", gEventStrings[j]);
 					break;
@@ -397,11 +384,10 @@ void Patch_DumpOsQueueInfo()
 			}
 		}
 		DBGConsole_Msg(0, "%08x, %s, %s, % 4d, % 4d, % 4d, %08x %s",
-			dwQueue, emptyqueue_buffer, fullqueue_buffer, dwValidCount, dwFirst, dwMsgCount, dwMsg, type_buffer);
+			queue, emptyqueue_buffer, fullqueue_buffer, dwValidCount, dwFirst, dwMsgCount, dwMsg, type_buffer);
 	}
 #endif
 }
-
 
 void Patch_DumpOsEventInfo()
 {

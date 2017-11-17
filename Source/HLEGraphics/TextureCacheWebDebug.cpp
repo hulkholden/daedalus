@@ -33,9 +33,8 @@ static void TextureHandler(void * arg, WebDebugConnection * connection)
 		{
 			std::vector<CTextureCache::STextureInfoSnapshot> textures;
 			CTextureCache::Get()->Snapshot(lock, textures);
-			for (size_t i = 0; i < textures.size(); ++i)
+			for (const auto& snap : textures)
 			{
-				CTextureCache::STextureInfoSnapshot & snap = textures[i];
 				if ((CNativeTexture*)snap.Texture == ptr)
 				{
 					texture = snap.Texture;
@@ -94,11 +93,9 @@ static void TextureCacheHandler(void * arg, WebDebugConnection * connection)
 		std::vector<CTextureCache::STextureInfoSnapshot> textures;
 		CTextureCache::Get()->Snapshot(lock, textures);
 
-		for (size_t i = 0; i < textures.size(); ++i)
+		for (const auto& snap : textures)
 		{
-			CTextureCache::STextureInfoSnapshot & snap = textures[i];
 			const TextureInfo & ti = snap.Info;
-
 			connection->WriteF(
 				"<tr>"
 				"<td>%s/%dbpp</td>"

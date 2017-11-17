@@ -259,9 +259,9 @@ void IPreferences::Commit()
 		OUTPUT_INT(gGlobalPreferences, TVType, defaults);
 		fprintf(fh, "\n\n");  // Spacer to go before Rom Settings
 
-		for (PreferencesMap::const_iterator it = mPreferences.begin(); it != mPreferences.end(); ++it)
+		for (const auto& it : mPreferences)
 		{
-			OutputSectionDetails(it->first, it->second, fh);
+			OutputSectionDetails(it.first, it.second, fh);
 		}
 
 		fclose(fh);
