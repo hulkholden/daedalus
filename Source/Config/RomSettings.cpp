@@ -31,13 +31,9 @@ void RomSettings::Reset()
 	PatchesEnabled = true;
 	SpeedSyncEnabled = 0;
 	DynarecSupported = true;
-	DynarecLoopOptimisation = false;
-	DynarecDoublesOptimisation = false;
 	DoubleDisplayEnabled = true;
 	CleanSceneEnabled = false;
 	ClearDepthFrameBuffer = false;
-	AudioRateMatch = false;
-	VideoRateMatch = false;
 	FogEnabled = false;
 	MemoryAccessOptimisation = false;
 	CheatsEnabled = false;

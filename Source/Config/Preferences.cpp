@@ -34,13 +34,9 @@ void SRomPreferences::Reset()
 {
 	PatchesEnabled = true;
 	DynarecEnabled = true;
-	DynarecLoopOptimisation = false;
-	DynarecDoublesOptimisation = false;
 	DoubleDisplayEnabled = true;
 	CleanSceneEnabled = false;
 	ClearDepthFrameBuffer = false;
-	AudioRateMatch = false;
-	VideoRateMatch = false;
 	FogEnabled = false;
 	MemoryAccessOptimisation = false;
 	CheatsEnabled = false;
@@ -53,15 +49,11 @@ void SRomPreferences::Apply(const RomSettings& rom_settings) const
 	gOSHooksEnabled = PatchesEnabled;
 	gSpeedSyncEnabled = SpeedSyncEnabled;
 	gDynarecEnabled = rom_settings.DynarecSupported && DynarecEnabled;
-	gDynarecLoopOptimisation = DynarecLoopOptimisation;  // && rom_settings.DynarecLoopOptimisation;
-	gDynarecDoublesOptimisation = rom_settings.DynarecDoublesOptimisation || DynarecDoublesOptimisation;
 	gDoubleDisplayEnabled =
 		rom_settings.DoubleDisplayEnabled && DoubleDisplayEnabled;  // I don't know why DD won't disabled if we set ||
 	gCleanSceneEnabled = rom_settings.CleanSceneEnabled || CleanSceneEnabled;
 	gClearDepthFrameBuffer = rom_settings.ClearDepthFrameBuffer || ClearDepthFrameBuffer;
-	gAudioRateMatch = rom_settings.AudioRateMatch || AudioRateMatch;
 	gFogEnabled = rom_settings.FogEnabled || FogEnabled;
-	gMemoryAccessOptimisation = rom_settings.MemoryAccessOptimisation || MemoryAccessOptimisation;
 	gCheatsEnabled = rom_settings.CheatsEnabled || CheatsEnabled;
 	gAudioPluginEnabled = AudioEnabled;
 }

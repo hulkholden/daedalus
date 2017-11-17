@@ -230,13 +230,9 @@ bool IRomSettingsDB::OpenSettingsFile(const std::string& filename)
 		section->GetProperty("PatchesEnabled", &settings.PatchesEnabled);
 		section->GetProperty("SpeedSyncEnabled", &settings.SpeedSyncEnabled);
 		section->GetProperty("DynarecSupported", &settings.DynarecSupported);
-		section->GetProperty("DynarecLoopOptimisation", &settings.DynarecLoopOptimisation);
-		section->GetProperty("DynarecDoublesOptimisation", &settings.DynarecDoublesOptimisation);
 		section->GetProperty("DoubleDisplayEnabled", &settings.DoubleDisplayEnabled);
 		section->GetProperty("CleanSceneEnabled", &settings.CleanSceneEnabled);
 		section->GetProperty("ClearDepthFrameBuffer", &settings.ClearDepthFrameBuffer);
-		section->GetProperty("AudioRateMatch", &settings.AudioRateMatch);
-		section->GetProperty("VideoRateMatch", &settings.VideoRateMatch);
 		section->GetProperty("FogEnabled", &settings.FogEnabled);
 		section->GetProperty("MemoryAccessOptimisation", &settings.MemoryAccessOptimisation);
 		section->GetProperty("CheatsEnabled", &settings.CheatsEnabled);
@@ -345,13 +341,9 @@ void IRomSettingsDB::OutputSectionDetails(const RomID& id, const RomSettings& se
 	if (!settings.PatchesEnabled) fprintf(fh, "PatchesEnabled=no\n");
 	if (!settings.SpeedSyncEnabled) fprintf(fh, "SpeedSyncEnabled=%d\n", settings.SpeedSyncEnabled);
 	if (!settings.DynarecSupported) fprintf(fh, "DynarecSupported=no\n");
-	if (!settings.DynarecLoopOptimisation) fprintf(fh, "DynarecLoopOptimisation=yes\n");
-	if (!settings.DynarecDoublesOptimisation) fprintf(fh, "DynarecDoublesOptimisation=yes\n");
 	if (!settings.DoubleDisplayEnabled) fprintf(fh, "DoubleDisplayEnabled=no\n");
 	if (settings.CleanSceneEnabled) fprintf(fh, "CleanSceneEnabled=yes\n");
 	if (settings.ClearDepthFrameBuffer) fprintf(fh, "ClearDepthFrameBuffer=yes\n");
-	if (settings.AudioRateMatch) fprintf(fh, "AudioRateMatch=yes\n");
-	if (settings.VideoRateMatch) fprintf(fh, "VideoRateMatch=yes\n");
 	if (settings.FogEnabled) fprintf(fh, "FogEnabled=yes\n");
 	if (settings.MemoryAccessOptimisation) fprintf(fh, "MemoryAccessOptimisation=yes\n");
 	if (settings.CheatsEnabled) fprintf(fh, "CheatsEnabled=yes\n");

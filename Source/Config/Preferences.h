@@ -40,13 +40,9 @@ struct SRomPreferences
 {
 	bool PatchesEnabled;
 	bool DynarecEnabled;  // Requires DynarceSupported in RomSettings
-	bool DynarecLoopOptimisation;
-	bool DynarecDoublesOptimisation;
 	bool DoubleDisplayEnabled;
 	bool CleanSceneEnabled;
 	bool ClearDepthFrameBuffer;
-	bool AudioRateMatch;
-	bool VideoRateMatch;
 	bool FogEnabled;
 	bool MemoryAccessOptimisation;
 	bool CheatsEnabled;

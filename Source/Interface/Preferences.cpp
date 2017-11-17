@@ -122,13 +122,9 @@ bool IPreferences::OpenPreferencesFile(const std::string& filename)
 		section->GetProperty("PatchesEnabled", &preferences.PatchesEnabled);
 		section->GetProperty("SpeedSyncEnabled", &preferences.SpeedSyncEnabled);
 		section->GetProperty("DynarecEnabled", &preferences.DynarecEnabled);
-		section->GetProperty("DynarecLoopOptimisation", &preferences.DynarecLoopOptimisation);
-		section->GetProperty("DynarecDoublesOptimisation", &preferences.DynarecDoublesOptimisation);
 		section->GetProperty("DoubleDisplayEnabled", &preferences.DoubleDisplayEnabled);
 		section->GetProperty("CleanSceneEnabled", &preferences.CleanSceneEnabled);
 		section->GetProperty("ClearDepthFrameBuffer", &preferences.ClearDepthFrameBuffer);
-		section->GetProperty("AudioRateMatch", &preferences.AudioRateMatch);
-		section->GetProperty("VideoRateMatch", &preferences.VideoRateMatch);
 		section->GetProperty("FogEnabled", &preferences.FogEnabled);
 		if (section->GetProperty("AudioEnabled", &int_value))
 		{
@@ -158,13 +154,9 @@ void IPreferences::OutputSectionDetails(const RomID& id, const SRomPreferences& 
 	fprintf(fh, "PatchesEnabled=%d\n", preferences.PatchesEnabled);
 	fprintf(fh, "SpeedSyncEnabled=%d\n", preferences.SpeedSyncEnabled);
 	fprintf(fh, "DynarecEnabled=%d\n", preferences.DynarecEnabled);
-	fprintf(fh, "DynarecLoopOptimisation=%d\n", preferences.DynarecLoopOptimisation);
-	fprintf(fh, "DynarecDoublesOptimisation=%d\n", preferences.DynarecDoublesOptimisation);
 	fprintf(fh, "DoubleDisplayEnabled=%d\n", preferences.DoubleDisplayEnabled);
 	fprintf(fh, "CleanSceneEnabled=%d\n", preferences.CleanSceneEnabled);
 	fprintf(fh, "ClearDepthFrameBuffer=%d\n", preferences.ClearDepthFrameBuffer);
-	fprintf(fh, "AudioRateMatch=%d\n", preferences.AudioRateMatch);
-	fprintf(fh, "VideoRateMatch=%d\n", preferences.VideoRateMatch);
 	fprintf(fh, "FogEnabled=%d\n", preferences.FogEnabled);
 	fprintf(fh, "AudioEnabled=%d\n", preferences.AudioEnabled);
 	fprintf(fh, "MemoryAccessOptimisation=%d\n", preferences.MemoryAccessOptimisation);

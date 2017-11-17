@@ -37,14 +37,10 @@ extern DaedalusConfig g_DaedalusConfig;
 
 // Per-ROM config
 extern bool gDynarecEnabled;				// Use dynamic recompilation
-extern bool gDynarecLoopOptimisation;		// Enable the dynarec loop optmisation
-extern bool gDynarecDoublesOptimisation;	// Enable the dynarec loop optmisation
 extern bool gOSHooksEnabled;				// Apply os-hooks
 extern u32 gSpeedSyncEnabled;
 extern bool gDoubleDisplayEnabled;
-extern bool gAudioRateMatch;
 extern bool gFogEnabled;
-extern bool gMemoryAccessOptimisation;
 extern bool gCheatsEnabled;
 // ToDo: Needs moving to Graphics plugin config
 extern bool gCleanSceneEnabled;

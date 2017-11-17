@@ -56,13 +56,9 @@ struct RomSettings
 	bool PatchesEnabled;
 	u32 SpeedSyncEnabled;
 	bool DynarecSupported;
-	bool DynarecLoopOptimisation;
-	bool DynarecDoublesOptimisation;
 	bool DoubleDisplayEnabled;
 	bool CleanSceneEnabled;
 	bool ClearDepthFrameBuffer;
-	bool AudioRateMatch;
-	bool VideoRateMatch;
 	bool FogEnabled;
 	bool MemoryAccessOptimisation;
 	bool CheatsEnabled;
