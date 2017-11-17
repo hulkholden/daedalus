@@ -8,8 +8,8 @@ cc_library(
         "//Core",
         "//Debug",
         "//HLEGraphics",
+        "//Main:SystemInit",
         "//RomFile",
-        "//System:SystemInit",
         "//Utility",
     ],
 )

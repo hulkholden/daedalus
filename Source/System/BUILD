@@ -41,27 +41,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "SystemInit",
-    srcs = ["SystemInit.cpp"],
-    hdrs = ["SystemInit.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":System",
-        "//Base",
-        "//Core",
-        "//Debug",
-        "//Debug:Synchroniser",
-        "//Graphics",
-        "//HLEAudio",
-        "//HLEGraphics",
-        "//Input",
-        "//Interface",
-        "//OSHLE",
-        "//Utility",
-    ],
-)
-
 cc_test(
     name = "IO_test",
     size = "small",

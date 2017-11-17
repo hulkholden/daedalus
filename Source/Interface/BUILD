@@ -21,9 +21,9 @@ cc_library(
         "//Graphics",
         "//Graphics:GL",
         "//Input",
+        "//Main:SystemInit",
         "//OSHLE",
         "//RomFile",
-        "//System:SystemInit",
         "//Utility",
     ],
 )
