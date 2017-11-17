@@ -24,55 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string>
 
-enum ESaveType
-{
-	SAVE_TYPE_UNKNOWN = 0,
-	SAVE_TYPE_EEP4K,
-	SAVE_TYPE_EEP16K,
-	SAVE_TYPE_SRAM,
-	SAVE_TYPE_FLASH,
-};
-const u32 NUM_SAVE_TYPES = SAVE_TYPE_FLASH + 1;
-
-enum EExpansionPakUsage
-{
-	PAK_STATUS_UNKNOWN = 0,
-	PAK_UNUSED,
-	PAK_USED,
-	PAK_REQUIRED,
-};
-const u32 NUM_EXPANSIONPAK_USAGE_TYPES = PAK_REQUIRED + 1;
-
-struct RomSettings
-{
-	std::string GameName;
-	std::string Comment;
-	std::string Info;
-	std::string Preview;
-
-	EExpansionPakUsage ExpansionPakUsage;
-	ESaveType SaveType;
-
-	bool PatchesEnabled;
-	u32 SpeedSyncEnabled;
-	bool DynarecSupported;
-	bool DynarecLoopOptimisation;
-	bool DynarecDoublesOptimisation;
-	bool DoubleDisplayEnabled;
-	bool CleanSceneEnabled;
-	bool ClearDepthFrameBuffer;
-	bool AudioRateMatch;
-	bool VideoRateMatch;
-	bool FogEnabled;
-	bool MemoryAccessOptimisation;
-	bool CheatsEnabled;
-
-	RomSettings() { Reset(); }
-
-	void Reset();
-};
-
 #include "Base/Singleton.h"
+#include "Config/RomSettings.h"
 
 class RomID;
 

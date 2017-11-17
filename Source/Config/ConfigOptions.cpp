@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // settings.
 
 #include "Base/Daedalus.h"
-#include "ConfigOptions.h"
+#include "Config/ConfigOptions.h"
 
 u32 gSpeedSyncEnabled = 0;				   // Enable to limit frame rate.
 bool gDynarecEnabled = true;			   // Use dynamic recompilation
@@ -42,3 +42,6 @@ bool gMemoryAccessOptimisation = false;  // Enable the memory access optmisation
 bool gCheatsEnabled = false;			 // Enable cheat codes
 
 DaedalusConfig g_DaedalusConfig;
+
+
+EAudioPluginMode gAudioPluginEnabled = APM_DISABLED;

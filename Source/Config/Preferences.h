@@ -19,10 +19,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef INTERFACE_ROMPREFERENCES_H_
-#define INTERFACE_ROMPREFERENCES_H_
+#ifndef CONFIG_PREFERENCES_H_
+#define CONFIG_PREFERENCES_H_
 
+#include "Base/Types.h"
 #include "Config/ConfigOptions.h"
+#include "Config/RomSettings.h"
+
+struct SGlobalPreferences
+{
+	bool ForceLinearFilter;
+	bool RumblePak;
+
+	SGlobalPreferences();
+
+	void Apply() const;
+};
 
 struct SRomPreferences
 {
@@ -45,7 +57,10 @@ struct SRomPreferences
 	SRomPreferences() { Reset(); }
 
 	void Reset();
-	void Apply() const;
+	void Apply(const RomSettings& rom_settings) const;
 };
 
-#endif  // INTERFACE_ROMPREFERENCES_H_
+
+extern SGlobalPreferences gGlobalPreferences;
+
+#endif  // CONFIG_PREFERENCES_H_

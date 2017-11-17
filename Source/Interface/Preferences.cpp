@@ -29,14 +29,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <map>
 
 #include "Config/ConfigOptions.h"
+#include "Config/Preferences.h"
 #include "Input/InputManager.h"
-#include "Interface/GlobalPreferences.h"
 #include "Interface/RomDB.h"
 #include "System/IO.h"
 #include "System/Paths.h"
 #include "Utility/IniFile.h"
-
-SGlobalPreferences gGlobalPreferences;
 
 class IPreferences : public CPreferences
 {
@@ -230,48 +228,3 @@ void IPreferences::SetRomPreferences(const RomID& id, const SRomPreferences& pre
 
 	mDirty = true;
 }
-
-SGlobalPreferences::SGlobalPreferences()
-	: ForceLinearFilter(false),
-	  RumblePak(false)
-{
-}
-
-void SGlobalPreferences::Apply() const {}
-
-void SRomPreferences::Reset()
-{
-	PatchesEnabled = true;
-	DynarecEnabled = true;
-	DynarecLoopOptimisation = false;
-	DynarecDoublesOptimisation = false;
-	DoubleDisplayEnabled = true;
-	CleanSceneEnabled = false;
-	ClearDepthFrameBuffer = false;
-	AudioRateMatch = false;
-	VideoRateMatch = false;
-	FogEnabled = false;
-	MemoryAccessOptimisation = false;
-	CheatsEnabled = false;
-	AudioEnabled = APM_ENABLED_SYNC;
-	SpeedSyncEnabled = 0;
-}
-
-void SRomPreferences::Apply() const
-{
-	gOSHooksEnabled = PatchesEnabled;
-	gSpeedSyncEnabled = SpeedSyncEnabled;
-	gDynarecEnabled = g_ROM.settings.DynarecSupported && DynarecEnabled;
-	gDynarecLoopOptimisation = DynarecLoopOptimisation;  // && g_ROM.settings.DynarecLoopOptimisation;
-	gDynarecDoublesOptimisation = g_ROM.settings.DynarecDoublesOptimisation || DynarecDoublesOptimisation;
-	gDoubleDisplayEnabled =
-		g_ROM.settings.DoubleDisplayEnabled && DoubleDisplayEnabled;  // I don't know why DD won't disabled if we set ||
-	gCleanSceneEnabled = g_ROM.settings.CleanSceneEnabled || CleanSceneEnabled;
-	gClearDepthFrameBuffer = g_ROM.settings.ClearDepthFrameBuffer || ClearDepthFrameBuffer;
-	gAudioRateMatch = g_ROM.settings.AudioRateMatch || AudioRateMatch;
-	gFogEnabled = g_ROM.settings.FogEnabled || FogEnabled;
-	gMemoryAccessOptimisation = g_ROM.settings.MemoryAccessOptimisation || MemoryAccessOptimisation;
-	gCheatsEnabled = g_ROM.settings.CheatsEnabled || CheatsEnabled;
-	gAudioPluginEnabled = AudioEnabled;
-}
-

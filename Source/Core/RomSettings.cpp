@@ -394,25 +394,3 @@ void IRomSettingsDB::SetSettings(const RomID& id, const RomSettings& settings)
 
 	mDirty = true;
 }
-
-void RomSettings::Reset()
-{
-	GameName = "";
-	Comment = "";
-	Info = "";
-	ExpansionPakUsage = PAK_STATUS_UNKNOWN;
-	SaveType = SAVE_TYPE_UNKNOWN;
-	PatchesEnabled = true;
-	SpeedSyncEnabled = 0;
-	DynarecSupported = true;
-	DynarecLoopOptimisation = false;
-	DynarecDoublesOptimisation = false;
-	DoubleDisplayEnabled = true;
-	CleanSceneEnabled = false;
-	ClearDepthFrameBuffer = false;
-	AudioRateMatch = false;
-	VideoRateMatch = false;
-	FogEnabled = false;
-	MemoryAccessOptimisation = false;
-	CheatsEnabled = false;
-}

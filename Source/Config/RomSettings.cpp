@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007 StrmnNrmn
+Copyright (C) 2006,2007 StrmnNrmn
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -17,21 +17,29 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
+#include "Base/Daedalus.h"
+#include "Config/RomSettings.h"
 
-#ifndef INTERFACE_GLOBALPREFERENCES_H_
-#define INTERFACE_GLOBALPREFERENCES_H_
 
-struct SGlobalPreferences
+void RomSettings::Reset()
 {
-	bool ForceLinearFilter;
-	bool RumblePak;
+	GameName = "";
+	Comment = "";
+	Info = "";
+	ExpansionPakUsage = PAK_STATUS_UNKNOWN;
+	SaveType = SAVE_TYPE_UNKNOWN;
+	PatchesEnabled = true;
+	SpeedSyncEnabled = 0;
+	DynarecSupported = true;
+	DynarecLoopOptimisation = false;
+	DynarecDoublesOptimisation = false;
+	DoubleDisplayEnabled = true;
+	CleanSceneEnabled = false;
+	ClearDepthFrameBuffer = false;
+	AudioRateMatch = false;
+	VideoRateMatch = false;
+	FogEnabled = false;
+	MemoryAccessOptimisation = false;
+	CheatsEnabled = false;
+}
 
-	SGlobalPreferences();
-
-	void Apply() const;
-};
-
-extern SGlobalPreferences gGlobalPreferences;
-
-#endif  // INTERFACE_GLOBALPREFERENCES_H_

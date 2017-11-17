@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Macros.h"
 #include "Base/MathUtil.h"
-#include "Config/ConfigOptions.h"
+#include "Config/Preferences.h"
 #include "Core/Cheats.h"
 #include "Core/CPU.h"
 #include "Core/PIF.h"
@@ -36,7 +36,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DebugLog.h"
 #include "Debug/Synchroniser.h"
 #include "HLEAudio/AudioPlugin.h"
-#include "Interface/RomPreferences.h"
 #include "OSHLE/OSHLE.h"
 #include "RomFile/RomFile.h"
 #include "System/IO.h"
@@ -457,7 +456,7 @@ bool ROM_LoadFile(const RomID & rom_id, const RomSettings & settings, const SRom
 	DumpROMInfo( g_ROM.rh );
 
 	// Read and apply preferences from preferences.ini
-	preferences.Apply();
+	preferences.Apply(g_ROM.settings);
 
 	// Parse cheat file this rom, if cheat feature is enabled
 	// This is also done when accessing the cheat menu

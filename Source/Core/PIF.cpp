@@ -89,13 +89,13 @@ area assignment does not change. After Tx/RxData assignment, this flag is reset 
 #include "Core/PIF.h"
 
 #include "Base/MathUtil.h"
+#include "Config/Preferences.h"
 #include "Core/CPU.h"
 #include "Core/Memory.h"
 #include "Core/ROM.h"
 #include "Core/Save.h"
 #include "Debug/DBGConsole.h"
 #include "Input/InputManager.h"
-#include "Interface/GlobalPreferences.h"
 #include "Ultra/ultra_os.h"
 
 #include <time.h>

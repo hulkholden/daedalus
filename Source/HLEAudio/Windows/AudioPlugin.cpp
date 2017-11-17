@@ -89,7 +89,6 @@ private:
 };
 
 CAudioPlugin* gAudioPlugin = nullptr;
-EAudioPluginMode gAudioPluginEnabled( APM_ENABLED_SYNC );
 
 
 bool CreateAudioPlugin()

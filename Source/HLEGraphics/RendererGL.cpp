@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Base/Macros.h"
+#include "Config/Preferences.h"
 #include "Core/ROM.h"
 #include "Debug/DBGConsole.h"
 #include "Graphics/ColourValue.h"
@@ -12,7 +13,6 @@
 #include "Graphics/NativeTexture.h"
 #include "HLEGraphics/DLDebug.h"
 #include "HLEGraphics/RDPStateManager.h"
-#include "Interface/GlobalPreferences.h"
 #include "Ultra/ultra_gbi.h"
 #include "System/IO.h"
 #include "System/Paths.h"

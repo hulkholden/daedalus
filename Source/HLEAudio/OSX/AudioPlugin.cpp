@@ -43,7 +43,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Timing.h"
 
 CAudioPlugin* gAudioPlugin = nullptr;
-EAudioPluginMode gAudioPluginEnabled = APM_DISABLED;
 
 #define DEBUG_AUDIO 0
 
