@@ -84,10 +84,13 @@ static void BatchVblHandler( void * arg )
 	gBatchTestEventHandler->OnVerticalBlank();
 }
 
-static void BatchDisplayListHandler( void * arg )
+class BatchDisplayListEventHandler : public DisplayListEventHandler
 {
-	gBatchTestEventHandler->OnDisplayListComplete();
-}
+	void OnDisplayListComplete() override
+	{
+		gBatchTestEventHandler->OnDisplayListComplete();
+	}
+};
 
 static std::string MakeNewLogFilename( const std::string& rundir )
 {
@@ -209,9 +212,11 @@ void BatchTestMain( int argc, char* argv[] )
 	//	Set up an assert hook to capture all asserts
 	SetAssertHook( BatchAssertHook );
 
-	// Hook in our Vbl handler.
+	// Hook in our handlers.
+	BatchDisplayListEventHandler dl_handler;
+
 	CPU_RegisterVblCallback( &BatchVblHandler, nullptr );
-	RSP_HLE_RegisterDisplayListCallback( &BatchDisplayListHandler, nullptr );
+	RSP_HLE_RegisterDisplayListEventHandler( &dl_handler );
 
 	std::string tmpfilepath = IO::Path::Join(rundir, "tmp.tmp");
 
@@ -284,7 +289,7 @@ void BatchTestMain( int argc, char* argv[] )
 
 	}
 
-	RSP_HLE_UnregisterDisplayListCallback( &BatchDisplayListHandler, nullptr );
+	RSP_HLE_UnregisterDisplayListEventHandler( &dl_handler );
 	CPU_UnregisterVblCallback( &BatchVblHandler, nullptr );
 	SetAssertHook( nullptr );
 
