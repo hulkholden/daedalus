@@ -105,12 +105,12 @@ CFragment::CFragment(CCodeBufferManager * p_manager, u32 entry_address,
 	,	mpIndirectExitMap( new CIndirectExitMap )
 #ifdef FRAGMENT_RETAIN_ADDITIONAL_INFO
 	,	mHitCount( 0 )
-	,	mTraceBuffer( NULL )
-	,	mBranchBuffer( NULL )
+	,	mTraceBuffer()
+	,	mBranchBuffer()
 	,	mExitAddress( 0 )
 #endif
 #ifdef FRAGMENT_SIMULATE_EXECUTION
-	,	mpCache( NULL )
+	,	mpCache( nullptr )
 #endif
 {
 	Assemble(p_manager, CCodeLabel(function_Ptr));
@@ -924,10 +924,8 @@ void CFragment::DumpFragmentInfoHtml( FILE * fh, u64 total_cycles ) const
 
 	fputs( "<h2>Spans</h2>\n", fh );
 	fputs( "<div align=\"center\"><pre>\n", fh );
-	for(RegisterSpanList::const_iterator span_it = mRegisterUsage.SpanList.begin(); span_it < mRegisterUsage.SpanList.end(); ++span_it )
+	for(const auto& span : mRegisterUsage.SpanList)
 	{
-		const SRegisterSpan &	span( *span_it );
-
 		fprintf( fh, "%s: %3d -> %3d   [", RegNames[ span.Register ], span.SpanStart, span.SpanEnd );
 
 		// Display the span as a line
@@ -961,12 +959,11 @@ void CFragment::DumpFragmentInfoHtml( FILE * fh, u64 total_cycles ) const
 		fputs( "<h2>Input Disassembly</h2>\n", fh );
 		fputs( "<div align=\"center\"><table><tr><th>Address</th><th>Instruction</th><th>Exit Target</th></tr>\n", fh );
 		u32			last_address( mTraceBuffer.size() > 0 ? mTraceBuffer[ 0 ].Address-4 : 0 );
-		for( u32 i = 0; i < mTraceBuffer.size(); ++i )
+		for( const auto& entry : mTraceBuffer )
 		{
-			const STraceEntry &	entry( mTraceBuffer[ i ] );
-			u32					address( entry.Address );
-			OpCode				op_code( entry.OpCode );
-			u32					branch_index( entry.BranchIdx );
+			u32		address( entry.Address );
+			OpCode	op_code( entry.OpCode );
+			u32		branch_index( entry.BranchIdx );
 
 			char				buf[100];
 			SprintOpCodeInfo( buf, address, op_code );
@@ -990,6 +987,7 @@ void CFragment::DumpFragmentInfoHtml( FILE * fh, u64 total_cycles ) const
 	}
 
 
+#if defined(DAEDALUS_W32)
 	if( mEntryPoint.IsSet() )
 	{
 		fputs( "<h2>Disassembly</h2>\n", fh );
@@ -1040,6 +1038,7 @@ void CFragment::DumpFragmentInfoHtml( FILE * fh, u64 total_cycles ) const
 
 		fputs( "</table></div>\n", fh );
 	}
+#endif
 
 	fputs( "</body></html>\n", fh );
 }

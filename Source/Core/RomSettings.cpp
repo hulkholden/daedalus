@@ -312,12 +312,12 @@ void IRomSettingsDB::Commit()
 	}
 
 	// Input buffer done-  process any new entries!
-	for (SettingsMap::const_iterator it = mSettings.begin(); it != mSettings.end(); ++it)
+	for (const auto& it : mSettings)
 	{
 		// Skip any that have not been done.
-		if (visited.find(it->first) == visited.end())
+		if (visited.find(it.first) == visited.end())
 		{
-			OutputSectionDetails(it->first, it->second, fh_dst);
+			OutputSectionDetails(it.first, it.second, fh_dst);
 		}
 	}
 
