@@ -14,6 +14,7 @@
 #include "Interface/Preferences.h"
 #include "System/Timing.h"
 
+CGraphicsPlugin* 	gGraphicsPlugin = NULL;
 bool                gTakeScreenshot = false;
 
 namespace
@@ -81,18 +82,30 @@ static void	UpdateFramerate()
 }
 }
 
-class CGraphicsPlugin *	CreateGraphicsPlugin()
+bool CreateGraphicsPlugin()
 {
+	DAEDALUS_ASSERT(gGraphicsPlugin == nullptr, "The graphics plugin should not be initialised at this point");
 	DBGConsole_Msg( 0, "Initialising Graphics Plugin" );
 
 	CGraphicsPlugin * plugin = new CGraphicsPlugin();
 	if (!plugin->Initialise())
 	{
 		delete plugin;
-		plugin = NULL;
+		plugin = nullptr;
 	}
 
-	return plugin;
+	gGraphicsPlugin = plugin;
+	return plugin != nullptr;
+}
+
+void DestroyGraphicsPlugin()
+{
+	if (gGraphicsPlugin != nullptr)
+	{
+		gGraphicsPlugin->Finalise();
+		delete gGraphicsPlugin;
+		gGraphicsPlugin = nullptr;
+	}
 }
 
 CGraphicsPlugin::~CGraphicsPlugin()

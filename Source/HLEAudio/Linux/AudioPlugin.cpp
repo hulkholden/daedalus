@@ -2,9 +2,15 @@
 #include "HLEAudio/AudioPlugin.h"
 #include "Config/ConfigOptions.h"
 
+CAudioPlugin* gAudioPlugin = nullptr;
 EAudioPluginMode gAudioPluginEnabled = APM_DISABLED;
 
-CAudioPlugin * CreateAudioPlugin()
+bool CreateAudioPlugin()
 {
-	return NULL;
+	return true;
+}
+
+void DestroyAudioPlugin()
+{
+
 }

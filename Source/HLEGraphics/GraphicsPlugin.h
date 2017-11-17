@@ -42,7 +42,8 @@ class CGraphicsPlugin : public DisplayListProcessor, public VIOriginChangedEvent
 		u32					LastOrigin;
 };
 
-CGraphicsPlugin *		CreateGraphicsPlugin();
+bool CreateGraphicsPlugin();
+void DestroyGraphicsPlugin();
 extern CGraphicsPlugin * gGraphicsPlugin;
 
 #endif // HLEGRAPHICS_GRAPHICSPLUGIN_H_

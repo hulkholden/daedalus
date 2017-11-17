@@ -45,57 +45,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEGraphics/DisplayListDebugger.h"
 #endif
 
-
-CGraphicsPlugin* gGraphicsPlugin = NULL;
-CAudioPlugin* gAudioPlugin = NULL;
-
-static bool InitAudioPlugin()
-{
-	DAEDALUS_ASSERT(gAudioPlugin == NULL, "Why is there already an audio plugin?");
-	CAudioPlugin* audio_plugin = CreateAudioPlugin();
-	if (audio_plugin != NULL)
-	{
-		if (!audio_plugin->StartEmulation())
-		{
-			delete audio_plugin;
-			audio_plugin = NULL;
-		}
-		gAudioPlugin = audio_plugin;
-	}
-	return true;
-}
-
-static bool InitGraphicsPlugin()
-{
-	DAEDALUS_ASSERT(gGraphicsPlugin == NULL, "The graphics plugin should not be initialised at this point");
-	gGraphicsPlugin = CreateGraphicsPlugin();
-	return true;
-}
-
-static void DisposeGraphicsPlugin()
-{
-	if (gGraphicsPlugin != NULL)
-	{
-		gGraphicsPlugin->Finalise();
-		delete gGraphicsPlugin;
-		gGraphicsPlugin = NULL;
-	}
-}
-
-static void DisposeAudioPlugin()
-{
-	// Make a copy of the plugin, and set the global pointer to NULL;
-	// This stops other threads from trying to access the plugin
-	// while we're in the process of shutting it down.
-	CAudioPlugin* audio_plugin = gAudioPlugin;
-	gAudioPlugin = NULL;
-	if (audio_plugin != NULL)
-	{
-		audio_plugin->StopEmulation();
-		delete audio_plugin;
-	}
-}
-
 struct SysEntityEntry
 {
 	const char* name;
@@ -172,8 +121,8 @@ static const RomEntityEntry gRomInitTable[] = {
 	{"Settings", ROM_LoadFile, ROM_UnloadFile},
 	{"InputManager", CInputManager::Init, CInputManager::Fini},
 	{"Memory", Memory_Reset, Memory_Cleanup},
-	{"Audio", InitAudioPlugin, DisposeAudioPlugin},
-	{"Graphics", InitGraphicsPlugin, DisposeGraphicsPlugin},
+	{"Audio", CreateAudioPlugin, DestroyAudioPlugin},
+	{"Graphics", CreateGraphicsPlugin, DestroyGraphicsPlugin},
 	{"FramerateLimiter", FramerateLimiter_Reset, NULL},
 	//{"RSP", RSP_Reset, NULL},
 	{"CPU", CPU_RomOpen, CPU_RomClose},
