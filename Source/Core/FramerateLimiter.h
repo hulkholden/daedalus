@@ -22,8 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Types.h"
 
-extern u32		gSpeedSyncEnabled;
-
 bool			FramerateLimiter_Reset();
 void			FramerateLimiter_Limit();
 f32				FramerateLimiter_GetSync();	// Returns fraction of real n64 we're running at (1 = 100%)

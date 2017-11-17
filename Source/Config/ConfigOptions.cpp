@@ -27,17 +27,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Daedalus.h"
 #include "Config/ConfigOptions.h"
 
-u32 gSpeedSyncEnabled = 0;				   // Enable to limit frame rate.
-bool gDynarecEnabled = true;			   // Use dynamic recompilation
-bool gOSHooksEnabled = true;			   // Apply os-hooks
-bool gDoubleDisplayEnabled = true;		   // Workaround for games that have shaking issues
-bool gCleanSceneEnabled = false;		   // Clean our Scenes, it gets rid of many glitches
-bool gClearDepthFrameBuffer =
-	false;					   // Clears depth frame buffer, fixes shaky camera in DK64 and sun/flame glare in Zelda
-bool gFogEnabled = false;	  // Enable fog
-bool gCheatsEnabled = false;			 // Enable cheat codes
+u32 gSpeedSyncEnabled = 0;				// Enable to limit frame rate.
+bool gDynarecEnabled = true;			// Use dynamic recompilation
+bool gOSHooksEnabled = true;			// Apply os-hooks
+bool gDoubleDisplayEnabled = true;		// Workaround for games that have shaking issues
+bool gCleanSceneEnabled = false;		// Clean our Scenes, it gets rid of many glitches
+bool gClearDepthFrameBuffer = false;	// Clears depth frame buffer, fixes shaky camera in DK64 and sun/flame glare in Zelda
+bool gFogEnabled = false;				// Enable fog
+bool gCheatsEnabled = false;			// Enable cheat codes
 
 DaedalusConfig g_DaedalusConfig;
-
 
 EAudioPluginMode gAudioPluginEnabled = APM_DISABLED;
