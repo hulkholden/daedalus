@@ -96,16 +96,6 @@ static void UpdateTexture( const TextureInfo & ti, CNativeTexture * texture )
 			//
 			ClampTexels( texels, ti.GetWidth(), ti.GetHeight(), texture->GetCorrectedWidth(), texture->GetCorrectedHeight(), stride );
 
-			//
-			//	Mirror the texels if required (in-place)
-			//
-			bool mirror_s = ti.GetEmulateMirrorS();
-			bool mirror_t = ti.GetEmulateMirrorT();
-			if( mirror_s || mirror_t )
-			{
-				MirrorTexels( mirror_s, mirror_t, texels, stride, texels, stride, ti.GetWidth(), ti.GetHeight() );
-			}
-
 			texture->SetData( texels );
 		}
 	}
@@ -146,9 +136,6 @@ bool CachedTexture::Initialise()
 
 	u32 width  = mTextureInfo.GetWidth();
 	u32 height = mTextureInfo.GetHeight();
-
-	if (mTextureInfo.GetEmulateMirrorS()) width  *= 2;
-	if (mTextureInfo.GetEmulateMirrorT()) height *= 2;
 
 	mpTexture = CNativeTexture::Create( width, height );
 	if( mpTexture != NULL )

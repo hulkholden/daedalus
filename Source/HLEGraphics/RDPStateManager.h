@@ -36,9 +36,6 @@ public:
 
 	void							Reset();
 
-	void 							SetEmulateMirror(bool enable)			{ EmulateMirror = enable; }
-
-
 	//inline const u32				GetTmemAdr( u32 idx ) const				{ return mTiles[ idx ].tmem; }
 	inline const RDP_Tile &			GetTile( u32 idx ) const				{ return mTiles[ idx ]; }
 	inline const RDP_TileSize &		GetTileSize( u32 idx ) const			{ return mTileSizes[ idx ]; }
@@ -83,8 +80,6 @@ private:
 
 	TextureInfo				mTileTextureInfo[ 8 ];
 	bool					mTileTextureInfoValid[ 8 ];		// Set to false if this needs rebuilding
-
-	bool					EmulateMirror;
 };
 
 extern CRDPStateManager		gRDPStateManager;

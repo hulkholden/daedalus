@@ -21,8 +21,6 @@
 BaseRenderer * gRenderer   = NULL;
 RendererGL *   gRendererGL = NULL;
 
-static bool gAccurateUVPipe = true;
-
 /* OpenGL 3.0 */
 typedef void (APIENTRY * PFN_glGenVertexArrays)(GLsizei n, GLuint *arrays);
 typedef void (APIENTRY * PFN_glBindVertexArray)(GLuint array);
@@ -98,9 +96,6 @@ bool initgl()
 		fprintf(stderr, "ERROR: couldn't load shader source %s\n", kShaderSource);
 		return false;
 	}
-
-	// Only do software emulation of mirror_s/mirror_t if we're not doing accurate UV handling
-	gRDPStateManager.SetEmulateMirror(!gAccurateUVPipe);
 
 	// FIXME(strmnnrmn): we shouldn't need these with GLEW, but they don't seem to resolve on OSX.
     GLboolean status = GL_TRUE;

@@ -47,8 +47,6 @@ private:
 //	u32			Tile : 3;			// e.g. Tile number (0-7)
 	u32			Line : 9;
 	bool		Swapped : 1;		// Are odd lines word swapped?
-	bool		EmulateMirrorS : 1;
-	bool		EmulateMirrorT : 1;
 
 public:
 	// Pretty gross. Needed so that any padding bytes are consistently zeroed.
@@ -83,8 +81,6 @@ public:
 	inline u32				GetLine() const					{ return Line; }
 	inline u32				GetPalette() const				{ return Palette; }
 	inline bool				IsSwapped() const				{ return Swapped; }
-	inline bool				GetEmulateMirrorS() const		{ return EmulateMirrorS; }
-	inline bool				GetEmulateMirrorT() const		{ return EmulateMirrorT; }
 
 	inline void				SetLoadAddress( u32 address )	{ LoadAddress = address; }
 	inline void				SetTlutAddress( u32 address )	{ TlutAddress = address; }
@@ -98,8 +94,6 @@ public:
 	inline void				SetLine( u32 line )				{ Line = line; }
 	inline void				SetPalette( u32 index )			{ Palette = index; }
 	inline void				SetSwapped( bool swapped )		{ Swapped = swapped; }
-	inline void				SetEmulateMirrorS( bool e )		{ EmulateMirrorS = e; }
-	inline void				SetEmulateMirrorT( bool e )		{ EmulateMirrorT = e; }
 
 	inline int				Compare( const TextureInfo & rhs ) const			{ return memcmp( this, &rhs, sizeof( TextureInfo ) ); }
 	inline bool				operator==( const TextureInfo & rhs ) const			{ return Compare( rhs ) == 0; }
