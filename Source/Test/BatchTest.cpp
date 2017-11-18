@@ -129,10 +129,6 @@ static bool MakeRunDirectory(std::string* rundir, const std::string& batchdir)
 
 void BatchTestMain()
 {
-	bool random_order = FLAGS_random_order;
-	bool update_results = FLAGS_update_results;
-	s32 run_id = FLAGS_run_id;
-
 	// TODO(strmnnrmn): Fix this for Windows.
 	char* dir = realpath(FLAGS_roms.c_str(), nullptr);
 	std::string romdir = dir;
@@ -149,6 +145,7 @@ void BatchTestMain()
 	std::string batchdir = Dump_GetDumpDirectory("batch");
 
 	std::string rundir;
+	s32 run_id = FLAGS_run_id;
 	if (run_id < 0)
 	{
 		if (!MakeRunDirectory(&rundir, batchdir))
@@ -208,7 +205,7 @@ void BatchTestMain()
 		u32 idx = 0;
 
 		// Picking roms in a random order means we can work around roms which crash the emulator a little more easily
-		if (random_order)
+		if (FLAGS_random_order)
 		{
 			idx = rand() % roms.size();
 		}
@@ -225,7 +222,7 @@ void BatchTestMain()
 
 		bool result_exists = IO::File::Exists(rom_logpath);
 
-		if (!update_results && result_exists)
+		if (!FLAGS_update_results && result_exists)
 		{
 			// Already exists, skip
 			fprintf(gBatchFH, "\n\n%#.3f: Skipping %s - log already exists\n", timer.GetElapsedSecondsSinceReset(),
