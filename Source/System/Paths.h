@@ -9,6 +9,7 @@
 void SetExeFilename(const std::string& filename);
 
 std::string GetRunfilePath(absl::string_view filename);
+bool LoadRunfile(absl::string_view filename, std::string* out);
 
 // TODO(strmnnrmn): Eventually this function and GetRunfilePath should be
 // equivalent.

@@ -33,7 +33,7 @@ static PFN_glBindVertexArray            pglBindVertexArray = NULL;
 static PFN_glDeleteVertexArrays         pglDeleteVertexArrays = NULL;
 
 // We read n64.psh into this.
-static const char * 					gN64FramentLibrary = NULL;
+static std::string	 					gN64FramentLibrary;
 
 static const u32 kNumTextures = 2;
 
@@ -86,31 +86,17 @@ static float 	gPositionBuffer[kMaxVertices][3];
 static TexCoord gTexCoordBuffer[kMaxVertices];
 static u32 		gColorBuffer[kMaxVertices];
 
+static const char* const kShaderSource = "HLEGraphics/n64.psh";
+
 bool initgl()
 {
-	DAEDALUS_ASSERT(gN64FramentLibrary == NULL, "Already initialised");
+	DAEDALUS_ASSERT(gN64FramentLibrary.empty(), "Already initialised");
 
-	// FIXME(strmnnrmn): need a nicer 'load file' utility function.
+	if (!LoadRunfile(kShaderSource, &gN64FramentLibrary))
 	{
-		std::string shader_path = GetRunfilePath("HLEGraphics/n64.psh");
-
-		FILE * fh = fopen(shader_path.c_str(), "r");
-		if (!fh)
-		{
-			DAEDALUS_ERROR("Couldn't load shader source %s", shader_path.c_str());
-			fprintf(stderr, "ERROR: couldn't load shader source %s\n", shader_path.c_str());
-			return false;
-		}
-
-		fseek(fh, 0, SEEK_END);
-		size_t l = ftell(fh);
-		fseek(fh, 0, SEEK_SET);
-		char * p = (char *)malloc(l+1);
-		fread(p, l, 1, fh);
-		p[l] = 0;
-		fclose(fh);
-
-		gN64FramentLibrary = p;
+		DAEDALUS_ERROR("Couldn't load shader source %s", kShaderSource);
+		fprintf(stderr, "ERROR: couldn't load shader source %s\n", kShaderSource);
+		return false;
 	}
 
 	// Only do software emulation of mirror_s/mirror_t if we're not doing accurate UV handling
@@ -551,7 +537,7 @@ void RendererGL::MakeShaderConfigFromCurrentState(ShaderConfiguration * config) 
 
 static ShaderProgram * GetShaderForConfig(const ShaderConfiguration & config)
 {
-	DAEDALUS_ASSERT( gN64FramentLibrary != NULL, "Haven't initialised the n64 fragment library" );
+	DAEDALUS_ASSERT( !gN64FramentLibrary.empty(), "Haven't initialised the n64 fragment library" );
 
 	for (ShaderProgram* program : gShaders)
 	{
@@ -563,7 +549,7 @@ static ShaderProgram * GetShaderForConfig(const ShaderConfiguration & config)
 	SprintShader(frag_shader, config);
 
 	const char * vertex_lines[] = { default_vertex_shader };
-	const char * fragment_lines[] = { gN64FramentLibrary, frag_shader };
+	const char * fragment_lines[] = { gN64FramentLibrary.c_str(), frag_shader };
 
 	GLuint shader_program = make_shader_program(
 								vertex_lines, ARRAYSIZE(vertex_lines),
