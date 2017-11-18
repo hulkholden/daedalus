@@ -152,10 +152,13 @@ static std::string GetOutputDirectory(const std::string& batchdir, int run_id)
 
 void BatchTestMain()
 {
-	// TODO(strmnnrmn): Fix this for Windows.
+#if defined(DAEDALUS_OSX)
 	char* dir = realpath(FLAGS_roms.c_str(), nullptr);
 	std::string romdir = dir;
 	free(dir);
+#else
+	std::string romdir = FLAGS_roms;
+#endif
 
 	if (romdir.empty())
 	{
