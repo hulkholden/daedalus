@@ -83,7 +83,7 @@ static u32 FramerateLimiter_UpdateAverageTicksPerVbl( u32 elapsed_ticks )
 	ptr &= 0x3;
 
 	//Average 4 frames
-	return (s[0] + s[1] + s[2] + s[3] + 2) >> 2;
+	return (s[0] + s[1] + s[2] + s[3] + 2) / 4;
 }
 
 void FramerateLimiter_Limit()
@@ -112,7 +112,7 @@ void FramerateLimiter_Limit()
 	{
 		u32 required_ticks = gTicksBetweenVbls * gVblsSinceFlip;
 
-		if( gSpeedSyncEnabled == 2 ) required_ticks = required_ticks << 1;	// Slow down to 1/2 speed //Corn
+		if( gSpeedSyncEnabled == 2 ) required_ticks = required_ticks * 2;	// Slow down to 1/2 speed //Corn
 
 		// FIXME the constant here will need to be adjusted for different platforms.
 		s32	delay_ticks = required_ticks - elapsed_ticks - 50;	//Remove ~50 ticks for additional processing
