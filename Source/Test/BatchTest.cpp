@@ -22,11 +22,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdarg.h>
 
-#include <gflags/gflags.h>
-
 #include <vector>
 #include <string>
 #include <algorithm>
+
+#include "absl/strings/str_cat.h"
+#include "gflags/gflags.h"
 
 #include "Config/ConfigOptions.h"
 #include "Core/CPU.h"
@@ -87,7 +88,7 @@ static EAssertResult BatchAssertHook(const char* expression, const char* file, u
 }
 #endif
 
-static std::string MakeNewLogFilename(const std::string& rundir)
+static std::string MakeNewLogFilename(const std::string& outdir)
 {
 	u32 count = 0;
 	std::string filepath;
@@ -95,18 +96,17 @@ static std::string MakeNewLogFilename(const std::string& rundir)
 	{
 		char filename[64];
 		sprintf(filename, "log%04d.txt", count);
+		filepath = IO::Path::Join(outdir, filename);
 		++count;
-
-		filepath = IO::Path::Join(rundir, filename);
 	} while (IO::File::Exists(filepath));
 	return filepath;
 }
 
-static std::string SprintRunDirectory(const std::string& batchdir, u32 run_id)
+static std::string MakeRunDirectoryName(const std::string& batchdir, u32 run_id)
 {
-	char filename[64];
-	sprintf(filename, "run%04d", run_id);
-	return IO::Path::Join(batchdir, filename);
+	char dirname[64];
+	sprintf(dirname, "run%04d", run_id);
+	return IO::Path::Join(batchdir, dirname);
 }
 
 static bool MakeRunDirectory(std::string* rundir, const std::string& batchdir)
@@ -114,7 +114,7 @@ static bool MakeRunDirectory(std::string* rundir, const std::string& batchdir)
 	// Find an unused directory
 	for (u32 run_id = 0; run_id < 100; ++run_id)
 	{
-		std::string dir = SprintRunDirectory(batchdir, run_id);
+		std::string dir = MakeRunDirectoryName(batchdir, run_id);
 
 		// Skip if it already exists as a file or directory
 		if (IO::Directory::Create(dir))
@@ -125,6 +125,29 @@ static bool MakeRunDirectory(std::string* rundir, const std::string& batchdir)
 	}
 
 	return false;
+}
+
+static std::string GetOutputDirectory(const std::string& batchdir, int run_id)
+{
+	std::string rundir;
+	if (run_id >= 0)
+	{
+		rundir = MakeRunDirectoryName(batchdir, run_id);
+		if (!IO::Directory::IsDirectory(rundir))
+		{
+			fprintf(stderr, "Couldn't resume run %d\n", run_id);
+			return "";
+		}
+	}
+	else
+	{
+		if (!MakeRunDirectory(&rundir, batchdir))
+		{
+			fprintf(stderr, "Couldn't start a new run\n");
+			return "";
+		}
+	}
+	return rundir;
 }
 
 void BatchTestMain()
@@ -144,29 +167,19 @@ void BatchTestMain()
 
 	std::string batchdir = Dump_GetDumpDirectory("batch");
 
-	std::string rundir;
-	s32 run_id = FLAGS_run_id;
-	if (run_id < 0)
+	std::string outdir = GetOutputDirectory(batchdir, FLAGS_run_id);
+	if (outdir.empty())
 	{
-		if (!MakeRunDirectory(&rundir, batchdir))
-		{
-			fprintf(stderr, "Couldn't start a new run\n");
-			return;
-		}
+		fprintf(stderr, "No output directory\n");
+		return;
 	}
-	else
-	{
-		rundir = SprintRunDirectory(batchdir, run_id);
-		if (!IO::Directory::IsDirectory(rundir))
-		{
-			fprintf(stderr, "Couldn't resume run %d\n", run_id);
-			return;
-		}
-	}
+
+	printf("batchdir: %s\n", batchdir.c_str());
+	printf("outdir: %s\n", outdir.c_str());
 
 	gBatchTestEventHandler = new CBatchTestEventHandler();
 
-	std::string logpath = MakeNewLogFilename(rundir);
+	std::string logpath = MakeNewLogFilename(outdir);
 	gBatchFH = fopen(logpath.c_str(), "w");
 	if (!gBatchFH)
 	{
@@ -196,7 +209,7 @@ void BatchTestMain()
 	CPU_RegisterCpuEventHandler(gBatchTestEventHandler);
 	RSP_HLE_RegisterDisplayListEventHandler(gBatchTestEventHandler);
 
-	std::string tmpfilepath = IO::Path::Join(rundir, "tmp.tmp");
+	std::string tmpfilepath = IO::Path::Join(outdir, "tmp.tmp");
 
 	while (!roms.empty())
 	{
@@ -214,8 +227,8 @@ void BatchTestMain()
 		rom_to_load.swap(roms[idx]);
 		roms.erase(roms.begin() + idx);
 
-		// Make a filename of the form: '<rundir>/<romfilename>.txt'
-		std::string rom_logpath = IO::Path::Join(rundir, IO::Path::FindFileName(rom_to_load));
+		// Make a filename of the form: '<outdir>/<romfilename>.txt'
+		std::string rom_logpath = IO::Path::Join(outdir, IO::Path::FindFileName(rom_to_load));
 		IO::Path::SetExtension(&rom_logpath, ".txt");
 
 		printf("%s\n", rom_to_load.c_str());
