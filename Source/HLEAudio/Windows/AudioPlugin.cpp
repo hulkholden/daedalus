@@ -54,10 +54,8 @@ inline void Soundmemcpy(void * dest, const void * src, size_t count)
 
 class CAudioPluginW32 : public CAudioPlugin
 {
-private:
-	CAudioPluginW32();
 public:
-
+	CAudioPluginW32();
 	bool Initialise();
 
 	virtual ~CAudioPluginW32() {}
@@ -93,8 +91,13 @@ CAudioPlugin* gAudioPlugin = nullptr;
 
 bool CreateAudioPlugin()
 {
-	gAudioPlugin = new CAudioPluginW32();
-	return gAudioPlugin->Initialise();
+	CAudioPluginW32* plugin = new CAudioPluginW32();
+	if (!plugin->Initialise())
+	{
+		return false;
+	}
+	gAudioPlugin = plugin;
+	return true;
 }
 
 void DestroyAudioPlugin()
@@ -149,7 +152,6 @@ bool CAudioPluginW32::Initialise()
 	}
 #endif
 	return true;
-
 }
 
 void CAudioPluginW32::StopEmulation()
