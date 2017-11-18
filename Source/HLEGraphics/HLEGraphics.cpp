@@ -9,11 +9,11 @@
 #include "HLEGraphics/BaseRenderer.h"
 #include "HLEGraphics/DisplayListDebugger.h"
 #include "HLEGraphics/DLParser.h"
-#include "HLEGraphics/GraphicsPlugin.h"
+#include "HLEGraphics/HLEGraphics.h"
 #include "HLEGraphics/TextureCache.h"
 #include "System/Timing.h"
 
-CGraphicsPlugin* 	gGraphicsPlugin = NULL;
+HLEGraphics* 	gHLEGraphics = NULL;
 
 namespace
 {
@@ -82,35 +82,35 @@ static void	UpdateFramerate()
 
 bool CreateGraphicsPlugin()
 {
-	DAEDALUS_ASSERT(gGraphicsPlugin == nullptr, "The graphics plugin should not be initialised at this point");
+	DAEDALUS_ASSERT(gHLEGraphics == nullptr, "The graphics plugin should not be initialised at this point");
 	DBGConsole_Msg( 0, "Initialising Graphics Plugin" );
 
-	CGraphicsPlugin * plugin = new CGraphicsPlugin();
+	HLEGraphics * plugin = new HLEGraphics();
 	if (!plugin->Initialise())
 	{
 		delete plugin;
 		plugin = nullptr;
 	}
 
-	gGraphicsPlugin = plugin;
+	gHLEGraphics = plugin;
 	return plugin != nullptr;
 }
 
 void DestroyGraphicsPlugin()
 {
-	if (gGraphicsPlugin != nullptr)
+	if (gHLEGraphics != nullptr)
 	{
-		gGraphicsPlugin->Finalise();
-		delete gGraphicsPlugin;
-		gGraphicsPlugin = nullptr;
+		gHLEGraphics->Finalise();
+		delete gHLEGraphics;
+		gHLEGraphics = nullptr;
 	}
 }
 
-CGraphicsPlugin::~CGraphicsPlugin()
+HLEGraphics::~HLEGraphics()
 {
 }
 
-bool CGraphicsPlugin::Initialise()
+bool HLEGraphics::Initialise()
 {
 	if (!CreateRenderer())
 	{
@@ -132,7 +132,7 @@ bool CGraphicsPlugin::Initialise()
 	return true;
 }
 
-void CGraphicsPlugin::Finalise()
+void HLEGraphics::Finalise()
 {
 	DBGConsole_Msg(0, "Finalising GLGraphics");
 	Memory_UnregisterVIOriginChangedEventHandler(this);
@@ -142,7 +142,7 @@ void CGraphicsPlugin::Finalise()
 	DestroyRenderer();
 }
 
-void CGraphicsPlugin::ProcessDisplayList()
+void HLEGraphics::ProcessDisplayList()
 {
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	if (!DLDebugger_Process())
@@ -157,7 +157,7 @@ void CGraphicsPlugin::ProcessDisplayList()
 extern void RenderFrameBuffer(u32);
 extern u32 gRDPFrame;
 
-void CGraphicsPlugin::OnOriginChanged(u32 origin)
+void HLEGraphics::OnOriginChanged(u32 origin)
 {
 	// NB: if no display lists executed, interpret framebuffer
 	if( gRDPFrame == 0 )
@@ -170,7 +170,7 @@ void CGraphicsPlugin::OnOriginChanged(u32 origin)
 	}
 }
 
-void CGraphicsPlugin::UpdateScreen()
+void HLEGraphics::UpdateScreen()
 {
 	// TODO: this is actually lagging a frame behind
 	u32 current_origin = Memory_VI_GetRegister(VI_ORIGIN_REG);

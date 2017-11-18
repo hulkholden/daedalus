@@ -102,7 +102,7 @@ void RenderFrameBuffer(u32 origin)
 	if (texture != NULL) DrawFrameBuffer(origin, texture);
 
 	gRenderer->EndScene();
-	gGraphicsPlugin->UpdateScreen();
+	gHLEGraphics->UpdateScreen();
 }
 
 #endif  // HLEGRAPHICS_UCODES_UCODE_FB_H_

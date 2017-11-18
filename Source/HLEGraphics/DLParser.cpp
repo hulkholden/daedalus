@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DBGConsole.h"
 #include "Debug/Dump.h"
 #include "Graphics/GraphicsContext.h"
-#include "HLEGraphics/GraphicsPlugin.h"
+#include "HLEGraphics/HLEGraphics.h"
 #include "Base/MathUtil.h"
 #include "Ultra/ultra_gbi.h"
 #include "Ultra/ultra_rcp.h"
@@ -457,7 +457,7 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 	}
 
 	// Update Screen only when something is drawn, otherwise several games ex Army Men will flash or shake.
-	if( g_ROM.GameHacks != CHAMELEON_TWIST_2 ) gGraphicsPlugin->UpdateScreen();
+	if( g_ROM.GameHacks != CHAMELEON_TWIST_2 ) gHLEGraphics->UpdateScreen();
 
 	OSTask * pTask = (OSTask *)(g_pu8SpMemBase + 0x0FC0);
 	u32 code_base = (u32)pTask->t.ucode & 0x1fffffff;
@@ -506,7 +506,7 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 	gRenderer->EndScene();
 
 	// Hack for Chameleon Twist 2, only works if screen is update at last
-	if( g_ROM.GameHacks == CHAMELEON_TWIST_2 ) gGraphicsPlugin->UpdateScreen();
+	if( g_ROM.GameHacks == CHAMELEON_TWIST_2 ) gHLEGraphics->UpdateScreen();
 
 	// Do this regardless!
 	FinishRDPJob();

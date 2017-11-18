@@ -19,31 +19,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef HLEGRAPHICS_GRAPHICSPLUGIN_H_
-#define HLEGRAPHICS_GRAPHICSPLUGIN_H_
+#ifndef HLEGRAPHICS_HLEGRAPHICS_H_
+#define HLEGRAPHICS_HLEGRAPHICS_H_
 
 #include "Core/Memory.h"
 #include "Core/RSP_HLE.h"
 
-class CGraphicsPlugin : public DisplayListProcessor, public VIOriginChangedEventHandler
+class HLEGraphics : public DisplayListProcessor, public VIOriginChangedEventHandler
 {
-	public:
-		CGraphicsPlugin() : LastOrigin(0) {}
-		~CGraphicsPlugin() override;
+  public:
+	HLEGraphics() : LastOrigin(0) {}
+	~HLEGraphics() override;
 
-		bool		Initialise();
-		void		UpdateScreen();
-		void		Finalise();
+	bool		Initialise();
+	void		UpdateScreen();
+	void		Finalise();
 
-		void		ProcessDisplayList() override;
-		void		OnOriginChanged(u32 origin) override;
+	void		ProcessDisplayList() override;
+	void		OnOriginChanged(u32 origin) override;
 
-	private:
-		u32					LastOrigin;
+  private:
+	u32					LastOrigin;
 };
 
 bool CreateGraphicsPlugin();
 void DestroyGraphicsPlugin();
-extern CGraphicsPlugin * gGraphicsPlugin;
+extern HLEGraphics * gHLEGraphics;
 
-#endif // HLEGRAPHICS_GRAPHICSPLUGIN_H_
+#endif // HLEGRAPHICS_HLEGRAPHICS_H_
