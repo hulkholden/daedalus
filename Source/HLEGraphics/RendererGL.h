@@ -30,7 +30,7 @@ class RendererGL : public BaseRenderer
 
 };
 
-// NB: this is equivalent to gRenderer, but points to the implementation class, for platform-specific functionality.
-extern RendererGL * gRendererGL;
+bool Renderer_Initialise();
+void Renderer_Finalise();
 
 #endif // SYSGL_HLEGRAPHICS_RENDERERGL_H_

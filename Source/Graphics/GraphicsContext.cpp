@@ -40,8 +40,6 @@ static void error_callback(int error, const char* description)
 	fprintf(stderr, "Error: %d - %s\n", error, description);
 }
 
-
-extern bool initgl();
 bool CGraphicsContext::Initialise()
 {
 	glfwSetErrorCallback(error_callback);
@@ -101,9 +99,7 @@ bool CGraphicsContext::Initialise()
 	// This is not valid in GLFW 3.0, and doesn't work with glfwGetWindowAttrib.
 	//if (glfwGetWindowParam(GLFW_FSAA_SAMPLES) != 0)
 	//	fprintf( stderr, "Full Screen Anti-Aliasing 4X has been enabled\n" );
-
-	// FIXME(strmnnrmn): this needs tidying.
-	return initgl();
+	return true;
 }
 
 bool CGraphicsContext::IsInitialised() const

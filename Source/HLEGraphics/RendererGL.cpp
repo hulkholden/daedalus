@@ -19,7 +19,6 @@
 #include "Utility/Profiler.h"
 
 BaseRenderer * gRenderer   = NULL;
-RendererGL *   gRendererGL = NULL;
 
 /* OpenGL 3.0 */
 typedef void (APIENTRY * PFN_glGenVertexArrays)(GLsizei n, GLuint *arrays);
@@ -86,7 +85,7 @@ static u32 		gColorBuffer[kMaxVertices];
 
 static const char* const kShaderSource = "HLEGraphics/n64.psh";
 
-bool initgl()
+bool Renderer_Initialise()
 {
 	DAEDALUS_ASSERT(gN64FramentLibrary.empty(), "Already initialised");
 
@@ -116,7 +115,16 @@ bool initgl()
 
 	glBindBuffer(GL_ARRAY_BUFFER, gVBOs[kColorBuffer]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(gColorBuffer), gColorBuffer, GL_DYNAMIC_DRAW);
+
+	DAEDALUS_ASSERT_Q(gRenderer == NULL);
+	gRenderer = new RendererGL();
 	return true;
+}
+
+void Renderer_Finalise()
+{
+	delete gRenderer;
+	gRenderer = NULL;
 }
 
 // This defines all the state that is expressed by a given shader.
@@ -1234,18 +1242,4 @@ void RendererGL::Draw2DTextureR(f32 x0, f32 y0,
 	};
 
 	RenderDaedalusVtxStreams(GL_TRIANGLE_FAN, positions, uvs, colours, 4);
-}
-
-bool CreateRenderer()
-{
-	DAEDALUS_ASSERT_Q(gRenderer == NULL);
-	gRendererGL = new RendererGL();
-	gRenderer   = gRendererGL;
-	return true;
-}
-void DestroyRenderer()
-{
-	delete gRendererGL;
-	gRendererGL = NULL;
-	gRenderer   = NULL;
 }

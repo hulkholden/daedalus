@@ -34,6 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Graphics/GraphicsContext.h"
 #include "HLEAudio/AudioPlugin.h"
 #include "HLEGraphics/HLEGraphics.h"
+#include "HLEGraphics/RendererGL.h"
 #include "Input/InputManager.h"
 #include "Interface/Preferences.h"
 #include "Interface/RomDB.h"
@@ -124,6 +125,7 @@ static const SysEntityEntry gSysInitTable[] = {
 	{"ROM Settings", CRomSettingsDB::Create, CRomSettingsDB::Destroy},
 	{"InputManager", InputManager_Create, InputManager_Destroy},
 	{"GraphicsContext", CGraphicsContext::Create, CGraphicsContext::Destroy},
+	{"Renderer", Renderer_Initialise, Renderer_Finalise},
 #ifdef DAEDALUS_PSP
 	{"Language", Translate_Init, NULL},
 #endif

@@ -440,8 +440,6 @@ protected:
 #endif
 };
 
-bool CreateRenderer();
-void DestroyRenderer();
 extern BaseRenderer * gRenderer;
 
 inline s16 ApplyShift(s16 c, u8 shift)

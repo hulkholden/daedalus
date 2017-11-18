@@ -6,10 +6,10 @@
 #include "Debug/DBGConsole.h"
 #include "Graphics/GL.h"
 #include "Graphics/GraphicsContext.h"
-#include "HLEGraphics/BaseRenderer.h"
 #include "HLEGraphics/DisplayListDebugger.h"
 #include "HLEGraphics/DLParser.h"
 #include "HLEGraphics/HLEGraphics.h"
+#include "HLEGraphics/RendererGL.h"
 #include "HLEGraphics/TextureCache.h"
 #include "System/Timing.h"
 
@@ -112,11 +112,6 @@ HLEGraphics::~HLEGraphics()
 
 bool HLEGraphics::Initialise()
 {
-	if (!CreateRenderer())
-	{
-		return false;
-	}
-
 	if (!CTextureCache::Create())
 	{
 		return false;
@@ -139,7 +134,6 @@ void HLEGraphics::Finalise()
 	RSP_HLE_UnregisterDisplayListProcessor(this);
 	DLParser_Finalise();
 	CTextureCache::Destroy();
-	DestroyRenderer();
 }
 
 void HLEGraphics::ProcessDisplayList()
