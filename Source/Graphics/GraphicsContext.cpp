@@ -11,38 +11,17 @@
 static u32 SCR_WIDTH = 640;
 static u32 SCR_HEIGHT = 480;
 
-class GraphicsContextGL : public CGraphicsContext
-{
-public:
-	virtual ~GraphicsContextGL();
-
-
-	virtual bool Initialise();
-	virtual bool IsInitialised() const { return true; }
-
-	virtual void ClearAllSurfaces();
-	virtual void ClearZBuffer();
-	virtual void ClearColBuffer(const c32 & colour);
-	virtual void ClearToBlack();
-	virtual void ClearColBufferAndDepth(const c32 & colour);
-	virtual	void BeginFrame();
-	virtual void EndFrame();
-	virtual void UpdateFrame();
-
-	virtual void GetScreenSize(u32 * width, u32 * height) const;
-	virtual void ViewportType(u32 * width, u32 * height) const;
-};
 
 template<> bool CSingleton< CGraphicsContext >::Create()
 {
-	DAEDALUS_ASSERT_Q(mpInstance == NULL);
+	DAEDALUS_ASSERT_Q(mpInstance == nullptr);
 
-	mpInstance = new GraphicsContextGL();
+	mpInstance = new CGraphicsContext();
 	return mpInstance->Initialise();
 }
 
 
-GraphicsContextGL::~GraphicsContextGL()
+CGraphicsContext::~CGraphicsContext()
 {
 	// glew
 
@@ -50,7 +29,7 @@ GraphicsContextGL::~GraphicsContextGL()
 	if (gWindow)
 	{
 		glfwDestroyWindow(gWindow);
-		gWindow = NULL;
+		gWindow = nullptr;
 	}
 
 	glfwTerminate();
@@ -63,7 +42,7 @@ static void error_callback(int error, const char* description)
 
 
 extern bool initgl();
-bool GraphicsContextGL::Initialise()
+bool CGraphicsContext::Initialise()
 {
 	glfwSetErrorCallback(error_callback);
 
@@ -88,7 +67,7 @@ bool GraphicsContextGL::Initialise()
 	//glfwWindowHint(GLFW_STENCIL_BITS, 0);
 
 	// Open a window and create its OpenGL context
-	gWindow = glfwCreateWindow( SCR_WIDTH, SCR_HEIGHT, "Daedalus", NULL, NULL );
+	gWindow = glfwCreateWindow( SCR_WIDTH, SCR_HEIGHT, "Daedalus", nullptr, nullptr );
 	if (!gWindow)
 	{
 		fprintf( stderr, "Failed to open GLFW window\n" );
@@ -112,7 +91,7 @@ bool GraphicsContextGL::Initialise()
 	{
 		fprintf( stderr, "Failed to initialize GLEW\n" );
 		glfwDestroyWindow(gWindow);
-		gWindow = NULL;
+		gWindow = nullptr;
 		glfwTerminate();
 		return false;
 	}
@@ -127,7 +106,12 @@ bool GraphicsContextGL::Initialise()
 	return initgl();
 }
 
-void GraphicsContextGL::GetScreenSize(u32 * width, u32 * height) const
+bool CGraphicsContext::IsInitialised() const
+{
+	return gWindow != nullptr;
+}
+
+void CGraphicsContext::GetScreenSize(u32 * width, u32 * height) const
 {
 	int window_width, window_height;
 	glfwGetFramebufferSize(gWindow, &window_width, &window_height);
@@ -136,19 +120,19 @@ void GraphicsContextGL::GetScreenSize(u32 * width, u32 * height) const
 	*height = window_height;
 }
 
-void GraphicsContextGL::ViewportType(u32 * width, u32 * height) const
+void CGraphicsContext::ViewportType(u32 * width, u32 * height) const
 {
 	GetScreenSize(width, height);
 }
 
-void GraphicsContextGL::ClearAllSurfaces()
+void CGraphicsContext::ClearAllSurfaces()
 {
 	// FIXME: this should clear/flip a couple of times to ensure the front and backbuffers are cleared.
 	// Not sure if it's necessary...
 	ClearToBlack();
 }
 
-void GraphicsContextGL::ClearToBlack()
+void CGraphicsContext::ClearToBlack()
 {
 	glDepthMask(GL_TRUE);
 	glClearDepth( 1.0f );
@@ -156,20 +140,20 @@ void GraphicsContextGL::ClearToBlack()
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
-void GraphicsContextGL::ClearZBuffer()
+void CGraphicsContext::ClearZBuffer()
 {
 	glDepthMask(GL_TRUE);
 	glClearDepth( 1.0f );
 	glClear( GL_DEPTH_BUFFER_BIT );
 }
 
-void GraphicsContextGL::ClearColBuffer(const c32 & colour)
+void CGraphicsContext::ClearColBuffer(const c32 & colour)
 {
 	glClearColor( colour.GetRf(), colour.GetGf(), colour.GetBf(), colour.GetAf() );
 	glClear( GL_COLOR_BUFFER_BIT );
 }
 
-void GraphicsContextGL::ClearColBufferAndDepth(const c32 & colour)
+void CGraphicsContext::ClearColBufferAndDepth(const c32 & colour)
 {
 	glDepthMask(GL_TRUE);
 	glClearDepth( 1.0f );
@@ -177,7 +161,7 @@ void GraphicsContextGL::ClearColBufferAndDepth(const c32 & colour)
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
-void GraphicsContextGL::BeginFrame()
+void CGraphicsContext::BeginFrame()
 {
 	// Get window size (may be different than the requested size)
 	u32 width, height;
@@ -190,11 +174,11 @@ void GraphicsContextGL::BeginFrame()
 	glScissor( 0, 0, width, height );
 }
 
-void GraphicsContextGL::EndFrame()
+void CGraphicsContext::EndFrame()
 {
 }
 
-void GraphicsContextGL::UpdateFrame()
+void CGraphicsContext::UpdateFrame()
 {
 	glfwSwapBuffers(gWindow);
 //	if( gCleanSceneEnabled ) //TODO: This should be optional

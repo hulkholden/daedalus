@@ -35,24 +35,24 @@ class c32;
 class CGraphicsContext : public CSingleton< CGraphicsContext >
 {
 public:
-	virtual ~CGraphicsContext() {}
+	~CGraphicsContext() override;
 
-	virtual bool Initialise() = 0;
+	bool Initialise();
 
-	virtual bool IsInitialised() const = 0;
+	bool IsInitialised() const;
 
-	virtual void ClearAllSurfaces() = 0;
-	virtual void ClearToBlack() = 0;
-	virtual void ClearZBuffer() = 0;
-	virtual void ClearColBuffer(const c32 & colour) = 0;
-	virtual void ClearColBufferAndDepth(const c32 & colour) = 0;
+	void ClearAllSurfaces();
+	void ClearToBlack();
+	void ClearZBuffer();
+	void ClearColBuffer(const c32 & colour);
+	void ClearColBufferAndDepth(const c32 & colour);
 
-	virtual	void BeginFrame() = 0;
-	virtual void EndFrame() = 0;
-	virtual void UpdateFrame() = 0;
+	void BeginFrame();
+	void EndFrame();
+	void UpdateFrame();
 
-	virtual void GetScreenSize(u32 * width, u32 * height) const = 0;
-	virtual void ViewportType(u32 * width, u32 * height) const = 0;
+	void GetScreenSize(u32 * width, u32 * height) const;
+	void ViewportType(u32 * width, u32 * height) const;
 };
 
 #endif // GRAPHICS_GRAPHICSCONTEXT_H_
