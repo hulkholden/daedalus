@@ -53,9 +53,6 @@ public:
 
 	virtual void GetScreenSize(u32 * width, u32 * height) const = 0;
 	virtual void ViewportType(u32 * width, u32 * height) const = 0;
-
-	virtual void DumpNextScreen() = 0;
-	virtual void DumpScreenShot() = 0;
 };
 
 #endif // GRAPHICS_GRAPHICSCONTEXT_H_

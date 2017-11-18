@@ -14,7 +14,6 @@
 #include "System/Timing.h"
 
 CGraphicsPlugin* 	gGraphicsPlugin = NULL;
-bool                gTakeScreenshot = false;
 
 namespace
 {
@@ -187,12 +186,6 @@ void CGraphicsPlugin::UpdateScreen()
 	sprintf(string, "Daedalus | FPS %#.1f", gCurrentFramerate);
 
 	glfwSetWindowTitle(gWindow, string);
-
-	if (gTakeScreenshot)
-	{
-		CGraphicsContext::Get()->DumpNextScreen();
-		gTakeScreenshot = false;
-	}
 
 	CGraphicsContext::Get()->UpdateFrame();
 
