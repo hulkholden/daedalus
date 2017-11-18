@@ -1547,9 +1547,14 @@ void BaseRenderer::PrepareTexRectUVs(TexCoord * puv0, TexCoord * puv1)
 CRefPtr<CNativeTexture> BaseRenderer::LoadTextureDirectly( const TextureInfo & ti )
 {
 	CRefPtr<CNativeTexture> texture = CTextureCache::Get()->GetOrCreateTexture( ti );
-	DAEDALUS_ASSERT( texture, "texture is NULL" );
-
-	texture->InstallTexture();
+	if (texture)
+	{
+		texture->InstallTexture();
+	}
+	else
+	{
+		DAEDALUS_ERROR("Texture is null");
+	}
 
 	mBoundTexture[0] = texture;
 	mBoundTextureInfo[0] = ti;
