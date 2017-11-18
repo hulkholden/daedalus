@@ -334,7 +334,7 @@ void ROM_Unload()
 //Most hacks are for the PSP, due the limitations of the hardware, and because we prefer speed over accuracy
 void SpecificGameHacks( const ROMHeader & id )
 {
-	printf("ROM ID[%04X]\n", id.CartID);
+	DBGConsole_Msg(0, "ROM ID[%04X]\n", id.CartID);
 
 	g_ROM.HACKS_u32 = 0;	//Default to no game hacks
 
