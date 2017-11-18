@@ -380,11 +380,16 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 	++mNumTrisRendered;
 #endif
 
-	DAEDALUS_ASSERT( mNumIndices + 3 < kMaxIndices, "Array overflow, too many Indices" );
-
-	mIndexBuffer[ mNumIndices++ ] = (u16)v0;
-	mIndexBuffer[ mNumIndices++ ] = (u16)v1;
-	mIndexBuffer[ mNumIndices++ ] = (u16)v2;
+	if (mNumIndices + 3 <= kMaxIndices)
+	{
+		mIndexBuffer[ mNumIndices++ ] = (u16)v0;
+		mIndexBuffer[ mNumIndices++ ] = (u16)v1;
+		mIndexBuffer[ mNumIndices++ ] = (u16)v2;
+	}
+	else
+	{
+		DAEDALUS_ERROR( "Array overflow, too many Indices" );
+	}
 
 	mVtxClipFlagsUnion |= f0 | f1 | f2;
 

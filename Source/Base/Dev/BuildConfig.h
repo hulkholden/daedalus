@@ -38,7 +38,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	DAEDALUS_ENABLE_ASSERTS				// Enable asserts
 #undef	DAEDALUS_ENABLE_PROFILING			// Enable the built-in profiler
 #undef	DAEDALUS_PROFILE_EXECUTION			// Enable to keep track of various execution stats
-#define	DAEDALUS_BATCH_TEST_ENABLED			// Enable the batch test
 #undef	ALLOW_TRACES_WHICH_EXCEPT
 #define	DAEDALUS_LOG						// Enable various logging
 #undef	DAEDALUS_DIALOGS					// Enable this to ask confimation dialogs in the GUI

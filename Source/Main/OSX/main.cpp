@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Core/CPU.h"
 #include "Debug/DBGConsole.h"
-#include "Interface/RomDB.h"
 #include "Main/SystemInit.h"
 #include "System/IO.h"
 #include "System/Paths.h"
@@ -50,19 +49,11 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	// ReadConfiguration();
-
 	if (!System_Init())
 	{
 		fprintf(stderr, "System_Init failed\n");
 		return 1;
 	}
-
-	//
-	// Create the console if it's enabled. Don't care about failures
-	//
-	// DisplayDisclaimer();
-	// DisplayConfig();
 
 	if (argc > 1)
 	{
@@ -80,18 +71,6 @@ int main(int argc, char **argv)
 					batch_test = true;
 					break;
 				}
-				else if (strcmp(arg, "-roms") == 0)
-				{
-					if (i + 1 < argc)
-					{
-						const char *relative_path = argv[i + 1];
-						++i;
-
-						char* dir = realpath(relative_path, nullptr);
-						CRomDB::Get()->AddRomDirectory(dir);
-						free(dir);
-					}
-				}
 			}
 			else
 			{
@@ -101,11 +80,7 @@ int main(int argc, char **argv)
 
 		if (batch_test)
 		{
-#ifdef DAEDALUS_BATCH_TEST_ENABLED
 			BatchTestMain(argc, argv);
-#else
-			fprintf(stderr, "BatchTest mode is not present in this build.\n");
-#endif
 		}
 		else if (filename)
 		{
@@ -121,16 +96,9 @@ int main(int argc, char **argv)
 	{
 		fprintf(stderr, "Usage: daedalus [rom]\n");
 		return 1;
-		//		result = RunMain();
 	}
 
-	//
-	// Write current config out to the registry
-	//
-	// WriteConfiguration();
-
 	System_Finalize();
-
 	return result;
 }
 

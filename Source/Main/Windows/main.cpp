@@ -58,8 +58,6 @@ int __cdecl main(int argc, char **argv)
 		return 1;
 	}
 
-	// ReadConfiguration();
-
 	int result = 0;
 
 	if (!System_Init())
@@ -93,11 +91,7 @@ int __cdecl main(int argc, char **argv)
 
 		if (batch_test)
 		{
-			#ifdef DAEDALUS_BATCH_TEST_ENABLED
-				BatchTestMain(argc, argv);
-			#else
-				fprintf(stderr, "BatchTest mode is not present in this build.\n");
-			#endif
+			BatchTestMain(argc, argv);
 		}
 		else if (filename)
 		{
@@ -112,11 +106,10 @@ int __cdecl main(int argc, char **argv)
 	}
 	else
 	{
-		// result = RunMain();
+		fprintf(stderr, "Usage: daedalus [rom]\n");
+		return 1;
 	}
 
-	// Write current config out to the registry
-	// WriteConfiguration();
 	System_Finalize();
 	return result;
 }

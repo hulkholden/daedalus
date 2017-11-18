@@ -28,8 +28,6 @@
 // Config stuff
 struct DaedalusConfig
 {
-	// FIXME(strmnnrmn): We never seem to assign to RomsDir?!
-	std::string RomsDir;
 	std::string SaveDir;
 };
 

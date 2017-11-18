@@ -8,6 +8,7 @@ cc_library(
         "//Core",
         "//Debug",
         "//HLEGraphics",
+        "//Interface",
         "//Main:SystemInit",
         "//RomFile",
         "//Utility",

@@ -17,8 +17,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifdef DAEDALUS_BATCH_TEST_ENABLED
-
 #include <stdio.h>
 
 #include <vector>
@@ -29,42 +27,42 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CBatchTestEventHandler : public CpuEventHandler, public DisplayListEventHandler
 {
-public:
+   public:
 	CBatchTestEventHandler();
 
 	enum ETerminationReason
 	{
-		TR_UNKNOWN						= -1,
-		TR_REACHED_DL_COUNT				= 0,
-		TR_TIME_LIMIT_REACHED			= 0x80000000,
+		TR_UNKNOWN = -1,
+		TR_REACHED_DL_COUNT = 0,
+		TR_TIME_LIMIT_REACHED = 0x80000000,
 		TR_TOO_MANY_VBLS_WITH_NO_DL,
 	};
 
-	void				Reset();
+	void Reset();
 
-	void				Terminate( ETerminationReason reason );
+	void Terminate(ETerminationReason reason);
 
-	void				OnDisplayListComplete() override;
-	void				OnVerticalBlank() override;
-	void				OnDebugMessage( const char * msg );
+	void OnDisplayListComplete() override;
+	void OnVerticalBlank() override;
+	void OnDebugMessage(const char* msg);
 
-	EAssertResult		OnAssert( const char * expression, const char * file, unsigned int line, const char * formatted_msg );
+#ifdef DAEDALUS_ENABLE_ASSERTS
+	EAssertResult OnAssert(const char* expression, const char* file, unsigned int line, const char* formatted_msg);
+#endif
 
-	ETerminationReason	GetTerminationReason() const { return mTerminationReason; }
+	ETerminationReason GetTerminationReason() const { return mTerminationReason; }
 
-	void				PrintSummary( FILE * fh );
+	void PrintSummary(FILE* fh);
 
-	static const char * GetTerminationReasonString( ETerminationReason reason );
+	static const char* GetTerminationReasonString(ETerminationReason reason);
 
-private:
-	CTimer				mTimer;
-	u32					mNumDisplayListsCompleted;
-	u32					mNumVerticalBlanksSinceDisplayList;
-	ETerminationReason	mTerminationReason;
+   private:
+	CTimer mTimer;
+	u32 mNumDisplayListsCompleted;
+	u32 mNumVerticalBlanksSinceDisplayList;
+	ETerminationReason mTerminationReason;
 
-	std::vector<u32>	mAsserts;
+	std::vector<u32> mAsserts;
 };
 
-void BatchTestMain( int argc, char* argv[] );
-
-#endif
+void BatchTestMain(int argc, char* argv[]);
