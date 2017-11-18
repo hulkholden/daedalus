@@ -32,7 +32,6 @@ public:
 	virtual void GetScreenSize(u32 * width, u32 * height) const;
 	virtual void ViewportType(u32 * width, u32 * height) const;
 
-	virtual void SetDebugScreenTarget( ETargetSurface buffer ) {}
 	virtual void DumpNextScreen() {}
 	virtual void DumpScreenShot() {}
 };

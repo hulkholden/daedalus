@@ -37,12 +37,6 @@ class CGraphicsContext : public CSingleton< CGraphicsContext >
 public:
 	virtual ~CGraphicsContext() {}
 
-	enum ETargetSurface
-	{
-		TS_BACKBUFFER,
-		TS_FRONTBUFFER,
-	};
-
 	virtual bool Initialise() = 0;
 
 	virtual bool IsInitialised() const = 0;
@@ -59,8 +53,6 @@ public:
 
 	virtual void GetScreenSize(u32 * width, u32 * height) const = 0;
 	virtual void ViewportType(u32 * width, u32 * height) const = 0;
-
-	virtual void SetDebugScreenTarget( ETargetSurface buffer ) = 0;
 
 	virtual void DumpNextScreen() = 0;
 	virtual void DumpScreenShot() = 0;
