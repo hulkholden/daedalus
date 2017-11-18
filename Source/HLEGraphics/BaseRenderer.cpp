@@ -124,7 +124,6 @@ BaseRenderer::BaseRenderer()
 ,	mNumTrisRendered( 0 )
 ,	mNumTrisClipped( 0 )
 ,	mNumRect( 0 )
-,	mNastyTexture(false)
 #endif
 {
 	for ( u32 i = 0; i < kNumBoundTextures; i++ )

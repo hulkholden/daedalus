@@ -439,9 +439,6 @@ protected:
 	u32					mNumTrisRendered;
 	u32					mNumTrisClipped;
 	u32					mNumRect;
-
-	// Debugging
-	bool				mNastyTexture;
 #endif
 };
 
