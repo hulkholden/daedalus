@@ -296,7 +296,7 @@ bool DLDebugger_Process()
 		DLParser_Process(gInstructionCountLimit, NULL);
 		DLDebugger_ProcessDebugTask();
 
-		CGraphicsContext::Get()->UpdateFrame(false);
+		CGraphicsContext::Get()->UpdateFrame();
 
 		// FIXME: shouldn't need to do this, just wake up when there's incoming WebDebug request.
 		ThreadSleepMs(10);

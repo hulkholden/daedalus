@@ -27,7 +27,7 @@ public:
 	virtual void ClearColBufferAndDepth(const c32 & colour);
 	virtual	void BeginFrame();
 	virtual void EndFrame();
-	virtual void UpdateFrame( bool wait_for_vbl );
+	virtual void UpdateFrame();
 
 	virtual void GetScreenSize(u32 * width, u32 * height) const;
 	virtual void ViewportType(u32 * width, u32 * height) const;
@@ -198,7 +198,7 @@ void GraphicsContextGL::EndFrame()
 {
 }
 
-void GraphicsContextGL::UpdateFrame( bool wait_for_vbl )
+void GraphicsContextGL::UpdateFrame()
 {
 	glfwSwapBuffers(gWindow);
 //	if( gCleanSceneEnabled ) //TODO: This should be optional

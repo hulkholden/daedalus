@@ -175,25 +175,26 @@ void CGraphicsPlugin::UpdateScreen()
 {
 	// TODO: this is actually lagging a frame behind
 	u32 current_origin = Memory_VI_GetRegister(VI_ORIGIN_REG);
-
-	if (current_origin != LastOrigin)
+	if (current_origin == LastOrigin)
 	{
-		UpdateFramerate();
-
-		// FIXME: safe printf
-		char string[22];
-		sprintf(string, "Daedalus | FPS %#.1f", gCurrentFramerate);
-
-		glfwSetWindowTitle(gWindow, string);
-
-		if (gTakeScreenshot)
-		{
-			CGraphicsContext::Get()->DumpNextScreen();
-			gTakeScreenshot = false;
-		}
-
-		CGraphicsContext::Get()->UpdateFrame( false );
-
-		LastOrigin = current_origin;
+		return;
 	}
+
+	UpdateFramerate();
+
+	// FIXME: safe printf
+	char string[22];
+	sprintf(string, "Daedalus | FPS %#.1f", gCurrentFramerate);
+
+	glfwSetWindowTitle(gWindow, string);
+
+	if (gTakeScreenshot)
+	{
+		CGraphicsContext::Get()->DumpNextScreen();
+		gTakeScreenshot = false;
+	}
+
+	CGraphicsContext::Get()->UpdateFrame();
+
+	LastOrigin = current_origin;
 }

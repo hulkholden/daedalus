@@ -55,7 +55,7 @@ public:
 
 	virtual	void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
-	virtual void UpdateFrame( bool wait_for_vbl ) = 0;
+	virtual void UpdateFrame() = 0;
 
 	virtual void GetScreenSize(u32 * width, u32 * height) const = 0;
 	virtual void ViewportType(u32 * width, u32 * height) const = 0;
