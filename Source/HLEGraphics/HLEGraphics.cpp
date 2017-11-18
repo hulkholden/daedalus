@@ -80,23 +80,23 @@ static void	UpdateFramerate()
 }
 }
 
-bool CreateGraphicsPlugin()
+bool CreateHLEGraphics()
 {
-	DAEDALUS_ASSERT(gHLEGraphics == nullptr, "The graphics plugin should not be initialised at this point");
-	DBGConsole_Msg( 0, "Initialising Graphics Plugin" );
+	DAEDALUS_ASSERT(gHLEGraphics == nullptr, "HLEGraphics should not be initialised at this point");
+	DBGConsole_Msg( 0, "Initialising HLEGraphics" );
 
-	HLEGraphics * plugin = new HLEGraphics();
-	if (!plugin->Initialise())
+	HLEGraphics * hle = new HLEGraphics();
+	if (!hle->Initialise())
 	{
-		delete plugin;
-		plugin = nullptr;
+		delete hle;
+		hle = nullptr;
 	}
 
-	gHLEGraphics = plugin;
-	return plugin != nullptr;
+	gHLEGraphics = hle;
+	return hle != nullptr;
 }
 
-void DestroyGraphicsPlugin()
+void DestroyHLEGraphics()
 {
 	if (gHLEGraphics != nullptr)
 	{

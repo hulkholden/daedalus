@@ -42,8 +42,8 @@ class HLEGraphics : public DisplayListProcessor, public VIOriginChangedEventHand
 	u32					LastOrigin;
 };
 
-bool CreateGraphicsPlugin();
-void DestroyGraphicsPlugin();
+bool CreateHLEGraphics();
+void DestroyHLEGraphics();
 extern HLEGraphics * gHLEGraphics;
 
 #endif // HLEGRAPHICS_HLEGRAPHICS_H_

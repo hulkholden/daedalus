@@ -157,7 +157,7 @@ static const RomEntityEntry gRomInitTable[] = {
 	{"Settings", LoadROM, UnloadROM},
 	{"Memory", Memory_Reset, Memory_Cleanup},
 	{"Audio", CreateAudioPlugin, DestroyAudioPlugin},
-	{"Graphics", CreateGraphicsPlugin, DestroyGraphicsPlugin},
+	{"Graphics", CreateHLEGraphics, DestroyHLEGraphics},
 	{"FramerateLimiter", FramerateLimiter_Reset, NULL},
 	//{"RSP", RSP_Reset, NULL},
 	{"CPU", CPU_RomOpen, CPU_RomClose},
