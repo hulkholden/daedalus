@@ -1225,7 +1225,6 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 		}
 		else
 		{
-
 			mVtxProjected[i].Colour.x = (f32)mn[vert.cidx+3] * (1.0f / 255.0f);
 			mVtxProjected[i].Colour.y = (f32)mn[vert.cidx+2] * (1.0f / 255.0f);
 			mVtxProjected[i].Colour.z = (f32)mn[vert.cidx+1] * (1.0f / 255.0f);

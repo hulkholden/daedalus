@@ -92,9 +92,7 @@ bool GraphicsContextGL::Initialise()
 	//glfwWindowHint(GLFW_STENCIL_BITS, 0);
 
 	// Open a window and create its OpenGL context
-	gWindow = glfwCreateWindow( SCR_WIDTH, SCR_HEIGHT,
-								"Daedalus",
-								NULL, NULL );
+	gWindow = glfwCreateWindow( SCR_WIDTH, SCR_HEIGHT, "Daedalus", NULL, NULL );
 	if (!gWindow)
 	{
 		fprintf( stderr, "Failed to open GLFW window\n" );
