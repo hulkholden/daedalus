@@ -25,6 +25,7 @@ cc_library(
         "//Base",
         "//System",
         "@webby//:webby",
+        "//external:gflags",
     ],
 )
 

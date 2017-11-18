@@ -56,8 +56,6 @@ enum EDebugFlags
 	DEBUG_DYNREC = 1 << 19,
 	DEBUG_DYNAREC_CACHE = 1 << 20,
 	DEBUG_DYNAREC_PROF = 1 << 21,
-
-	DEBUG_FRAME = 1 << 22,
 };
 
 //
@@ -69,8 +67,6 @@ static const u32 DAED_DEBUG_MASK(0);
 
 bool Debug_InitLogging();
 void Debug_FinishLogging();
-bool Debug_GetLoggingEnabled();
-void Debug_SetLoggingEnabled(bool enabled);
 void Debug_Print(const char* format, ...);
 
 #define DAED_CHECK_LOG(flags) DAED_DEBUG_MASK&(flags)
