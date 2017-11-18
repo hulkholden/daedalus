@@ -135,12 +135,11 @@ BaseRenderer::BaseRenderer()
 		mActiveTile[i] = 0;
 	}
 
+	memset( &mTnL, 0, sizeof(mTnL) );
 	mTnL.Flags._u32 = 0;
 	mTnL.NumLights = 0;
 	mTnL.TextureScaleX = 1.0f;
 	mTnL.TextureScaleY = 1.0f;
-
-	memset( mTnL.Lights, 0, sizeof(mTnL.Lights) );
 }
 
 

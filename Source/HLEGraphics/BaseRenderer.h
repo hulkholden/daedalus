@@ -107,7 +107,7 @@ struct FiddledVtx
 };
 DAEDALUS_STATIC_ASSERT( sizeof(FiddledVtx) == 16 );
 
-ALIGNED_TYPE(struct, DaedalusLight, 16)
+struct DaedalusLight
 {
 	v3		Direction;		// w component is ignored. Should be normalised
 	u32		SkipIfZero;		// Used by CBFD & MM
@@ -119,7 +119,6 @@ ALIGNED_TYPE(struct, DaedalusLight, 16)
 	f32		qa;				// Used by MM(GBI2 point light)
 	u32		Pad0;			// Padding
 };
-DAEDALUS_STATIC_ASSERT( sizeof( DaedalusLight ) == 64 );	//Size=64 bytes and order is important or VFPU ASM for PSP will fail
 
 // Order here should be the same as in TnLMode
 enum ETnLModeFlags
@@ -152,7 +151,7 @@ struct TnLMode
 			u32 PointLight : 1;		// 0x100
 			u32 pad0 : 23;			// 0x0
 		};
-		
+
 		struct
 		{
 			u16 Modes;
@@ -163,7 +162,7 @@ struct TnLMode
 	};
 };
 
-ALIGNED_TYPE(struct, TnLParams, 16)
+struct TnLParams
 {
 	TnLMode			Flags;			//TnL flags
 	u32				NumLights;		//Number of lights
@@ -174,7 +173,6 @@ ALIGNED_TYPE(struct, TnLParams, 16)
 	f32				FogMult;		//Fog mult
 	f32				FogOffs;		//Fog offset
 };
-//DAEDALUS_STATIC_ASSERT( sizeof( TnLParams ) == 32 );
 
 // Bits for clipping
 // 543210

@@ -359,6 +359,7 @@ void DLParser_GBI1_GeometryMode(MicroCodeCommand command)
 	}
 
 	TnLMode TnL;
+	TnL._u32 = 0;
 
 	TnL.Light = gGeometryMode.GBI1_Lighting;
 	TnL.TexGen = gGeometryMode.GBI1_TexGen;

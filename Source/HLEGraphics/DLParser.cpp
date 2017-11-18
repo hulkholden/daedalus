@@ -565,9 +565,8 @@ void RDP_MoveMemLight(u32 light_idx, const N64Light *light)
 	s8 dir_y = light->dir_y;
 	s8 dir_z = light->dir_z;
 
-	bool valid = (dir_x | dir_y | dir_z) != 0;
+	const bool valid = (dir_x | dir_y | dir_z) != 0;
 	DAEDALUS_USE(valid);
-	DAEDALUS_ASSERT( valid, " Light direction is invalid" );
 
 	DL_PF("    Light[%d] RGB[%d, %d, %d] x[%d] y[%d] z[%d]", light_idx, r, g, b, dir_x, dir_y, dir_z);
 	DL_PF("    Light direction is %s",valid ? "valid" : "invalid");
