@@ -9,14 +9,7 @@ cc_library(
         "Dump.cpp",
         "WebDebug.cpp",
         "WebDebugTemplate.cpp",
-    ] + select({
-        "//:darwin": [
-            "Posix/Assert.cpp",
-        ],
-        "//:windows": [
-            "Windows/Assert.cpp",
-        ],
-    }),
+    ],
     hdrs = [
         "DBGConsole.h",
         "DebugConsoleImpl.h",

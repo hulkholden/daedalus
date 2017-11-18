@@ -179,4 +179,8 @@ inline void SetAssertHook(DaedalusAssertHook hook) { gAssertHook = hook; }
 
 #endif  // DAEDALUS_ENABLE_ASSERTS
 
+#if defined(DAEDALUS_OSX)
+void InstallAbortHandlers();
+#endif
+
 #endif  // BASE_ASSERT_H_

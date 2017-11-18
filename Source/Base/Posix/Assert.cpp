@@ -21,11 +21,15 @@
 #include "Base/Daedalus.h"
 #include "Base/Assert.h"
 
-#ifdef DAEDALUS_ENABLE_ASSERTS
-
+#include <execinfo.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef DAEDALUS_ENABLE_ASSERTS
+
+DaedalusAssertHook gAssertHook = nullptr;
 
 EAssertResult DaedalusAssert(const char* expression, const char* file, unsigned int line, const char* msg, ...)
 {
@@ -68,3 +72,75 @@ EAssertResult DaedalusAssert(const char* expression, const char* file, unsigned 
 }
 
 #endif  // DAEDALUS_ENABLE_ASSERTS
+
+// See https://oroboro.com/stack-trace-on-crash/
+static inline void PrintStackTrace(FILE* out = stderr, unsigned int max_frames = 63)
+{
+	fprintf(out, "stack trace:\n");
+
+	void* addrlist[max_frames + 1];
+	u32 addrlen = backtrace(addrlist, sizeof(addrlist) / sizeof(void*));
+
+	if (addrlen == 0)
+	{
+		fprintf(out, "  \n");
+		return;
+	}
+
+	// create readable strings to each frame.
+	char** symbollist = backtrace_symbols(addrlist, addrlen);
+	for (u32 i = 4; i < addrlen; i++) fprintf(out, "%s\n", symbollist[i]);
+
+	free(symbollist);
+}
+
+void AbortHandler(int signum, siginfo_t* si, void* unused)
+{
+	// associate each signal with a signal name string.
+	const char* name = nullptr;
+	switch (signum)
+	{
+		case SIGABRT:
+			name = "SIGABRT";
+			break;
+		case SIGSEGV:
+			name = "SIGSEGV";
+			break;
+		case SIGBUS:
+			name = "SIGBUS";
+			break;
+		case SIGILL:
+			name = "SIGILL";
+			break;
+		case SIGFPE:
+			name = "SIGFPE";
+			break;
+	}
+
+	if (name)
+	{
+		fprintf(stderr, "Caught signal %d (%s)\n", signum, name);
+	}
+	else
+	{
+		fprintf(stderr, "Caught signal %d\n", signum);
+	}
+
+	PrintStackTrace();
+	exit(signum);
+}
+
+void InstallAbortHandlers()
+{
+	struct sigaction sa;
+	sa.sa_flags = SA_SIGINFO;
+	sa.sa_sigaction = AbortHandler;
+	sigemptyset(&sa.sa_mask);
+
+	sigaction(SIGABRT, &sa, nullptr);
+	sigaction(SIGSEGV, &sa, nullptr);
+	sigaction(SIGBUS, &sa, nullptr);
+	sigaction(SIGILL, &sa, nullptr);
+	sigaction(SIGFPE, &sa, nullptr);
+	sigaction(SIGPIPE, &sa, nullptr);
+}
