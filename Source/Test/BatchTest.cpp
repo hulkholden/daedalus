@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdarg.h>
 
+#include <gflags/gflags.h>
+
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -37,6 +39,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Timing.h"
 #include "Utility/Hash.h"
 #include "Utility/Timer.h"
+
+DECLARE_string(roms);
+DEFINE_bool(random_order, false, "Whether to randomise the order of processing, to help avoid hangs.");
+DEFINE_bool(update_results, false, " Whether to update existing results.");
+DEFINE_int32(run_id, -1, "New run by default");
 
 static void MakeRomList(const std::string& romdir, std::vector<std::string>& roms)
 {
@@ -120,51 +127,16 @@ static bool MakeRunDirectory(std::string* rundir, const std::string& batchdir)
 	return false;
 }
 
-void BatchTestMain(int argc, char* argv[])
+void BatchTestMain()
 {
-	bool random_order = false;	// Whether to randomise the order of processing, to help avoid hangs
-	bool update_results = false;  // Whether to update existing results
-	s32 run_id = -1;				 // New run by default
+	bool random_order = FLAGS_random_order;
+	bool update_results = FLAGS_update_results;
+	s32 run_id = FLAGS_run_id;
 
-	std::string romdir;
-	for (int i = 1; i < argc; ++i)
-	{
-		const char* arg(argv[i]);
-		if (*arg == '-')
-		{
-			++arg;
-			// TODO(strmnnrmn): Make this a global flag and move to main.
-			if (strcmp(arg, "-roms") == 0)
-			{
-				if (i + 1 < argc)
-				{
-					const char *relative_path = argv[i + 1];
-					++i;
-
-					// TODO(strmnnrmn): Fix this for Windows.
-					char* dir = realpath(relative_path, nullptr);
-					romdir = dir;
-					free(dir);
-				}
-			}
-			else if (strcmp(arg, "rand") == 0 || strcmp(arg, "random") == 0)
-			{
-				random_order = true;
-			}
-			else if (strcmp(arg, "u") == 0 || strcmp(arg, "update") == 0)
-			{
-				update_results = true;
-			}
-			else if (strcmp(arg, "r") == 0 || strcmp(arg, "run") == 0)
-			{
-				if (i + 1 < argc)
-				{
-					++i;  // Consume next arg
-					run_id = atoi(argv[i]);
-				}
-			}
-		}
-	}
+	// TODO(strmnnrmn): Fix this for Windows.
+	char* dir = realpath(FLAGS_roms.c_str(), nullptr);
+	std::string romdir = dir;
+	free(dir);
 
 	if (romdir.empty())
 	{

@@ -25,6 +25,7 @@ cc_library(
         "//HLEAudio",
         "//Interface",
         "//Test:BatchTest",
+        "//external:gflags",
     ],
 )
 

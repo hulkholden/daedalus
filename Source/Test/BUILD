@@ -12,6 +12,7 @@ cc_library(
         "//Main:SystemInit",
         "//RomFile",
         "//Utility",
+        "//external:gflags",
     ],
 )
 

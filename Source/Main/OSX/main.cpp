@@ -19,6 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Daedalus.h"
 
+#include <gflags/gflags.h>
+
 #include "Core/CPU.h"
 #include "Debug/DBGConsole.h"
 #include "Main/SystemInit.h"
@@ -26,13 +28,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Paths.h"
 #include "Test/BatchTest.h"
 
-#ifdef DAEDALUS_LINUX
-#include <linux/limits.h>
-#endif
+DEFINE_bool(batch, false, "Run in batch testing mode.");
+DEFINE_string(roms, "", "The roms directory.");
 
 int main(int argc, char **argv)
 {
 	InstallAbortHandlers();
+	gflags::ParseCommandLineFlags(&argc, &argv, true);
+
 	int result = 0;
 
 	if (argc > 0)
@@ -55,47 +58,27 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if (argc > 1)
+	if (FLAGS_batch)
 	{
-		bool batch_test = false;
-		const char *filename = NULL;
-
-		for (int i = 1; i < argc; ++i)
-		{
-			const char *arg = argv[i];
-			if (*arg == '-')
-			{
-				++arg;
-				if (strcmp(arg, "-batch") == 0)
-				{
-					batch_test = true;
-					break;
-				}
-			}
-			else
-			{
-				filename = arg;
-			}
-		}
-
-		if (batch_test)
-		{
-			BatchTestMain(argc, argv);
-		}
-		else if (filename)
-		{
-			if (!System_Open(filename))
-			{
-				fprintf(stderr, "System_Open failed\n");
-			}
-			CPU_Run();
-			System_Close();
-		}
+		BatchTestMain();
 	}
 	else
 	{
-		fprintf(stderr, "Usage: daedalus [rom]\n");
-		return 1;
+		if (argc != 2)
+		{
+			fprintf(stderr, "Usage: daedalus [rom]\n");
+			return 1;
+		}
+
+		std::string rom_path = argv[1];
+		fprintf(stderr, "Loading %s\n", rom_path.c_str());
+		if (!System_Open(rom_path))
+		{
+			fprintf(stderr, "System_Open failed\n");
+			return 1;
+		}
+		CPU_Run();
+		System_Close();
 	}
 
 	System_Finalize();

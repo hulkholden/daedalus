@@ -14,6 +14,22 @@ http_archive(
     strip_prefix = "googletest-master",
 )
 
+http_archive(
+    name = "com_github_gflags_gflags",
+    url = "https://github.com/gflags/gflags/archive/77592648e3f3be87d6c7123eb81cbad75f9aef5a.zip",
+    strip_prefix = "gflags-77592648e3f3be87d6c7123eb81cbad75f9aef5a",
+)
+
+bind(
+    name = "gflags",
+    actual = "@com_github_gflags_gflags//:gflags",
+)
+
+bind(
+    name = "gflags_nothreads",
+    actual = "@com_github_gflags_gflags//:gflags_nothreads",
+)
+
 new_http_archive(
     name = "glfw",
     url = "https://github.com/glfw/glfw/archive/master.zip",

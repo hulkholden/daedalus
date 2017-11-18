@@ -19,6 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Daedalus.h"
 
+#include <gflags/gflags.h>
+
 #include "Config/ConfigOptions.h"
 #include "Core/CPU.h"
 #include "Core/ROM.h"
@@ -42,8 +44,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "ws2_32.lib")
 
+DEFINE_bool(batch, false, "Run in batch testing mode.");
+DEFINE_string(roms, "", "The roms directory.");
+
 int __cdecl main(int argc, char **argv)
 {
+	gflags::ParseCommandLineFlags(&argc, &argv, true);
+
 	HMODULE hModule = GetModuleHandle(NULL);
 	if (hModule != NULL)
 	{
@@ -66,48 +73,29 @@ int __cdecl main(int argc, char **argv)
 		return 1;
 	}
 
-	if (argc > 1)
+	if (FLAGS_batch)
 	{
-		bool 			batch_test = false;
-		const char *	filename   = NULL;
-
-		for (int i = 1; i < argc; ++i)
-		{
-			const char * arg = argv[i];
-			if (*arg == '-')
-			{
-				++arg;
-				if( strcmp( arg, "-batch" ) == 0 )
-				{
-					batch_test = true;
-					break;
-				}
-			}
-			else
-			{
-				filename = arg;
-			}
-		}
-
-		if (batch_test)
-		{
-			BatchTestMain(argc, argv);
-		}
-		else if (filename)
-		{
-			// Need absolute path when loading from Visual Studio
-			// This is ok when loading from console too, since arg0 will be empty, it'll just load file name (arg1)
-			std::string rom_path = filename;// IO::Path::Join(gDaedalusExePath, argv[1]);
-			fprintf(stderr, "Loading %s\n", rom_path.c_str());
-			System_Open(rom_path);
-			CPU_Run();
-			System_Close();
-		}
+		BatchTestMain();
 	}
 	else
 	{
-		fprintf(stderr, "Usage: daedalus [rom]\n");
-		return 1;
+		if (argc != 2)
+		{
+			fprintf(stderr, "Usage: daedalus [rom]\n");
+			return 1;
+		}
+
+		// Need absolute path when loading from Visual Studio
+		// This is ok when loading from console too, since arg0 will be empty, it'll just load file name (arg1)
+		std::string rom_path = argv[1];// IO::Path::Join(gDaedalusExePath, argv[1]);
+		fprintf(stderr, "Loading %s\n", rom_path.c_str());
+		if (!System_Open(rom_path))
+		{
+			fprintf(stderr, "System_Open failed\n");
+			return 1;
+		}
+		CPU_Run();
+		System_Close();
 	}
 
 	System_Finalize();

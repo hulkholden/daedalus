@@ -65,4 +65,4 @@ class CBatchTestEventHandler : public CpuEventHandler, public DisplayListEventHa
 	std::vector<u32> mAsserts;
 };
 
-void BatchTestMain(int argc, char* argv[]);
+void BatchTestMain();
