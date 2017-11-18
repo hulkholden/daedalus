@@ -138,7 +138,7 @@ bool CSingleton<CRomSettingsDB>::Create()
 
 	mpInstance = new IRomSettingsDB();
 
-	std::string ini_filename = IO::Path::Join(gDaedalusExePath, "roms.ini");
+	std::string ini_filename = GetDataFilename("roms.ini");
 	mpInstance->OpenSettingsFile(ini_filename);
 
 	return true;

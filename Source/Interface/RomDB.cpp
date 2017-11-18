@@ -172,9 +172,7 @@ template<> bool	CSingleton< CRomDB >::Create()
 	DAEDALUS_ASSERT_Q(mpInstance == nullptr);
 
 	mpInstance = new IRomDB();
-
-	std::string romdb_filename = IO::Path::Join(gDaedalusExePath, "rom.db");
-	/*ret = */mpInstance->OpenDB( romdb_filename );
+	/*ret = */mpInstance->OpenDB(GetDataFilename("rom.db"));
 	// Ignore failure - this file might not exist on first run.
 
 	return true;

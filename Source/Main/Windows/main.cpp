@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "ws2_32.lib")
 
-std::string GetExePath(const char* argv0)
+std::string GetExeFilename(const char* argv0)
 {
 	HMODULE hModule = GetModuleHandle(nullptr);
 	if (hModule == nullptr)
@@ -40,15 +40,5 @@ std::string GetExePath(const char* argv0)
 
 	char exe_path[256];
 	GetModuleFileName(hModule, exe_path, ARRAYSIZE(exe_path));
-	std::string path = exe_path;
-	IO::Path::RemoveFileSpec(&path);
-	return path;
-}
-
-std::string MakeRomPath(const char* filename)
-{
-	// Need absolute path when loading from Visual Studio
-	// This is ok when loading from console too, since arg0 will be empty, it'll just load file name (arg1)
-	std::string rom_path = argv[1];// IO::Path::Join(gDaedalusExePath, argv[1]);
-	return rom_path;
+	return exe_path;
 }

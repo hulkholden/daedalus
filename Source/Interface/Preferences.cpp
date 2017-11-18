@@ -74,8 +74,7 @@ CPreferences::~CPreferences() {}
 
 IPreferences::IPreferences() : mDirty(false)
 {
-	std::string ini_filename = IO::Path::Join(gDaedalusExePath, "preferences.ini");
-	OpenPreferencesFile(ini_filename);
+	OpenPreferencesFile(GetDataFilename("preferences.ini"));
 }
 
 IPreferences::~IPreferences()

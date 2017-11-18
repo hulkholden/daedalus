@@ -38,7 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEAudio/AudioPlugin.h"
 #include "OSHLE/OSHLE.h"
 #include "RomFile/RomFile.h"
-#include "System/IO.h"
+#include "System/Paths.h"
 #include "Ultra/ultra_os.h"
 #include "Ultra/ultra_R4300.h"
 #include "Utility/CRC.h"
@@ -463,7 +463,7 @@ bool ROM_LoadFile(const RomID & rom_id, const RomSettings & settings, const SRom
 	// But we do this when ROM is loaded too, to allow any forced enabled cheats to work.
 	if (gCheatsEnabled)
 	{
-		CheatCodes_Read( g_ROM.settings.GameName.c_str(), "Daedalus.cht", g_ROM.rh.CountryID );
+		CheatCodes_Read( g_ROM.settings.GameName.c_str(), GetDataFilename("Daedalus.cht"), g_ROM.rh.CountryID );
 	}
 
 	DBGConsole_Msg(0, "[G%s]", g_ROM.settings.GameName.c_str());

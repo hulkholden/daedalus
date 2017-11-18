@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Appends subdir to the global dump base and returns.
 std::string Dump_GetDumpDirectory(const std::string& subdir)
 {
-	std::string dump_dir = IO::Path::Join(gDaedalusExePath, "Dumps", subdir);
+	std::string dump_dir = IO::Path::Join(GetOutputFilename("Dumps"), subdir);
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 	if (CDebugConsole::IsAvailable())

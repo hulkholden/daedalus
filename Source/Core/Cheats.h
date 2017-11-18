@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef CORE_CHEATS_H_
 #define CORE_CHEATS_H_
 
+#include <string>
+
 #include "Base/Types.h"
 
 // Limit the number of cheatcodes on the PSP, for performance reasons
@@ -63,7 +65,7 @@ extern u32 codegroupcount;
 extern CODEGROUP* codegrouplist;
 
 void CheatCodes_Activate(CHEAT_MODE mode);
-bool CheatCodes_Read(const char* rom_name, const char* file, u8 countryID);
+bool CheatCodes_Read(const char* rom_name, const std::string& path, u8 countryID);
 void CheatCodes_Disable(u32 index);
 
 #endif  // CORE_CHEATS_H_

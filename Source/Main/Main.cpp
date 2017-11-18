@@ -32,8 +32,7 @@ DEFINE_bool(batch, false, "Run in batch testing mode.");
 DEFINE_string(roms, "", "The roms directory.");
 
 // Platform-specific.
-std::string GetExePath(const char* argv0);
-std::string MakeRomPath(const char* filename);
+std::string GetExeFilename(const char* argv0);
 
 int DAEDALUS_VARARG_CALL_TYPE main(int argc, char **argv)
 {
@@ -48,12 +47,13 @@ int DAEDALUS_VARARG_CALL_TYPE main(int argc, char **argv)
 		return 1;
 	}
 
-	gDaedalusExePath = GetExePath(argv[0]);
-	if (gDaedalusExePath.empty())
+	std::string exe_filename = GetExeFilename(argv[0]);
+	if (exe_filename.empty())
 	{
 		fprintf(stderr, "Couldn't determine executable path\n");
 		return 1;
 	}
+	SetExeFilename(exe_filename);
 
 	if (!System_Init())
 	{
@@ -73,7 +73,7 @@ int DAEDALUS_VARARG_CALL_TYPE main(int argc, char **argv)
 			return 1;
 		}
 
-		std::string rom_path = MakeRomPath(argv[1]);
+		std::string rom_path = argv[1];
 		fprintf(stderr, "Loading %s\n", rom_path.c_str());
 		if (!System_Open(rom_path))
 		{

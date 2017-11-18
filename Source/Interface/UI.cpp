@@ -25,12 +25,10 @@ static void HandleKeys(GLFWwindow * window, int key, int scancode, int action, i
 
 			bool ctrl_down = (mods & GLFW_MOD_CONTROL) != 0;
 
-			std::string filename_ss = absl::StrCat("saveslot", idx, ".ss");
-			std::string path_sub = absl::StrCat("SaveStates\\", g_ROM.settings.GameName);
-			std::string path_ss = IO::Path::Join(gDaedalusExePath, path_sub);
-			IO::Directory::EnsureExists(path_ss);
+			std::string path = IO::Path::Join(GetOutputFilename("SaveStates"), g_ROM.settings.GameName);
+			IO::Directory::EnsureExists(path);
 
-			std::string filename = IO::Path::Join(path_ss, filename_ss);
+			std::string filename = IO::Path::Join(path, absl::StrCat("saveslot", idx, ".ss"));
 
 			if (ctrl_down)
 			{

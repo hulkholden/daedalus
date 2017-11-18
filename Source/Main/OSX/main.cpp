@@ -26,17 +26,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "System/IO.h"
 
-std::string GetExePath(const char* argv0)
+std::string GetExeFilename(const char* argv0)
 {
-	char* exe_path = realpath(argv0, nullptr);
-	std::string path = exe_path;
-	free(exe_path);
-	IO::Path::RemoveFileSpec(&path);
-	return path;
-}
-
-std::string MakeRomPath(const char* filename)
-{
+	char* p = realpath(argv0, nullptr);
+	std::string filename = p;
+	free(p);
 	return filename;
 }
 

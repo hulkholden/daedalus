@@ -233,7 +233,7 @@ void CheatCodes_Delete(u32 index)
 }
 */
 
-bool CheatCodes_Read(const char* rom_name, const char* file, u8 countryID)
+bool CheatCodes_Read(const char* rom_name, const std::string& path, u8 countryID)
 {
 	char current_rom_name[128];
 	static char last_rom_name[128];
@@ -259,8 +259,6 @@ bool CheatCodes_Read(const char* rom_name, const char* file, u8 countryID)
 
 	// Always clear when parsing a new ROM
 	CheatCodes_Clear();
-
-	std::string path = IO::Path::Join(gDaedalusExePath, file);
 
 	stream = fopen(path.c_str(), "rt");
 	if (stream == NULL)
