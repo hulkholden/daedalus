@@ -19,70 +19,25 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Daedalus.h"
 
-#include <gflags/gflags.h>
+#include <limits.h>
+#include <stdlib.h>
 
-#include "Core/CPU.h"
-#include "Debug/DBGConsole.h"
-#include "Main/SystemInit.h"
+#include <string>
+
 #include "System/IO.h"
-#include "System/Paths.h"
-#include "Test/BatchTest.h"
 
-DEFINE_bool(batch, false, "Run in batch testing mode.");
-DEFINE_string(roms, "", "The roms directory.");
-
-int main(int argc, char **argv)
+std::string GetExePath(const char* argv0)
 {
-	InstallAbortHandlers();
-	gflags::ParseCommandLineFlags(&argc, &argv, true);
+	char* exe_path = realpath(argv0, nullptr);
+	std::string path = exe_path;
+	free(exe_path);
+	IO::Path::RemoveFileSpec(&path);
+	return path;
+}
 
-	int result = 0;
-
-	if (argc > 0)
-	{
-		char* exe_path = realpath(argv[0], nullptr);
-		gDaedalusExePath = exe_path;
-		free(exe_path);
-
-		IO::Path::RemoveFileSpec(&gDaedalusExePath);
-	}
-	else
-	{
-		fprintf(stderr, "Couldn't determine executable path\n");
-		return 1;
-	}
-
-	if (!System_Init())
-	{
-		fprintf(stderr, "System_Init failed\n");
-		return 1;
-	}
-
-	if (FLAGS_batch)
-	{
-		BatchTestMain();
-	}
-	else
-	{
-		if (argc != 2)
-		{
-			fprintf(stderr, "Usage: daedalus [rom]\n");
-			return 1;
-		}
-
-		std::string rom_path = argv[1];
-		fprintf(stderr, "Loading %s\n", rom_path.c_str());
-		if (!System_Open(rom_path))
-		{
-			fprintf(stderr, "System_Open failed\n");
-			return 1;
-		}
-		CPU_Run();
-		System_Close();
-	}
-
-	System_Finalize();
-	return result;
+std::string MakeRomPath(const char* filename)
+{
+	return filename;
 }
 
 // FIXME: All this stuff needs tidying

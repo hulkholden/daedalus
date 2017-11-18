@@ -1,6 +1,8 @@
 cc_library(
     name = "Main",
-    srcs = select({
+    srcs = [
+        "Main.cpp",
+    ] + select({
         "//:darwin": [
             "OSX/main.cpp",
         ],
