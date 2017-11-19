@@ -281,26 +281,6 @@ bool ROM_ReBoot()
 	else
 	{
 		Console_Print("[MRom uses %s]", ROM_GetCicName( g_ROM.cic_chip ));
-
-/* goodn64 already tell us if the rom is good or bad
-		u32 crc1;
-		u32 crc2;
-		if( ROM_DoCicCheckSum( g_ROM.cic_chip, &crc1, &crc2 ) )
-		{
-			if (crc1 != RomBuffer::ReadValueRaw< u32 >( 0x10 ) ||
-				crc2 != RomBuffer::ReadValueRaw< u32 >( 0x14 ))
-			{
-				Console_Print("[MWarning, CRC values don't match, fixing]");
-
-				RomBuffer::WriteValueRaw< u32 >( 0x10, crc1 );
-				RomBuffer::WriteValueRaw< u32 >( 0x14, crc2 );
-			}
-		}
-		else
-		{
-			// Unable to checksum - just continue with what we have
-		}
-*/
 	}
 #endif
 	// XXXX Update this rom's boot info
