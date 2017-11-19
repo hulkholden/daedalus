@@ -25,136 +25,185 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <string.h>
 
+#include "absl/strings/string_view.h"
+
 #include "Debug/Console.h"
-#include "Debug/DebugConsoleImpl.h"
+
+static const char* const kDefaultColour = "\033[0m";
+static const char* const kColour_r = "\033[0;31m";
+static const char* const kColour_g = "\033[0;32m";
+static const char* const kColour_y = "\033[0;33m";
+static const char* const kColour_b = "\033[0;34m";
+static const char* const kColour_m = "\033[0;35m";
+static const char* const kColour_c = "\033[0;36m";
+static const char* const kColour_w = "\033[0;37m";
+static const char* const kColour_R = "\033[1;31m";
+static const char* const kColour_G = "\033[1;32m";
+static const char* const kColour_Y = "\033[1;33m";
+static const char* const kColour_B = "\033[1;34m";
+static const char* const kColour_M = "\033[1;35m";
+static const char* const kColour_C = "\033[1;36m";
+static const char* const kColour_W = "\033[1;37m";
 
 class IDebugConsole : public CDebugConsole
 {
    public:
-	IDebugConsole();
-
 	void Print(const char *format, ...) override;
 
 	void OverwriteStart() override {}
-	void Overwrite(const char *format, ...) override
-	{
-		va_list marker;
-		va_start(marker, format);
-		vprintf(format, marker);
-		va_end(marker);
-		printf("\n");
-	}
+	void Overwrite(const char *format, ...) override;
 	void OverwriteEnd() override {}
+
+	const char* GetTerminalColourString(char c);
+	size_t ParseFormatString(const char *format, char *out);
+	void ApplyStyleAndPrint(const char *format, va_list args);
 };
 
 template <>
 bool CSingleton<CDebugConsole>::Create()
 {
-	DAEDALUS_ASSERT(mpInstance == NULL, "Already initialised");
-
+	DAEDALUS_ASSERT(mpInstance == nullptr, "Already initialised");
 	mpInstance = new IDebugConsole();
-
-	return mpInstance ? true : false;
+	return true;
 }
 
 CDebugConsole::~CDebugConsole() {}
 
-IDebugConsole::IDebugConsole() {}
-
-static size_t ParseFormatString(const char *format, char *out, size_t out_len)
+const char* IDebugConsole::GetTerminalColourString(char c)
 {
-	ETerminalColour tc = TC_DEFAULT;
+	switch (c)
+	{
+		case 'r':
+			return kColour_r;
+		case 'g':
+			return kColour_g;
+		case 'y':
+			return kColour_y;
+		case 'b':
+			return kColour_b;
+		case 'm':
+			return kColour_m;
+		case 'c':
+			return kColour_c;
+		case 'w':
+			return kColour_w;
+		case 'R':
+			return kColour_R;
+		case 'G':
+			return kColour_G;
+		case 'Y':
+			return kColour_Y;
+		case 'B':
+			return kColour_B;
+		case 'M':
+			return kColour_M;
+		case 'C':
+			return kColour_C;
+		case 'W':
+			return kColour_W;
+	}
 
-	const char *p = format;
-	char *o = out;
+	return "";
+}
 
-	size_t len = 0;
-	while (*p)
+struct ParseFormatState
+{
+	char* output;
+	size_t len;
+
+	void Append(absl::string_view str)
+	{
+		len += str.length();
+		if (output)
+		{
+			memcpy(output, str.data(), str.length());
+			output += str.length();
+		}
+	}
+
+	void Append(char c)
+	{
+		len++;
+		if (output)
+		{
+			*output = c;
+			output++;
+		}
+	}
+};
+
+size_t IDebugConsole::ParseFormatString(const char *format, char *out)
+{
+	bool colour_active = false;
+	ParseFormatState state = {out, 0};
+
+	for (const char *p = format; *p; ++p)
 	{
 		if (*p == '[')
 		{
 			++p;
-
-			tc = GetTerminalColour(*p);
-			const char *str = GetTerminalColourString(tc);
-			size_t str_len = strlen(str);
-
-			len += str_len;
-			if (o)
-			{
-				strcpy(o, str);
-				o += str_len;
-			}
+			colour_active = true;
+			state.Append(GetTerminalColourString(*p));
 		}
 		else if (*p == ']')
 		{
-			tc = TC_DEFAULT;
-			const char *str = GetTerminalColourString(tc);
-			size_t str_len = strlen(str);
-			len += str_len;
-			if (o)
-			{
-				strcpy(o, str);
-				o += str_len;
-			}
+			colour_active = false;
+			state.Append(kDefaultColour);
 		}
 		else
 		{
-			++len;
-			if (o)
-			{
-				*o = *p;
-				++o;
-			}
-		}
-
-		++p;
-	}
-
-	if (tc != TC_DEFAULT)
-	{
-		tc = TC_DEFAULT;
-		const char *str = GetTerminalColourString(tc);
-		size_t str_len = strlen(str);
-		len += str_len;
-		if (o)
-		{
-			strcpy(o, str);
-			o += str_len;
+			state.Append(*p);
 		}
 	}
 
-	if (o)
+	if (colour_active)
 	{
-		*o = '\0';
-		++o;
-		DAEDALUS_ASSERT(o == out + len + 1, "Oops");
+		state.Append(kDefaultColour);
 	}
 
-	return len;
+	if (state.output)
+	{
+		const char nil = '\0';
+		state.Append(nil);
+		DAEDALUS_ASSERT(state.output == out + state.len, "Oops");
+	}
+
+	return state.len;
 }
 
-void IDebugConsole::Print(const char *format, ...)
+
+void IDebugConsole::ApplyStyleAndPrint(const char *format, va_list args)
 {
-	char *temp = NULL;
+	char *temp = nullptr;
 
-	if (strchr(format, '[') != NULL)
+	if (strchr(format, '[') != nullptr)
 	{
-		size_t len = ParseFormatString(format, NULL, 0);
-
+		size_t len = ParseFormatString(format, nullptr);
 		temp = (char *)malloc(len + 1);
-
-		ParseFormatString(format, temp, len);
-
+		ParseFormatString(format, temp);
 		format = temp;
 	}
 
-	va_list marker;
-	va_start(marker, format);
-	vprintf(format, marker);
-	va_end(marker);
+	vprintf(format, args);
 	printf("\n");
 
 	if (temp) free(temp);
 }
+
+void IDebugConsole::Print(const char *format, ...)
+{
+	va_list marker;
+	va_start(marker, format);
+	ApplyStyleAndPrint(format, marker);
+	va_end(marker);
+}
+
+void IDebugConsole::Overwrite(const char *format, ...)
+{
+	va_list marker;
+	va_start(marker, format);
+	ApplyStyleAndPrint(format, marker);
+	va_end(marker);
+}
+
 #endif

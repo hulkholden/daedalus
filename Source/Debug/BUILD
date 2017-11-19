@@ -4,7 +4,6 @@ cc_library(
     name = "Debug",
     srcs = [
         "DebugConsole.cpp",
-        "DebugConsoleImpl.cpp",
         "DebugLog.cpp",
         "Dump.cpp",
         "WebDebug.cpp",
@@ -12,7 +11,6 @@ cc_library(
     ],
     hdrs = [
         "Console.h",
-        "DebugConsoleImpl.h",
         "DebugLog.h",
         "Dump.h",
         "WebDebug.h",
