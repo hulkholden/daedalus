@@ -35,40 +35,44 @@ u8* gRomData = nullptr;
 u32 gRomSize = 0;
 }
 
+bool RomBuffer::IsRomLoaded() { return gRomLoaded; }
+
+u32 RomBuffer::GetRomSize() { return gRomSize; }
+
 bool RomBuffer::Open()
 {
 	CNullOutputStream messages;
 	std::string filename = g_ROM.FileName;
-	ROMFile* p_rom_file = ROMFile::Create(filename);
-	if (p_rom_file == nullptr)
+	ROMFile* rom = ROMFile::Create(filename);
+	if (rom == nullptr)
 	{
 		Console_Print("Failed to create [C%s]\n", filename.c_str());
 		return false;
 	}
 
-	if (!p_rom_file->Open(messages))
+	if (!rom->Open(messages))
 	{
 		Console_Print("Failed to open [C%s]\n", filename.c_str());
-		delete p_rom_file;
+		delete rom;
 		return false;
 	}
 
-	gRomSize = p_rom_file->GetRomSize();
+	gRomSize = rom->GetRomSize();
 
 	// Now, allocate memory for rom - round up to a 4 byte boundry
-	u32 size_aligned(AlignPow2(gRomSize, 4));
-	u8* p_bytes = (u8*)malloc(size_aligned);
+	u32 size_aligned = AlignPow2(gRomSize, 4);
+	u8* data = (u8*)malloc(size_aligned);
 
-	if (!p_rom_file->LoadData(gRomSize, p_bytes, messages))
+	if (!rom->LoadData(gRomSize, data, messages))
 	{
 		Console_Print("Failed to load [C%s]\n", filename.c_str());
-		free(p_bytes);
-		delete p_rom_file;
+		free(data);
+		delete rom;
 		return false;
 	}
-	gRomData = p_bytes;
+	gRomData = data;
 
-	delete p_rom_file;
+	delete rom;
 
 	Console_Print("Opened [C%s]\n", filename.c_str());
 	gRomLoaded = true;
@@ -87,31 +91,21 @@ void RomBuffer::Close()
 	gRomLoaded = false;
 }
 
-bool RomBuffer::IsRomLoaded() { return gRomLoaded; }
-
-u32 RomBuffer::GetRomSize() { return gRomSize; }
-
-void RomBuffer::GetRomBytesRaw(void* p_dst, u32 rom_start, u32 length)
-{
-	memcpy(p_dst, (const u8*)gRomData + rom_start, length);
-}
+void RomBuffer::GetRomBytesRaw(void* dst, u32 rom_start, u32 length) { memcpy(dst, gRomData + rom_start, length); }
 
 void* RomBuffer::GetAddressRaw(u32 rom_start)
 {
 	if (rom_start < gRomSize)
 	{
-		return (u8*)gRomData + rom_start;
+		return gRomData + rom_start;
 	}
 
 	return nullptr;
 }
 
-void RomBuffer::CopyToRam(u8* p_dst, u32 dst_offset, u32 dst_size, u32 src_offset, u32 length)
+void RomBuffer::CopyToRam(u8* dst, u32 dst_offset, u32 dst_size, u32 src_offset, u32 length)
 {
-	const u8* p_src = (const u8*)gRomData;
-	u32 src_size = gRomSize;
-
-	DMA_HandleTransfer(p_dst, dst_offset, dst_size, p_src, src_offset, src_size, length);
+	DMA_HandleTransfer(dst, dst_offset, dst_size, gRomData, src_offset, gRomSize, length);
 }
 
 const void* RomBuffer::GetFixedRomBaseAddress()
