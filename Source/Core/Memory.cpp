@@ -98,9 +98,8 @@ static void *	gMemBase = NULL;				// Virtual memory base
 u32	  g_pWriteRom;
 bool  g_RomWritten;
 
-// Ram base, offset by 0x80000000 and 0xa0000000
-u8 * g_pu8RamBase_8000 = NULL;
-//u8 * g_pu8RamBase_A000 = NULL;
+// Ram base, offset by 0x80000000.
+u8 * gu8RamBase_8000 = NULL;
 
 MemFuncRead  	g_MemoryLookupTableRead[0x4000];
 MemFuncWrite 	g_MemoryLookupTableWrite[0x4000];
@@ -156,6 +155,9 @@ const u32 kMemBasePIF       = 0x1FC00000;
 const u32 kMemBaseC1A3      = 0x1FD00000;
 const u32 kMemBaseDUMMY     = 0x1FFF0000;
 
+#define FLASHRAM_READ_ADDR 0x08000000
+#define FLASHRAM_WRITE_ADDR 0x08010000
+
 #include "Memory_Read.inl"
 #include "Memory_WriteValue.inl"
 #include "Memory_ReadInternal.inl"
@@ -208,8 +210,7 @@ bool Memory_Init()
 	}
 #endif
 
-	g_pu8RamBase_8000 = ((u8*)gMemBuffers[MEM_RD_RAM]) - 0x80000000;
-	//g_pu8RamBase_A000 = ((u8*)gMemBuffers[MEM_RD_RAM]) - 0xa0000000;
+	gu8RamBase_8000 = ((u8*)gMemBuffers[MEM_RD_RAM]) - 0x80000000;
 
 	g_RomWritten = false;
 
@@ -242,8 +243,7 @@ void Memory_Fini(void)
 	}
 #endif
 
-	g_pu8RamBase_8000 = NULL;
-	//g_pu8RamBase_A000 = NULL;
+	gu8RamBase_8000 = NULL;
 
 	memset( gMemBuffers, 0, sizeof( gMemBuffers ) );
 }

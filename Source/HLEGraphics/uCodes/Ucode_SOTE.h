@@ -42,7 +42,7 @@ void DLParser_GBI0_Vtx_SOTE(MicroCodeCommand command)
 void DLParser_GBI0_Line3D_SOTE( MicroCodeCommand command )
 {
 	u32 pc = gDisplayListStack.back().addr;
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32 * pCmdBase = (u32 *)(gu8RamBase + pc);
 
 	bool tris_added = false;
 
@@ -60,8 +60,8 @@ void DLParser_GBI0_Line3D_SOTE( MicroCodeCommand command )
 
 		tris_added |= gRenderer->AddTri(v3_idx, v4_idx, v5_idx);
 
-		command.inst.cmd0			= *(u32 *)(g_pu8RamBase + pc+0);
-		command.inst.cmd1			= *(u32 *)(g_pu8RamBase + pc+4);
+		command.inst.cmd0			= *(u32 *)(gu8RamBase + pc+0);
+		command.inst.cmd1			= *(u32 *)(gu8RamBase + pc+4);
 		pc += 8;
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
@@ -85,7 +85,7 @@ command.inst.cmd ]);
 void DLParser_GBI0_Tri1_SOTE( MicroCodeCommand command )
 {
 	u32 pc = gDisplayListStack.back().addr;
-	u32 * pCmdBase = (u32 *)( g_pu8RamBase + pc );
+	u32 * pCmdBase = (u32 *)( gu8RamBase + pc );
 
 	bool tris_added = false;
 
@@ -98,8 +98,8 @@ void DLParser_GBI0_Tri1_SOTE( MicroCodeCommand command )
 
 		tris_added |= gRenderer->AddTri(v0_idx, v1_idx, v2_idx);
 
-		command.inst.cmd0			= *(u32 *)(g_pu8RamBase + pc+0);
-		command.inst.cmd1			= *(u32 *)(g_pu8RamBase + pc+4);
+		command.inst.cmd0			= *(u32 *)(gu8RamBase + pc+0);
+		command.inst.cmd1			= *(u32 *)(gu8RamBase + pc+4);
 		pc += 8;
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST

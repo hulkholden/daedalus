@@ -633,7 +633,7 @@ static void RescaleUVSubBlock(s16 *dst, const s16 *src)
 //ToDo: memcpy_swizzle?
 static void rdram_read_many_u16(u16 *dst, u32 address, u32 count)
 {
-	const u8 *src = g_pu8RamBase + (address& MEMMASK);
+	const u8 *src = gu8RamBase + (address& MEMMASK);
 
     while (count != 0)
     {
@@ -647,7 +647,7 @@ static void rdram_read_many_u16(u16 *dst, u32 address, u32 count)
 
 static void rdram_write_many_u16(const u16 *src, u32 address, u32 count)
 {
-	u8 *dst = g_pu8RamBase + (address& MEMMASK);
+	u8 *dst = gu8RamBase + (address& MEMMASK);
     while (count != 0)
     {
        *(u8*)((uintptr_t)dst++ ^ U8_TWIDDLE) = (u8)(*src >> 8);
@@ -659,7 +659,7 @@ static void rdram_write_many_u16(const u16 *src, u32 address, u32 count)
 
 static u32 rdram_read_u32(u32 address)
 {
-	const u8 *src = g_pu8RamBase + (address& MEMMASK);
+	const u8 *src = gu8RamBase + (address& MEMMASK);
 
 	u32 a = *(u8*)((uintptr_t)src++ ^ U8_TWIDDLE);
 	u32 b = *(u8*)((uintptr_t)src++ ^ U8_TWIDDLE);
@@ -671,7 +671,7 @@ static u32 rdram_read_u32(u32 address)
 
 static void rdram_write_many_u32(const u32 *src, u32 address, u32 count)
 {
-	u8 *dst = g_pu8RamBase + (address& MEMMASK);
+	u8 *dst = gu8RamBase + (address& MEMMASK);
     while (count != 0)
     {
        *(u8*)((uintptr_t)dst++ ^ U8_TWIDDLE) = (u8)(*src >> 24);

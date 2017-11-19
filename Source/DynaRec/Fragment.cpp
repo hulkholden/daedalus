@@ -161,7 +161,7 @@ void CFragment::Execute()
 	}
 
 #else
-	const void *		p( g_pu8RamBase_8000 );
+	const void *		p( gu8RamBase_8000 );
 	u32					upper( 0x80000000 + gRamSize );
 
 	_EnterDynaRec( mEntryPoint.GetTarget(), &gCPUState, p, upper );

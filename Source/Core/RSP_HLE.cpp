@@ -216,7 +216,7 @@ EProcessResult ProcessJpegTask(OSTask * task)
 
 	// most ucode_boot procedure copy 0xf80 bytes of ucode whatever the ucode_size is.
 	// For practical purpose we use a ucode_size = min(0xf80, task->ucode_size)
-	u32 sum = sum_bytes(g_pu8RamBase + (u32)task->t.ucode , Min<u32>(task->t.ucode_size, 0xf80) >> 1);
+	u32 sum = sum_bytes(gu8RamBase + (u32)task->t.ucode , Min<u32>(task->t.ucode_size, 0xf80) >> 1);
 
 	//Console_Print("JPEG Task: Sum=0x%08x", sum);
 	switch(sum)
@@ -234,7 +234,7 @@ EProcessResult ProcessJpegTask(OSTask * task)
 
 EProcessResult RSP_HLE_CICX105(OSTask * task)
 {
-    const u32 sum = sum_bytes(g_pu8SpImemBase, 0x1000 >> 1);
+    const u32 sum = sum_bytes(gu8SpImemBase, 0x1000 >> 1);
 
     switch(sum)
     {
@@ -243,11 +243,11 @@ EProcessResult RSP_HLE_CICX105(OSTask * task)
         case 0x9f2: /* CIC 7105 */
 			{
 				u32 i;
-				u8 * dst = g_pu8RamBase + 0x2fb1f0;
-				u8 * src = g_pu8SpImemBase + 0x120;
+				u8 * dst = gu8RamBase + 0x2fb1f0;
+				u8 * src = gu8SpImemBase + 0x120;
 
 				/* dma_read(0x1120, 0x1e8, 0x1e8) */
-				memcpy(g_pu8SpImemBase + 0x120, g_pu8RamBase + 0x1e8, 0x1f0);
+				memcpy(gu8SpImemBase + 0x120, gu8RamBase + 0x1e8, 0x1f0);
 
 				/* dma_write(0x1120, 0x2fb1f0, 0xfe817000) */
 				for (i = 0; i < 24; ++i)
@@ -267,7 +267,7 @@ EProcessResult RSP_HLE_CICX105(OSTask * task)
 
 void RSP_HLE_ProcessTask()
 {
-	OSTask * pTask = (OSTask *)(g_pu8SpMemBase + 0x0FC0);
+	OSTask * pTask = (OSTask *)(gu8SpMemBase + 0x0FC0);
 
 	EProcessResult	result( PR_NOT_STARTED );
 
@@ -309,8 +309,8 @@ void RSP_HLE_ProcessTask()
 			// Can't handle
 			Console_Print("Unknown task: %08x", pTask->t.type);
 			//	RSP_HLE_DumpTaskInfo( pTask );
-			//	RDP_DumpRSPCode("boot",    0xDEAFF00D, (u32*)(g_pu8RamBase + (((u32)pTask->t.ucode_boot)&0x00FFFFFF)), 0x04001000, pTask->t.ucode_boot_size);
-			//	RDP_DumpRSPCode("unkcode", 0xDEAFF00D, (u32*)(g_pu8RamBase + (((u32)pTask->t.ucode)&0x00FFFFFF)),      0x04001080, 0x1000 - 0x80);//pTask->t.ucode_size);
+			//	RDP_DumpRSPCode("boot",    0xDEAFF00D, (u32*)(gu8RamBase + (((u32)pTask->t.ucode_boot)&0x00FFFFFF)), 0x04001000, pTask->t.ucode_boot_size);
+			//	RDP_DumpRSPCode("unkcode", 0xDEAFF00D, (u32*)(gu8RamBase + (((u32)pTask->t.ucode)&0x00FFFFFF)),      0x04001080, 0x1000 - 0x80);//pTask->t.ucode_size);
 			break;
 	}
 

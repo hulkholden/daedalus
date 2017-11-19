@@ -114,14 +114,14 @@ void DLParser_GBI1_Sprite2DBase(MicroCodeCommand command)
 	Sprite2DStruct* sprite;
 
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32* pCmdBase = (u32*)(g_pu8RamBase + pc);
+	u32* pCmdBase = (u32*)(gu8RamBase + pc);
 
 	// Try to execute as many sprite2d ucodes as possible, I seen chains over 200! in FB
 	// NB Glover calls RDP Sync before draw for the sky.. so checks were added
 	do
 	{
 		address = RDPSegAddr(command.inst.cmd1) & (MAX_RAM_ADDRESS - 1);
-		sprite = (Sprite2DStruct*)(g_ps8RamBase + address);
+		sprite = (Sprite2DStruct*)(gu8RamBase + address);
 
 		// Fetch Sprite2D Flip
 		command.inst.cmd0 = *pCmdBase++;

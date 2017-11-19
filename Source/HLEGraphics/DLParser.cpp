@@ -188,7 +188,7 @@ inline void	DLParser_FetchNextCommand( MicroCodeCommand * p_command )
 	u32 & pc( gDlistStack.address[gDlistStackPointer] );
 
 	DAEDALUS_ASSERT(pc < MAX_RAM_ADDRESS, "Display list PC is out of range: 0x%08x", pc );
-	*p_command = *(MicroCodeCommand*)(g_pu8RamBase + pc);
+	*p_command = *(MicroCodeCommand*)(gu8RamBase + pc);
 	pc+= 8;
 }
 
@@ -241,8 +241,8 @@ void DLParser_DumpVtxInfo(u32 address, u32 v0_idx, u32 num_verts)
 {
 	if (DLDebug_IsActive())
 	{
-		s8 *pcSrc = (s8 *)(g_pu8RamBase + address);
-		s16 *psSrc = (s16 *)(g_pu8RamBase + address);
+		s8 *pcSrc = (s8 *)(gu8RamBase + address);
+		s16 *psSrc = (s16 *)(gu8RamBase + address);
 
 		for ( u32 idx = v0_idx; idx < v0_idx + num_verts; idx++ )
 		{
@@ -459,7 +459,7 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 	// Update Screen only when something is drawn, otherwise several games ex Army Men will flash or shake.
 	if( g_ROM.GameHacks != CHAMELEON_TWIST_2 ) gHLEGraphics->UpdateScreen();
 
-	OSTask * pTask = (OSTask *)(g_pu8SpMemBase + 0x0FC0);
+	OSTask * pTask = (OSTask *)(gu8SpMemBase + 0x0FC0);
 	u32 code_base = (u32)pTask->t.ucode & 0x1fffffff;
 	u32 code_size = pTask->t.ucode_size;
 	u32 data_base = (u32)pTask->t.ucode_data & 0x1fffffff;
@@ -523,7 +523,7 @@ void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address )
 	DAEDALUS_ASSERT( address+64 < MAX_RAM_ADDRESS, "Mtx: Address invalid (0x%08x)", address);
 
 	const f32 fRecip = 1.0f / 65536.0f;
-	const N64mat *Imat = (N64mat *)( g_pu8RamBase + address );
+	const N64mat *Imat = (N64mat *)( gu8RamBase + address );
 
 	s16 hi;
 	s32 tmp;
@@ -590,7 +590,7 @@ void RDP_MoveMemViewport(u32 address)
 	DAEDALUS_ASSERT( address+16 < MAX_RAM_ADDRESS, "MoveMem Viewport, invalid memory" );
 
 	// address is offset into RD_RAM of 8 x 16bits of data...
-	N64Viewport *vp = (N64Viewport*)(g_pu8RamBase + address);
+	N64Viewport *vp = (N64Viewport*)(gu8RamBase + address);
 
 	// With D3D we had to ensure that the vp coords are positive, so
 	// we truncated them to 0. This happens a lot, as things
@@ -905,7 +905,7 @@ void Clear_N64DepthBuffer( MicroCodeCommand command )
 	x1 >>= 1;
 	u32 zi_width_in_dwords = g_CI.Width >> 1;
 	u32 fill_colour = gRenderer->GetFillColour();
-	u32 * dst = (u32*)(g_pu8RamBase + g_CI.Address) + y0 * zi_width_in_dwords;
+	u32 * dst = (u32*)(gu8RamBase + g_CI.Address) + y0 * zi_width_in_dwords;
 
 	for( u32 y = y0; y <y1; y++ )
 	{

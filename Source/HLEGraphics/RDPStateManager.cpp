@@ -145,7 +145,7 @@ void CRDPStateManager::LoadBlock(const SetLoadTile & load)
 	}
 
 	u32* dst = (u32*)(gTMEM + tmem_offset);
-	u32* src = (u32*)(g_pu8RamBase + ram_offset);
+	u32* src = (u32*)(gu8RamBase + ram_offset);
 
 	if (dxt == 0)
 	{
@@ -254,7 +254,7 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 	}
 
 	u8* dst = gTMEM + tmem_offset;
-	u8* src = g_pu8RamBase + ram_offset;
+	u8* src = gu8RamBase + ram_offset;
 
 	for (u32 y = 0; y < h; ++y)
 	{
@@ -288,7 +288,7 @@ void CRDPStateManager::LoadTlut(const SetLoadTile & load)
 	u32	   lrt		  = load.th;	    //Bottom
 	u32    tile_idx   = load.tile;
 	u32    ram_offset = g_TI.GetAddress16bpp(uls >> 2, ult >> 2);
-	u8*	   address	  = g_pu8RamBase + ram_offset;
+	u8*	   address	  = gu8RamBase + ram_offset;
 
 	const RDP_Tile & rdp_tile = mTiles[tile_idx];
 

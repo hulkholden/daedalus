@@ -96,8 +96,8 @@ void DLParser_GBI0_Tri4(MicroCodeCommand command)
 
 		tris_added |= AddTri4(v9, v10, v11);
 
-		command.inst.cmd0 = *(u32*)(g_pu8RamBase + pc + 0);
-		command.inst.cmd1 = *(u32*)(g_pu8RamBase + pc + 4);
+		command.inst.cmd0 = *(u32*)(gu8RamBase + pc + 0);
+		command.inst.cmd1 = *(u32*)(gu8RamBase + pc + 4);
 		pc += 8;
 	} while (command.inst.cmd == G_GBI1_TRI2);
 

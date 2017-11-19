@@ -39,7 +39,7 @@ static bool InternalReadMapped( u32 address, const void ** translated )
 	u32 physical_addr = TLBEntry::Translate(address, missing);
 	if (physical_addr != 0)
 	{
-		*translated = g_pu8RamBase + (physical_addr & 0x007FFFFF);
+		*translated = gu8RamBase + (physical_addr & 0x007FFFFF);
 
 		return true;
 	}
@@ -49,13 +49,13 @@ static bool InternalReadMapped( u32 address, const void ** translated )
 
 static bool InternalRead_4Mb_8000_803F( u32 address, const void ** translated )
 {
-	*translated = g_pu8RamBase + (address & 0x003FFFFF);
+	*translated = gu8RamBase + (address & 0x003FFFFF);
 	return true;
 }
 
 static bool InternalRead_8Mb_8000_807F( u32 address, const void ** translated )
 {
-	*translated = g_pu8RamBase + (address & 0x007FFFFF);
+	*translated = gu8RamBase + (address & 0x007FFFFF);
 	return true;
 }
 

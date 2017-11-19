@@ -52,7 +52,7 @@ static void WriteValueMapped( u32 address, u32 value )
 	u32 physical_addr = TLBEntry::Translate(address, missing);
 	if (physical_addr != 0)
 	{
-		*(u32*)(g_pu8RamBase + (physical_addr & 0x007FFFFF)) = value;
+		*(u32*)(gu8RamBase + (physical_addr & 0x007FFFFF)) = value;
 	}
 	else
 	{

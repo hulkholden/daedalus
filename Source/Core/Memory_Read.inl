@@ -40,7 +40,7 @@ static const void * ReadMapped( u32 address )
 	u32 physical_addr = TLBEntry::Translate(address, missing);
 	if (physical_addr != 0)
 	{
-		return g_pu8RamBase + (physical_addr & 0x007FFFFF);
+		return gu8RamBase + (physical_addr & 0x007FFFFF);
 	}
 	else
 	{

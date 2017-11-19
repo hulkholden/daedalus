@@ -62,7 +62,7 @@ static bool	GBIMicrocode_DetectVersionString( u32 data_base, u32 data_size, char
 {
 	DAEDALUS_ASSERT( data_base < MAX_RAM_ADDRESS + 0x1000 ,"GBIMicrocode out of bound %08X", data_base );
 
-	const s8 * ram( g_ps8RamBase );
+	const s8 * ram = gs8RamBase;
 
 	for ( u32 i = 0; i+2 < data_size; i++ )
 	{
@@ -76,7 +76,7 @@ static bool	GBIMicrocode_DetectVersionString( u32 data_base, u32 data_size, char
 			// Loop while we haven't filled our buffer, and there's space for our terminator
 			while (p+1 < e)
 			{
-				char c( ram[ (data_base + i)  ^ U8_TWIDDLE ] );
+				char c = ram[ (data_base + i)  ^ U8_TWIDDLE ];
 				if( c < ' ')
 					break;
 
@@ -95,7 +95,7 @@ static u32 GBIMicrocode_MicrocodeHash(u32 code_base, u32 code_size)
 	// Needed for Conker's Bad Fur Day
 	if( code_size == 0 ) code_size = 0x1000;
 
-	const u8 * ram( g_pu8RamBase );
+	const u8 * ram = gu8RamBase;
 
 	u32 hash = 0;
 	for (u32 i = 0; i < code_size; ++i)

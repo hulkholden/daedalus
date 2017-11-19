@@ -46,8 +46,8 @@ void DLParser_Last_Legion_0x00(MicroCodeCommand command)
 			return;
 		}
 
-		u32 pc1 = *(u32*)(g_pu8RamBase + newaddr + 8 * 1 + 4);
-		u32 pc2 = *(u32*)(g_pu8RamBase + newaddr + 8 * 4 + 4);
+		u32 pc1 = *(u32*)(gu8RamBase + newaddr + 8 * 1 + 4);
+		u32 pc2 = *(u32*)(gu8RamBase + newaddr + 8 * 4 + 4);
 		pc1 = RDPSegAddr(pc1);
 		pc2 = RDPSegAddr(pc2);
 

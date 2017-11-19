@@ -79,7 +79,7 @@ static void CheatCodes_Apply(u32 index, u32 mode)
 		u32 address = (code->addr & 0xFFFFFF);
 		u16 value = code->val;
 		u32 type = (code->addr >> 24) & 0xFF;
-		u8* p_mem = g_pu8RamBase + address;  // addr is already pre-swapped
+		u8* p_mem = gu8RamBase + address;  // addr is already pre-swapped
 
 		switch (type)
 		{
@@ -147,7 +147,7 @@ static void CheatCodes_Apply(u32 index, u32 mode)
 					type = code->addr >> 24;
 					address = (code->addr & 0x00FFFFFF);
 					value = code->val;
-					p_mem = g_pu8RamBase + address;
+					p_mem = gu8RamBase + address;
 
 					switch (type)
 					{

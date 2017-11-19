@@ -314,7 +314,7 @@ static inline void Draw_ObjSprite(const uObjSprite* sprite, ESpriteMode mode, co
 // Bomberman : Second Atatck uses this
 void DLParser_S2DEX_ObjSprite(MicroCodeCommand command)
 {
-	uObjSprite* sprite = (uObjSprite*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjSprite* sprite = (uObjSprite*)(gu8RamBase + RDPSegAddr(command.inst.cmd1));
 
 	CRefPtr<CNativeTexture> texture = Load_ObjSprite(sprite, NULL);
 	Draw_ObjSprite(sprite, FULL_ROTATION, texture);
@@ -324,7 +324,7 @@ void DLParser_S2DEX_ObjSprite(MicroCodeCommand command)
 // Note : This cmd loads textures from both ObjTxtr and LoadBlock/LoadTile!!
 void DLParser_S2DEX_ObjRectangle(MicroCodeCommand command)
 {
-	uObjSprite* sprite = (uObjSprite*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjSprite* sprite = (uObjSprite*)(gu8RamBase + RDPSegAddr(command.inst.cmd1));
 
 	CRefPtr<CNativeTexture> texture = Load_ObjSprite(sprite, gObjTxtr);
 	Draw_ObjSprite(sprite, NO_ROTATION, texture);
@@ -333,7 +333,7 @@ void DLParser_S2DEX_ObjRectangle(MicroCodeCommand command)
 // Untested.. I can't find any game that uses this.. but it should work fine
 void DLParser_S2DEX_ObjRectangleR(MicroCodeCommand command)
 {
-	uObjSprite* sprite = (uObjSprite*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjSprite* sprite = (uObjSprite*)(gu8RamBase + RDPSegAddr(command.inst.cmd1));
 	if (sprite->imageFmt == G_IM_FMT_YUV)
 	{
 		DLParser_OB_YUV(sprite);
@@ -350,7 +350,7 @@ void DLParser_S2DEX_ObjRectangleR(MicroCodeCommand command)
 // Nintendo logo, shade, items, enemies & foes, sun, and pretty much everything in Yoshi
 void DLParser_S2DEX_ObjLdtxSprite(MicroCodeCommand command)
 {
-	uObjTxSprite* sprite = (uObjTxSprite*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjTxSprite* sprite = (uObjTxSprite*)(gu8RamBase + RDPSegAddr(command.inst.cmd1));
 
 	CRefPtr<CNativeTexture> texture = Load_ObjSprite(&sprite->sprite, &sprite->txtr);
 	Draw_ObjSprite(&sprite->sprite, FULL_ROTATION, texture);
@@ -359,7 +359,7 @@ void DLParser_S2DEX_ObjLdtxSprite(MicroCodeCommand command)
 // No Rotation. Intro logo, Awesome command screens and HUD in game :)
 void DLParser_S2DEX_ObjLdtxRect(MicroCodeCommand command)
 {
-	uObjTxSprite* sprite = (uObjTxSprite*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjTxSprite* sprite = (uObjTxSprite*)(gu8RamBase + RDPSegAddr(command.inst.cmd1));
 
 	CRefPtr<CNativeTexture> texture = Load_ObjSprite(&sprite->sprite, &sprite->txtr);
 	Draw_ObjSprite(&sprite->sprite, NO_ROTATION, texture);
@@ -368,7 +368,7 @@ void DLParser_S2DEX_ObjLdtxRect(MicroCodeCommand command)
 // With Rotation. Text, smoke, and items in Yoshi
 void DLParser_S2DEX_ObjLdtxRectR(MicroCodeCommand command)
 {
-	uObjTxSprite* sprite = (uObjTxSprite*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjTxSprite* sprite = (uObjTxSprite*)(gu8RamBase + RDPSegAddr(command.inst.cmd1));
 
 	CRefPtr<CNativeTexture> texture = Load_ObjSprite(&sprite->sprite, &sprite->txtr);
 	Draw_ObjSprite(&sprite->sprite, PARTIAL_ROTATION, texture);
@@ -382,7 +382,7 @@ void DLParser_S2DEX_ObjMoveMem(MicroCodeCommand command)
 
 	if (index == 0)  // Mtx
 	{
-		uObjMtx* mtx = (uObjMtx*)(addr + g_pu8RamBase);
+		uObjMtx* mtx = (uObjMtx*)(addr + gu8RamBase);
 		mat2D.A = mtx->A / 65536.0f;
 		mat2D.B = mtx->B / 65536.0f;
 		mat2D.C = mtx->C / 65536.0f;
@@ -394,7 +394,7 @@ void DLParser_S2DEX_ObjMoveMem(MicroCodeCommand command)
 	}
 	else if (index == 2)  // Sub Mtx
 	{
-		uObjSubMtx* sub = (uObjSubMtx*)(addr + g_pu8RamBase);
+		uObjSubMtx* sub = (uObjSubMtx*)(addr + gu8RamBase);
 		mat2D.X = f32(sub->X >> 2);
 		mat2D.Y = f32(sub->Y >> 2);
 		mat2D.BaseScaleX = sub->BaseScaleX / 1024.0f;
@@ -405,7 +405,7 @@ void DLParser_S2DEX_ObjMoveMem(MicroCodeCommand command)
 // Kirby uses this for proper palette loading
 void DLParser_S2DEX_ObjLoadTxtr(MicroCodeCommand command)
 {
-	uObjTxtr* ObjTxtr = (uObjTxtr*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjTxtr* ObjTxtr = (uObjTxtr*)(gu8RamBase + RDPSegAddr(command.inst.cmd1));
 	if (ObjTxtr->block.type == S2DEX_OBJLT_TLUT)
 	{
 		uObjTxtrTLUT* ObjTlut = (uObjTxtrTLUT*)ObjTxtr;
@@ -427,7 +427,7 @@ inline void DLParser_Yoshi_MemRect(MicroCodeCommand command)
 	// Fetch the next two instructions
 	//
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32* pCmdBase = (u32*)(g_pu8RamBase + pc);
+	u32* pCmdBase = (u32*)(gu8RamBase + pc);
 	gDlistStack.address[gDlistStackPointer] += 16;
 
 	RDP_MemRect mem_rect;
@@ -452,8 +452,8 @@ inline void DLParser_Yoshi_MemRect(MicroCodeCommand command)
 	// This assumes Yoshi always copy 16 bytes per line and dst is aligned and we force alignment on src!!! //Corn
 	u32 tex_width = rdp_tile.line << 3;
 	uintptr_t texaddr =
-		((uintptr_t)g_pu8RamBase + tile_addr + tex_width * (mem_rect.s >> 5) + (mem_rect.t >> 5) + 3) & ~3;
-	uintptr_t fbaddr = (uintptr_t)g_pu8RamBase + g_CI.Address + x0;
+		((uintptr_t)gu8RamBase + tile_addr + tex_width * (mem_rect.s >> 5) + (mem_rect.t >> 5) + 3) & ~3;
+	uintptr_t fbaddr = (uintptr_t)gu8RamBase + g_CI.Address + x0;
 
 	for (u32 y = y0; y < y1; y++)
 	{
@@ -468,8 +468,8 @@ inline void DLParser_Yoshi_MemRect(MicroCodeCommand command)
 #else
 	u32 width = x1 - x0;
 	u32 tex_width = rdp_tile.line << 3;
-	u8* texaddr = g_pu8RamBase + tile_addr + tex_width * (mem_rect.s >> 5) + (mem_rect.t >> 5);
-	u8* fbaddr = g_pu8RamBase + g_CI.Address + x0;
+	u8* texaddr = gu8RamBase + tile_addr + tex_width * (mem_rect.s >> 5) + (mem_rect.t >> 5);
+	u8* fbaddr = gu8RamBase + g_CI.Address + x0;
 
 	for (u32 y = y0; y < y1; y++)
 	{
@@ -527,8 +527,8 @@ void DLParser_OB_YUV(const uObjSprite* sprite)
 	if (lr_x > ci_width) width = ci_width - ul_x;
 	if (lr_y > ci_height) height = ci_height - ul_y;
 
-	u32* mb = (u32*)(g_pu8RamBase + g_TI.Address);  // pointer to the first macro block
-	u16* dst = (u16*)(g_pu8RamBase + g_CI.Address);
+	u32* mb = (u32*)(gu8RamBase + g_TI.Address);  // pointer to the first macro block
+	u16* dst = (u16*)(gu8RamBase + g_CI.Address);
 	dst += ul_x + ul_y * ci_width;
 
 	// yuv macro block contains 16x16 texture. we need to put it in the proper place inside cimg
@@ -572,7 +572,7 @@ void DLParser_S2DEX_BgCopy(MicroCodeCommand command)
 {
 	DL_PF("    DLParser_S2DEX_BgCopy");
 
-	uObjBg* objBg = (uObjBg*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjBg* objBg = (uObjBg*)(gu8RamBase + RDPSegAddr(command.inst.cmd1));
 
 	u16 imageX = objBg->imageX >> 5;
 	u16 imageY = objBg->imageY >> 5;
@@ -610,7 +610,7 @@ void DLParser_S2DEX_Bg1cyc(MicroCodeCommand command)
 {
 	if (g_ROM.GameHacks == ZELDA_MM) return;
 
-	uObjScaleBg* objBg = (uObjScaleBg*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjScaleBg* objBg = (uObjScaleBg*)(gu8RamBase + RDPSegAddr(command.inst.cmd1));
 
 	f32 frameX = objBg->frameX / 4.0f;
 	f32 frameY = objBg->frameY / 4.0f;

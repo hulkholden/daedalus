@@ -210,7 +210,7 @@ void CAudioPluginW32::LenChanged()
 	if (len == 0) { return; }
 	Memory_AI_SetRegisterBits(AI_STATUS_REG, AI_STATUS_FIFO_FULL);
 	Snd1Len = (len & 0x3FFF8);
-	Snd1ReadPos = g_pu8RamBase + (Memory_AI_GetRegister(AI_DRAM_ADDR_REG) & 0x00FFFFF8);
+	Snd1ReadPos = gu8RamBase + (Memory_AI_GetRegister(AI_DRAM_ADDR_REG) & 0x00FFFFF8);
 	AIReady = true;
 
 	int offset = 0;

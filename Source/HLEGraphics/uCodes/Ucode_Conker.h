@@ -51,7 +51,7 @@ void DLParser_Tri1_Conker(MicroCodeCommand command)
 {
 	// While the next command pair is Tri1, add vertices
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32* pCmdBase = (u32*)(g_pu8RamBase + pc);
+	u32* pCmdBase = (u32*)(gu8RamBase + pc);
 
 	// If Off screen rendering is true then just skip the whole list of tris //Corn
 	// Skip shadow as well
@@ -96,7 +96,7 @@ void DLParser_Tri1_Conker(MicroCodeCommand command)
 void DLParser_Tri2_Conker(MicroCodeCommand command)
 {
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32* pCmdBase = (u32*)(g_pu8RamBase + pc);
+	u32* pCmdBase = (u32*)(gu8RamBase + pc);
 
 	// If Off screen rendering is true then just skip the whole list of tris //Corn
 	// Skip shadow as well
@@ -156,8 +156,8 @@ void DLParser_Tri4_Conker(MicroCodeCommand command)
 		do
 		{
 			DL_PF("    Tri4 (Culled -> Off-Screen)");
-			command.inst.cmd0 = *(u32*)(g_pu8RamBase + pc + 0);
-			command.inst.cmd1 = *(u32*)(g_pu8RamBase + pc + 4);
+			command.inst.cmd0 = *(u32*)(gu8RamBase + pc + 0);
+			command.inst.cmd1 = *(u32*)(gu8RamBase + pc + 4);
 			pc += 8;
 		} while ((command.inst.cmd0 >> 28) == 1);
 		gDlistStack.address[gDlistStackPointer] = pc - 8;
@@ -198,8 +198,8 @@ void DLParser_Tri4_Conker(MicroCodeCommand command)
 
 		tris_added |= gRenderer->AddTri(idx[9], idx[10], idx[11]);
 
-		command.inst.cmd0 = *(u32*)(g_pu8RamBase + pc + 0);
-		command.inst.cmd1 = *(u32*)(g_pu8RamBase + pc + 4);
+		command.inst.cmd0 = *(u32*)(gu8RamBase + pc + 0);
+		command.inst.cmd1 = *(u32*)(gu8RamBase + pc + 4);
 		pc += 8;
 	} while ((command.inst.cmd0 >> 28) == 1);
 
@@ -240,7 +240,7 @@ void DLParser_MoveMem_Conker(MicroCodeCommand command)
 			}
 
 			light_idx -= 2;
-			N64Light* light = (N64Light*)(g_pu8RamBase + address);
+			N64Light* light = (N64Light*)(gu8RamBase + address);
 			RDP_MoveMemLight(light_idx, light);
 
 			gRenderer->SetLightPosition(light_idx, light->x, light->y, light->z, light->w);

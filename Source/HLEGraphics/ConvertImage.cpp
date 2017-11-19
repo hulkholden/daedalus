@@ -120,7 +120,7 @@ static void ConvertGeneric( const TextureDestInfo & dsti,
 							ConvertRowFunction unswapped_fn )
 {
 	NativePf8888 * dst = reinterpret_cast< NativePf8888 * >( dsti.Data );
-	const u8 *	src        = g_pu8RamBase;
+	const u8 *	src        = gu8RamBase;
 	u32			src_offset = ti.GetLoadAddress();
 	u32			src_pitch  = ti.GetPitch();
 
@@ -161,7 +161,7 @@ static void ConvertPalettisedTo8888( const TextureDestInfo & dsti, const Texture
 									 ConvertPalettisedRowFunction unswapped_fn )
 {
 	NativePf8888 *	dst        = reinterpret_cast< NativePf8888 * >( dsti.Data );
-	const u8 *		src        = g_pu8RamBase;
+	const u8 *		src        = gu8RamBase;
 	u32				src_offset = ti.GetLoadAddress();
 	u32				src_pitch  = ti.GetPitch();
 
@@ -200,7 +200,7 @@ static void ConvertPalettisedToCI( const TextureDestInfo & dsti, const TextureIn
 								   void (*unswapped_fn)( OutT * dst, const u8 * src, u32 src_offset, u32 width ) )
 {
 	OutT *		dst        = reinterpret_cast< OutT * >( dsti.Data );
-	const u8 *	src        = g_pu8RamBase;
+	const u8 *	src        = gu8RamBase;
 	u32			src_offset = ti.GetLoadAddress();
 	u32			src_pitch  = ti.GetPitch();
 
@@ -467,7 +467,7 @@ static void ConvertI8(const TextureDestInfo & dsti, const TextureInfo & ti)
 static void ConvertCI8(const TextureDestInfo & dsti, const TextureInfo & ti)
 {
 	NativePf8888	dst_palette[256];
-	const void * 	src_palette = g_pu8RamBase + ti.GetTlutAddress();
+	const void * 	src_palette = gu8RamBase + ti.GetTlutAddress();
 
 	ConvertPalette(ti.GetTLutFormat(), dst_palette, src_palette, 256);
 	ConvertPalettisedTo8888( dsti, ti, dst_palette,
@@ -478,7 +478,7 @@ static void ConvertCI8(const TextureDestInfo & dsti, const TextureInfo & ti)
 static void ConvertCI4(const TextureDestInfo & dsti, const TextureInfo & ti)
 {
 	NativePf8888	dst_palette[16];
-	const void * 	src_palette = g_pu8RamBase + ti.GetTlutAddress();
+	const void * 	src_palette = gu8RamBase + ti.GetTlutAddress();
 
 	ConvertPalette(ti.GetTLutFormat(), dst_palette, src_palette, 16);
 	ConvertPalettisedTo8888( dsti, ti, dst_palette,

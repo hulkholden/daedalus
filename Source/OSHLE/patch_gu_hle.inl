@@ -347,7 +347,7 @@ TEST_DISABLE_GU_FUNCS
 	REG32 l, r, b, t, n, f, s;
 
 	u8 * pMtxBase   = (u8 *)ReadAddress(gGPR[REG_a0]._u32_0);	// Base address
-	u8 * pStackBase = g_pu8RamBase_8000 + gGPR[REG_sp]._u32_0;	//Base stack address, this is safe since stack is always in physical memory
+	u8 * pStackBase = gu8RamBase_8000 + gGPR[REG_sp]._u32_0;	//Base stack address, this is safe since stack is always in physical memory
 	l._u32 = gGPR[REG_a1]._u32_0;	//Left
 	r._u32 = gGPR[REG_a2]._u32_0;	//Right
 	b._u32 = gGPR[REG_a3]._u32_0;	//Bottom
@@ -412,7 +412,7 @@ TEST_DISABLE_GU_FUNCS
 	REG32 l, r, b, t, n, f, s;
 
 	u8 * pMtxBase   = (u8 *)ReadAddress(gGPR[REG_a0]._u32_0);	// Fixed point Base address
-	u8 * pStackBase = g_pu8RamBase_8000 + gGPR[REG_sp]._u32_0;	//Base stack address, this is safe since stack is always in physical memory
+	u8 * pStackBase = gu8RamBase_8000 + gGPR[REG_sp]._u32_0;	//Base stack address, this is safe since stack is always in physical memory
 	l._u32 = gGPR[REG_a1]._u32_0;	//Left
 	r._u32 = gGPR[REG_a2]._u32_0;	//Right
 	b._u32 = gGPR[REG_a3]._u32_0;	//Bottom
@@ -469,7 +469,7 @@ TEST_DISABLE_GU_FUNCS
 	REG32 a, r, x, y, z;
 
 	u8 * pMtxBase = (u8 *)ReadAddress(gGPR[REG_a0]._u32_0);		//Matrix base address
-	u8 * pStackBase = g_pu8RamBase_8000 + gGPR[REG_sp]._u32_0;	//Base stack address, this is safe since stack is always in physical memory
+	u8 * pStackBase = gu8RamBase_8000 + gGPR[REG_sp]._u32_0;	//Base stack address, this is safe since stack is always in physical memory
 
 	a._u32 = gGPR[REG_a1]._u32_0;	//Angle in degrees + -> CCW
 	x._u32 = gGPR[REG_a2]._u32_0;	//X

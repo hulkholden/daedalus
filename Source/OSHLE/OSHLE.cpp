@@ -239,7 +239,7 @@ const char* Patch_GetJumpAddressName(u32 jump)
 		if (!g_PatchSymbols[p]->Found)
 			continue;
 
-		const void* patch_base = g_pu32RamBase + (g_PatchSymbols[p]->Location >> 2);
+		const void* patch_base = gu32RamBase + (g_PatchSymbols[p]->Location >> 2);
 
 		// Symbol not found, attempt to locate on this pass. This may
 		// fail if all dependent symbols are not found
@@ -554,7 +554,7 @@ void Patch_RecurseAndFind()
 // Attempt to locate this symbol.
 bool Patch_LocateFunction(PatchSymbol* ps)
 {
-	const u32* code_base = g_pu32RamBase;
+	const u32* code_base = gu32RamBase;
 
 	for (u32 s = 0; s < ps->Signatures[s].NumOps; s++)
 	{
@@ -620,7 +620,7 @@ bool Patch_VerifyLocation_CheckSignature(PatchSymbol* ps, PatchSignature* psig, 
 		return false;
 	}
 
-	const u32* code_base(g_pu32RamBase);
+	const u32* code_base = gu32RamBase;
 
 	PatchCrossRef dummy_cr = {static_cast<u32>(~0), PX_JUMP, NULL};
 

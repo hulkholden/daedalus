@@ -57,13 +57,13 @@ bool DMA_FLASH_CopyToDRAM(u32 dest, u32 StartOffset, u32 len)
 	case FLASHRAM_MODE_READ:
 		{
 			StartOffset = StartOffset << 1;
-			DMA_HandleTransfer( g_pu8RamBase, dest, gRamSize, (u8*)gMemBuffers[MEM_SAVE], StartOffset, gMemBufferSizes[MEM_SAVE], len );
+			DMA_HandleTransfer( gu8RamBase, dest, gRamSize, (u8*)gMemBuffers[MEM_SAVE], StartOffset, gMemBufferSizes[MEM_SAVE], len );
 			return true;
 		}
 	case FLASHRAM_MODE_STATUS:
 		DAEDALUS_ASSERT(len == sizeof(u32) * 2, "Len is not correct when fetch status.");
-		*(u32 *)(g_pu8RamBase + dest) = FlashStatus[0];
-		*(u32 *)(g_pu8RamBase + dest + sizeof(u32)) = FlashStatus[1];
+		*(u32 *)(gu8RamBase + dest) = FlashStatus[0];
+		*(u32 *)(gu8RamBase + dest + sizeof(u32)) = FlashStatus[1];
 		return true;
 	default:
 		return false;
@@ -74,7 +74,7 @@ bool DMA_FLASH_CopyFromDRAM(u32 dest, u32 len)
 {
 	if(FlashFlag == FLASHRAM_MODE_WRITE )
 	{
-		DMA_HandleTransfer( FlashBlock, 0, 128, g_pu8RamBase, dest, gRamSize, len );
+		DMA_HandleTransfer( FlashBlock, 0, 128, gu8RamBase, dest, gRamSize, len );
 		return true;
 	}
 	return false;

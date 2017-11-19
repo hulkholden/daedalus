@@ -60,7 +60,7 @@ void DMA_SP_CopyFromRDRAM()
 			//Console_Print("(0x%08x) (0x%08x)", spmem_address, rdram_address);
 			break;
 		}
-		memcpy_swizzle( &g_pu8SpMemBase[spmem_address], &g_pu8RamBase[rdram_address], length );
+		memcpy_swizzle( &gu8SpMemBase[spmem_address], &gu8RamBase[rdram_address], length );
 
 		rdram_address += length + skip;
 		spmem_address += length;
@@ -93,7 +93,7 @@ void DMA_SP_CopyToRDRAM()
 			//Console_Print("(0x%08x) (0x%08x)", spmem_address, rdram_address);
 			break;
 		}
-		memcpy_swizzle( &g_pu8RamBase[rdram_address], &g_pu8SpMemBase[spmem_address], length );
+		memcpy_swizzle( &gu8RamBase[rdram_address], &gu8SpMemBase[spmem_address], length );
 		rdram_address += length + skip;
 		spmem_address += length;
 	}
@@ -111,7 +111,7 @@ void DMA_SI_CopyFromDRAM( )
 {
 	u32 mem = Memory_SI_GetRegister(SI_DRAM_ADDR_REG) & 0x1fffffff;
 	u32 * p_dst = (u32 *)gMemBuffers[MEM_PIF_RAM];
-	u32 * p_src = (u32 *)(g_pu8RamBase + mem);
+	u32 * p_src = (u32 *)(gu8RamBase + mem);
 
 	DPF( DEBUG_MEMORY_PIF, "DRAM (0x%08x) -> PIF Transfer ", mem );
 
@@ -136,7 +136,7 @@ void DMA_SI_CopyToDRAM( )
 
 	u32 mem = Memory_SI_GetRegister(SI_DRAM_ADDR_REG) & 0x1fffffff;
 	u32 * p_src = (u32 *)gMemBuffers[MEM_PIF_RAM];
-	u32 * p_dst = (u32 *)(g_pu8RamBase + mem);
+	u32 * p_dst = (u32 *)(gu8RamBase + mem);
 
 	DPF( DEBUG_MEMORY_PIF, "PIF -> DRAM (0x%08x) Transfer ", mem );
 
@@ -205,11 +205,11 @@ static void OnCopiedRom()
 
 		// Set RDRAM size
 		u32 addr = (g_ROM.cic_chip != CIC_6105) ? 0x318 : 0x3F0;
-		*(u32 *)(g_pu8RamBase + addr) = gRamSize;
+		*(u32 *)(gu8RamBase + addr) = gRamSize;
 
 		// Azimer's DK64 hack, it makes DK64 boot!
 		if(g_ROM.GameHacks == DK64)
-			*(u32 *)(g_pu8RamBase + 0x2FE1C0) = 0xAD170014;
+			*(u32 *)(gu8RamBase + 0x2FE1C0) = 0xAD170014;
 	}
 }
 
@@ -233,7 +233,7 @@ void DMA_PI_CopyToRDRAM()
 			cart_address -= PI_DOM2_ADDR2;
 
 			if (g_ROM.settings.SaveType != SAVE_TYPE_FLASH)
-				DMA_HandleTransfer( g_pu8RamBase, mem_address, gRamSize, p_src, cart_address, src_size, pi_length_reg );
+				DMA_HandleTransfer( gu8RamBase, mem_address, gRamSize, p_src, cart_address, src_size, pi_length_reg );
 			else
 				DMA_FLASH_CopyToDRAM(mem_address, cart_address, pi_length_reg);
 		}
@@ -253,7 +253,7 @@ void DMA_PI_CopyToRDRAM()
 			//Console_Print("[YReading from Cart domain 1/addr2]");
 			cart_address -= PI_DOM1_ADDR2;
 			CPU_InvalidateICacheRange( 0x80000000 | mem_address, pi_length_reg );
-			RomBuffer::CopyToRam( g_pu8RamBase, mem_address, gRamSize, cart_address, pi_length_reg );
+			RomBuffer::CopyToRam( gu8RamBase, mem_address, gRamSize, cart_address, pi_length_reg );
 
 			OnCopiedRom();
 		}
@@ -302,7 +302,7 @@ void DMA_PI_CopyFromRDRAM()
 		Console_Print("[YWriting to Cart domain 2/addr2 0x%08x]", cart_address);
 
 		if (g_ROM.settings.SaveType != SAVE_TYPE_FLASH)
-			DMA_HandleTransfer( p_dst, cart_address, dst_size, g_pu8RamBase, mem_address, gRamSize, pi_length_reg );
+			DMA_HandleTransfer( p_dst, cart_address, dst_size, gu8RamBase, mem_address, gRamSize, pi_length_reg );
 		else
 			DMA_FLASH_CopyFromDRAM(mem_address, pi_length_reg);
 

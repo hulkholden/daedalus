@@ -31,7 +31,7 @@ void DLParser_DumpVtxInfoDKR(u32 address, u32 v0_idx, u32 num_verts)
 {
 	if (DLDebug_IsActive())
 	{
-		uintptr_t psSrc = (uintptr_t)(g_pu8RamBase + address);
+		uintptr_t psSrc = (uintptr_t)(gu8RamBase + address);
 
 		for (u32 idx = v0_idx; idx < v0_idx + num_verts; idx++)
 		{
@@ -58,7 +58,7 @@ void DLParser_DumpVtxInfoDKR(u32 address, u32 v0_idx, u32 num_verts)
 		}
 
 		/*
-		u16 * pwSrc = (u16 *)(g_pu8RamBase + address);
+		u16 * pwSrc = (u16 *)(gu8RamBase + address);
 		i = 0;
 		for( u32 idx = v0_idx; idx < v0_idx + num_verts; idx++ )
 		{
@@ -177,7 +177,7 @@ void DLParser_DMA_Tri_DKR(MicroCodeCommand command)
 	u32 address = RDPSegAddr(command.inst.cmd1);
 	u32 count = (command.inst.cmd0 >> 4) & 0x1F;  // Count should never exceed 16
 
-	TriDKR* tri = (TriDKR*)(g_pu8RamBase + address);
+	TriDKR* tri = (TriDKR*)(gu8RamBase + address);
 
 	bool tris_added = false;
 
