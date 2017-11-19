@@ -24,8 +24,8 @@ cc_library(
     deps = [
         "//Base",
         "//System",
-        "@webby//:webby",
         "//external:gflags",
+        "@webby//:webby",
     ],
 )
 
