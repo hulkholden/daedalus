@@ -106,55 +106,55 @@ MemFuncRead  	g_MemoryLookupTableRead[0x4000];
 MemFuncWrite 	g_MemoryLookupTableWrite[0x4000];
 void * 			g_pMemoryBuffers[NUM_MEM_BUFFERS];
 
-#define MEMORY_SIZE_RDRAM 0x400000
-#define MEMORY_SIZE_EXRDRAM 0x400000
-#define MEMORY_SIZE_RDRAM_DEFAULT MEMORY_SIZE_RDRAM + MEMORY_SIZE_EXRDRAM
-#define MEMORY_SIZE_RAMREGS0 0x30
-#define MEMORY_SIZE_RAMREGS4 0x30
-#define MEMORY_SIZE_RAMREGS8 0x30
-#define MEMORY_SIZE_SPMEM 0x2000
-#define MEMORY_SIZE_SPREG_1 0x24
-#define MEMORY_SIZE_SPREG_2 0x8
-#define MEMORY_SIZE_DPC 0x20
-#define MEMORY_SIZE_DPS 0x10
-#define MEMORY_SIZE_MI 0x10
-#define MEMORY_SIZE_VI 0x50
-#define MEMORY_SIZE_AI 0x18
-#define MEMORY_SIZE_PI 0x4C
-#define MEMORY_SIZE_RI 0x20
-#define MEMORY_SIZE_SI 0x1C
-#define MEMORY_SIZE_C2A1 0x8000
-#define MEMORY_SIZE_C1A1 0x8000
-#define MEMORY_SIZE_C2A2 0x20000
-#define MEMORY_SIZE_GIO_REG 0x804
-#define MEMORY_SIZE_C1A3 0x8000
-#define MEMORY_SIZE_PIF 0x800
-#define MEMORY_SIZE_DUMMY 0x10000
+const u32 kMemSizeRDRAM         = 0x400000;
+const u32 kMemSizeEXRDRAM       = 0x400000;
+const u32 kMemSizeRDRAM_DEFAULT = kMemSizeRDRAM + kMemSizeEXRDRAM;
+const u32 kMemSizeRAMREGS0      = 0x30;
+const u32 kMemSizeRAMREGS4      = 0x30;
+const u32 kMemSizeRAMREGS8      = 0x30;
+const u32 kMemSizeSPMEM         = 0x2000;
+const u32 kMemSizeSPREG_1       = 0x24;
+const u32 kMemSizeSPREG_2       = 0x8;
+const u32 kMemSizeDPC           = 0x20;
+const u32 kMemSizeDPS           = 0x10;
+const u32 kMemSizeMI            = 0x10;
+const u32 kMemSizeVI            = 0x50;
+const u32 kMemSizeAI            = 0x18;
+const u32 kMemSizePI            = 0x4C;
+const u32 kMemSizeRI            = 0x20;
+const u32 kMemSizeSI            = 0x1C;
+const u32 kMemSizeC2A1          = 0x8000;
+const u32 kMemSizeC1A1          = 0x8000;
+const u32 kMemSizeC2A2          = 0x20000;
+const u32 kMemSizeGIO_REG       = 0x804;
+const u32 kMemSizeC1A3          = 0x8000;
+const u32 kMemSizePIF           = 0x800;
+const u32 kMemSizeDUMMY         = 0x10000;
 
-#define MEMORY_START_RDRAM 0x00000000
-#define MEMORY_START_EXRDRAM 0x00400000
-#define MEMORY_START_RAMREGS0 0x03F00000
-#define MEMORY_START_RAMREGS4 0x03F04000
-#define MEMORY_START_RAMREGS8 0x03F80000
-#define MEMORY_START_SPMEM 0x04000000
-#define MEMORY_START_SPREG_1 0x04040000
-#define MEMORY_START_SPREG_2 0x04080000
-#define MEMORY_START_DPC 0x04100000
-#define MEMORY_START_DPS 0x04200000
-#define MEMORY_START_MI 0x04300000
-#define MEMORY_START_VI 0x04400000
-#define MEMORY_START_AI 0x04500000
-#define MEMORY_START_PI 0x04600000
-#define MEMORY_START_RI 0x04700000
-#define MEMORY_START_SI 0x04800000
-#define MEMORY_START_C2A1 0x05000000
-#define MEMORY_START_C1A1 0x06000000
-#define MEMORY_START_C2A2 0x08000000
-#define MEMORY_START_ROM_IMAGE 0x10000000
-#define MEMORY_START_GIO 0x18000000
-#define MEMORY_START_PIF 0x1FC00000
-#define MEMORY_START_C1A3 0x1FD00000
-#define MEMORY_START_DUMMY 0x1FFF0000
+const u32 kMemBaseRDRAM     = 0x00000000;
+const u32 kMemBaseEXRDRAM   = 0x00400000;
+const u32 kMemBaseRAMREGS0  = 0x03F00000;
+const u32 kMemBaseRAMREGS4  = 0x03F04000;
+const u32 kMemBaseRAMREGS8  = 0x03F80000;
+const u32 kMemBaseSPMEM     = 0x04000000;
+const u32 kMemBaseSPREG_1   = 0x04040000;
+const u32 kMemBaseSPREG_2   = 0x04080000;
+const u32 kMemBaseDPC       = 0x04100000;
+const u32 kMemBaseDPS       = 0x04200000;
+const u32 kMemBaseMI        = 0x04300000;
+const u32 kMemBaseVI        = 0x04400000;
+const u32 kMemBaseAI        = 0x04500000;
+const u32 kMemBasePI        = 0x04600000;
+const u32 kMemBaseRI        = 0x04700000;
+const u32 kMemBaseSI        = 0x04800000;
+const u32 kMemBaseC2A1      = 0x05000000;
+const u32 kMemBaseC1A1      = 0x06000000;
+const u32 kMemBaseC2A2      = 0x08000000;
+const u32 kMemBaseROM_IMAGE = 0x10000000;
+const u32 kMemBaseGIO       = 0x18000000;
+const u32 kMemBasePIF       = 0x1FC00000;
+const u32 kMemBaseC1A3      = 0x1FD00000;
+const u32 kMemBaseDUMMY     = 0x1FFF0000;
 
 #include "Memory_Read.inl"
 #include "Memory_WriteValue.inl"
@@ -404,221 +404,46 @@ void Memory_InitTables()
 
 	// Init RDRAM
 	// By default we init with EPAK (8Mb)
-	Memory_InitFunc
-	(
-		MEMORY_START_RDRAM,
-		MEMORY_SIZE_RDRAM_DEFAULT,
-		MEM_RD_RAM,
-		MEM_RD_RAM,
-		Read_8000_807F,
-		WriteValue_8000_807F
-	);
+	Memory_InitFunc(kMemBaseRDRAM, kMemSizeRDRAM_DEFAULT, MEM_RD_RAM, MEM_RD_RAM, Read_8000_807F, WriteValue_8000_807F);
 
 	// Need to turn off the EPAK
 	if (ram_size != MEMORY_8_MEG)
 	{
-		Memory_InitFunc
-		(
-			MEMORY_START_EXRDRAM,
-			MEMORY_SIZE_EXRDRAM,
-			MEM_UNUSED,
-			MEM_UNUSED,
-			ReadInvalid,
-			WriteValueInvalid
-		);
+		Memory_InitFunc(kMemBaseEXRDRAM, kMemSizeEXRDRAM, MEM_UNUSED, MEM_UNUSED, ReadInvalid, WriteValueInvalid);
 	}
 
-	// RDRAM Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_RAMREGS0,
-		MEMORY_SIZE_RAMREGS0,
-		MEM_RD_REG0,
-		MEM_RD_REG0,
-		Read_83F0_83F0,
-		WriteValue_83F0_83F0
-	);
-
-
-	// DMEM/IMEM
-	Memory_InitFunc
-	(
-		MEMORY_START_SPMEM,
-		MEMORY_SIZE_SPMEM,
-		MEM_SP_MEM,
-		MEM_SP_MEM,
-		Read_8400_8400,
-		WriteValue_8400_8400
-	);
-
-	// SP Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_SPREG_1,
-		MEMORY_SIZE_SPREG_1,
-		MEM_SP_REG,
-		MEM_UNUSED,
-		Read_8404_8404,
-		WriteValue_8404_8404
-	);
-
-	// SP PC/OBOST
-	Memory_InitFunc
-	(
-		MEMORY_START_SPREG_2,
-		MEMORY_SIZE_SPREG_2,
-		MEM_SP_PC_REG,
-		MEM_SP_PC_REG,
-		Read_8408_8408,
-		WriteValue_8408_8408
-	);
-	// DPC Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_DPC,
-		MEMORY_SIZE_DPC,
-		MEM_DPC_REG,
-		MEM_UNUSED,
-		Read_8410_841F,
-		WriteValue_8410_841F
-	);
-
-	// DPS Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_DPS,
-		MEMORY_SIZE_DPS,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		Read_8420_842F,
-		WriteValue_8420_842F
-	);
-
-	// MI reg
-	Memory_InitFunc
-	(
-		MEMORY_START_MI,
-		MEMORY_SIZE_MI,
-		MEM_MI_REG,
-		MEM_UNUSED,
-		Read_8430_843F,
-		WriteValue_8430_843F
-	);
-
-	// VI Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_VI,
-		MEMORY_SIZE_VI,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		Read_8440_844F,
-		WriteValue_8440_844F
-	);
-
-	// AI Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_AI,
-		MEMORY_SIZE_AI,
-		MEM_AI_REG,
-		MEM_UNUSED,
-		Read_8450_845F,
-		WriteValue_8450_845F
-	);
-
-	// PI Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_PI,
-		MEMORY_SIZE_PI,
-		MEM_PI_REG,
-		MEM_UNUSED,
-		Read_8460_846F,
-		WriteValue_8460_846F
-	);
-
-	// RI Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_RI,
-		MEMORY_SIZE_RI,
-		MEM_RI_REG,
-		MEM_RI_REG,
-		Read_8470_847F,
-		WriteValue_8470_847F
-	);
-
-	// SI Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_SI,
-		MEMORY_SIZE_SI,
-		MEM_SI_REG,
-		MEM_UNUSED,
-		Read_8480_848F,
-		WriteValue_8480_848F
-	);
+	Memory_InitFunc(kMemBaseRAMREGS0, kMemSizeRAMREGS0, MEM_RD_REG0, MEM_RD_REG0, Read_83F0_83F0, WriteValue_83F0_83F0);
+	Memory_InitFunc(kMemBaseSPMEM, kMemSizeSPMEM, MEM_SP_MEM, MEM_SP_MEM, Read_8400_8400, WriteValue_8400_8400);
+	Memory_InitFunc(kMemBaseSPREG_1, kMemSizeSPREG_1, MEM_SP_REG, MEM_UNUSED, Read_8404_8404, WriteValue_8404_8404);
+	Memory_InitFunc(kMemBaseSPREG_2, kMemSizeSPREG_2, MEM_SP_PC_REG, MEM_SP_PC_REG, Read_8408_8408,
+	                WriteValue_8408_8408);
+	Memory_InitFunc(kMemBaseDPC, kMemSizeDPC, MEM_DPC_REG, MEM_UNUSED, Read_8410_841F, WriteValue_8410_841F);
+	Memory_InitFunc(kMemBaseDPS, kMemSizeDPS, MEM_UNUSED, MEM_UNUSED, Read_8420_842F, WriteValue_8420_842F);
+	Memory_InitFunc(kMemBaseMI, kMemSizeMI, MEM_MI_REG, MEM_UNUSED, Read_8430_843F, WriteValue_8430_843F);
+	Memory_InitFunc(kMemBaseVI, kMemSizeVI, MEM_UNUSED, MEM_UNUSED, Read_8440_844F, WriteValue_8440_844F);
+	Memory_InitFunc(kMemBaseAI, kMemSizeAI, MEM_AI_REG, MEM_UNUSED, Read_8450_845F, WriteValue_8450_845F);
+	Memory_InitFunc(kMemBasePI, kMemSizePI, MEM_PI_REG, MEM_UNUSED, Read_8460_846F, WriteValue_8460_846F);
+	Memory_InitFunc(kMemBaseRI, kMemSizeRI, MEM_RI_REG, MEM_RI_REG, Read_8470_847F, WriteValue_8470_847F);
+	Memory_InitFunc(kMemBaseSI, kMemSizeSI, MEM_SI_REG, MEM_UNUSED, Read_8480_848F, WriteValue_8480_848F);
 
 	// Ignore C1A1 and C2A1
 	// As a matter of fact handling C2A1 breaks Pokemon Stadium 1 and F-Zero U
 
 	// Cartridge Domain 2 Address 1 (SRAM)
-	/*Memory_InitFunc
-	(
-		MEMORY_START_C2A1,
-		MEMORY_SIZE_C2A1,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		ReadInvalid,
-		WriteValueInvalid
-	);*/
+	// Memory_InitFunc(kMemBaseC2A1, kMemSizeC2A1, MEM_UNUSED, MEM_UNUSED, ReadInvalid, WriteValueInvalid);
 
 	// Cartridge Domain 1 Address 1 (SRAM)
-	/*Memory_InitFunc
-	(
-		MEMORY_START_C1A1,
-		MEMORY_SIZE_C1A1,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		ReadInvalid,
-		WriteValueInvalid
-	);*/
+	// Memory_InitFunc(kMemBaseC1A1, kMemSizeC1A1, MEM_UNUSED, MEM_UNUSED, ReadInvalid, WriteValueInvalid);
 
-	// PIF Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_PIF,
-		MEMORY_SIZE_PIF,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		Read_9FC0_9FCF,
-		WriteValue_9FC0_9FCF
-	);
+	Memory_InitFunc(kMemBasePIF, kMemSizePIF, MEM_UNUSED, MEM_UNUSED, Read_9FC0_9FCF, WriteValue_9FC0_9FCF);
 
 	// Cartridge Domain 2 Address 2 (FlashRam)
 	// FlashRam Read is at 0x800, and FlashRam Write at 0x801
 	// BUT since we shift off the insignificant bits, we can't do that, so is handled in the functions itself
-	Memory_InitFunc
-	(
-		MEMORY_START_C2A2,
-		MEMORY_SIZE_C2A2,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		ReadFlashRam,
-		WriteValue_FlashRam
-	);
+	Memory_InitFunc(kMemBaseC2A2, kMemSizeC2A2, MEM_UNUSED, MEM_UNUSED, ReadFlashRam, WriteValue_FlashRam);
 
 	// Cartridge Domain 1 Address 2 (Rom)
-	Memory_InitFunc
-	(
-		MEMORY_START_ROM_IMAGE,
-		rom_size,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		ReadROM,
-		WriteValue_ROM
-	);
+	Memory_InitFunc(kMemBaseROM_IMAGE, rom_size, MEM_UNUSED, MEM_UNUSED, ReadROM, WriteValue_ROM);
 
 	// Hack the TLB Map per game
 	if (g_ROM.GameHacks == GOLDEN_EYE)
