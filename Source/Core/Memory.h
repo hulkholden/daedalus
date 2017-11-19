@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Endian.h"
 #include "Ultra/ultra_rcp.h"
 
-enum MEMBANKTYPE
+enum MemoryType
 {
 	MEM_UNUSED = 0,  // Simplifies code so that we don't have to check for illegal memory accesses
 
@@ -73,8 +73,8 @@ extern u32 gRamSize;
 extern u32 gTLBReadHit;
 extern u32 gTLBWriteHit;
 #endif
-extern void*     g_pMemoryBuffers[NUM_MEM_BUFFERS];
-extern const u32 MemoryRegionSizes[NUM_MEM_BUFFERS];
+extern void*     gMemBuffers[NUM_MEM_BUFFERS];
+extern const u32 gMemBufferSizes[NUM_MEM_BUFFERS];
 
 bool Memory_Init();
 void Memory_Fini();
@@ -160,18 +160,18 @@ inline void QuickWrite32Bits(u8* ptr, u32 value)
 }
 
 // Useful defines for making code look nicer:
-#define g_pu8RamBase ((u8*)g_pMemoryBuffers[MEM_RD_RAM])
-#define g_ps8RamBase ((s8*)g_pMemoryBuffers[MEM_RD_RAM])
-#define g_pu16RamBase ((u16*)g_pMemoryBuffers[MEM_RD_RAM])
-#define g_pu32RamBase ((u32*)g_pMemoryBuffers[MEM_RD_RAM])
+#define g_pu8RamBase ((u8*)gMemBuffers[MEM_RD_RAM])
+#define g_ps8RamBase ((s8*)gMemBuffers[MEM_RD_RAM])
+#define g_pu16RamBase ((u16*)gMemBuffers[MEM_RD_RAM])
+#define g_pu32RamBase ((u32*)gMemBuffers[MEM_RD_RAM])
 
-#define g_pu8SpMemBase ((u8*)g_pMemoryBuffers[MEM_SP_MEM])
-#define g_ps8SpMemBase ((s8*)g_pMemoryBuffers[MEM_SP_MEM])
-#define g_pu16SpMemBase ((u16*)g_pMemoryBuffers[MEM_SP_MEM])
-#define g_pu32SpMemBase ((u32*)g_pMemoryBuffers[MEM_SP_MEM])
+#define g_pu8SpMemBase ((u8*)gMemBuffers[MEM_SP_MEM])
+#define g_ps8SpMemBase ((s8*)gMemBuffers[MEM_SP_MEM])
+#define g_pu16SpMemBase ((u16*)gMemBuffers[MEM_SP_MEM])
+#define g_pu32SpMemBase ((u32*)gMemBuffers[MEM_SP_MEM])
 
-#define g_pu8SpDmemBase ((u8*)g_pMemoryBuffers[MEM_SP_MEM] + SP_DMA_DMEM)
-#define g_pu8SpImemBase ((u8*)g_pMemoryBuffers[MEM_SP_MEM] + SP_DMA_IMEM)
+#define g_pu8SpDmemBase ((u8*)gMemBuffers[MEM_SP_MEM] + SP_DMA_DMEM)
+#define g_pu8SpImemBase ((u8*)gMemBuffers[MEM_SP_MEM] + SP_DMA_IMEM)
 
 #define FLASHRAM_READ_ADDR 0x08000000
 #define FLASHRAM_WRITE_ADDR 0x08010000
@@ -272,44 +272,38 @@ inline void Write8Bits(u32 address, u8 data)
 #error No DAEDALUS_ENDIAN_MODE specified
 #endif  // DAEDALUS_ENDIAN_MODE
 
-/////////////////////////////////////////////////////
-/////////////////////////////////////////////////////
-//                Register Macros                  //
-/////////////////////////////////////////////////////
-/////////////////////////////////////////////////////
-
 #define REGISTER_FUNCTIONS(set, base_reg, memory_buffer)                          \
 	inline void Memory_##set##_SetRegister(u32 reg, u32 value)                    \
 	{                                                                             \
-		((u32*)g_pMemoryBuffers[memory_buffer])[(reg - base_reg) / 4] = value;    \
+		((u32*)gMemBuffers[memory_buffer])[(reg - base_reg) / 4] = value;         \
 	}                                                                             \
                                                                                   \
 	inline u32 Memory_##set##_GetRegister(u32 reg)                                \
 	{                                                                             \
-		return ((u32*)g_pMemoryBuffers[memory_buffer])[(reg - base_reg) / 4];     \
+		return ((u32*)gMemBuffers[memory_buffer])[(reg - base_reg) / 4];          \
 	}                                                                             \
                                                                                   \
 	inline u32 Memory_##set##_SetRegisterBits(u32 reg, u32 and_bits, u32 or_bits) \
 	{                                                                             \
-		u32* p = &((u32*)g_pMemoryBuffers[memory_buffer])[(reg - base_reg) / 4];  \
+		u32* p = &((u32*)gMemBuffers[memory_buffer])[(reg - base_reg) / 4];       \
 		return AtomicBitSet(p, and_bits, or_bits);                                \
 	}                                                                             \
                                                                                   \
 	inline u32 Memory_##set##_SetRegisterBits(u32 reg, u32 value)                 \
 	{                                                                             \
-		u32* p = &((u32*)g_pMemoryBuffers[memory_buffer])[(reg - base_reg) / 4];  \
+		u32* p = &((u32*)gMemBuffers[memory_buffer])[(reg - base_reg) / 4];       \
 		return AtomicBitSet(p, 0xffffffff, value);                                \
 	}                                                                             \
                                                                                   \
 	inline u32 Memory_##set##_ClrRegisterBits(u32 reg, u32 value)                 \
 	{                                                                             \
-		u32* p = &((u32*)g_pMemoryBuffers[memory_buffer])[(reg - base_reg) / 4];  \
+		u32* p = &((u32*)gMemBuffers[memory_buffer])[(reg - base_reg) / 4];       \
 		return AtomicBitSet(p, ~value, 0);                                        \
 	}                                                                             \
                                                                                   \
 	inline u32* set##_REG_ADDRESS(u32 reg)                                        \
 	{                                                                             \
-		return &((u32*)g_pMemoryBuffers[memory_buffer])[(reg - base_reg) / 4];    \
+		return &((u32*)gMemBuffers[memory_buffer])[(reg - base_reg) / 4];         \
 	}
 
 REGISTER_FUNCTIONS(MI, MI_BASE_REG, MEM_MI_REG)

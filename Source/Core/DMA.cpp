@@ -110,7 +110,7 @@ void DMA_SP_CopyToRDRAM()
 void DMA_SI_CopyFromDRAM( )
 {
 	u32 mem = Memory_SI_GetRegister(SI_DRAM_ADDR_REG) & 0x1fffffff;
-	u32 * p_dst = (u32 *)g_pMemoryBuffers[MEM_PIF_RAM];
+	u32 * p_dst = (u32 *)gMemBuffers[MEM_PIF_RAM];
 	u32 * p_src = (u32 *)(g_pu8RamBase + mem);
 
 	DPF( DEBUG_MEMORY_PIF, "DRAM (0x%08x) -> PIF Transfer ", mem );
@@ -135,7 +135,7 @@ void DMA_SI_CopyToDRAM( )
 	CController::Get()->Process();
 
 	u32 mem = Memory_SI_GetRegister(SI_DRAM_ADDR_REG) & 0x1fffffff;
-	u32 * p_src = (u32 *)g_pMemoryBuffers[MEM_PIF_RAM];
+	u32 * p_src = (u32 *)gMemBuffers[MEM_PIF_RAM];
 	u32 * p_dst = (u32 *)(g_pu8RamBase + mem);
 
 	DPF( DEBUG_MEMORY_PIF, "PIF -> DRAM (0x%08x) Transfer ", mem );
@@ -228,8 +228,8 @@ void DMA_PI_CopyToRDRAM()
     {
 		if (IsFlashDomAddr(cart_address))
 		{
-           	const u8 *	p_src( (const u8 *)g_pMemoryBuffers[MEM_SAVE] );
-			u32			src_size( ( MemoryRegionSizes[MEM_SAVE] ) );
+			const u8* p_src    = (const u8*)gMemBuffers[MEM_SAVE];
+			u32       src_size = (gMemBufferSizes[MEM_SAVE]);
 			cart_address -= PI_DOM2_ADDR2;
 
 			if (g_ROM.settings.SaveType != SAVE_TYPE_FLASH)
@@ -295,8 +295,8 @@ void DMA_PI_CopyFromRDRAM()
 	// Only care for DOM2/ADDR2
 	if(IsFlashDomAddr(cart_address))
 	{
-		u8 *	p_dst( (u8 *)g_pMemoryBuffers[MEM_SAVE] );
-		u32		dst_size( MemoryRegionSizes[MEM_SAVE] );
+		u8* p_dst    = (u8*)gMemBuffers[MEM_SAVE];
+		u32 dst_size = gMemBufferSizes[MEM_SAVE];
 		cart_address -= PI_DOM2_ADDR2;
 
 		Console_Print("[YWriting to Cart domain 2/addr2 0x%08x]", cart_address);

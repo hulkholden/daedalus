@@ -76,12 +76,12 @@ static void DumpROMInfo( const ROMHeader & header )
 static void ROM_SimulatePIFBoot( ECicType cic_chip, u32 Country )
 {
 	// Copy low 1000 bytes to MEM_SP_MEM
-	RomBuffer::GetRomBytesRaw( (u8*)g_pMemoryBuffers[MEM_SP_MEM] + RAMROM_BOOTSTRAP_OFFSET,
+	RomBuffer::GetRomBytesRaw( (u8*)gMemBuffers[MEM_SP_MEM] + RAMROM_BOOTSTRAP_OFFSET,
 		   RAMROM_BOOTSTRAP_OFFSET,
 		   RAMROM_GAME_OFFSET - RAMROM_BOOTSTRAP_OFFSET );
 
 	// Need to copy crap to SP_IMEM for CIC-6105 boot.
-	u8 * pIMemBase = (u8*)g_pMemoryBuffers[ MEM_SP_MEM ] + 0x1000;
+	u8 * pIMemBase = (u8*)gMemBuffers[ MEM_SP_MEM ] + 0x1000;
 
 	//FIX ME: Some of these are redundant, see CPU_RomOpen
 	//

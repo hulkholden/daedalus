@@ -63,21 +63,21 @@ static void WriteValueMapped( u32 address, u32 value )
 static void WriteValue_8000_807F( u32 address, u32 value )
 {
 	// Note: Mask is slighty different when EPAK isn't used 0x003FFFFF
-	*(u32 *)((u8 *)g_pMemoryBuffers[MEM_RD_RAM] + (address & 0x007FFFFF)) = value;
+	*(u32 *)((u8 *)gMemBuffers[MEM_RD_RAM] + (address & 0x007FFFFF)) = value;
 }
 
 // 0x03F0 0000 to 0x03FF FFFF  RDRAM registers
 static void WriteValue_83F0_83F0( u32 address, u32 value )
 {
 	DPF( DEBUG_MEMORY_RDRAM_REG, "Writing to MEM_RD_REG: 0x%08x", address );
-	*(u32 *)((u8 *)g_pMemoryBuffers[MEM_RD_REG0] + (address & 0xFF)) = value;
+	*(u32 *)((u8 *)gMemBuffers[MEM_RD_REG0] + (address & 0xFF)) = value;
 }
 
 // 0x0400 0000 to 0x0400 FFFF  SP registers
 static void WriteValue_8400_8400( u32 address, u32 value )
 {
 	DPF( DEBUG_MEMORY_SP_IMEM, "Writing to SP_MEM: 0x%08x", address );
-	*(u32 *)((u8 *)g_pMemoryBuffers[MEM_SP_MEM] + (address & 0x1FFF)) = value;
+	*(u32 *)((u8 *)gMemBuffers[MEM_SP_MEM] + (address & 0x1FFF)) = value;
 }
 
 static void WriteValue_8404_8404( u32 address, u32 value )
@@ -89,16 +89,16 @@ static void WriteValue_8404_8404( u32 address, u32 value )
 	{
 	case 0x0:	// SP_MEM_ADDR_REG
 	case 0x4:	// SP_DRAM_ADDR_REG
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_SP_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_SP_REG] + offset) = value;
 		break;
 
 	case 0x8:	//SP_RD_LEN_REG
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_SP_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_SP_REG] + offset) = value;
 		DMA_SP_CopyFromRDRAM();
 		break;
 
 	case 0xc:	//SP_WR_LEN_REG
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_SP_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_SP_REG] + offset) = value;
 		DMA_SP_CopyToRDRAM();
 		break;
 
@@ -106,7 +106,7 @@ static void WriteValue_8404_8404( u32 address, u32 value )
 		MemoryUpdateSPStatus( value );
 		break;
 	case 0x1c:	// SP_SEMAPHORE_REG ToDO: Read should be 0 too
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_SP_REG] + offset) = 0;
+		*(u32 *)((u8 *)gMemBuffers[MEM_SP_REG] + offset) = 0;
 		break;
 /*
 	case SP_DMA_FULL_REG:
@@ -122,7 +122,7 @@ static void WriteValue_8404_8404( u32 address, u32 value )
 static void WriteValue_8408_8408( u32 address, u32 value )
 {
 	DPF( DEBUG_MEMORY_SP_REG, "Writing to SP_PC_REG: 0x%08x/0x%08x", address, value );
-	*(u32 *)((u8 *)g_pMemoryBuffers[MEM_SP_PC_REG] + (address & 0xFF)) = value;
+	*(u32 *)((u8 *)gMemBuffers[MEM_SP_PC_REG] + (address & 0xFF)) = value;
 }
 
 // 0x0410 0000 to 0x041F FFFF DP Command Registers
@@ -234,7 +234,7 @@ static void WriteValue_8440_844F( u32 address, u32 value )
 		return;
 	}
 
-	*(u32 *)((u8 *)g_pMemoryBuffers[MEM_VI_REG] + offset) = value;
+	*(u32 *)((u8 *)gMemBuffers[MEM_VI_REG] + offset) = value;
 }
 
 // 0x0450 0000 to 0x045F FFFF Audio Interface (AI) Registers
@@ -247,7 +247,7 @@ static void WriteValue_8450_845F( u32 address, u32 value )
 	{
 	case 0x4:	//AI_LEN_REG
 		// LS 3 bits ignored
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_AI_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_AI_REG] + offset) = value;
 
 		if (gAudioPlugin != NULL)
 		{
@@ -261,7 +261,7 @@ static void WriteValue_8450_845F( u32 address, u32 value )
 		break;
 
 	case 0x10:	//AI_DACRATE_REG
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_AI_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_AI_REG] + offset) = value;
 
 		if (gAudioPlugin != NULL)
 		{
@@ -271,7 +271,7 @@ static void WriteValue_8450_845F( u32 address, u32 value )
 		}
 		break;
 	default:
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_AI_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_AI_REG] + offset) = value;
 		break;
 	}
 }
@@ -285,16 +285,16 @@ static void WriteValue_8460_846F( u32 address, u32 value )
 /*
 	case 0x0: // PI_DRAM_ADDR_REG
 	case 0x4: // PI_CART_ADDR_REG
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_PI_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_PI_REG] + offset) = value;
 		break;
 */
 	case 0x8:	// PI_RD_LEN_REG
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_PI_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_PI_REG] + offset) = value;
 		DMA_PI_CopyFromRDRAM();
 		break;
 
 	case 0xc:	// PI_WR_LEN_REG
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_PI_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_PI_REG] + offset) = value;
 		// Do memory transfer
 		DMA_PI_CopyToRDRAM();
 		break;
@@ -304,7 +304,7 @@ static void WriteValue_8460_846F( u32 address, u32 value )
 		break;
 
 	default:
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_PI_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_PI_REG] + offset) = value;
 		break;
 	}
 }
@@ -313,7 +313,7 @@ static void WriteValue_8460_846F( u32 address, u32 value )
 static void WriteValue_8470_847F( u32 address, u32 value )
 {
 	DPF( DEBUG_MEMORY_RI, "Writing to MEM_RI_REG: 0x%08x", address );
-	*(u32 *)((u8 *)g_pMemoryBuffers[MEM_RI_REG] + (address & 0xFF)) = value;
+	*(u32 *)((u8 *)gMemBuffers[MEM_RI_REG] + (address & 0xFF)) = value;
 }
 
 // 0x0480 0000 to 0x048F FFFF Serial Interface (SI) Registers
@@ -325,19 +325,19 @@ static void WriteValue_8480_848F( u32 address, u32 value )
 	switch (offset)
 	{
 	case 0x0:	//SI_DRAM_ADDR_REG
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_SI_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_SI_REG] + offset) = value;
 		break;
 
 	case 0x4:	// SI_PIF_ADDR_RD64B_REG
 		// Trigger DRAM -> PIF DMA
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_SI_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_SI_REG] + offset) = value;
 		DMA_SI_CopyToDRAM();
 		break;
 
 		// Reserved Registers here!
 	case 0x10:	//SI_PIF_ADDR_WR64B_REG
 		// Trigger DRAM -> PIF DMA
-		*(u32 *)((u8 *)g_pMemoryBuffers[MEM_SI_REG] + offset) = value;
+		*(u32 *)((u8 *)gMemBuffers[MEM_SI_REG] + offset) = value;
 		DMA_SI_CopyFromDRAM();
 		break;
 
@@ -365,7 +365,7 @@ static void WriteValue_9FC0_9FCF( u32 address, u32 value )
 	}
 
 	DPF( DEBUG_MEMORY_PIF, "Writing to MEM_PIF_RAM: 0x%08x", address );
-	*(u32 *)((u8 *)g_pMemoryBuffers[MEM_PIF_RAM] + pif_ram_offset) = value;
+	*(u32 *)((u8 *)gMemBuffers[MEM_PIF_RAM] + pif_ram_offset) = value;
 	if (pif_ram_offset == 0x3C)
 	{
 		MemoryUpdatePIF();

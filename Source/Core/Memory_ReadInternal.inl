@@ -28,7 +28,7 @@ bool Memory_GetInternalReadAddress(u32 address, const void ** translated)
 
 static bool InternalReadInvalid( u32 address, const void ** translated )
 {
-	*translated = g_pMemoryBuffers[MEM_UNUSED];
+	*translated = gMemBuffers[MEM_UNUSED];
 	return false;
 }
 
@@ -82,7 +82,7 @@ static bool InternalRead_8400_8400( u32 address, const void ** translated )
 
 		offset = address & 0x1FFF;
 
-		*translated = (u8 *)g_pMemoryBuffers[MEM_SP_MEM] + offset;
+		*translated = (u8 *)gMemBuffers[MEM_SP_MEM] + offset;
 		return true;
 	}
 
@@ -99,7 +99,7 @@ static bool InternalRead_9FC0_9FCF( u32 address, const void ** translated )
 
 		offset = address & 0x0FFF;
 
-		*translated = (u8 *)g_pMemoryBuffers[MEM_PIF_RAM] + offset;
+		*translated = (u8 *)gMemBuffers[MEM_PIF_RAM] + offset;
 		return true;
 	}
 	else if ((address&0x1FFFFFFF) <= PIF_RAM_END)
@@ -109,7 +109,7 @@ static bool InternalRead_9FC0_9FCF( u32 address, const void ** translated )
 
 		offset = address & 0x0FFF;
 
-		*translated = (u8 *)g_pMemoryBuffers[MEM_PIF_RAM] + offset;
+		*translated = (u8 *)gMemBuffers[MEM_PIF_RAM] + offset;
 		return true;
 	}
 

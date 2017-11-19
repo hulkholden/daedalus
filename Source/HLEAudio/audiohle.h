@@ -401,9 +401,9 @@ typedef void ( * AudioHLEInstruction )( AudioHLECommand command );
 
 // MMmm, why not use the defines from Memory.h?
 // ToDo : remove these and use the ones already provided by the core?
-#define dmem	((u8*)g_pMemoryBuffers[MEM_SP_MEM] + SP_DMA_DMEM)
-#define imem	((u8*)g_pMemoryBuffers[MEM_SP_MEM] + SP_DMA_IMEM)
-#define rdram	((u8*)g_pMemoryBuffers[MEM_RD_RAM])
+#define dmem	((u8*)gMemBuffers[MEM_SP_MEM] + SP_DMA_DMEM)
+#define imem	((u8*)gMemBuffers[MEM_SP_MEM] + SP_DMA_IMEM)
+#define rdram	((u8*)gMemBuffers[MEM_RD_RAM])
 
 // Use these functions to interface with the HLE Audio...
 void Audio_Ucode();

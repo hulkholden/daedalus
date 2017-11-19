@@ -325,7 +325,7 @@ bool CPU_RomOpen()
 
 	Memory_MI_SetRegister(MI_VERSION_REG, 0x02020102);
 
-	((u32*)g_pMemoryBuffers[MEM_RI_REG])[3] = 1;  // RI_CONFIG_REG Skips most of init
+	((u32*)gMemBuffers[MEM_RI_REG])[3] = 1;  // RI_CONFIG_REG Skips most of init
 
 	R4300_Init();
 
