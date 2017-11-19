@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/MathUtil.h"
 #include "Core/Memory.h"
 #include "Core/ROM.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "HLEGraphics/DLDebug.h"
 #include "HLEGraphics/TMEM.h"
 #include "HLEGraphics/uCodes/UcodeDefs.h"

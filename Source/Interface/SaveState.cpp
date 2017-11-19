@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/Memory.h"
 #include "Core/R4300.h"
 #include "Core/ROM.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Interface/RomDB.h"
 #include "Main/SystemInit.h"
 #include "OSHLE/OSHLE.h"

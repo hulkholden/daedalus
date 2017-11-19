@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Daedalus.h"
 #include "DynaRec/CodeBufferManager.h"
 
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 
 #include "DynaRec/Windows/x86/CodeGeneratorX86.h"
 

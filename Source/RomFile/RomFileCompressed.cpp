@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Macros.h"
 #include "Base/MathUtil.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "System/IO.h"
 #include "Utility/Stream.h"
 

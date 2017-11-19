@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/MathUtil.h"
 #include "Config/ConfigOptions.h"
 #include "Core/ROM.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Debug/Dump.h"
 #include "Graphics/ColourValue.h"
 #include "Graphics/NativePixelFormat.h"

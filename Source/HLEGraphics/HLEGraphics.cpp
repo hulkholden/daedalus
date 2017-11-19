@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "Core/Memory.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Graphics/GL.h"
 #include "Graphics/GraphicsContext.h"
 #include "HLEGraphics/DisplayListDebugger.h"

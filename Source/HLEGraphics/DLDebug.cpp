@@ -7,7 +7,7 @@
 
 #include "RDP.h"
 #include "Core/ROM.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Debug/Dump.h"
 #include "Ultra/ultra_gbi.h"
 #include "System/IO.h"

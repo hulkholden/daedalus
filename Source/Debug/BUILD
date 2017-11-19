@@ -11,7 +11,7 @@ cc_library(
         "WebDebugTemplate.cpp",
     ],
     hdrs = [
-        "DBGConsole.h",
+        "Console.h",
         "DebugConsoleImpl.h",
         "DebugLog.h",
         "Dump.h",

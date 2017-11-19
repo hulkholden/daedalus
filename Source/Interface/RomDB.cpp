@@ -29,7 +29,7 @@
 #include "Base/MathUtil.h"
 #include "Core/ROM.h"
 #include "Core/ROMImage.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "RomFile/RomFile.h"
 #include "System/IO.h"
 #include "System/Paths.h"

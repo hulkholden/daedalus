@@ -7,7 +7,7 @@
 
 #ifdef DAEDALUS_ENABLE_PROFILING
 
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "System/Timing.h"
 #include "Utility/Hash.h"
 

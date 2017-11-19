@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "FragmentCache.h"
 #include "Fragment.h"
 
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 
 
 CIndirectExitMap::CIndirectExitMap()

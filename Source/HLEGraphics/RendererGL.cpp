@@ -6,7 +6,7 @@
 #include "Base/Macros.h"
 #include "Config/Preferences.h"
 #include "Core/ROM.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Graphics/ColourValue.h"
 #include "Graphics/GL.h"
 #include "Graphics/GraphicsContext.h"

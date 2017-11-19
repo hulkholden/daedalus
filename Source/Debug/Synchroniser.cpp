@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/CPU.h"
 #include "Core/ROM.h"
 #include "Core/Save.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "System/CompressedStream.h"
 #include "System/IO.h"
 

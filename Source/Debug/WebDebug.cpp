@@ -18,7 +18,7 @@
 
 #include "Base/Macros.h"
 #include "Base/MathUtil.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Debug/WebDebugTemplate.h"
 #include "System/IO.h"
 #include "System/Paths.h"

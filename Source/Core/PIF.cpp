@@ -94,7 +94,7 @@ area assignment does not change. After Tx/RxData assignment, this flag is reset 
 #include "Core/Memory.h"
 #include "Core/ROM.h"
 #include "Core/Save.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Input/InputManager.h"
 #include "Ultra/ultra_os.h"
 

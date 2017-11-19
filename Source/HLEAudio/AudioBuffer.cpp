@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "AudioBuffer.h"
 
 #include "Config/ConfigOptions.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "System/Thread.h"
 
 CAudioBuffer::CAudioBuffer( u32 buffer_size )
