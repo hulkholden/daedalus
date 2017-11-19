@@ -31,9 +31,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class RomBuffer
 {
    public:
-	static bool Create();
-	static void Destroy();
-
 	static bool Open();
 	static void Close();
 
@@ -66,7 +63,6 @@ class RomBuffer
 
 	static void CopyToRam(u8* p_dst, u32 dst_offset, u32 dst_size, u32 src_offset, u32 length);
 
-	static bool IsRomAddressFixed();
 	static const void* GetFixedRomBaseAddress();
 };
 

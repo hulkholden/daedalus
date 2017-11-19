@@ -2,13 +2,11 @@ cc_library(
     name = "RomFile",
     srcs = [
         "RomFile.cpp",
-        "RomFileCache.cpp",
         "RomFileCompressed.cpp",
         "RomFileUncompressed.cpp",
     ],
     hdrs = [
         "RomFile.h",
-        "RomFileCache.h",
         "RomFileCompressed.h",
         "RomFileUncompressed.h",
     ],

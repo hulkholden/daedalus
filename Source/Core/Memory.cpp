@@ -254,7 +254,7 @@ void Memory_Cleanup()
 
 static void Memory_Tlb_Hack()
 {
-	bool RomBaseKnown = RomBuffer::IsRomLoaded() && RomBuffer::IsRomAddressFixed();
+	bool RomBaseKnown = RomBuffer::IsRomLoaded();
 
 	const void * rom_address = RomBaseKnown ? RomBuffer::GetFixedRomBaseAddress() : NULL;
 	if (rom_address != NULL)

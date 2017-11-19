@@ -133,7 +133,6 @@ static const SysEntityEntry gSysInitTable[] = {
 	{"Memory", Memory_Init, Memory_Fini},
 
 	{"Controller", CController::Create, CController::Destroy},
-	{"RomBuffer", RomBuffer::Create, RomBuffer::Destroy},
 
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_W32)
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
