@@ -101,7 +101,7 @@ void R4300_CALL_TYPE CPU_InvalidateICacheRange( u32 address, u32 length )
 {
 	if( gFragmentCache.ShouldInvalidateOnWrite( address, length ) )
 	{
-		DBGConsole_Msg(0, "Write to %08x (%d bytes) overlaps fragment cache entries\n", address, length);
+		Console_Print("Write to %08x (%d bytes) overlaps fragment cache entries\n", address, length);
 		CPU_ResetFragmentCache();
 	}
 }
@@ -235,7 +235,7 @@ template < bool DynaRec, bool TraceEnabled > void CPU_Go()
 			{
 #ifdef DAEDALUS_DEBUG_DYNAREC
 				u32 start_address( gTraceRecorder.GetStartTraceAddress() );
-				//DBGConsole_Msg( 0, "Aborting tracing of [R%08x] - StuffToDo is %08x", start_address, stuff_to_do );
+				//Console_Print("Aborting tracing of [R%08x] - StuffToDo is %08x", start_address, stuff_to_do);
 
 				gAbortedTraceReasons[ start_address ] = stuff_to_do;
 #endif
@@ -243,7 +243,7 @@ template < bool DynaRec, bool TraceEnabled > void CPU_Go()
 #ifdef ALLOW_TRACES_WHICH_EXCEPT
 				if(stuff_to_do == CPU_CHECK_INTERRUPTS && gCPUState.Delay == NO_DELAY )		// Note checking for exactly equal, not just that it's set
 				{
-					//DBGConsole_Msg( 0, "Adding chunk at %08x after interrupt\n", gTraceRecorder.GetStartTraceAddress() );
+					//Console_Print("Adding chunk at %08x after interrupt\n", gTraceRecorder.GetStartTraceAddress());
 					gTraceRecorder.StopTrace( gCPUState.CurrentPC );
 					CPU_CreateAndAddFragment();
 				}
@@ -352,7 +352,7 @@ void CPU_CreateAndAddFragment()
 		gHotTraceCountMap.erase( p_fragment->GetEntryAddress() );
 		gFragmentCache.InsertFragment( p_fragment );
 
-		//DBGConsole_Msg( 0, "Inserted hot trace at [R%08x]! (size is %d. %dKB)", p_fragment->GetEntryAddress(), gFragmentCache.GetCacheSize(), gFragmentCache.GetMemoryUsage() / 1024 );
+		//Console_Print("Inserted hot trace at [R%08x]! (size is %d. %dKB)", p_fragment->GetEntryAddress(), gFragmentCache.GetCacheSize(), gFragmentCache.GetMemoryUsage() / 1024);
 	}
 }
 
@@ -465,7 +465,7 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 #ifdef DAEDALUS_DEBUG_CONSOLE
 						else
 						{
-							DBGConsole_Msg(0, "Safely skipped one flush");
+							Console_Print("Safely skipped one flush");
 						}
 #endif
 						gResetFragmentCache = false;
@@ -485,7 +485,7 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 					if( gHotTraceCountMap.size() >= gMaxHotTraceMapSize )
 					{
 
-						DBGConsole_Msg( 0, "Hot trace cache hit %d, dumping", gHotTraceCountMap.size() );
+						Console_Print("Hot trace cache hit %d, dumping", gHotTraceCountMap.size());
 						gHotTraceCountMap.clear();
 						gFragmentCache.Clear();
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
@@ -494,8 +494,8 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 					}
 					else if( trace_count == gHotTraceThreshold )
 					{
-						//DBGConsole_Msg( 0, "Identified hot trace at [R%08x]! (size is %d)", gCPUState.CurrentPC, gHotTraceCountMap.size() );
-						gTraceRecorder.StartTrace( gCPUState.CurrentPC );
+						//Console_Print("Identified hot trace at [R%08x]! (size is %d)", gCPUState.CurrentPC, gHotTraceCountMap.size());
+						gTraceRecorder.StartTrace( gCPUState.CurrentPC);
 
 						if(!trace_already_enabled)
 						{
@@ -510,7 +510,7 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 						{
 							u32 reason( gAbortedTraceReasons[ gCPUState.CurrentPC ] );
 							use( reason );
-							//DBGConsole_Msg( 0, "Hot trace at [R%08x] has count of %d! (reason is %x) size %d", gCPUState.CurrentPC, trace_count, reason, gHotTraceCountMap.size( ) );
+							//Console_Print("Hot trace at [R%08x] has count of %d! (reason is %x) size %d", gCPUState.CurrentPC, trace_count, reason, gHotTraceCountMap.size());
 							DAED_LOG( DEBUG_DYNAREC_CACHE, "Hot trace at %08x has count of %d! (reason is %x) size %d", gCPUState.CurrentPC, trace_count, reason, gHotTraceCountMap.size( ) );
 						}
 						else

@@ -151,7 +151,7 @@ void AudioPluginOSX::DacrateChanged(int system_type)
 	u32 dacrate = Memory_AI_GetRegister(AI_DACRATE_REG);
 	u32 frequency = clock / (dacrate + 1);
 
-	DBGConsole_Msg(0, "Audio frequency: %d", frequency);
+	Console_Print("Audio frequency: %d", frequency);
 	mFrequency = frequency;
 }
 
@@ -327,7 +327,7 @@ void AudioPluginOSX::StartAudio()
 	mAudioThread = CreateThread("Audio", &AudioThread, this);
 	if (mAudioThread == kInvalidThreadHandle)
 	{
-		DBGConsole_Msg(0, "Failed to start the audio thread!");
+		Console_Print("Failed to start the audio thread!");
 		mKeepRunning = false;
 		FramerateLimiter_SetAuxillarySyncFunction(NULL, NULL);
 	}

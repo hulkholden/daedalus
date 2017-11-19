@@ -105,7 +105,7 @@ static bool InternalRead_9FC0_9FCF( u32 address, void ** translated )
 	else if ((address&0x1FFFFFFF) <= PIF_RAM_END)
 	{
 		DPF( DEBUG_MEMORY_PIF, "Reading from MEM_PIF_RAM: 0x%08x", address );
-		DBGConsole_Msg(0, "[WReading directly from PI ram]: 0x%08x!", address);
+		Console_Print("[WReading directly from PI ram]: 0x%08x!", address);
 
 		offset = address & 0x0FFF;
 

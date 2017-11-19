@@ -308,7 +308,7 @@ void BaseRenderer::UpdateViewport()
 	s32		vp_w = s32( scfreen_max.x - screen_min.x );
 	s32		vp_h = s32( scfreen_max.y - screen_min.y );
 
-	//DBGConsole_Msg(0, "[WViewport Changed (%d) (%d)]",vp_w,vp_h );
+	//Console_Print("[WViewport Changed (%d) (%d)]",vp_w,vp_h);
 
 	glViewport(vp_x, (s32)mScreenHeight - (vp_h + vp_y), vp_w, vp_h);
 }
@@ -904,7 +904,7 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 // Conker Bad Fur Day rendering pipeline
 void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 {
-	//DBGConsole_Msg(0, "In SetNewVertexInfo");
+	//Console_Print("In SetNewVertexInfo");
 	const FiddledVtx * const pVtxBase( (const FiddledVtx*)(g_pu8RamBase + address) );
 	const Matrix4x4 & mat_project = mProjectionMat;
 	const Matrix4x4 & mat_world = mModelViewStack[mModelViewTop];
@@ -1301,7 +1301,7 @@ void BaseRenderer::ModifyVertexInfo(u32 whered, u32 vert, u32 val)
 			break;
 
 		default:
-			DBGConsole_Msg( 0, "ModifyVtx - Setting vert data where: 0x%02x, vert: 0x%08x, val: 0x%08x", whered, vert, val );
+			Console_Print("ModifyVtx - Setting vert data where: 0x%02x, vert: 0x%08x, val: 0x%08x", whered, vert, val);
 			DL_PF( "    Setting unknown value: where: 0x%02x, vert: 0x%08x, val: 0x%08x", whered, vert, val );
 			break;
 	}

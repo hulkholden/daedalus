@@ -437,12 +437,12 @@ void DLParser_GBI1_SpNoop(MicroCodeCommand command) {}
 
 void DLParser_GBI1_RDPHalf_Cont(MicroCodeCommand command)
 {
-	// DBGConsole_Msg( 0, "Unexpected RDPHalf_Cont: %08x %08x", command.inst.cmd0, command.inst.cmd1 );
+	// Console_Print("Unexpected RDPHalf_Cont: %08x %08x", command.inst.cmd0, command.inst.cmd1);
 }
 
 void DLParser_GBI1_RDPHalf_2(MicroCodeCommand command)
 {
-	//	DBGConsole_Msg( 0, "Unexpected RDPHalf_2: %08x %08x", command.inst.cmd0, command.inst.cmd1 );
+	//	Console_Print("Unexpected RDPHalf_2: %08x %08x", command.inst.cmd0, command.inst.cmd1);
 }
 
 void DLParser_GBI1_RDPHalf_1(MicroCodeCommand command) { gRDPHalf1 = command.inst.cmd1; }

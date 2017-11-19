@@ -77,7 +77,7 @@ CTraceRecorder::EUpdateTraceStatus	CTraceRecorder::UpdateTrace( u32 address,
 
 	if( mTraceBuffer.size() > MAX_TRACE_LENGTH )
 	{
-		DBGConsole_Msg(0, "Hit max trace size!");
+		Console_Print("Hit max trace size!");
 		want_to_stop = true;
 	}
 
@@ -275,7 +275,7 @@ CFragment *		CTraceRecorder::CreateFragment( CCodeBufferManager * p_manager )
 	CFragment *	p_frament( new CFragment( p_manager, mStartTraceAddress, mExpectedExitTraceAddress,
 		mTraceBuffer, register_usage, mBranchDetails, mNeedIndirectExitMap ) );
 
-	//DBGConsole_Msg( 0, "Inserting hot trace for [R%08x]!", mStartTraceAddress );
+	//Console_Print("Inserting hot trace for [R%08x]!", mStartTraceAddress);
 
 	mTracing = false;
 	mStartTraceAddress = 0;
@@ -332,7 +332,7 @@ void	CTraceRecorder::AbortTrace()
 #endif
 
 
-		//DBGConsole_Msg( 0, "Aborting tracing of     [R%08x]", mStartTraceAddress );
+		//Console_Print("Aborting tracing of     [R%08x]", mStartTraceAddress);
 		mTracing = false;
 		mStartTraceAddress = 0;
 		mTraceBuffer.clear();

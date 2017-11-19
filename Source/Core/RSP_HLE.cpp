@@ -91,16 +91,16 @@ static void RDP_DumpRSPData(char * name, u32 crc, u32 * mem_base, u32 pc_base, u
 #if 0
 static void	RSP_HLE_DumpTaskInfo( const OSTask * pTask )
 {
-	DBGConsole_Msg(0, "DP: Task:%08x Flags:%08x BootCode:%08x BootCodeSize:%08x",
+	Console_Print("DP: Task:%08x Flags:%08x BootCode:%08x BootCodeSize:%08x",
 		pTask->t.type, pTask->t.flags, pTask->t.ucode_boot, pTask->t.ucode_boot_size);
 
-	DBGConsole_Msg(0, "DP: uCode:%08x uCodeSize:%08x uCodeData:%08x uCodeDataSize:%08x",
+	Console_Print("DP: uCode:%08x uCodeSize:%08x uCodeData:%08x uCodeDataSize:%08x",
 		pTask->t.ucode, pTask->t.ucode_size, pTask->t.ucode_data, pTask->t.ucode_data_size);
 
-	DBGConsole_Msg(0, "DP: Stack:%08x StackS:%08x Output:%08x OutputS:%08x",
+	Console_Print("DP: Stack:%08x StackS:%08x Output:%08x OutputS:%08x",
 		pTask->t.dram_stack, pTask->t.dram_stack_size, pTask->t.output_buff, pTask->t.output_buff_size);
 
-	DBGConsole_Msg(0, "DP: Data(PC):%08x DataSize:%08x YieldData:%08x YieldDataSize:%08x",
+	Console_Print("DP: Data(PC):%08x DataSize:%08x YieldData:%08x YieldDataSize:%08x",
 		pTask->t.data_ptr, pTask->t.data_size, pTask->t.yield_data_ptr, pTask->t.yield_data_size);
 }
 #endif
@@ -218,7 +218,7 @@ EProcessResult ProcessJpegTask(OSTask * task)
 	// For practical purpose we use a ucode_size = min(0xf80, task->ucode_size)
 	u32 sum = sum_bytes(g_pu8RamBase + (u32)task->t.ucode , Min<u32>(task->t.ucode_size, 0xf80) >> 1);
 
-	//DBGConsole_Msg(0, "JPEG Task: Sum=0x%08x", sum);
+	//Console_Print("JPEG Task: Sum=0x%08x", sum);
 	switch(sum)
 	{
 	case 0x2caa6: // Zelda OOT, Pokemon Stadium {1,2} jpg decompression
@@ -307,7 +307,7 @@ void RSP_HLE_ProcessTask()
 			DAEDALUS_ASSERT( pTask->t.type != M_FBTASK, "FB task is not handled");
 
 			// Can't handle
-			DBGConsole_Msg(0, "Unknown task: %08x", pTask->t.type );
+			Console_Print("Unknown task: %08x", pTask->t.type);
 			//	RSP_HLE_DumpTaskInfo( pTask );
 			//	RDP_DumpRSPCode("boot",    0xDEAFF00D, (u32*)(g_pu8RamBase + (((u32)pTask->t.ucode_boot)&0x00FFFFFF)), 0x04001000, pTask->t.ucode_boot_size);
 			//	RDP_DumpRSPCode("unkcode", 0xDEAFF00D, (u32*)(g_pu8RamBase + (((u32)pTask->t.ucode)&0x00FFFFFF)),      0x04001080, 0x1000 - 0x80);//pTask->t.ucode_size);

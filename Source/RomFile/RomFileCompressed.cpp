@@ -85,7 +85,7 @@ bool ROMFileCompressed::Open(COutputStream& messages)
 					if (bytes_read == u32size)
 					{
 						// Check the format:
-						// DBGConsole_Msg(0, "%s %08x", rom_filename, dwVal);
+						// Console_Print("%s %08x", rom_filename, dwVal);
 
 						// Could be byteswapped - check all variations
 						if (magic == 0x80371240 || magic == 0x40123780 || magic == 0x12408037)
@@ -95,7 +95,7 @@ bool ROMFileCompressed::Open(COutputStream& messages)
 							mFoundRom = true;
 							if (!SetHeaderMagic(magic))
 							{
-								DBGConsole_Msg(0, "Bad header magic for [C%s]", rom_filename);
+								Console_Print("Bad header magic for [C%s]", rom_filename);
 							}
 							break;
 						}
@@ -189,7 +189,7 @@ bool ROMFileCompressed::Seek(u32 offset, u8* p_scratch_block, u32 block_size)
 
 	if (current_offset > offset)
 	{
-		DBGConsole_Msg(0, "[CRomCache - seeking from %08x to %08x in zip", current_offset, offset);
+		Console_Print("[CRomCache - seeking from %08x to %08x in zip", current_offset, offset);
 
 		// Annoyingly, have to close and reopen the zip file
 		unzCloseCurrentFile(mZipFile);  // Ignore errors here

@@ -10,7 +10,7 @@ TEST_DISABLE_PI_FUNCS
 #ifdef DAED_OS_MESSAGE_QUEUES
 	Write32Bits(VAR_ADDRESS(osPiAccessQueueCreated), 1);
 
-	DBGConsole_Msg(0, "Creating Pi Access Queue");
+	Console_Print("Creating Pi Access Queue");
 
 	OS_HLE_osCreateMesgQueue(VAR_ADDRESS(osPiAccessQueue), VAR_ADDRESS(osPiAccessQueueBuffer), 1);
 

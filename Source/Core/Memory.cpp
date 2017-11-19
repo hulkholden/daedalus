@@ -219,11 +219,11 @@ bool Memory_Reset()
 {
 	u32 main_mem = g_ROM.settings.ExpansionPakUsage != PAK_UNUSED ? MEMORY_8_MEG : MEMORY_4_MEG;
 
-	DBGConsole_Msg(0, "Reseting Memory - %d MB", main_mem/(1024*1024));
+	Console_Print("Reseting Memory - %d MB", main_mem/(1024*1024));
 
 	if (main_mem > kMaximumMemSize)
 	{
-		DBGConsole_Msg( 0, "Memory_Reset: Can't reset with more than %dMB ram", kMaximumMemSize / (1024*1024) );
+		Console_Print("Memory_Reset: Can't reset with more than %dMB ram", kMaximumMemSize / (1024*1024));
 		main_mem = kMaximumMemSize;
 	}
 
@@ -349,7 +349,7 @@ void Memory_InitTables()
 	u32 rom_size = RomBuffer::GetRomSize();
 	u32 ram_size = gRamSize;
 
-	DBGConsole_Msg(0, "Initialising %s main memory", (ram_size == MEMORY_8_MEG) ? "8Mb" : "4Mb");
+	Console_Print("Initialising %s main memory", (ram_size == MEMORY_8_MEG) ? "8Mb" : "4Mb");
 
 	// Init RDRAM
 	// By default we init with EPAK (8Mb)
@@ -585,33 +585,33 @@ void Memory_InitTables()
 void MemoryUpdateSPStatus( u32 flags )
 {
 #ifdef DEBUG_SP_STATUS_REG
-	DBGConsole_Msg( 0, "----------" );
-	if (flags & SP_CLR_HALT)				DBGConsole_Msg( 0, "SP: Clearing Halt" );
-	if (flags & SP_SET_HALT)				DBGConsole_Msg( 0, "SP: Setting Halt" );
-	if (flags & SP_CLR_BROKE)				DBGConsole_Msg( 0, "SP: Clearing Broke" );
+	Console_Print("----------");
+	if (flags & SP_CLR_HALT)				Console_Print("SP: Clearing Halt");
+	if (flags & SP_SET_HALT)				Console_Print("SP: Setting Halt");
+	if (flags & SP_CLR_BROKE)				Console_Print("SP: Clearing Broke");
 	// No SP_SET_BROKE
-	if (flags & SP_CLR_INTR)				DBGConsole_Msg( 0, "SP: Clearing Interrupt" );
-	if (flags & SP_SET_INTR)				DBGConsole_Msg( 0, "SP: Setting Interrupt" );
-	if (flags & SP_CLR_SSTEP)				DBGConsole_Msg( 0, "SP: Clearing Single Step" );
-	if (flags & SP_SET_SSTEP)				DBGConsole_Msg( 0, "SP: Setting Single Step" );
-	if (flags & SP_CLR_INTR_BREAK)			DBGConsole_Msg( 0, "SP: Clearing Interrupt on break" );
-	if (flags & SP_SET_INTR_BREAK)			DBGConsole_Msg( 0, "SP: Setting Interrupt on break" );
-	if (flags & SP_CLR_SIG0)				DBGConsole_Msg( 0, "SP: Clearing Sig0 (Yield)" );
-	if (flags & SP_SET_SIG0)				DBGConsole_Msg( 0, "SP: Setting Sig0 (Yield)" );
-	if (flags & SP_CLR_SIG1)				DBGConsole_Msg( 0, "SP: Clearing Sig1 (Yielded)" );
-	if (flags & SP_SET_SIG1)				DBGConsole_Msg( 0, "SP: Setting Sig1 (Yielded)" );
-	if (flags & SP_CLR_SIG2)				DBGConsole_Msg( 0, "SP: Clearing Sig2 (TaskDone)" );
-	if (flags & SP_SET_SIG2)				DBGConsole_Msg( 0, "SP: Setting Sig2 (TaskDone)" );
-	if (flags & SP_CLR_SIG3)				DBGConsole_Msg( 0, "SP: Clearing Sig3" );
-	if (flags & SP_SET_SIG3)				DBGConsole_Msg( 0, "SP: Setting Sig3" );
-	if (flags & SP_CLR_SIG4)				DBGConsole_Msg( 0, "SP: Clearing Sig4" );
-	if (flags & SP_SET_SIG4)				DBGConsole_Msg( 0, "SP: Setting Sig4" );
-	if (flags & SP_CLR_SIG5)				DBGConsole_Msg( 0, "SP: Clearing Sig5" );
-	if (flags & SP_SET_SIG5)				DBGConsole_Msg( 0, "SP: Setting Sig5" );
-	if (flags & SP_CLR_SIG6)				DBGConsole_Msg( 0, "SP: Clearing Sig6" );
-	if (flags & SP_SET_SIG6)				DBGConsole_Msg( 0, "SP: Setting Sig6" );
-	if (flags & SP_CLR_SIG7)				DBGConsole_Msg( 0, "SP: Clearing Sig7" );
-	if (flags & SP_SET_SIG7)				DBGConsole_Msg( 0, "SP: Setting Sig7" );
+	if (flags & SP_CLR_INTR)				Console_Print("SP: Clearing Interrupt");
+	if (flags & SP_SET_INTR)				Console_Print("SP: Setting Interrupt");
+	if (flags & SP_CLR_SSTEP)				Console_Print("SP: Clearing Single Step");
+	if (flags & SP_SET_SSTEP)				Console_Print("SP: Setting Single Step");
+	if (flags & SP_CLR_INTR_BREAK)			Console_Print("SP: Clearing Interrupt on break");
+	if (flags & SP_SET_INTR_BREAK)			Console_Print("SP: Setting Interrupt on break");
+	if (flags & SP_CLR_SIG0)				Console_Print("SP: Clearing Sig0 (Yield)");
+	if (flags & SP_SET_SIG0)				Console_Print("SP: Setting Sig0 (Yield)");
+	if (flags & SP_CLR_SIG1)				Console_Print("SP: Clearing Sig1 (Yielded)");
+	if (flags & SP_SET_SIG1)				Console_Print("SP: Setting Sig1 (Yielded)");
+	if (flags & SP_CLR_SIG2)				Console_Print("SP: Clearing Sig2 (TaskDone)");
+	if (flags & SP_SET_SIG2)				Console_Print("SP: Setting Sig2 (TaskDone)");
+	if (flags & SP_CLR_SIG3)				Console_Print("SP: Clearing Sig3");
+	if (flags & SP_SET_SIG3)				Console_Print("SP: Setting Sig3");
+	if (flags & SP_CLR_SIG4)				Console_Print("SP: Clearing Sig4");
+	if (flags & SP_SET_SIG4)				Console_Print("SP: Setting Sig4");
+	if (flags & SP_CLR_SIG5)				Console_Print("SP: Clearing Sig5");
+	if (flags & SP_SET_SIG5)				Console_Print("SP: Setting Sig5");
+	if (flags & SP_CLR_SIG6)				Console_Print("SP: Clearing Sig6");
+	if (flags & SP_SET_SIG6)				Console_Print("SP: Setting Sig6");
+	if (flags & SP_CLR_SIG7)				Console_Print("SP: Clearing Sig7");
+	if (flags & SP_SET_SIG7)				Console_Print("SP: Setting Sig7");
 #endif
 
 	// If !HALT && !BROKE
@@ -686,7 +686,7 @@ void MemoryUpdateSPStatus( u32 flags )
 void MemoryUpdateDP( u32 flags )
 {
 	// Ignore address, as this is only called with DPC_STATUS_REG write
-	// DBGConsole_Msg(0, "DP Status: 0x%08x", flags);
+	// Console_Print("DP Status: 0x%08x", flags);
 
 	u32 dpc_status  =  Memory_DPC_GetRegister(DPC_STATUS_REG);
 	bool unfreeze_task  = false;
@@ -707,18 +707,18 @@ void MemoryUpdateDP( u32 flags )
 	*/
 
 #ifdef DISPLAY_DPC_WRITES
-	if ( flags & DPC_CLR_XBUS_DMEM_DMA )		DBGConsole_Msg( 0, "DPC_CLR_XBUS_DMEM_DMA" );
-	if ( flags & DPC_SET_XBUS_DMEM_DMA )		DBGConsole_Msg( 0, "DPC_SET_XBUS_DMEM_DMA" );
-	if ( flags & DPC_CLR_FREEZE )				DBGConsole_Msg( 0, "DPC_CLR_FREEZE" );
-	if ( flags & DPC_SET_FREEZE )				DBGConsole_Msg( 0, "DPC_SET_FREEZE" );
-	if ( flags & DPC_CLR_FLUSH )				DBGConsole_Msg( 0, "DPC_CLR_FLUSH" );
-	if ( flags & DPC_SET_FLUSH )				DBGConsole_Msg( 0, "DPC_SET_FLUSH" );
-	if ( flags & DPC_CLR_TMEM_CTR )				DBGConsole_Msg( 0, "DPC_CLR_TMEM_CTR" );
-	if ( flags & DPC_CLR_PIPE_CTR )				DBGConsole_Msg( 0, "DPC_CLR_PIPE_CTR" );
-	if ( flags & DPC_CLR_CMD_CTR )				DBGConsole_Msg( 0, "DPC_CLR_CMD_CTR" );
-	if ( flags & DPC_CLR_CLOCK_CTR )			DBGConsole_Msg( 0, "DPC_CLR_CLOCK_CTR" );
+	if ( flags & DPC_CLR_XBUS_DMEM_DMA )		Console_Print("DPC_CLR_XBUS_DMEM_DMA");
+	if ( flags & DPC_SET_XBUS_DMEM_DMA )		Console_Print("DPC_SET_XBUS_DMEM_DMA");
+	if ( flags & DPC_CLR_FREEZE )				Console_Print("DPC_CLR_FREEZE");
+	if ( flags & DPC_SET_FREEZE )				Console_Print("DPC_SET_FREEZE");
+	if ( flags & DPC_CLR_FLUSH )				Console_Print("DPC_CLR_FLUSH");
+	if ( flags & DPC_SET_FLUSH )				Console_Print("DPC_SET_FLUSH");
+	if ( flags & DPC_CLR_TMEM_CTR )				Console_Print("DPC_CLR_TMEM_CTR");
+	if ( flags & DPC_CLR_PIPE_CTR )				Console_Print("DPC_CLR_PIPE_CTR");
+	if ( flags & DPC_CLR_CMD_CTR )				Console_Print("DPC_CLR_CMD_CTR");
+	if ( flags & DPC_CLR_CLOCK_CTR )			Console_Print("DPC_CLR_CLOCK_CTR");
 
-	DBGConsole_Msg( 0, "Modified DPC_STATUS_REG - now %08x", dpc_status );
+	Console_Print("Modified DPC_STATUS_REG - now %08x", dpc_status);
 #endif
 
 	Memory_DPC_SetRegister(DPC_STATUS_REG, dpc_status);
@@ -838,13 +838,13 @@ void MemoryUpdatePIF()
 	{
 		pPIFRam[ 0x3F ^ U8_TWIDDLE ] = 0x00;
 
-		DBGConsole_Msg( 0, "[GSI Interrupt control value: 0x%02x", command );
+		Console_Print("[GSI Interrupt control value: 0x%02x", command);
 		Memory_SI_SetRegisterBits(SI_STATUS_REG, SI_STATUS_INTERRUPT);
 		Memory_MI_SetRegisterBits(MI_INTR_REG, MI_INTR_SI);
 		R4300_Interrupt_UpdateCause3();
 	}
 	else
 	{
-		DBGConsole_Msg( 0, "[GUnknown control value: 0x%02x", command );
+		Console_Print("[GUnknown control value: 0x%02x", command);
 	}
 }

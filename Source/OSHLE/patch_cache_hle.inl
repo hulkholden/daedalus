@@ -30,7 +30,7 @@ TEST_DISABLE_CACHE_FUNCS
 	//u32 p = gGPR[REG_a0]._u32_0;
 	//u32 len = gGPR[REG_a1]._u32_0;
 
-	//DBGConsole_Msg(0, "osInvalDCache(0x%08x, %d)", p, len);
+	//Console_Print("osInvalDCache(0x%08x, %d)", p, len);
 
 	return PATCH_RET_JR_RA;
 }
@@ -40,7 +40,7 @@ TEST_DISABLE_CACHE_FUNCS
 	//u32 p = gGPR[REG_a0]._u32_0;
 	//u32 len = gGPR[REG_a1]._u32_0;
 
-	//DBGConsole_Msg(0, "osInvalDCache(0x%08x, %d)", p, len);
+	//Console_Print("osInvalDCache(0x%08x, %d)", p, len);
 
 	return PATCH_RET_JR_RA;
 }
@@ -52,7 +52,7 @@ TEST_DISABLE_CACHE_FUNCS
 	//u32 p = gGPR[REG_a0]._u32_0;
 	//u32 len = gGPR[REG_a1]._u32_0;
 
-	//DBGConsole_Msg(0, "osWritebackDCache(0x%08x, %d)", p, len);
+	//Console_Print("osWritebackDCache(0x%08x, %d)", p, len);
 
 	return PATCH_RET_JR_RA;
 }
@@ -62,7 +62,7 @@ TEST_DISABLE_CACHE_FUNCS
 	//u32 p = gGPR[REG_a0]._u32_0;
 	//u32 len = gGPR[REG_a1]._u32_0;
 
-	//DBGConsole_Msg(0, "osWritebackDCache(0x%08x, %d)", p, len);
+	//Console_Print("osWritebackDCache(0x%08x, %d)", p, len);
 
 	return PATCH_RET_JR_RA;
 }
@@ -71,7 +71,7 @@ TEST_DISABLE_CACHE_FUNCS
 u32 Patch_osWritebackDCacheAll()
 {
 TEST_DISABLE_CACHE_FUNCS
-	//DBGConsole_Msg(0, "osWritebackDCacheAll()");
+	//Console_Print("osWritebackDCacheAll()");
 
 	return PATCH_RET_JR_RA;
 }

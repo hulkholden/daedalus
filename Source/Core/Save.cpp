@@ -57,7 +57,7 @@ std::string Save_GetDirectory(const char* extension)
 #ifdef DAEDALUS_DEBUG_CONSOLE
 			if (CDebugConsole::IsAvailable())
 			{
-				DBGConsole_Msg(0, "SaveDir is still empty - defaulting to [C%s]", g_DaedalusConfig.SaveDir.c_str());
+				Console_Print("SaveDir is still empty - defaulting to [C%s]", g_DaedalusConfig.SaveDir.c_str());
 			}
 #endif
 		}
@@ -108,7 +108,7 @@ bool Save_Reset()
 		FILE * fp = fopen(gSaveFileName.c_str(), "rb");
 		if (fp != NULL)
 		{
-			DBGConsole_Msg(0, "Loading save from [C%s]", gSaveFileName.c_str());
+			Console_Print("Loading save from [C%s]", gSaveFileName.c_str());
 
 			u8 buffer[2048];
 			u8 * dst = (u8*)g_pMemoryBuffers[MEM_SAVE];
@@ -126,7 +126,7 @@ bool Save_Reset()
 		}
 		else
 		{
-			DBGConsole_Msg(0, "Save File [C%s] cannot be found.", gSaveFileName.c_str());
+			Console_Print("Save File [C%s] cannot be found.", gSaveFileName.c_str());
 		}
 	}
 
@@ -136,14 +136,14 @@ bool Save_Reset()
 		FILE * fp = fopen(gMempackFileName.c_str(), "rb");
 		if (fp != NULL)
 		{
-			DBGConsole_Msg(0, "Loading MemPack from [C%s]", gMempackFileName.c_str());
+			Console_Print("Loading MemPack from [C%s]", gMempackFileName.c_str());
 			fread(g_pMemoryBuffers[MEM_MEMPACK], MemoryRegionSizes[MEM_MEMPACK], 1, fp);
 			fclose(fp);
 			gMempackDirty = false;
 		}
 		else
 		{
-			DBGConsole_Msg(0, "MemPack File [C%s] cannot be found.", gMempackFileName.c_str());
+			Console_Print("MemPack File [C%s] cannot be found.", gMempackFileName.c_str());
 			InitMempackContent();
 			gMempackDirty = true;
 		}
@@ -172,7 +172,7 @@ void Save_Flush(bool force)
 {
 	if ((gSaveDirty || force) && g_ROM.settings.SaveType != SAVE_TYPE_UNKNOWN)
 	{
-		DBGConsole_Msg(0, "Saving to [C%s]", gSaveFileName.c_str());
+		Console_Print("Saving to [C%s]", gSaveFileName.c_str());
 
 		FILE * fp = fopen(gSaveFileName.c_str(), "wb");
 		if (fp != NULL)
@@ -195,7 +195,7 @@ void Save_Flush(bool force)
 
 	if (gMempackDirty || force)
 	{
-		DBGConsole_Msg(0, "Saving MemPack to [C%s]", gMempackFileName.c_str());
+		Console_Print("Saving MemPack to [C%s]", gMempackFileName.c_str());
 
 		FILE * fp = fopen(gMempackFileName.c_str(), "wb");
 		if (fp != NULL)

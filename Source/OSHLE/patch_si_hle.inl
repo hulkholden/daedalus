@@ -10,7 +10,7 @@ TEST_DISABLE_SI_FUNCS
 
 	Write32Bits(VAR_ADDRESS(osSiAccessQueueCreated), 1);
 
-	DBGConsole_Msg(0, "Creating Si Access Queue");
+	Console_Print("Creating Si Access Queue");
 
 	OS_HLE_osCreateMesgQueue(VAR_ADDRESS(osSiAccessQueue), VAR_ADDRESS(osSiAccessQueueBuffer), 1);
 

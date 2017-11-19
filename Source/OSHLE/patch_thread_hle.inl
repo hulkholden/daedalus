@@ -23,7 +23,7 @@ TEST_DISABLE_THREAD_FUNCS
 	// Pri is arg 5
 	u32 pri = QuickRead32Bits(pStackBase, 4*5);
 
-	DBGConsole_Msg(0, "[WosCreateThread](0x%08x, %d, 0x%08x(), 0x%08x, 0x%08x, %d)",
+	Console_Print("[WosCreateThread](0x%08x, %d, 0x%08x(), 0x%08x, 0x%08x, %d)",
 		thread, id, func, arg, stack, pri );
 
 	// fp used - we now HLE the Cop1 Unusable exception and set this
@@ -89,7 +89,7 @@ TEST_DISABLE_THREAD_FUNCS
 		thread = ActiveThread;
 	}
 
-	//DBGConsole_Msg(0, "[WosSetThreadPri](0x%08x, %d) 0x%08x", thread, pri, ActiveThread);
+	//Console_Print("[WosSetThreadPri](0x%08x, %d) 0x%08x", thread, pri, ActiveThread);
 
 	return PATCH_RET_NOT_PROCESSED;
 }
@@ -123,7 +123,7 @@ TEST_DISABLE_THREAD_FUNCS
 	u32 queue = gGPR[REG_a0]._u32_0;
 	u32 thread = gGPR[REG_a1]._u32_0;
 
-	//DBGConsole_Msg(0, "Dequeuing Thread");
+	//Console_Print("Dequeuing Thread");
 
 	u32 CurThread = Read32Bits(queue + 0x0);
 	while (CurThread != 0)
@@ -440,7 +440,7 @@ TEST_DISABLE_THREAD_FUNCS
 	{
 		thread = ActiveThread;
 	}
-	DBGConsole_Msg(0, "osDestroyThread(0x%08x)", thread);
+	Console_Print("osDestroyThread(0x%08x)", thread);
 
 	state = Read16Bits(thread + offsetof(OSThread, state));
 	if (state != OS_STATE_STOPPED)
@@ -498,7 +498,7 @@ u32 Patch_osDestroyThread_Zelda()
 {
 TEST_DISABLE_THREAD_FUNCS
 
-	DBGConsole_Msg(0, "osDestroyThread_Zelda not implemented (0x%08x)", gGPR[REG_a0]._u32_0);
+	Console_Print("osDestroyThread_Zelda not implemented (0x%08x)", gGPR[REG_a0]._u32_0);
 
 	return PATCH_RET_NOT_PROCESSED0(osDestroyThread);
 }
@@ -513,15 +513,15 @@ TEST_DISABLE_THREAD_FUNCS
 	u32 thread = gGPR[REG_a1]._u32_0;
 	u32 ThreadPri = Read32Bits(thread + 0x4);
 
-	//DBGConsole_Msg(0, "osEnqueueThread(queue = 0x%08x, thread = 0x%08x)", queue, thread);
-	//DBGConsole_Msg(0, "  thread->priority = 0x%08x", ThreadPri);
+	//Console_Print("osEnqueueThread(queue = 0x%08x, thread = 0x%08x)", queue, thread);
+	//Console_Print("  thread->priority = 0x%08x", ThreadPri);
 
 	u32 t9 = queue;
 
 	u32 CurThread = Read32Bits(t9);
 	u32 CurThreadPri = Read32Bits(CurThread + 0x4);
 
-	//DBGConsole_Msg(0, curthread = 0x%08x, curthread->priority = 0x%08x", CurThread, CurThreadPri);
+	//Console_Print(curthread = 0x%08x, curthread->priority = 0x%08x", CurThread, CurThreadPri);
 
 	while ((s32)CurThreadPri >= (s32)ThreadPri)
 	{
@@ -529,7 +529,7 @@ TEST_DISABLE_THREAD_FUNCS
 		CurThread = Read32Bits(CurThread + 0x0);		// Get next thread
 		// Check if CurThread is null there?
 		CurThreadPri = Read32Bits(CurThread + 0x4);
-		//DBGConsole_Msg(0, "  curthread = 0x%08x, curthread->priority = 0x%08x", CurThread, CurThreadPri);
+		//Console_Print("  curthread = 0x%08x, curthread->priority = 0x%08x", CurThread, CurThreadPri);
 	}
 
 	CurThread = Read32Bits(t9);
@@ -551,15 +551,15 @@ TEST_DISABLE_THREAD_FUNCS
 	u32 thread = gGPR[REG_a1]._u32_0;
 	u32 ThreadPri = Read32Bits(thread + 0x4);
 
-	//DBGConsole_Msg(0, "osEnqueueThread(queue = 0x%08x, thread = 0x%08x)", queue, thread);
-	//DBGConsole_Msg(0, "  thread->priority = 0x%08x", ThreadPri);
+	//Console_Print("osEnqueueThread(queue = 0x%08x, thread = 0x%08x)", queue, thread);
+	//Console_Print("  thread->priority = 0x%08x", ThreadPri);
 
 	u32 t9 = queue;
 
 	u32 CurThread = Read32Bits(t9);
 	u32 CurThreadPri = Read32Bits(CurThread + 0x4);
 
-	//DBGConsole_Msg(0, curthread = 0x%08x, curthread->priority = 0x%08x", CurThread, CurThreadPri);
+	//Console_Print(curthread = 0x%08x, curthread->priority = 0x%08x", CurThread, CurThreadPri);
 
 	while ((s32)CurThreadPri >= (s32)ThreadPri)
 	{
@@ -567,7 +567,7 @@ TEST_DISABLE_THREAD_FUNCS
 		CurThread = Read32Bits(CurThread + 0x0);		// Get next thread
 		// Check if CurThread is null there?
 		CurThreadPri = Read32Bits(CurThread + 0x4);
-		//DBGConsole_Msg(0, "  curthread = 0x%08x, curthread->priority = 0x%08x", CurThread, CurThreadPri);
+		//Console_Print("  curthread = 0x%08x, curthread->priority = 0x%08x", CurThread, CurThreadPri);
 	}
 
 	CurThread = Read32Bits(t9);
@@ -589,7 +589,7 @@ TEST_DISABLE_THREAD_FUNCS
 	u32 thread = Read32Bits(VAR_ADDRESS(osActiveThread));
 	u8 * pThreadBase = (u8 *)ReadAddress(thread);
 
-	//DBGConsole_Msg(0, "EnqueueAndYield()");
+	//Console_Print("EnqueueAndYield()");
 
 	// Store various registers:
 	// For speed, we cache the base pointer!!!
@@ -669,13 +669,13 @@ TEST_DISABLE_THREAD_FUNCS
 	u8 * pThreadBase = (u8 *)ReadAddress(thread);
 	// Disable interrupts
 
-	//DBGConsole_Msg(0, "osStartThread(0x%08x)", thread)
+	//Console_Print("osStartThread(0x%08x)", thread)
 	u32 ThreadQueue = VAR_ADDRESS(osThreadQueue);
 	u32 ThreadState = QuickRead16Bits(pThreadBase, 0x10);
 
 	if (ThreadState == OS_STATE_WAITING)
 	{
-		//DBGConsole_Msg(0, "  Thread is WAITING");
+		//Console_Print("  Thread is WAITING");
 
 		QuickWrite16Bits(pThreadBase, 0x10, OS_STATE_RUNNABLE);
 
@@ -686,16 +686,16 @@ TEST_DISABLE_THREAD_FUNCS
 	}
 	else if (ThreadState == OS_STATE_STOPPED)
 	{
-		//DBGConsole_Msg(0, "  Thread is STOPPED");
+		//Console_Print("  Thread is STOPPED");
 
 		u32 queue = QuickRead32Bits(pThreadBase, 0x08);
 
 		if (queue == 0 || queue == ThreadQueue)
 		{
 			//if (queue == NULL)
-				//DBGConsole_Msg(0, "  Thread has NULL queue");
+				//Console_Print("  Thread has NULL queue");
 			//else
-				//DBGConsole_Msg(0, "  Thread's queue is VAR_ADDRESS(osThreadQueue)");
+				//Console_Print("  Thread's queue is VAR_ADDRESS(osThreadQueue)");
 
 			QuickWrite16Bits(pThreadBase, 0x10, OS_STATE_RUNNABLE);
 
@@ -706,7 +706,7 @@ TEST_DISABLE_THREAD_FUNCS
 		}
 		else
 		{
-			//DBGConsole_Msg(0, "  Thread has it's own queue");
+			//Console_Print("  Thread has it's own queue");
 			QuickWrite16Bits(pThreadBase, 0x10, OS_STATE_WAITING);
 
 			gGPR[REG_a0]._u32_0 = queue;
@@ -727,7 +727,7 @@ TEST_DISABLE_THREAD_FUNCS
 	}
 	else
 	{
-		DBGConsole_Msg(0, "  Thread is neither WAITING nor STOPPED");
+		Console_Print("  Thread is neither WAITING nor STOPPED");
 	}
 
 	// At this point, we check the priority of the current
@@ -740,7 +740,7 @@ TEST_DISABLE_THREAD_FUNCS
 	if (ActiveThread == 0)
 	{
 		// There is no currently active thread
-		//DBGConsole_Msg(0, "  No active thread, dispatching");
+		//Console_Print("  No active thread, dispatching");
 
 		return CALL_PATCHED_FUNCTION(__osDispatchThread);
 
@@ -755,7 +755,7 @@ TEST_DISABLE_THREAD_FUNCS
 
 		if (ActiveThreadPri < QueueThreadPri)
 		{
-			//DBGConsole_Msg(0, "  New thread has higher priority, enqueue/yield");
+			//Console_Print("  New thread has higher priority, enqueue/yield");
 
 			// Set the active thread's state to RUNNABLE
 			Write16Bits(ActiveThread + 0x10, OS_STATE_RUNNABLE);
@@ -769,7 +769,7 @@ TEST_DISABLE_THREAD_FUNCS
 		}
 		else
 		{
-			//DBGConsole_Msg(0, "  Thread has lower priority, continuing with active thread");
+			//Console_Print("  Thread has lower priority, continuing with active thread");
 		}
 
 	}
@@ -791,7 +791,7 @@ TEST_DISABLE_THREAD_FUNCS
 	gGPR[REG_v0]._s64 = (s64)thread;
 
 	QuickWrite32Bits(pBase, Read32Bits(thread + 0x0));
-	//DBGConsole_Msg(0, "0x%08x = __osPopThread(0x%08x)", thread, queue);
+	//Console_Print("0x%08x = __osPopThread(0x%08x)", thread, queue);
 
 	return PATCH_RET_JR_RA;
 }

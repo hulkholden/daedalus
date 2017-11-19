@@ -191,7 +191,7 @@ void CFragmentCache::InsertFragment( CFragment * p_fragment )
 		const JumpList &		jumps( jump_it->second );
 		for( JumpList::const_iterator it = jumps.begin(); it != jumps.end(); ++it )
 		{
-			//DBGConsole_Msg( 0, "Inserting [R%08x], patching jump at %08x ", address, (*it) );
+			//Console_Print("Inserting [R%08x], patching jump at %08x ", address, (*it));
 			PatchJumpLongAndFlush( (*it), p_fragment->GetEntryTarget() );
 		}
 
@@ -245,7 +245,7 @@ void CFragmentCache::InsertFragment( CFragment * p_fragment )
 		{
 			expansion = (100 * mOutputLength) / mInputLength;
 		}
-		DBGConsole_Msg( 0, "Dynarec: %d fragments, %dKB (i:o %d:%d = %d%%)",
+		Console_Print("Dynarec: %d fragments, %dKB (i:o %d:%d = %d%%)",
 			mFragments.size(), mMemoryUsage / 1024, mInputLength / 1024, mOutputLength / 1024, expansion );
 	}
 #endif
@@ -256,7 +256,7 @@ void CFragmentCache::Clear()
 #ifdef DAEDALUS_DEBUG_CONSOLE
 	if(CDebugConsole::IsAvailable())
 	{
-		DBGConsole_Msg( 0, "Clearing fragment cache of %d fragments", mFragments.size() );
+		Console_Print("Clearing fragment cache of %d fragments", mFragments.size());
 	}
 #endif
 	// Clear out all the framents
@@ -387,7 +387,7 @@ bool CFragmentCacheCoverage::IsCovered( u32 address, u32 len ) const
 {
 	if((address - BASE_ADDRESS) == 0)
 	{
-		DBGConsole_Msg( 0, "Cache coverage address is overlapping" );
+		Console_Print("Cache coverage address is overlapping");
 		return true;
 	}
 

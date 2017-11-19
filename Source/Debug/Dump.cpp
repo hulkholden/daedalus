@@ -34,7 +34,7 @@ std::string Dump_GetDumpDirectory(const std::string& subdir)
 #ifdef DAEDALUS_DEBUG_CONSOLE
 	if (CDebugConsole::IsAvailable())
 	{
-		// DBGConsole_Msg( 0, "Dump dir: [C%s]", dump_dir.c_str() );
+		// Console_Print("Dump dir: [C%s]", dump_dir.c_str());
 	}
 #endif
 	IO::Directory::EnsureExists(dump_dir);

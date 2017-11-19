@@ -83,7 +83,7 @@ static void	UpdateFramerate()
 bool CreateHLEGraphics()
 {
 	DAEDALUS_ASSERT(gHLEGraphics == nullptr, "HLEGraphics should not be initialised at this point");
-	DBGConsole_Msg( 0, "Initialising HLEGraphics" );
+	Console_Print("Initialising HLEGraphics");
 
 	HLEGraphics * hle = new HLEGraphics();
 	if (!hle->Initialise())
@@ -129,7 +129,7 @@ bool HLEGraphics::Initialise()
 
 void HLEGraphics::Finalise()
 {
-	DBGConsole_Msg(0, "Finalising GLGraphics");
+	Console_Print("Finalising GLGraphics");
 	Memory_UnregisterVIOriginChangedEventHandler(this);
 	RSP_HLE_UnregisterDisplayListProcessor(this);
 	DLParser_Finalise();

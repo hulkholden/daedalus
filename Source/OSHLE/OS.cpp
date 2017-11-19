@@ -61,7 +61,7 @@ void OS_HLE_osCreateMesgQueue(u32 queue, u32 msgBuffer, u32 msgCount)
 	q.SetMsgCount(msgCount);
 	q.SetMesgArray(msgBuffer);
 
-	//DBGConsole_Msg(0, "osCreateMsgQueue(0x%08x, 0x%08x, %d)",
+	//Console_Print("osCreateMsgQueue(0x%08x, 0x%08x, %d)",
 	//	queue, msgBuffer, msgCount);
 #ifdef DUMPOSFUNCTIONS
 	for (u32 existing_queue : g_MessageQueues)
@@ -131,7 +131,7 @@ u32 OS_HLE___osProbeTLB(u32 vaddr)
 		}
 	}
 
-	//DBGConsole_Msg(0, "Probe: 0x%08x -> 0x%08x", vaddr, PAddr);
+	//Console_Print("Probe: 0x%08x -> 0x%08x", vaddr, PAddr);
 	return PAddr;
 
 }

@@ -204,7 +204,7 @@ bool IRomSettingsDB::OpenSettingsFile(const std::string& filename)
 	IniFile* inifile = IniFile::Create(filename);
 	if (inifile == NULL)
 	{
-		DBGConsole_Msg(0, "Failed to open RomDB from %s\n", filename.c_str());
+		Console_Print("Failed to open RomDB from %s\n", filename.c_str());
 		return false;
 	}
 

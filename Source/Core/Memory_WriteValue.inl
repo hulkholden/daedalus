@@ -38,7 +38,7 @@ void Memory_UnregisterVIOriginChangedEventHandler(VIOriginChangedEventHandler* h
 static void WriteValueInvalid( u32 address, u32 value )
 {
 	DPF( DEBUG_MEMORY, "Illegal Memory Access Tried to Write To 0x%08x PC: 0x%08x", address, gCPUState.CurrentPC );
-	DBGConsole_Msg(0, "Illegal Memory Access: Tried to Write To 0x%08x (PC: 0x%08x)", address, gCPUState.CurrentPC);
+	Console_Print("Illegal Memory Access: Tried to Write To 0x%08x (PC: 0x%08x)", address, gCPUState.CurrentPC);
 }
 
 static void WriteValueMapped( u32 address, u32 value )
@@ -137,7 +137,7 @@ static void WriteValue_8410_841F( u32 address, u32 value )
 		// Write value to current reg too
 		Memory_DPC_SetRegister( DPC_START_REG, value );
 		Memory_DPC_SetRegister( DPC_CURRENT_REG, value );
-		//DBGConsole_Msg( 0, "Wrote to [WDPC_START_REG] 0x%08x", value );
+		//Console_Print("Wrote to [WDPC_START_REG] 0x%08x", value);
 		break;
 
 	case 0x4:	//DPC_END_REG
@@ -145,7 +145,7 @@ static void WriteValue_8410_841F( u32 address, u32 value )
 		//
 		// ToDo : Implement ProcessRDPList (LLE DList)
 		//
-		DBGConsole_Msg( 0, "Wrote to [WDPC_END_REG] 0x%08x", value );
+		Console_Print("Wrote to [WDPC_END_REG] 0x%08x", value);
 		Memory_MI_SetRegisterBits(MI_INTR_REG, MI_INTR_DP);
 		R4300_Interrupt_UpdateCause3();
 		break;
@@ -160,7 +160,7 @@ static void WriteValue_8410_841F( u32 address, u32 value )
 	case DPC_BUFBUSY_REG: //- Read Only
 	case DPC_PIPEBUSY_REG: //- Read Only
 	case DPC_TMEM_REG: //- Read Only
-		DBGConsole_Msg( 0, "Wrote to read only DPC reg" );
+		Console_Print("Wrote to read only DPC reg");
 		break;
 */
 	}
@@ -169,7 +169,7 @@ static void WriteValue_8410_841F( u32 address, u32 value )
 // 0x0420 0000 to 0x042F FFFF DP Span Registers
 static void WriteValue_8420_842F( u32 address, u32 value )
 {
-	DBGConsole_Msg(0, "Write to DP Span Registers is unhandled (0x%08x, PC: 0x%08x)",
+	Console_Print("Write to DP Span Registers is unhandled (0x%08x, PC: 0x%08x)",
 		address, gCPUState.CurrentPC);
 }
 
@@ -360,7 +360,7 @@ static void WriteValue_9FC0_9FCF( u32 address, u32 value )
 	// Writing PIF ROM or outside PIF RAM
 	if ((offset < 0x7C0) || (offset > 0x7FF))
 	{
-		DBGConsole_Msg(0, "[GWrite to PIF (0x%08x) is invalid", address);
+		Console_Print("[GWrite to PIF (0x%08x) is invalid", address);
 		return;
 	}
 
@@ -383,7 +383,7 @@ static void WriteValue_FlashRam( u32 address, u32 value )
 			return;
 		}
 	}
-	DBGConsole_Msg(0, "[GWrite to FlashRam (0x%08x) is invalid", address);
+	Console_Print("[GWrite to FlashRam (0x%08x) is invalid", address);
 }
 
 static void WriteValue_ROM( u32 address, u32 value )
@@ -392,6 +392,6 @@ static void WriteValue_ROM( u32 address, u32 value )
 	// A Bug's Life and Toy Story 2 write to ROM, add support by storing written value which is used when reading from Rom.
 	g_pWriteRom = value;
 
-	DBGConsole_Msg(0, "[YWarning : Wrote to ROM -> [0x%08x]", value);
+	Console_Print("[YWarning : Wrote to ROM -> [0x%08x]", value);
 	g_RomWritten = true;
 }

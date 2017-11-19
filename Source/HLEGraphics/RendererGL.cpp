@@ -898,7 +898,7 @@ void RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_z
 	if (program == NULL)
 	{
 		// There must have been some failure to compile the shader. Abort!
-		DBGConsole_Msg(0, "Couldn't generate a shader for mux %llx, cycle %d, alpha %d\n", config.Mux, config.CycleType, config.AlphaThreshold);
+		Console_Print("Couldn't generate a shader for mux %llx, cycle %d, alpha %d\n", config.Mux, config.CycleType, config.AlphaThreshold);
 		return;
 	}
 

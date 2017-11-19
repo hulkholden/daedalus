@@ -32,7 +32,7 @@ TEST_DISABLE_SP_FUNCS
 	u32 len    = gGPR[REG_a3]._u32_0;
 
 	/*
-	DBGConsole_Msg(0, "osSpRawStartDma(%d, 0x%08x, 0x%08x (0x%08x), %d)",
+	Console_Print("osSpRawStartDma(%d, 0x%08x, 0x%08x (0x%08x), %d)",
 		RWflag,
 		SPAddr,
 		VAddr, PAddr,
@@ -159,7 +159,7 @@ u32 Patch___osSpSetPc()
 TEST_DISABLE_SP_FUNCS
 	u32 pc = gGPR[REG_a0]._u32_0;
 
-	//DBGConsole_Msg(0, "__osSpSetPc(0x%08x)", pc);
+	//Console_Print("__osSpSetPc(0x%08x)", pc);
 
 	u32 status = SpGetStatus();
 
@@ -191,7 +191,7 @@ TEST_DISABLE_SP_FUNCS
 	if ((status & SP_STATUS_HALT) == 0 ||
 		IsSpDeviceBusy())
 	{
-		DBGConsole_Msg(0, "Sp Device is not HALTED, or is busy");
+		Console_Print("Sp Device is not HALTED, or is busy");
 		// We'd have to loop, and we can't do this...
 		return PATCH_RET_NOT_PROCESSED;
 	}*/
@@ -282,11 +282,11 @@ TEST_DISABLE_SP_FUNCS
 		// LOOP Until device not busy -
 		// we can't do this, so we just exit. What we could to is
 		// a speed hack and jump to the next interrupt
-		DBGConsole_Msg(0, "Sp Device is BUSY, looping until not busy");
+		Console_Print("Sp Device is BUSY, looping until not busy");
 		return PATCH_RET_NOT_PROCESSED;
 	}
 	*/
-	//DBGConsole_Msg(0, "__osSpTaskStartGo()");
+	//Console_Print("__osSpTaskStartGo()");
 	Memory_SP_SetRegisterBits( SP_STATUS_REG, ~(SP_STATUS_SSTEP|SP_STATUS_BROKE|SP_STATUS_HALT), SP_STATUS_INTR_BREAK );
 	RSP_HLE_ProcessTask();
 

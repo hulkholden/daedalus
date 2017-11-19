@@ -36,7 +36,7 @@ TEST_DISABLE_AI_FUNCS
 	// If Ai interface is busy, stop the dma operation, can this happen??
 	DAEDALUS_ASSERT( IsAiDeviceBusy()==0, "Warning: AI Interace is busy, can't DMA'd" );
 
-	//DBGConsole_Msg(0, "osAiNextBuffer() %08X len %d bytes",addr,len);
+	//Console_Print("osAiNextBuffer() %08X len %d bytes",addr,len);
 
 	Memory_AI_SetRegister( AI_LEN_REG, len );
 	Memory_AI_SetRegister( AI_DRAM_ADDR_REG, addr );
@@ -61,7 +61,7 @@ TEST_DISABLE_AI_FUNCS
 
 	//u32 freg = gGPR[REG_a0]._u32_0;
 
-	//DBGConsole_Msg(0, "osAiSetFrequency(%d)", freg);
+	//Console_Print("osAiSetFrequency(%d)", freg);
 	//gGPR[REG_v1]._u64 = freg;
 
 	//return PATCH_RET_JR_RA;

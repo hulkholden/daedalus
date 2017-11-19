@@ -93,7 +93,7 @@ TEST_DISABLE_REG_FUNCS
 
 	R4300_SetSR(gGPR[REG_a0]._u32_0);
 
-	//DBGConsole_Msg(0, "__osSetSR()");
+	//Console_Print("__osSetSR()");
 
 	return PATCH_RET_JR_RA;
 }
@@ -106,7 +106,7 @@ u32 Patch___osGetSR()
 TEST_DISABLE_REG_FUNCS
 
 	gGPR[REG_v0]._s64 = (s64)gCPUState.CPUControl[C0_SR]._u32;
-	//DBGConsole_Msg(0, "__osGetSR()");
+	//Console_Print("__osGetSR()");
 
 	return PATCH_RET_JR_RA;
 }
@@ -120,7 +120,7 @@ TEST_DISABLE_REG_FUNCS
 	gGPR[REG_v0]._s64 = (s64)gCPUState.FPUControl[31]._u32;
 
 	gCPUState.FPUControl[31]._u32 = gGPR[REG_a0]._u32_0;
-	DBGConsole_Msg(0, "__osSetFpcCsr()");
+	Console_Print("__osSetFpcCsr()");
 
 	return PATCH_RET_JR_RA;
 }

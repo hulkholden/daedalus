@@ -68,7 +68,7 @@ Address/Range		Description
 
 static void SPNOOP( AudioHLECommand command )
 {
-	//DBGConsole_Msg( 0, "AudioHLE: Unknown/Unimplemented Audio Command %i in ABI 1", command.cmd );
+	//Console_Print("AudioHLE: Unknown/Unimplemented Audio Command %i in ABI 1", command.cmd);
 }
 
 void CLEARBUFF( AudioHLECommand command )

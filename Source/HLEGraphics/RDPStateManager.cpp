@@ -140,7 +140,7 @@ void CRDPStateManager::LoadBlock(const SetLoadTile & load)
 
 	if (( (address + bytes) > MAX_RAM_ADDRESS) || (tmem_offset + bytes) > kMaxTmemAddress )
 	{
-		DBGConsole_Msg(0, "[WWarning LoadBlock address is invalid]" );
+		Console_Print("[WWarning LoadBlock address is invalid]");
 		return;
 	}
 
@@ -249,7 +249,7 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 	u32 bytes_to_copy = (bytes_per_tmem_line * h);
 	if ((address + bytes_to_copy) > MAX_RAM_ADDRESS || (tmem_offset + bytes_to_copy) > kMaxTmemAddress)
 	{
-		DBGConsole_Msg(0, "[WWarning LoadTile address is invalid]" );
+		Console_Print("[WWarning LoadTile address is invalid]");
 		return;
 	}
 

@@ -280,14 +280,14 @@ bool IController::OnRomOpen()
 	{
 		mpEepromData = (u8*)g_pMemoryBuffers[MEM_SAVE];
 		mEepromContType = 0x80;
-		DBGConsole_Msg( 0, "Initialising EEPROM to [M%d] bytes", 4096/8 );	// 4k bits
+		Console_Print("Initialising EEPROM to [M%d] bytes", 4096/8);	// 4k bits
 	}
 	else if ( save_type == SAVE_TYPE_EEP16K )
 	{
 
 		mpEepromData = (u8*)g_pMemoryBuffers[MEM_SAVE];
 		mEepromContType = 0xC0;
-		DBGConsole_Msg( 0, "Initialising EEPROM to [M%d] bytes", 16384/8 );	// 16 kbits
+		Console_Print("Initialising EEPROM to [M%d] bytes", 16384/8);	// 16 kbits
 
 	}
 	else
@@ -335,7 +335,7 @@ void IController::Process()
 		(tmp[2] == 0xFFFFFFFF) &&
 		(tmp[3] == 0xFFFFFFFF))
 	{
-		DBGConsole_Msg(0, "[YDecrypting PifRam]");
+		Console_Print("[YDecrypting PifRam]");
 		n64_cic_nus_6105();
 		return;
 	}
@@ -418,12 +418,12 @@ void IController::Process()
 //*****************************************************************************
 void IController::DumpInput() const
 {
-	DBGConsole_Msg( 0, "PIF:" );
+	Console_Print("PIF:");
 	for ( u32 x = 0; x < 64; x+=8 )
 	{
-		DBGConsole_Msg( 0, "0x%02x%02x%02x%02x : 0x%02x%02x%02x%02x",
+		Console_Print("0x%02x%02x%02x%02x : 0x%02x%02x%02x%02x",
 			mpInput[(x + 0)],  mpInput[(x + 1)],  mpInput[(x + 2)],  mpInput[(x + 3)],
-			mpInput[(x + 4)],  mpInput[(x + 5)],  mpInput[(x + 6)],  mpInput[(x + 7)] );
+			mpInput[(x + 4)],  mpInput[(x + 5)],  mpInput[(x + 6)],  mpInput[(x + 7)]);
 	}
 }
 #endif

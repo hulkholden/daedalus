@@ -33,18 +33,18 @@ class CDebugConsole : public CSingleton<CDebugConsole>
    public:
 	virtual ~CDebugConsole();
 
-	virtual void DAEDALUS_VARARG_CALL_TYPE Msg(u32 type, const char* format, ...) = 0;
+	virtual void DAEDALUS_VARARG_CALL_TYPE Print(const char* format, ...) = 0;
 
-	virtual void MsgOverwriteStart() = 0;
-	virtual void DAEDALUS_VARARG_CALL_TYPE MsgOverwrite(u32 type, const char* format, ...) = 0;
-	virtual void MsgOverwriteEnd() = 0;
+	virtual void OverwriteStart() = 0;
+	virtual void DAEDALUS_VARARG_CALL_TYPE Overwrite(const char* format, ...) = 0;
+	virtual void OverwriteEnd() = 0;
 };
 
-#define DBGConsole_Msg(type, ...) CDebugConsole::Get()->Msg(type, __VA_ARGS__)
+#define Console_Print(...) CDebugConsole::Get()->Print(__VA_ARGS__)
 
 #else
 
-#define DBGConsole_Msg(...)        \
+#define Console_Print(...)        \
 	do                             \
 	{                              \
 		DAEDALUS_USE(__VA_ARGS__); \

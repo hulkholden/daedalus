@@ -43,7 +43,7 @@ inline s32		FixedPointMul16( s32 a, s32 b )
 
 static void SPNOOP( AudioHLECommand command )
 {
-	DBGConsole_Msg( 0, "AudioHLE: Unknown/Unimplemented Audio Command %i in ABI 3", command.cmd );
+	Console_Print("AudioHLE: Unknown/Unimplemented Audio Command %i in ABI 3", command.cmd);
 }
 
 static void SETVOL3( AudioHLECommand command )

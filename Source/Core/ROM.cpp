@@ -55,22 +55,22 @@ RomInfo g_ROM;
 static void DumpROMInfo( const ROMHeader & header )
 {
 	// The "Header" is actually something to do with the PI_DOM_*_OFS values...
-	DBGConsole_Msg(0, "Header:          0x%02x%02x%02x%02x", header.x1, header.x2, header.x3, header.x4);
-	DBGConsole_Msg(0, "Clockrate:       0x%08x", header.ClockRate);
-	DBGConsole_Msg(0, "BootAddr:        0x%08x", SwapEndian(header.BootAddress));
-	DBGConsole_Msg(0, "Release:         0x%08x", header.Release);
-	DBGConsole_Msg(0, "CRC1:            0x%08x", header.CRC1);
-	DBGConsole_Msg(0, "CRC2:            0x%08x", header.CRC2);
-	DBGConsole_Msg(0, "Unknown0:        0x%08x", header.Unknown0);
-	DBGConsole_Msg(0, "Unknown1:        0x%08x", header.Unknown1);
-	DBGConsole_Msg(0, "ImageName:       '%s'",   header.Name);
-	DBGConsole_Msg(0, "Unknown2:        0x%08x", header.Unknown2);
-	DBGConsole_Msg(0, "Unknown3:        0x%04x", header.Unknown3);
-	DBGConsole_Msg(0, "Unknown4:        0x%02x", header.Unknown4);
-	DBGConsole_Msg(0, "Manufacturer:    0x%02x", header.Manufacturer);
-	DBGConsole_Msg(0, "CartID:          0x%04x", header.CartID);
-	DBGConsole_Msg(0, "CountryID:       0x%02x - '%c'", header.CountryID, (char)header.CountryID);
-	DBGConsole_Msg(0, "Unknown5:        0x%02x", header.Unknown5);
+	Console_Print("Header:          0x%02x%02x%02x%02x", header.x1, header.x2, header.x3, header.x4);
+	Console_Print("Clockrate:       0x%08x", header.ClockRate);
+	Console_Print("BootAddr:        0x%08x", SwapEndian(header.BootAddress));
+	Console_Print("Release:         0x%08x", header.Release);
+	Console_Print("CRC1:            0x%08x", header.CRC1);
+	Console_Print("CRC2:            0x%08x", header.CRC2);
+	Console_Print("Unknown0:        0x%08x", header.Unknown0);
+	Console_Print("Unknown1:        0x%08x", header.Unknown1);
+	Console_Print("ImageName:       '%s'",   header.Name);
+	Console_Print("Unknown2:        0x%08x", header.Unknown2);
+	Console_Print("Unknown3:        0x%04x", header.Unknown3);
+	Console_Print("Unknown4:        0x%02x", header.Unknown4);
+	Console_Print("Manufacturer:    0x%02x", header.Manufacturer);
+	Console_Print("CartID:          0x%04x", header.CartID);
+	Console_Print("CountryID:       0x%02x - '%c'", header.CountryID, (char)header.CountryID);
+	Console_Print("Unknown5:        0x%02x", header.Unknown5);
 }
 
 static void ROM_SimulatePIFBoot( ECicType cic_chip, u32 Country )
@@ -274,13 +274,13 @@ bool ROM_ReBoot()
 #ifdef DAEDALUS_DEBUG_CONSOLE
 	if (g_ROM.cic_chip == CIC_UNKNOWN)
 	{
-		//DAEDALUS_ERROR( "Unknown CIC CRC: 0x%08x\nAssuming CIC-6102", crc );
-		//DBGConsole_Msg(0, "[MUnknown CIC CRC: 0x%08x]", crc );
-		DBGConsole_Msg(0, "[MUnknown CIC]" );
+		//DAEDALUS_ERROR("Unknown CIC CRC: 0x%08x\nAssuming CIC-6102", crc);
+		//Console_Print("[MUnknown CIC CRC: 0x%08x]", crc);
+		Console_Print("[MUnknown CIC]");
 	}
 	else
 	{
-		DBGConsole_Msg(0, "[MRom uses %s]", ROM_GetCicName( g_ROM.cic_chip ) );
+		Console_Print("[MRom uses %s]", ROM_GetCicName( g_ROM.cic_chip ));
 
 /* goodn64 already tell us if the rom is good or bad
 		u32 crc1;
@@ -290,7 +290,7 @@ bool ROM_ReBoot()
 			if (crc1 != RomBuffer::ReadValueRaw< u32 >( 0x10 ) ||
 				crc2 != RomBuffer::ReadValueRaw< u32 >( 0x14 ))
 			{
-				DBGConsole_Msg(0, "[MWarning, CRC values don't match, fixing]");
+				Console_Print("[MWarning, CRC values don't match, fixing]");
 
 				RomBuffer::WriteValueRaw< u32 >( 0x10, crc1 );
 				RomBuffer::WriteValueRaw< u32 >( 0x14, crc2 );
@@ -334,7 +334,7 @@ void ROM_Unload()
 //Most hacks are for the PSP, due the limitations of the hardware, and because we prefer speed over accuracy
 void SpecificGameHacks( const ROMHeader & id )
 {
-	DBGConsole_Msg(0, "ROM ID[%04X]\n", id.CartID);
+	Console_Print("ROM ID[%04X]\n", id.CartID);
 
 	g_ROM.HACKS_u32 = 0;	//Default to no game hacks
 
@@ -435,7 +435,7 @@ void SpecificGameHacks( const ROMHeader & id )
 
 bool ROM_LoadFile(const RomID & rom_id, const RomSettings & settings, const SRomPreferences & preferences )
 {
-	DBGConsole_Msg(0, "Reading rom image: [C%s]", g_ROM.FileName.c_str());
+	Console_Print("Reading rom image: [C%s]", g_ROM.FileName.c_str());
 
 	// Get information about the rom header
 	RomBuffer::GetRomBytesRaw( &g_ROM.rh, 0, sizeof(ROMHeader) );
@@ -466,13 +466,13 @@ bool ROM_LoadFile(const RomID & rom_id, const RomSettings & settings, const SRom
 		CheatCodes_Read( g_ROM.settings.GameName.c_str(), GetDataFilename("Daedalus.cht"), g_ROM.rh.CountryID );
 	}
 
-	DBGConsole_Msg(0, "[G%s]", g_ROM.settings.GameName.c_str());
-	DBGConsole_Msg(0, "This game has been certified as [G%s] (%s)", g_ROM.settings.Comment.c_str(), g_ROM.settings.Info.c_str());
-	DBGConsole_Msg(0, "SaveType: [G%s]", ROM_GetSaveTypeName( g_ROM.settings.SaveType ) );
-	DBGConsole_Msg(0, "ApplyPatches: [G%s]", gOSHooksEnabled ? "on" : "off");
-	DBGConsole_Msg(0, "SpeedSync: [G%d]", gSpeedSyncEnabled);
-	DBGConsole_Msg(0, "DynaRec: [G%s]", gDynarecEnabled ? "on" : "off");
-	DBGConsole_Msg(0, "Cheats: [G%s]", gCheatsEnabled ? "on" : "off");
+	Console_Print("[G%s]", g_ROM.settings.GameName.c_str());
+	Console_Print("This game has been certified as [G%s] (%s)", g_ROM.settings.Comment.c_str(), g_ROM.settings.Info.c_str());
+	Console_Print("SaveType: [G%s]", ROM_GetSaveTypeName(g_ROM.settings.SaveType));
+	Console_Print("ApplyPatches: [G%s]", gOSHooksEnabled ? "on" : "off");
+	Console_Print("SpeedSync: [G%d]", gSpeedSyncEnabled);
+	Console_Print("DynaRec: [G%s]", gDynarecEnabled ? "on" : "off");
+	Console_Print("Cheats: [G%s]", gCheatsEnabled ? "on" : "off");
 
 	//Patch_ApplyPatches();
 

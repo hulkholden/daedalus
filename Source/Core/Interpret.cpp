@@ -166,7 +166,7 @@ void CPU_Skip()
 {
 	if (CPU_IsRunning())
 	{
-		DBGConsole_Msg(0, "Already Running");
+		Console_Print("Already Running");
 		return;
 	}
 
@@ -180,7 +180,7 @@ void CPU_Step()
 {
 	if (CPU_IsRunning())
 	{
-		DBGConsole_Msg(0, "Already Running");
+		Console_Print("Already Running");
 		return;
 	}
 

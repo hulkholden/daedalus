@@ -12,7 +12,7 @@ TEST_DISABLE_EEPROM_FUNCS
 	u32 ContStatus = gGPR[REG_a1]._u32_0;
 	u32 type, data;
 
-	DBGConsole_Msg(0, "osEepStatus(), ra = 0x%08x", (u32)gGPR[REG_ra]._s64);
+	Console_Print("osEepStatus(), ra = 0x%08x", (u32)gGPR[REG_ra]._s64);
 
 	// Set up ContStatus values
 	switch(g_ROM.settings.SaveType)
@@ -78,7 +78,7 @@ u32 Patch_osEepromProbe()
 {
 TEST_DISABLE_EEPROM_FUNCS
 	// Returns 1 on EEPROM detected, 0 on error/no eeprom
-	DBGConsole_Msg(0, "osEepromProbe(), ra = 0x%08x", gGPR[REG_ra]._u32_0);
+	Console_Print("osEepromProbe(), ra = 0x%08x", gGPR[REG_ra]._u32_0);
 
 	u32 data = 0;
 	switch( g_ROM.settings.SaveType )
@@ -112,7 +112,7 @@ TEST_DISABLE_EEPROM_FUNCS
 	//u32 dwBuf  = gGPR[REG_a2]._u32_0;
 
 
-	//DBGConsole_Msg(0, "osEepromRead(0x%08x, 0x%08x, 0x%08x), ra = 0x%08x",
+	//Console_Print("osEepromRead(0x%08x, 0x%08x, 0x%08x), ra = 0x%08x",
 	//	dwMQ, dwPage, dwBuf, (u32)g_qwGPR[REG_ra]);
 
 	return PATCH_RET_NOT_PROCESSED;
@@ -130,7 +130,7 @@ TEST_DISABLE_EEPROM_FUNCS
 	//u32 dwLen  = gGPR[REG_a3]._u32_0;
 
 
-	//DBGConsole_Msg(0, "[WosEepromLongRead(0x%08x, %d, 0x%08x, 0x%08x), ra = 0x%08x]",
+	//Console_Print("[WosEepromLongRead(0x%08x, %d, 0x%08x, 0x%08x), ra = 0x%08x]",
 	//	dwMQ, dwPage, dwBuf, dwLen, (u32)g_qwGPR[REG_ra]);
 
 	return PATCH_RET_NOT_PROCESSED;
@@ -152,7 +152,7 @@ TEST_DISABLE_EEPROM_FUNCS
 	//u32 dwB = Read32Bits(dwBuf + 4);
 
 
-	//DBGConsole_Msg(0, "osEepromWrite(0x%08x, %d, [0x%08x] = 0x%08x%08x), ra = 0x%08x",
+	//Console_Print("osEepromWrite(0x%08x, %d, [0x%08x] = 0x%08x%08x), ra = 0x%08x",
 	//	dwMQ, dwPage, dwBuf, dwA, dwB, (u32)g_qwGPR[REG_ra]);
 
 	return PATCH_RET_NOT_PROCESSED;
@@ -170,7 +170,7 @@ TEST_DISABLE_EEPROM_FUNCS
 	//u32 dwLen  = gGPR[REG_a3]._u32_0;
 
 
-	//DBGConsole_Msg(0, "[WosEepromLongWrite(0x%08x, %d, 0x%08x, 0x%08x), ra = 0x%08x]",
+	//Console_Print("[WosEepromLongWrite(0x%08x, %d, 0x%08x, 0x%08x), ra = 0x%08x]",
 	//	dwMQ, dwPage, dwBuf, dwLen, (u32)g_qwGPR[REG_ra]);
 
 

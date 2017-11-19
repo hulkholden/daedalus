@@ -14,7 +14,7 @@ TEST_DISABLE_VI_FUNCS
     OSViFieldRegs	fldRegs[2];	// Registers for Field 1  & 2
 	*/
 
-	//DBGConsole_Msg(0, "[WosViSetMode({%d, ...})]",
+	//Console_Print("[WosViSetMode({%d, ...})]",
 	//	Read8Bits(dwViMode + offsetof(OSViMode, type)));
 
 
@@ -30,7 +30,7 @@ u32 Patch_osViBlack()
 TEST_DISABLE_VI_FUNCS
 	//u32 dwVal = gGPR[REG_a0]._u32_0;
 
-	//DBGConsole_Msg(0, "[WosViBlack(%d)]", dwVal);
+	//Console_Print("[WosViBlack(%d)]", dwVal);
 
 	//Force pause
 	return PATCH_RET_NOT_PROCESSED;
@@ -46,7 +46,7 @@ TEST_DISABLE_VI_FUNCS
 	// Ignore interrupts disable
 	// Ignore save parameter
 
-	//DBGConsole_Msg(0, "osViSwapBuffer(0x%08x)", (u32)gGPR[REG_a0]);
+	//Console_Print("osViSwapBuffer(0x%08x)", (u32)gGPR[REG_a0]);
 
 	u32 pointer = Read32Bits(VAR_ADDRESS(osViSetModeGubbins));
 

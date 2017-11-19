@@ -551,7 +551,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 			trace[1].OpCode._u32 == 0x5420FFFE &&
 			trace[2].OpCode._u32 == 0x8C4F0000)
 		{
-			DBGConsole_Msg(0, "Speedhack complex %08x\n", trace[0].Address);
+			Console_Print("Speedhack complex %08x\n", trace[0].Address);
 			p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( CPU_SkipToNextEvent ) ) );
 		}
 	}

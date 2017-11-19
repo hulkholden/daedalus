@@ -181,11 +181,11 @@ bool System_Init()
 
 		if (entry.init())
 		{
-			DBGConsole_Msg(0, "==>Initialized %s", entry.name);
+			Console_Print("==>Initialized %s", entry.name);
 		}
 		else
 		{
-			DBGConsole_Msg(0, "==>Initialize %s Failed", entry.name);
+			Console_Print("==>Initialize %s Failed", entry.name);
 			return false;
 		}
 	}
@@ -202,10 +202,10 @@ bool System_Open(const std::string& filename)
 
 		if (entry.open == NULL) continue;
 
-		DBGConsole_Msg(0, "==>Open %s", entry.name);
+		Console_Print("==>Open %s", entry.name);
 		if (!entry.open())
 		{
-			DBGConsole_Msg(0, "==>Open %s [RFAILED]", entry.name);
+			Console_Print("==>Open %s [RFAILED]", entry.name);
 			return false;
 		}
 	}
@@ -221,7 +221,7 @@ void System_Close()
 
 		if (entry.close == NULL) continue;
 
-		DBGConsole_Msg(0, "==>Close %s", entry.name);
+		Console_Print("==>Close %s", entry.name);
 		entry.close();
 	}
 }
@@ -234,7 +234,7 @@ void System_Finalize()
 
 		if (entry.final == NULL) continue;
 
-		DBGConsole_Msg(0, "==>Finalize %s", entry.name);
+		Console_Print("==>Finalize %s", entry.name);
 		entry.final();
 	}
 }

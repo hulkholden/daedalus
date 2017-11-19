@@ -135,7 +135,7 @@ void jpeg_decode_PS(OSTask *task)
 
     if (task->t.flags & 0x1)
     {
-        DBGConsole_Msg(0, "jpeg_decode_PS: task yielding not implemented");
+        Console_Print("jpeg_decode_PS: task yielding not implemented");
         return;
     }
 
@@ -148,7 +148,7 @@ void jpeg_decode_PS(OSTask *task)
 
     if (mode != 0 && mode != 2)
     {
-        DBGConsole_Msg(0, "jpeg_decode_PS: invalid mode %d", mode);
+        Console_Print("jpeg_decode_PS: invalid mode %d", mode);
         return;
     }
 
@@ -173,7 +173,7 @@ void jpeg_decode_PS(OSTask *task)
 	macroblock = (s16 *)malloc(sizeof(*macroblock) * macroblock_size);
 	if (!macroblock)
 	{
-		DBGConsole_Msg(0, "jpeg_decode_PS: could not allocate macroblock");
+		Console_Print("jpeg_decode_PS: could not allocate macroblock");
 		return;
 	}
 

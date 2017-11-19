@@ -127,7 +127,7 @@ void Dump_Disassemble(u32 start, u32 end, const char* p_file_name)
 	u8* p_base;
 	if (!Memory_GetInternalReadAddress(start, (void**)&p_base))
 	{
-		DBGConsole_Msg(0, "[Ydis: Invalid base 0x%08x]", start);
+		Console_Print("[Ydis: Invalid base 0x%08x]", start);
 		return;
 	}
 
@@ -137,7 +137,7 @@ void Dump_Disassemble(u32 start, u32 end, const char* p_file_name)
 		return;
 	}
 
-	DBGConsole_Msg(0, "Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path.c_str());
+	Console_Print("Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path.c_str());
 
 	const OpCode* op_start(reinterpret_cast<const OpCode*>(p_base));
 	const OpCode* op_end(reinterpret_cast<const OpCode*>(p_base + (end - start)));
@@ -157,11 +157,11 @@ void Dump_RSPDisassemble(const char* p_file_name)
 
 	if (!Memory_GetInternalReadAddress(start, (void**)&base))
 	{
-		DBGConsole_Msg(0, "[Yrdis: Invalid base 0x%08x]", start);
+		Console_Print("[Yrdis: Invalid base 0x%08x]", start);
 		return;
 	}
 
-	DBGConsole_Msg(0, "Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path.c_str());
+	Console_Print("Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path.c_str());
 
 	FILE* fp = fopen(file_path.c_str(), "w");
 	if (!fp)
@@ -188,7 +188,7 @@ void Dump_Strings(const char* p_file_name)
 
 	static const u32 MIN_LENGTH = 5;
 
-	DBGConsole_Msg(0, "Dumping strings in rom ([C%s])", file_path.c_str());
+	Console_Print("Dumping strings in rom ([C%s])", file_path.c_str());
 
 	FILE* fp = fopen(file_path.c_str(), "w");
 	if (!fp)

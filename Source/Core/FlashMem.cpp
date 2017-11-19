@@ -85,7 +85,7 @@ void Flash_DoCommand(u32 FlashRAM_Command)
 	switch (FlashRAM_Command & 0xFF000000) {
 	case 0xD2000000:
 		switch (FlashFlag) {
-			DBGConsole_Msg(0, "Writing %X to flash ram command register\nFlashFlag: %d",FlashRAM_Command,FlashFlag);
+			Console_Print("Writing %X to flash ram command register\nFlashFlag: %d",FlashRAM_Command,FlashFlag);
 			case FLASHRAM_MODE_NOPES:
 				break;
 			case FLASHRAM_MODE_READ:
@@ -101,7 +101,7 @@ void Flash_DoCommand(u32 FlashRAM_Command)
 				Save_MarkSaveDirty();
 				break;
 			default:
-				DBGConsole_Msg(0, "Writing %X to flash ram command register\nFlashFlag: %d",FlashRAM_Command,FlashFlag);
+				Console_Print("Writing %X to flash ram command register\nFlashFlag: %d",FlashRAM_Command,FlashFlag);
 		}
 		FlashFlag = FLASHRAM_MODE_NOPES;
 		break;
@@ -131,6 +131,6 @@ void Flash_DoCommand(u32 FlashRAM_Command)
 	case 0x00000000:
 		break;
 	default:
-		DBGConsole_Msg(0, "Writing %X to flash ram command register",FlashRAM_Command);
+		Console_Print("Writing %X to flash ram command register",FlashRAM_Command);
 	}
 }

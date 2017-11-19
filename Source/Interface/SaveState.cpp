@@ -299,7 +299,7 @@ static bool LoadStateFromFile( const std::string& filename )
 	stream >> value;
 	if(value != SAVESTATE_PROJECT64_MAGIC_NUMBER)
 	{
-		DBGConsole_Msg(0, "Wrong magic number - savestate could be damaged or not in Daedalus/Project64 format" );
+		Console_Print("Wrong magic number - savestate could be damaged or not in Daedalus/Project64 format");
 		return false;
 	}
 	stream >> gRamSize;
@@ -312,7 +312,7 @@ static bool LoadStateFromFile( const std::string& filename )
 	if(g_ROM.mRomID != new_rom_id)
 	{
 		//ToDo: Give Option to switch Roms to one listed in SaveState if available.
-		DBGConsole_Msg(0, "ROM name in savestate is different from the name of the currently loaded ROM: %x-%x-%02x, %x-%x-%02x\n",
+		Console_Print("ROM name in savestate is different from the name of the currently loaded ROM: %x-%x-%02x, %x-%x-%02x\n",
 			g_ROM.mRomID.CRC[0], g_ROM.mRomID.CRC[1], g_ROM.mRomID.CountryID,
 			new_rom_id.CRC[0], new_rom_id.CRC[1], new_rom_id.CountryID);
 		return false;
@@ -515,12 +515,12 @@ static void HandleSaveStateOperationOnVerticalBlank()
 			DAEDALUS_ERROR("Unreachable");
 			break;
 		case SSO_SAVE:
-			DBGConsole_Msg(0, "Saving '%s'\n", gSaveStateFilename.c_str());
+			Console_Print("Saving '%s'\n", gSaveStateFilename.c_str());
 			SaveStateToFile(gSaveStateFilename);
 			gSaveStateOperation = SSO_NONE;
 			break;
 		case SSO_LOAD:
-			DBGConsole_Msg(0, "Loading '%s'\n", gSaveStateFilename.c_str());
+			Console_Print("Loading '%s'\n", gSaveStateFilename.c_str());
 
 			// Try to load the savestate immediately. If this fails, it
 			// usually means that we're running the correct rom (we should have a
@@ -559,7 +559,7 @@ static bool HandleSaveStateOperationOnCPUStopRunning()
 	}
 	else
 	{
-		DBGConsole_Msg(0, "Couldn't find matching rom for %s\n", gSaveStateFilename.c_str());
+		Console_Print("Couldn't find matching rom for %s\n", gSaveStateFilename.c_str());
 		// Keep running with the current rom.
 	}
 

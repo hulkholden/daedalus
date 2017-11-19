@@ -235,7 +235,7 @@ u32	CAudioBuffer::Drain( Sample * samples, u32 num_samples )
 	//
 	if( samples_required > 0 )
 	{
-		//DBGConsole_Msg( 0, "Buffer underflow (%d samples)\n", samples_required );
+		//Console_Print("Buffer underflow (%d samples)\n", samples_required);
 		//printf( "Buffer underflow (%d samples)\n", samples_required );
 		memset( out_ptr, 0, samples_required * sizeof( Sample ) );
 	}

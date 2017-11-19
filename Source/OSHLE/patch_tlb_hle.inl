@@ -15,7 +15,7 @@ TEST_DISABLE_TLB_FUNCS
 	u32 a = Read32Bits(gGPR[REG_sp]._u32_0 + 0x10);
 	u32 b = Read32Bits(gGPR[REG_sp]._u32_0 + 0x14);
 
-	DBGConsole_Msg(0, "[WosMapTLB(0x%08x,0x%08x,0x%08x,0x%08x,0x%08x,0x%08x)]",
+	Console_Print("[WosMapTLB(0x%08x,0x%08x,0x%08x,0x%08x,0x%08x,0x%08x)]",
 		w,x,y,z,a,b);
 #endif
 	return PATCH_RET_NOT_PROCESSED;
@@ -29,7 +29,7 @@ u32 Patch___osProbeTLB()
 {
 TEST_DISABLE_TLB_FUNCS
 	u32 addr = gGPR[REG_a0]._u32_0;
-	//DBGConsole_Msg(0, "Probe: 0x%08x -> 0x%08x", VAddr, dwPAddr);
+	//Console_Print("Probe: 0x%08x -> 0x%08x", VAddr, dwPAddr);
 
 	gGPR[REG_v0]._s64 = (s64)OS_HLE___osProbeTLB( addr );
 
@@ -43,7 +43,7 @@ u32 Patch_osVirtualToPhysical_Mario()
 {
 TEST_DISABLE_TLB_FUNCS
 	u32 addr = gGPR[REG_a0]._u32_0;
-	//DBGConsole_Msg(0, "osVirtualToPhysical(0x%08x)", addr);
+	//Console_Print("osVirtualToPhysical(0x%08x)", addr);
 
 	gGPR[REG_v0]._s64 = (s64)ConvertToPhysical( addr );
 
@@ -58,7 +58,7 @@ u32 Patch_osVirtualToPhysical_Rugrats()
 {
 TEST_DISABLE_TLB_FUNCS
 	u32 addr = gGPR[REG_a0]._u32_0;
-	//DBGConsole_Msg(0, "osVirtualToPhysical(0x%08x)", (u32)gGPR[REG_a0]);
+	//Console_Print("osVirtualToPhysical(0x%08x)", (u32)gGPR[REG_a0]);
 
 	gGPR[REG_v0]._s64 = (s64)ConvertToPhysical( addr );
 

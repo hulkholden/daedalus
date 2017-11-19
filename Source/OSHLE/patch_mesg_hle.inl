@@ -11,12 +11,12 @@ TEST_DISABLE_MESG_FUNCS
 	u32 msg   = gGPR[REG_a2]._u32_0;
 	/*if (vent < 23)
 	{
-		DBGConsole_Msg(0, "osSetEventMesg(%s, 0x%08x, 0x%08x)",
+		Console_Print("osSetEventMesg(%s, 0x%08x, 0x%08x)",
 			gEventStrings[vent], queue, msg);
 	}
 	else
 	{
-		DBGConsole_Msg(0, "osSetEventMesg(%d, 0x%08x, 0x%08x)",
+		Console_Print("osSetEventMesg(%d, 0x%08x, 0x%08x)",
 			vent, queue, msg);
 	}*/
 	const u32 p = VAR_ADDRESS(osEventMesgArray) + (vent * 8);
@@ -40,12 +40,12 @@ TEST_DISABLE_MESG_FUNCS
 	u32 msg   = gGPR[REG_a2]._u32_0;
 	/*if (vent < 23)
 	{
-		DBGConsole_Msg(0, "osSetEventMesg(%s, 0x%08x, 0x%08x)",
+		Console_Print("osSetEventMesg(%s, 0x%08x, 0x%08x)",
 			gEventStrings[vent], queue, msg);
 	}
 	else
 	{
-		DBGConsole_Msg(0, "osSetEventMesg(%d, 0x%08x, 0x%08x)",
+		Console_Print("osSetEventMesg(%d, 0x%08x, 0x%08x)",
 			vent, queue, msg);
 	}*/
 	const u32 p = VAR_ADDRESS(osEventMesgArray) + (vent * 8);
@@ -116,8 +116,8 @@ TEST_DISABLE_MESG_FUNCS
 
 	/*if (queue == 0x80007d40)
 	{
-	DBGConsole_Msg(0, "Thread: 0x%08x", Read32Bits(VAR_ADDRESS(osActiveThread)));
-	DBGConsole_Msg(0, "osRecvMsg(0x%08x, 0x%08x, %s) (%d/%d pending)",
+	Console_Print("Thread: 0x%08x", Read32Bits(VAR_ADDRESS(osActiveThread)));
+	Console_Print("osRecvMsg(0x%08x, 0x%08x, %s) (%d/%d pending)",
 		queue, msg, BlockFlag == OS_MESG_BLOCK ? "Block" : "Don't Block",
 		ValidCount, MsgCount);
 	}*/
@@ -139,14 +139,14 @@ TEST_DISABLE_MESG_FUNCS
 		}
 	}
 
-	//DBGConsole_Msg(0, "  Processing Pending");
+	//Console_Print("  Processing Pending");
 
 	u32 first = QuickRead32Bits(pBase, 0x0c);
 
 	//Store message in pointer
 	if (msg != 0)
 	{
-		//DBGConsole_Msg(0, "  Retrieving message");
+		//Console_Print("  Retrieving message");
 
 		u32 MsgBase = QuickRead32Bits(pBase, 0x14);
 
@@ -163,17 +163,17 @@ TEST_DISABLE_MESG_FUNCS
 	// Point first to the next valid message
 	/*if (MsgCount == 0)
 	{
-		DBGConsole_Msg(0, "Invalid message count");
+		Console_Print("Invalid message count");
 		// We would break here!
 	}
 	else if (MsgCount == u32(~0) && first+1 == 0x80000000)
 	{
-		DBGConsole_Msg(0, "Invalid message count/first");
+		Console_Print("Invalid message count/first");
 		// We would break here!
 	}
 	else*/
 	//{
-	//DBGConsole_Msg(0, "  Generating next valid message number");
+	//Console_Print("  Generating next valid message number");
 
 	QuickWrite32Bits(pBase, 0x0c, first);
 	//}
@@ -191,7 +191,7 @@ TEST_DISABLE_MESG_FUNCS
 	// If the first thread is not the idle thread, start it
 	if (NextThread != 0)
 	{
-		//DBGConsole_Msg(0, "  Activating sleeping thread");
+		//Console_Print("  Activating sleeping thread");
 
 		// From Patch___osPopThread():
 		QuickWrite32Bits(pBase, 0x04, NextThread);
@@ -234,8 +234,8 @@ TEST_DISABLE_MESG_FUNCS
 
 	/*if (queue == 0x80007d40)
 	{
-		DBGConsole_Msg(0, "Thread: 0x%08x", Read32Bits(VAR_ADDRESS(osActiveThread)));
-	DBGConsole_Msg(0, "osSendMsg(0x%08x, 0x%08x, %s) (%d/%d pending)",
+		Console_Print("Thread: 0x%08x", Read32Bits(VAR_ADDRESS(osActiveThread)));
+	Console_Print("osSendMsg(0x%08x, 0x%08x, %s) (%d/%d pending)",
 		queue, msg, BlockFlag == OS_MESG_BLOCK ? "Block" : "Don't Block",
 		ValidCount, MsgCount);
 	}*/
@@ -259,19 +259,19 @@ TEST_DISABLE_MESG_FUNCS
 
 	u32 first = QuickRead32Bits(pBase, 0x0c);
 
-	//DBGConsole_Msg(0, "  Processing Pending");
+	//Console_Print("  Processing Pending");
 	DAEDALUS_ASSERT( MsgCount != 0, "Invalid message count" );
 	DAEDALUS_ASSERT( MsgCount != u32(~0) && first+ValidCount != 0x80000000, "Invalid message count" );
 
 	// Point first to the next valid message
 	/*if (MsgCount == 0)
 	{
-		DBGConsole_Msg(0, "Invalid message count");
+		Console_Print("Invalid message count");
 		// We would break here!
 	}
 	else if (MsgCount == u32(~0) && first+ValidCount == 0x80000000)
 	{
-		DBGConsole_Msg(0, "Invalid message count/first");
+		Console_Print("Invalid message count/first");
 		// We would break here!
 	}
 	else*/
@@ -300,7 +300,7 @@ TEST_DISABLE_MESG_FUNCS
 	// If the first thread is not the idle thread, start it
 	if (NextThread != 0)
 	{
-		//DBGConsole_Msg(0, "  Activating sleeping thread");
+		//Console_Print("  Activating sleeping thread");
 
 		// From Patch___osPopThread():
 		QuickWrite32Bits(pBase, 0x00, NextThread);

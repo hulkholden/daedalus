@@ -611,7 +611,7 @@ void DLParser_Nothing( MicroCodeCommand command )
 	DAEDALUS_DL_ERROR( "RDP Command %08x Does not exist...", command.inst.cmd0 );
 
 	// Terminate!
-	//	DBGConsole_Msg(0, "Warning, DL cut short with unknown command: 0x%08x 0x%08x", command.inst.cmd0, command.inst.cmd1);
+	//	Console_Print("Warning, DL cut short with unknown command: 0x%08x 0x%08x", command.inst.cmd0, command.inst.cmd1);
 	DLParser_PopDL();
 
 }

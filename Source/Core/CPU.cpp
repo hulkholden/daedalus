@@ -267,26 +267,26 @@ DAEDALUS_STATIC_ASSERT(ARRAYSIZE(kRegisterNames) == 32);
 
 void SCPUState::Dump()
 {
-	DBGConsole_Msg(0, "Emulation CPU State:");
+	Console_Print("Emulation CPU State:");
 	{
 		for (int i = 0; i < 32; i += 4)
 		{
-			DBGConsole_Msg(0, "%s:%08X %s:%08X %s:%08X %s:%08X",
-						   kRegisterNames[i + 0], gCPUState.CPU[i + 0]._u32_0,
-						   kRegisterNames[i + 1], gCPUState.CPU[i + 1]._u32_0,
-						   kRegisterNames[i + 2], gCPUState.CPU[i + 2]._u32_0,
-						   kRegisterNames[i + 3], gCPUState.CPU[i + 3]._u32_0);
+			Console_Print("%s:%08X %s:%08X %s:%08X %s:%08X",
+						  kRegisterNames[i + 0], gCPUState.CPU[i + 0]._u32_0,
+						  kRegisterNames[i + 1], gCPUState.CPU[i + 1]._u32_0,
+						  kRegisterNames[i + 2], gCPUState.CPU[i + 2]._u32_0,
+						  kRegisterNames[i + 3], gCPUState.CPU[i + 3]._u32_0);
 		}
 
-		DBGConsole_Msg(0, "TargetPC: %08x", gCPUState.TargetPC);
-		DBGConsole_Msg(0, "CurrentPC: %08x", gCPUState.CurrentPC);
-		DBGConsole_Msg(0, "Delay: %08x", gCPUState.Delay);
+		Console_Print("TargetPC: %08x", gCPUState.TargetPC);
+		Console_Print("CurrentPC: %08x", gCPUState.CurrentPC);
+		Console_Print("Delay: %08x", gCPUState.Delay);
 	}
 }
 
 bool CPU_RomOpen()
 {
-	DBGConsole_Msg(0, "Resetting CPU");
+	Console_Print("Resetting CPU");
 
 	gLastAddress = NULL;
 	gCPURunning = false;
@@ -417,7 +417,7 @@ bool CPU_Run()
 
 void CPU_Halt(const char* reason)
 {
-	DBGConsole_Msg(0, "CPU Halting: %s", reason);
+	Console_Print("CPU Halting: %s", reason);
 	gCPUStopOnSimpleState = true;
 	gCPUState.AddJob(CPU_STOP_RUNNING);
 }
@@ -432,12 +432,12 @@ void CPU_AddBreakPoint(u32 address)
 
 	if (!Memory_GetInternalReadAddress(address, (void**)&pdwOp))
 	{
-		DBGConsole_Msg(0, "Invalid Address for BreakPoint: 0x%08x", address);
+		Console_Print("Invalid Address for BreakPoint: 0x%08x", address);
 	}
 	else
 	{
 		DBG_BreakPoint bpt;
-		DBGConsole_Msg(0, "[YInserting BreakPoint at 0x%08x]", address);
+		Console_Print("[YInserting BreakPoint at 0x%08x]", address);
 
 		bpt.mOriginalOp = *pdwOp;
 		bpt.mEnabled = true;
@@ -460,7 +460,7 @@ void CPU_EnableBreakPoint(u32 address, bool enable)
 
 	if (!Memory_GetInternalReadAddress(address, (void**)&pdwOp))
 	{
-		DBGConsole_Msg(0, "Invalid Address for BreakPoint: 0x%08x", address);
+		Console_Print("Invalid Address for BreakPoint: 0x%08x", address);
 	}
 	else
 	{
@@ -468,7 +468,7 @@ void CPU_EnableBreakPoint(u32 address, bool enable)
 
 		if (op_code.op != OP_DBG_BKPT)
 		{
-			DBGConsole_Msg(0, "[YNo breakpoint is set at 0x%08x]", address);
+			Console_Print("[YNo breakpoint is set at 0x%08x]", address);
 			return;
 		}
 
@@ -571,12 +571,12 @@ void CPU_SetCompare(u32 value)
 	gCPUState.CPUControl[C0_CAUSE]._u32 &= ~CAUSE_IP8;
 
 	DPF(DEBUG_REGS, "COMPARE set to 0x%08x.", value);
-	// DBGConsole_Msg(0, "COMPARE set to 0x%08x Count is 0x%08x.", value, gCPUState.CPUControl[C0_COUNT]._u32);
+	// Console_Print("COMPARE set to 0x%08x Count is 0x%08x.", value, gCPUState.CPUControl[C0_COUNT]._u32);
 
 	// Add an event for this compare:
 	if (value == gCPUState.CPUControl[C0_COMPARE]._u32)
 	{
-		// DBGConsole_Msg(0, "Clear");
+		// Console_Print("Clear");
 	}
 	else
 	{
@@ -590,14 +590,14 @@ void CPU_SetCompare(u32 value)
 			// If seems to keep setting a delta of 140624981 when the counter is close to wrapping.
 			// if (value < gCPUState.CPUControl[C0_COUNT]._u32)
 			// {
-			// 	DBGConsole_Msg(0, "SetCompare wrapping: %d -> %d = %d", gCPUState.CPUControl[C0_COUNT]._u32, value,
+			// 	Console_Print("SetCompare wrapping: %d -> %d = %d", gCPUState.CPUControl[C0_COUNT]._u32, value,
 			// delta);
 			// }
 			CPU_SetCompareEvent(delta);
 		}
 		else
 		{
-			// DBGConsole_Msg(0, "[RIgnoring SetCompare 0] - is this right?");
+			// Console_Print("[RIgnoring SetCompare 0] - is this right?");
 		}
 
 		gCPUState.CPUControl[C0_COMPARE]._u32 = value;

@@ -36,12 +36,12 @@ TEST_DISABLE_TIMER_FUNCS
 	u64 NewValue    = QuickRead64Bits(pNewTimerBase, 0x10);	// Check ordering is correct?!
 	u64 InsertValue = QuickRead64Bits(pInsertTimerBase, 0x10);
 
-	DAEDALUS_ASSERT( InsertTimer, "osInsertTimer with NULL insert timer" );
+	DAEDALUS_ASSERT( InsertTimer, "osInsertTimer with NULL insert timer");
 	/*
 	if ( InsertTimer == 0 )
 	{
 		// What gives?
-		DBGConsole_Msg( 0, "[W__osInsertTimer with NULL insert timer" );
+		Console_Print("[W__osInsertTimer with NULL insert timer");
 
 		// We can quit, because we've not written anything
 		return PATCH_RET_NOT_PROCESSED0(__osInsertTimer);
@@ -103,7 +103,7 @@ TEST_DISABLE_TIMER_FUNCS
 	// This avoids using VAR_ADDRESS(osSystemTimeLo) which is NULL for Killer Instinct..
 	u8 * pTimeBase	 = (u8 *)ReadAddress(VAR_ADDRESS(osSystemTimeHi));
 
-	DBGConsole_Msg(0, "Initialising Timer Services");
+	Console_Print("Initialising Timer Services");
 	QuickWrite32Bits(pTimeBase, 0x0, 0);	// TimeHi
 	QuickWrite32Bits(pTimeBase, 0x4, 0);	// TimeLo
 
@@ -144,7 +144,7 @@ u32 Patch_osSetTime()
 {
 TEST_DISABLE_TIMER_FUNCS
 
-	//DBGConsole_Msg(0, "osSetTime(0x%08x%08x)", TimeHi, TimeLo);
+	//Console_Print("osSetTime(0x%08x%08x)", TimeHi, TimeLo);
 
 	u8 * pTimeBase	 = (u8 *)ReadAddress(VAR_ADDRESS(osSystemTimeHi));
 

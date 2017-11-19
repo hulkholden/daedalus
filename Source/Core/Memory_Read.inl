@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static void * ReadInvalid( u32 address )
 {
 	DPF( DEBUG_MEMORY, "Illegal Memory Access - Tried to Read From 0x%08x (PC: 0x%08x)", address, gCPUState.CurrentPC );
-	DBGConsole_Msg(0, "Illegal Memory Access - Tried to Read From 0x%08x (PC: 0x%08x)", address, gCPUState.CurrentPC);
+	Console_Print("Illegal Memory Access - Tried to Read From 0x%08x (PC: 0x%08x)", address, gCPUState.CurrentPC);
 
 	u8* temp = (u8 *)g_pMemoryBuffers[MEM_UNUSED];
 
@@ -91,7 +91,7 @@ static void * Read_8410_841F( u32 address )
 // 0x0420 0000 to 0x042F FFFF DP Span Registers
 static void * Read_8420_842F( u32 address )
 {
-	DBGConsole_Msg( 0, "Read from DP Span Registers is unhandled (0x%08x, PC: 0x%08x)", address, gCPUState.CurrentPC );
+	Console_Print("Read from DP Span Registers is unhandled (0x%08x, PC: 0x%08x)", address, gCPUState.CurrentPC);
 	return ReadInvalid(address);
 }
 
@@ -116,7 +116,7 @@ static void * Read_8440_844F( u32 address )
 		u32 vi_pos = Memory_VI_GetRegister(VI_CURRENT_REG);
 		vi_pos = (vi_pos + 2) % 512;
 
-		//DBGConsole_Msg(0, "Reading vi pos: %d", vi_pos);
+		//Console_Print("Reading vi pos: %d", vi_pos);
 		*(u32*)temp = vi_pos;
 	}
 	return temp;
@@ -160,7 +160,7 @@ static void * ReadFlashRam( u32 address )
 			return (u8 *)&FlashStatus[0];
 	}
 
-	DBGConsole_Msg(0, "[GRead from FlashRam (0x%08x) is invalid", address);
+	Console_Print("[GRead from FlashRam (0x%08x) is invalid", address);
 	return ReadInvalid(address);
 }
 
@@ -184,7 +184,7 @@ static void * Read_9FC0_9FCF( u32 address )
 	// Reading PIF ROM or outside PIF RAM
 	if ((offset < 0x7C0) || (offset > 0x7FF))
 	{
-		DBGConsole_Msg(0, "[GRead from PIF (0x%08x) is invalid", address);
+		Console_Print("[GRead from PIF (0x%08x) is invalid", address);
 		return g_pMemoryBuffers[MEM_UNUSED];
 	}
 

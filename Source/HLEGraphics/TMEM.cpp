@@ -219,7 +219,7 @@ void CopyLineSwap(void * dst, const void * src, u32 bytes)
 #endif
 	{
 		// Optimize me: Bomberman, Zelda, and Quest 64 have unaligned copies here
-		//DBGConsole_Msg(0, "[WWarning CopyLineSwap: Performing slow copy]" );
+		//Console_Print("[WWarning CopyLineSwap: Performing slow copy]");
 
 		u8* src8 = (u8*)src32;
 		u8* dst8 = (u8*)dst32;
@@ -266,7 +266,7 @@ void CopyLineSwap32(void * dst, const void * src, u32 bytes)
 #endif
 	{
 		// Have yet to see game with unaligned copies here
-		//DBGConsole_Msg(0, "[WWarning CopyLineSwap32: Performing slow copy]" );
+		//Console_Print("[WWarning CopyLineSwap32: Performing slow copy]");
 
 		u8* src8 = (u8*)src32;
 		u8* dst8 = (u8*)dst32;

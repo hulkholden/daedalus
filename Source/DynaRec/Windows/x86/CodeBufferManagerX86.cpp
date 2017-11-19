@@ -173,11 +173,11 @@ CCodeGenerator * CCodeBufferManagerX86::StartNewBlock()
 		pNewAddress = VirtualAlloc(mpBuffer, mBufferSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 		if (pNewAddress == 0)
 		{
-			DBGConsole_Msg(0, "SR Buffer allocation failed"); // maybe this should be an abort?
+			Console_Print("SR Buffer allocation failed"); // maybe this should be an abort?
 		}
 		else
 		{
-			DBGConsole_Msg(0, "Allocated %dMB of storage for dynarec buffer", mBufferSize / (1024*1024));
+			Console_Print("Allocated %dMB of storage for dynarec buffer", mBufferSize / (1024*1024));
 		}
 
 	}
@@ -191,11 +191,11 @@ CCodeGenerator * CCodeBufferManagerX86::StartNewBlock()
 		pNewAddress = VirtualAlloc(mpSecondBuffer, mSecondBufferSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 		if (pNewAddress == 0)
 		{
-			DBGConsole_Msg(0, "SR Second Buffer allocation failed"); // maybe this should be an abort?
+			Console_Print("SR Second Buffer allocation failed"); // maybe this should be an abort?
 		}
 		else
 		{
-			DBGConsole_Msg(0, "Allocated %dMB of storage for dynarec second buffer",
+			Console_Print("Allocated %dMB of storage for dynarec second buffer",
 				mSecondBufferSize / (1024*1024));
 		}
 	}

@@ -46,7 +46,7 @@ bool Debug_InitLogging()
 		g_hOutputLog = fopen(log_filename.c_str(), "w");
 		if (!g_hOutputLog)
 		{
-			DBGConsole_Msg(0, "Can't open %s", log_filename.c_str());
+			Console_Print("Can't open %s", log_filename.c_str());
 		}
 	}
 	return g_hOutputLog != nullptr;

@@ -83,14 +83,14 @@ void CSynchroniser::Destroy()
 void CSynchroniser::HandleOutOfStorage()
 {
 	const char* message("Out of storage for synchroniser");
-	DBGConsole_Msg(0, message);
+	Console_Print(message);
 	Destroy();
 }
 
 void CSynchroniser::HandleOutOfInput()
 {
 	const char* message("Out of input for synchroniser");
-	DBGConsole_Msg(0, message);
+	Console_Print(message);
 	Destroy();
 }
 
@@ -162,7 +162,7 @@ CSynchroniser::ESynchResult ISynchConsumer::SynchPoint(const void* data, u32 len
 			if (memcmp(current_ptr, buffer, bytes_to_process) != 0)
 			{
 				if (bytes_to_process == sizeof(u32))
-					DBGConsole_Msg(0, "Expect 0x%08x but get 0x%08x", *(u32*)buffer, *(u32*)current_ptr);
+					Console_Print("Expect 0x%08x but get 0x%08x", *(u32*)buffer, *(u32*)current_ptr);
 				return SR_OUT_OF_SYNCH;
 			}
 
@@ -194,12 +194,12 @@ bool CSynchroniser::InitialiseSynchroniser()
 	if (!IO::File::Exists(filename))
 	{
 		p_synch = CSynchroniser::CreateProducer(filename);
-		DBGConsole_Msg(0, "Start Synchroniser in [Gproducer] mode to create [C%s]", filename.c_str());
+		Console_Print("Start Synchroniser in [Gproducer] mode to create [C%s]", filename.c_str());
 	}
 	else
 	{
 		p_synch = CSynchroniser::CreateConsumer(filename);
-		DBGConsole_Msg(0, "Start Synchroniser in [Gconsumer] mode to read [C%s]", filename.c_str());
+		Console_Print("Start Synchroniser in [Gconsumer] mode to read [C%s]", filename.c_str());
 	}
 
 	// return p_synch != nullptr && p_synch->IsOpen();

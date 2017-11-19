@@ -33,7 +33,7 @@ void DLParser_GBI2_Vtx(MicroCodeCommand command)
 	if (vend > 64)
 	{
 		DL_PF("    *Warning, attempting to load into invalid vertex positions");
-		DBGConsole_Msg(0, "DLParser_GBI2_Vtx: Warning, attempting to load into invalid vertex positions: %d -> %d", v0,
+		Console_Print("DLParser_GBI2_Vtx: Warning, attempting to load into invalid vertex positions: %d -> %d", v0,
 					   v0 + n);
 		return;
 	}
@@ -303,7 +303,7 @@ void DLParser_GBI2_MoveMem(MicroCodeCommand command)
 
 		default:
 			DL_PF("    GBI2 MoveMem Type: Unknown");
-			DBGConsole_Msg(0, "GBI2 MoveMem: Unknown Type. 0x%08x 0x%08x", command.inst.cmd0, command.inst.cmd1);
+			Console_Print("GBI2 MoveMem: Unknown Type. 0x%08x 0x%08x", command.inst.cmd0, command.inst.cmd1);
 			break;
 	}
 }
