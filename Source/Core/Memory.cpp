@@ -101,8 +101,8 @@ bool  g_RomWritten;
 // Ram base, offset by 0x80000000.
 u8 * gu8RamBase_8000 = NULL;
 
-MemFuncRead  	g_MemoryLookupTableRead[0x4000];
-MemFuncWrite 	g_MemoryLookupTableWrite[0x4000];
+MemReadEntry  	gMemReadLUT[0x4000];
+MemWriteEntry 	gMemWriteLUT[0x4000];
 void * 			gMemBuffers[NUM_MEM_BUFFERS];
 
 const u32 kMemSizeRDRAM         = 0x400000;
@@ -306,15 +306,15 @@ static void Memory_Tlb_Hack()
 	   u32 start_addr = 0x7F000000 >> 18;
 	   u32 end_addr   = 0x7FFFFFFF >> 18;
 
-	   u8 * pRead = (u8*)(reinterpret_cast< uintptr_t >(rom_address) + offset - (start_addr << 18));
+	   u8 * base = (u8*)(reinterpret_cast< uintptr_t >(rom_address) + offset - (start_addr << 18));
 
 	   for (u32 i = start_addr; i <= end_addr; i++)
 	   {
-			g_MemoryLookupTableRead[i].pRead = pRead;
+			gMemReadLUT[i].base = base;
 	   }
 	}
 
-	g_MemoryLookupTableRead[0x70000000 >> 18].pRead = (u8*)(reinterpret_cast< uintptr_t >( gMemBuffers[MEM_RD_RAM]) - 0x70000000);
+	gMemReadLUT[0x70000000 >> 18].base = (u8*)(reinterpret_cast< uintptr_t >( gMemBuffers[MEM_RD_RAM]) - 0x70000000);
 }
 
 static void Memory_InitFunc(u32 start, u32 size,
@@ -326,22 +326,22 @@ static void Memory_InitFunc(u32 start, u32 size,
 
 	while (start_addr <= end_addr)
 	{
-		g_MemoryLookupTableRead[start_addr|(0x8000>>2)].ReadFunc = read_func;
-		g_MemoryLookupTableWrite[start_addr|(0x8000>>2)].WriteFunc = write_func;
+		gMemReadLUT[start_addr|(0x8000>>2)].read_func = read_func;
+		gMemWriteLUT[start_addr|(0x8000>>2)].write_func = write_func;
 
-		g_MemoryLookupTableRead[start_addr|(0xA000>>2)].ReadFunc = read_func;
-		g_MemoryLookupTableWrite[start_addr|(0xA000>>2)].WriteFunc = write_func;
+		gMemReadLUT[start_addr|(0xA000>>2)].read_func = read_func;
+		gMemWriteLUT[start_addr|(0xA000>>2)].write_func = write_func;
 
 		if (read_region != MEM_UNUSED)
 		{
-			g_MemoryLookupTableRead[start_addr|(0x8000>>2)].pRead = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[read_region]) - (((start>>16)|0x8000) << 16));
-			g_MemoryLookupTableRead[start_addr|(0xA000>>2)].pRead = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[read_region]) - (((start>>16)|0xA000) << 16));
+			gMemReadLUT[start_addr|(0x8000>>2)].base = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[read_region]) - (((start>>16)|0x8000) << 16));
+			gMemReadLUT[start_addr|(0xA000>>2)].base = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[read_region]) - (((start>>16)|0xA000) << 16));
 		}
 
 		if (write_region != MEM_UNUSED)
 		{
-			g_MemoryLookupTableWrite[start_addr|(0x8000>>2)].pWrite = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[write_region]) - (((start>>16)|0x8000) << 16));
-			g_MemoryLookupTableWrite[start_addr|(0xA000>>2)].pWrite = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[write_region]) - (((start>>16)|0xA000) << 16));
+			gMemWriteLUT[start_addr|(0x8000>>2)].base = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[write_region]) - (((start>>16)|0x8000) << 16));
+			gMemWriteLUT[start_addr|(0xA000>>2)].base = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[write_region]) - (((start>>16)|0xA000) << 16));
 		}
 
 		start_addr++;
@@ -350,35 +350,34 @@ static void Memory_InitFunc(u32 start, u32 size,
 
 void Memory_InitTables()
 {
-	memset(g_MemoryLookupTableRead, 0, sizeof(MemFuncRead) * 0x4000);
-	memset(g_MemoryLookupTableWrite, 0, sizeof(MemFuncWrite) * 0x4000);
+	memset(gMemReadLUT, 0, sizeof(MemReadEntry) * 0x4000);
+	memset(gMemWriteLUT, 0, sizeof(MemWriteEntry) * 0x4000);
 
-	u32 i;
-	for (i = 0; i < (0x10000 >> 2); i++)
+	for (u32 i = 0; i < (0x10000 >> 2); i++)
 	{
-		g_MemoryLookupTableRead[i].pRead = NULL;
-		g_MemoryLookupTableWrite[i].pWrite = NULL;
+		gMemReadLUT[i].base = nullptr;
+		gMemWriteLUT[i].base = nullptr;
 	}
 
 	// 0x00000000 - 0x7FFFFFFF Mapped Memory
-	for (i = 0; i < (0x8000 >> 2); i++)
+	for (u32 i = 0; i < (0x8000 >> 2); i++)
 	{
-		g_MemoryLookupTableRead[i].ReadFunc		= ReadMapped;
-		g_MemoryLookupTableWrite[i].WriteFunc	= WriteValueMapped;
+		gMemReadLUT[i].read_func   = ReadMapped;
+		gMemWriteLUT[i].write_func = WriteValueMapped;
 	}
 
 	// Invalidate all entries, mapped regions are untouched (0x00000000 - 0x7FFFFFFF, 0xC0000000 - 0x10000000 )
-	for (i = (0x8000 >> 2); i < (0xC000 >> 2); i++)
+	for (u32 i = (0x8000 >> 2); i < (0xC000 >> 2); i++)
 	{
-		g_MemoryLookupTableRead[i].ReadFunc		= ReadInvalid;
-		g_MemoryLookupTableWrite[i].WriteFunc	= WriteValueInvalid;
+		gMemReadLUT[i].read_func   = ReadInvalid;
+		gMemWriteLUT[i].write_func = WriteValueInvalid;
 	}
 
 	// 0xC0000000 - 0x10000000 Mapped Memory
-	for (i = (0xC000 >> 2); i < (0x10000 >> 2); i++)
+	for (u32 i = (0xC000 >> 2); i < (0x10000 >> 2); i++)
 	{
-		g_MemoryLookupTableRead[i].ReadFunc		= ReadMapped;
-		g_MemoryLookupTableWrite[i].WriteFunc	= WriteValueMapped;
+		gMemReadLUT[i].read_func   = ReadMapped;
+		gMemWriteLUT[i].write_func = WriteValueMapped;
 	}
 
 	u32 rom_size = RomBuffer::GetRomSize();

@@ -118,9 +118,9 @@ void R4300_CALL_TYPE CPU_InvalidateICacheRange( u32 address, u32 length )
 template< bool TraceEnabled > DAEDALUS_FORCEINLINE void CPU_EXECUTE_OP()
 {
 
-	u8 * p_Instruction;
+	const u8 * p_Instruction;
 	CPU_FETCH_INSTRUCTION( p_Instruction, gCPUState.CurrentPC );
-	OpCode op_code = *(OpCode*)p_Instruction;
+	OpCode op_code = *(const OpCode*)p_Instruction;
 
 	// Cache instruction base pointer (used for SpeedHack() @ R4300.0)
 	gLastAddress = p_Instruction;

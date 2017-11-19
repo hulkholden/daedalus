@@ -68,7 +68,7 @@ std::vector<DBG_BreakPoint> g_BreakPoints;
 volatile u32 eventQueueLocked = 0;
 
 static bool gCPURunning = false;  // CPU is actively running
-u8* gLastAddress = NULL;
+const u8* gLastAddress = NULL;
 
 // When stopping, try to stop in a 'simple' state (i.e. no RSP running and not in a branch delay slot)
 static bool gCPUStopOnSimpleState = false;
