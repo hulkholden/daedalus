@@ -93,7 +93,7 @@ void RomBuffer::Close()
 
 void RomBuffer::GetRomBytesRaw(void* dst, u32 rom_start, u32 length) { memcpy(dst, gRomData + rom_start, length); }
 
-void* RomBuffer::GetAddressRaw(u32 rom_start)
+const void* RomBuffer::GetAddressRaw(u32 rom_start)
 {
 	if (rom_start < gRomSize)
 	{

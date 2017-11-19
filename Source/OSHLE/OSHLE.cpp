@@ -240,10 +240,8 @@ u32 Patch_GetSymbolAddress(const char * name)
 
 const char * Patch_GetJumpAddressName(u32 jump)
 {
-	u32 * pdwOpBase;
-	u32 * pdwPatchBase;
-
-	if (!Memory_GetInternalReadAddress(jump, (void **)&pdwOpBase))
+	const void * mem_base;
+	if (!Memory_GetInternalReadAddress(jump, &mem_base))
 		return "??";
 
 	// Search new list
@@ -253,11 +251,11 @@ const char * Patch_GetJumpAddressName(u32 jump)
 		if (!g_PatchSymbols[p]->Found)
 			continue;
 
-		pdwPatchBase = g_pu32RamBase + (g_PatchSymbols[p]->Location>>2);
+		const void * patch_base = g_pu32RamBase + (g_PatchSymbols[p]->Location>>2);
 
 		// Symbol not found, attempt to locate on this pass. This may
 		// fail if all dependent symbols are not found
-		if (pdwPatchBase == pdwOpBase)
+		if (patch_base == mem_base)
 		{
 			return g_PatchSymbols[p]->Name;
 		}

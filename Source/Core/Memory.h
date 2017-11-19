@@ -58,19 +58,19 @@ static const u32 MEMORY_4_MEG( 4*1024*1024 );
 static const u32 MEMORY_8_MEG( 8*1024*1024 );
 #define MAX_RAM_ADDRESS MEMORY_8_MEG
 
-typedef void * (*mReadFunction )( u32 address );
-typedef void (*mWriteFunction )( u32 address, u32 value );
+typedef const void * (*ReadFunction )( u32 address );
+typedef void (*WriteFunction )( u32 address, u32 value );
 
 struct MemFuncWrite
 {
 	u8			  *pWrite;
-	mWriteFunction WriteFunc;
+	WriteFunction WriteFunc;
 };
 
 struct MemFuncRead
 {
 	u8			 *pRead;
-	mReadFunction ReadFunc;
+	ReadFunction ReadFunc;
 };
 
 extern u32		gRamSize;
@@ -89,13 +89,13 @@ void			Memory_Cleanup();
 
 typedef void * (*MemFastFunction )( u32 address );
 typedef void (*MemWriteValueFunction )( u32 address, u32 value );
-typedef bool (*InternalMemFastFunction)( u32 address, void ** p_translated );
+typedef bool (*InternalReadFunction)( u32 address, const void ** p_translated );
 
 extern MemFuncRead  				g_MemoryLookupTableRead[0x4000];
 extern MemFuncWrite 				g_MemoryLookupTableWrite[0x4000];
 
 // Fast memory access
-inline void* ReadAddress( u32 address )
+inline const void* ReadAddress( u32 address )
 {
 	const MemFuncRead & m( g_MemoryLookupTableRead[ address >> 18 ] );
 
@@ -121,7 +121,7 @@ inline void WriteAddress( u32 address, u32 value )
 	m.WriteFunc( address, value );
 }
 
-bool Memory_GetInternalReadAddress(u32 address, void ** p_translated);
+bool Memory_GetInternalReadAddress(u32 address, const void ** p_translated);
 
 //////////////////////////////////////////////////////////////
 // Quick Read/Write methods that require a base returned by

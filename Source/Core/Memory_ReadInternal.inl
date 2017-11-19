@@ -19,20 +19,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // InternalRead is only used for debug puposes.
 
-static InternalMemFastFunction gInternalReadFastTable[0x4000];
+static InternalReadFunction gInternalReadFastTable[0x4000];
 
-bool Memory_GetInternalReadAddress(u32 address, void ** translated)
+bool Memory_GetInternalReadAddress(u32 address, const void ** translated)
 {
 	return (gInternalReadFastTable)[(address)>>18](address, translated);
 }
 
-static bool InternalReadInvalid( u32 address, void ** translated )
+static bool InternalReadInvalid( u32 address, const void ** translated )
 {
 	*translated = g_pMemoryBuffers[MEM_UNUSED];
 	return false;
 }
 
-static bool InternalReadMapped( u32 address, void ** translated )
+static bool InternalReadMapped( u32 address, const void ** translated )
 {
 	bool missing;
 
@@ -47,19 +47,19 @@ static bool InternalReadMapped( u32 address, void ** translated )
 	return InternalReadInvalid(address, translated);
 }
 
-static bool InternalRead_4Mb_8000_803F( u32 address, void ** translated )
+static bool InternalRead_4Mb_8000_803F( u32 address, const void ** translated )
 {
 	*translated = g_pu8RamBase + (address & 0x003FFFFF);
 	return true;
 }
 
-static bool InternalRead_8Mb_8000_807F( u32 address, void ** translated )
+static bool InternalRead_8Mb_8000_807F( u32 address, const void ** translated )
 {
 	*translated = g_pu8RamBase + (address & 0x007FFFFF);
 	return true;
 }
 
-static bool InternalReadROM( u32 address, void ** translated )
+static bool InternalReadROM( u32 address, const void ** translated )
 {
 	// Note: NOT 0x1FFFFFFF
 	u32		offset( address & 0x00FFFFFF );
@@ -71,7 +71,7 @@ static bool InternalReadROM( u32 address, void ** translated )
 	return InternalReadInvalid( address, translated );
 }
 
-static bool InternalRead_8400_8400( u32 address, void ** translated )
+static bool InternalRead_8400_8400( u32 address, const void ** translated )
 {
 	u32 offset;
 
@@ -89,7 +89,7 @@ static bool InternalRead_8400_8400( u32 address, void ** translated )
 	return InternalReadInvalid( address, translated );
 }
 
-static bool InternalRead_9FC0_9FCF( u32 address, void ** translated )
+static bool InternalRead_9FC0_9FCF( u32 address, const void ** translated )
 {
 	u32 offset;
 
@@ -119,7 +119,7 @@ static bool InternalRead_9FC0_9FCF( u32 address, void ** translated )
 struct InternalMemMapEntry
 {
 	u32 mStartAddr, mEndAddr;
-	InternalMemFastFunction InternalReadFastFunction;
+	InternalReadFunction InternalReadFastFunction;
 };
 
 // Physical ram: 0x80000000 upwards is set up when tables are initialised

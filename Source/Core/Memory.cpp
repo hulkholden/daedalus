@@ -284,29 +284,31 @@ static void Memory_Tlb_Hack()
 	g_MemoryLookupTableRead[0x70000000 >> 18].pRead = (u8*)(reinterpret_cast< uintptr_t >( g_pMemoryBuffers[MEM_RD_RAM]) - 0x70000000);
 }
 
-static void Memory_InitFunc(u32 start, u32 size, const u32 ReadRegion, const u32 WriteRegion, mReadFunction ReadFunc, mWriteFunction WriteFunc)
+static void Memory_InitFunc(u32 start, u32 size,
+							const u32 read_region, const u32 write_region,
+							ReadFunction read_func, WriteFunction write_func)
 {
 	u32	start_addr = (start >> 18);
 	u32	end_addr   = ((start + size - 1) >> 18);
 
 	while (start_addr <= end_addr)
 	{
-		g_MemoryLookupTableRead[start_addr|(0x8000>>2)].ReadFunc= ReadFunc;
-		g_MemoryLookupTableWrite[start_addr|(0x8000>>2)].WriteFunc = WriteFunc;
+		g_MemoryLookupTableRead[start_addr|(0x8000>>2)].ReadFunc = read_func;
+		g_MemoryLookupTableWrite[start_addr|(0x8000>>2)].WriteFunc = write_func;
 
-		g_MemoryLookupTableRead[start_addr|(0xA000>>2)].ReadFunc= ReadFunc;
-		g_MemoryLookupTableWrite[start_addr|(0xA000>>2)].WriteFunc = WriteFunc;
+		g_MemoryLookupTableRead[start_addr|(0xA000>>2)].ReadFunc = read_func;
+		g_MemoryLookupTableWrite[start_addr|(0xA000>>2)].WriteFunc = write_func;
 
-		if (ReadRegion)
+		if (read_region)
 		{
-			g_MemoryLookupTableRead[start_addr|(0x8000>>2)].pRead = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[ReadRegion]) - (((start>>16)|0x8000) << 16));
-			g_MemoryLookupTableRead[start_addr|(0xA000>>2)].pRead = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[ReadRegion]) - (((start>>16)|0xA000) << 16));
+			g_MemoryLookupTableRead[start_addr|(0x8000>>2)].pRead = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[read_region]) - (((start>>16)|0x8000) << 16));
+			g_MemoryLookupTableRead[start_addr|(0xA000>>2)].pRead = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[read_region]) - (((start>>16)|0xA000) << 16));
 		}
 
-		if (WriteRegion)
+		if (write_region)
 		{
-			g_MemoryLookupTableWrite[start_addr|(0x8000>>2)].pWrite = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[WriteRegion]) - (((start>>16)|0x8000) << 16));
-			g_MemoryLookupTableWrite[start_addr|(0xA000>>2)].pWrite = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[WriteRegion]) - (((start>>16)|0xA000) << 16));
+			g_MemoryLookupTableWrite[start_addr|(0x8000>>2)].pWrite = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[write_region]) - (((start>>16)|0x8000) << 16));
+			g_MemoryLookupTableWrite[start_addr|(0xA000>>2)].pWrite = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[write_region]) - (((start>>16)|0xA000) << 16));
 		}
 
 		start_addr++;

@@ -17,7 +17,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-static void * ReadInvalid( u32 address )
+static const void * ReadInvalid( u32 address )
 {
 	DPF( DEBUG_MEMORY, "Illegal Memory Access - Tried to Read From 0x%08x (PC: 0x%08x)", address, gCPUState.CurrentPC );
 	Console_Print("Illegal Memory Access - Tried to Read From 0x%08x (PC: 0x%08x)", address, gCPUState.CurrentPC);
@@ -29,7 +29,7 @@ static void * ReadInvalid( u32 address )
 	return temp;
 }
 
-static void * ReadMapped( u32 address )
+static const void * ReadMapped( u32 address )
 {
 	bool missing;
 
@@ -49,61 +49,61 @@ static void * ReadMapped( u32 address )
 	}
 }
 
-static void * Read_8000_807F( u32 address )
+static const void * Read_8000_807F( u32 address )
 {
 	// Note: Mask is slighty different when EPAK isn't used 0x003FFFFF
 	return (u8 *)g_pMemoryBuffers[MEM_RD_RAM] + (address & 0x007FFFFF);
 }
 
 // 0x83F0 0000 to 0x83FF FFFF  RDRAM registers
-static void * Read_83F0_83F0( u32 address )
+static const void * Read_83F0_83F0( u32 address )
 {
 	DPF( DEBUG_MEMORY_RDRAM_REG, "Reading from MEM_RD_REG: 0x%08x", address );
 	return (u8 *)g_pMemoryBuffers[MEM_RD_REG0] + (address & 0xFF);
 }
 
 // 0x0400 0000 to 0x0400 FFFF  SP registers
-static void * Read_8400_8400( u32 address )
+static const void * Read_8400_8400( u32 address )
 {
 	DPF( DEBUG_MEMORY_SP_IMEM, "Reading from SP_MEM: 0x%08x", address );
 	return (u8 *)g_pMemoryBuffers[MEM_SP_MEM] + (address & 0x1FFF);
 }
 
-static void * Read_8404_8404( u32 address )
+static const void * Read_8404_8404( u32 address )
 {
 	DPF( DEBUG_MEMORY_SP_REG, "Reading from SP_REG: 0x%08x", address );
 	return (u8 *)g_pMemoryBuffers[MEM_SP_REG] + (address & 0xFF);
 }
 
-static void * Read_8408_8408( u32 address )
+static const void * Read_8408_8408( u32 address )
 {
 	DPF( DEBUG_MEMORY_SP_REG, "Reading from SP_PC_REG: 0x%08x", address );
 	return (u8 *)g_pMemoryBuffers[MEM_SP_PC_REG] + (address & 0xFF);
 }
 
 // 0x0410 0000 to 0x041F FFFF DP Command Registers
-static void * Read_8410_841F( u32 address )
+static const void * Read_8410_841F( u32 address )
 {
 	DPF( DEBUG_MEMORY_DP, "Reading from DP_COMMAND_REG: 0x%08x", address );
 	return (u8 *)g_pMemoryBuffers[MEM_DPC_REG] + (address & 0xFF);
 }
 
 // 0x0420 0000 to 0x042F FFFF DP Span Registers
-static void * Read_8420_842F( u32 address )
+static const void * Read_8420_842F( u32 address )
 {
 	Console_Print("Read from DP Span Registers is unhandled (0x%08x, PC: 0x%08x)", address, gCPUState.CurrentPC);
 	return ReadInvalid(address);
 }
 
 // 0x0430 0000 to 0x043F FFFF MIPS Interface (MI) Registers
-static void * Read_8430_843F( u32 address )
+static const void * Read_8430_843F( u32 address )
 {
 	DPF( DEBUG_MEMORY_MI, "Reading from MI Registers: 0x%08x", address );
 	return (u8 *)g_pMemoryBuffers[MEM_MI_REG] + (address & 0xFF);
 }
 
 // 0x0440 0000 to 0x044F FFFF Video Interface (VI) Registers
-static void * Read_8440_844F( u32 address )
+static const void * Read_8440_844F( u32 address )
 {
 	DPF( DEBUG_MEMORY_VI, "Reading from MEM_VI_REG: 0x%08x", address );
 	u32 offset = address & 0xFF;
@@ -123,14 +123,14 @@ static void * Read_8440_844F( u32 address )
 }
 
 // 0x0450 0000 to 0x045F FFFF Audio Interface (AI) Registers
-static void * Read_8450_845F( u32 address )
+static const void * Read_8450_845F( u32 address )
 {
 	DPF( DEBUG_MEMORY_AI, "Reading from AI Registers: 0x%08x", address );
 	return (u8 *)g_pMemoryBuffers[MEM_AI_REG] + (address & 0xFF);
 }
 
 // 0x0460 0000 to 0x046F FFFF Peripheral Interface (PI) Registers
-static void * Read_8460_846F( u32 address )
+static const void * Read_8460_846F( u32 address )
 {
 	DPF( DEBUG_MEMORY_PI, "Reading from MEM_PI_REG: 0x%08x", address );
 	return (u8 *)g_pMemoryBuffers[MEM_PI_REG] + (address & 0xFF);
@@ -138,20 +138,20 @@ static void * Read_8460_846F( u32 address )
 
 
 // 0x0470 0000 to 0x047F FFFF RDRAM Interface (RI) Registers
-static void * Read_8470_847F( u32 address )
+static const void * Read_8470_847F( u32 address )
 {
 	DPF( DEBUG_MEMORY_RI, "Reading from MEM_RI_REG: 0x%08x", address );
 	return (u8 *)g_pMemoryBuffers[MEM_RI_REG] + (address & 0xFF);
 }
 
 // 0x0480 0000 to 0x048F FFFF Serial Interface (SI) Registers
-static void * Read_8480_848F( u32 address )
+static const void * Read_8480_848F( u32 address )
 {
 	DPF( DEBUG_MEMORY_SI, "Reading from MEM_SI_REG: 0x%08x", address );
 	return (u8 *)g_pMemoryBuffers[MEM_SI_REG] + (address & 0xFF);
 }
 
-static void * ReadFlashRam( u32 address )
+static const void * ReadFlashRam( u32 address )
 {
 	u32 offset = address & 0xFF;
 	if (g_ROM.settings.SaveType == SAVE_TYPE_FLASH && offset == 0)
@@ -164,7 +164,7 @@ static void * ReadFlashRam( u32 address )
 	return ReadInvalid(address);
 }
 
-static void * ReadROM( u32 address )
+static const void * ReadROM( u32 address )
 {
 	if (g_RomWritten)
 	{
@@ -176,7 +176,7 @@ static void * ReadROM( u32 address )
 
 // 0x1FC0 0000 to 0x1FC0 07BF PIF Boot ROM (Ignored)
 // 0x1FC0 07C0 to 0x1FC0 07FF PIF RAM
-static void * Read_9FC0_9FCF( u32 address )
+static const void * Read_9FC0_9FCF( u32 address )
 {
 	u32 offset = address & 0x0FFF;
 	u32 pif_ram_offset = address & 0x3F;
