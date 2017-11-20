@@ -112,27 +112,19 @@ area assignment does not change. After Tx/RxData assignment, this flag is reset 
 
 bool gRumblePakActive = false;
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 class	IController : public CController
 {
 	public:
 		IController();
-		~IController();
+		~IController() override;
 
-		//
-		// CController implementation
-		//
-		bool			OnRomOpen();
-		void			OnRomClose();
+		bool			OnRomOpen() override;
+		void			OnRomClose() override;
 
-		void			Process();
+		void			Process() override;
 
 	private:
-		//
-		//
-		//
 		bool			ProcessController(u8 *cmd, u32 device);
 		bool			ProcessEeprom(u8 *cmd);
 
@@ -214,10 +206,6 @@ class	IController : public CController
 
 };
 
-
-//*****************************************************************************
-// Singleton creator
-//*****************************************************************************
 template<> bool	CSingleton< CController >::Create()
 {
 	DAEDALUS_ASSERT_Q(mpInstance == NULL);
@@ -227,9 +215,6 @@ template<> bool	CSingleton< CController >::Create()
 	return true;
 }
 
-//*****************************************************************************
-// Constructor
-//*****************************************************************************
 IController::IController() :
 	mpPifRam( NULL ),
 	mpEepromData( NULL )
@@ -248,9 +233,6 @@ IController::IController() :
 	mContPresent[ 0 ] = true;
 }
 
-//*****************************************************************************
-// Destructor
-//*****************************************************************************
 IController::~IController()
 {
 #ifdef DAEDALUS_DEBUG_PIF
@@ -261,9 +243,6 @@ IController::~IController()
 #endif
 }
 
-//*****************************************************************************
-// Called whenever a new rom is opened
-//*****************************************************************************
 bool IController::OnRomOpen()
 {
 	ESaveType save_type  = g_ROM.settings.SaveType;
@@ -307,16 +286,10 @@ bool IController::OnRomOpen()
 	return true;
 }
 
-//*****************************************************************************
-// Called as a rom is closed
-//*****************************************************************************
 void IController::OnRomClose()
 {
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 void IController::Process()
 {
 #ifdef DAEDALUS_DEBUG_PIF
@@ -413,9 +386,7 @@ void IController::Process()
 }
 
 #ifdef DAEDALUS_DEBUG_PIF
-//*****************************************************************************
 // Dump the PIF input
-//*****************************************************************************
 void IController::DumpInput() const
 {
 	Console_Print("PIF:");
@@ -428,9 +399,6 @@ void IController::DumpInput() const
 }
 #endif
 
-//*****************************************************************************
-// i points to start of command
-//*****************************************************************************
 bool	IController::ProcessController(u8 *cmd, u32 channel)
 {
 
@@ -493,10 +461,7 @@ bool	IController::ProcessController(u8 *cmd, u32 channel)
 	return true;
 }
 
-//*****************************************************************************
-// i points to start of command
-//*****************************************************************************
-bool	IController::ProcessEeprom(u8 *cmd)
+bool IController::ProcessEeprom(u8* cmd)
 {
 	DAEDALUS_ASSERT( IsEepromPresent(), "ROM is accessing the EEPROM, but none is present");
 
@@ -542,29 +507,21 @@ bool	IController::ProcessEeprom(u8 *cmd)
 	return false;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void	IController::CommandReadEeprom(u8* cmd)
+void IController::CommandReadEeprom(u8* cmd)
 {
 	memcpy(&cmd[4], mpEepromData + cmd[3] * 8, 8);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void	IController::CommandWriteEeprom(u8* cmd)
+
+void IController::CommandWriteEeprom(u8* cmd)
 {
 	Save_MarkSaveDirty();
 	memcpy(mpEepromData + cmd[3] * 8, &cmd[4], 8);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-#if 1	//1-> Unrolled fast 0-> old way //Corn
 u8 IController::CalculateDataCrc(const u8 * pBuf)
 {
+	// Unrolled for speed. //Corn
 	u32 c = 0;
 	for (u32 i = 0; i < 32; i++)
 	{
@@ -588,44 +545,9 @@ u8 IController::CalculateDataCrc(const u8 * pBuf)
 	return c;
 }
 
-#else
-u8 IController::CalculateDataCrc(u8 * pBuf)
-{
-	u8 c;
-	u8 x,s;
-	u8 i;
-	s8 z;
-
-	c = 0;
-	for (i = 0; i < 33; i++)
-	{
-		s = pBuf[i];
-
-		for (z = 7; z >= 0; z--)
-		{
-			x = (c & 0x80) ? 0x85 : 0;
-
-			c <<= 1;
-
-			if (i < 32)
-			{
-				if (s & (1<<z))
-					c |= 1;
-			}
-
-			c = c ^ x;
-		}
-	}
-
-	return c;
-}
-#endif
-
-//*****************************************************************************
 // Returns new position to continue reading
 // i is the address of the first write info (after command itself)
-//*****************************************************************************
-void	IController::CommandReadMemPack(u32 channel, u8 *cmd)
+void IController::CommandReadMemPack(u32 channel, u8* cmd)
 {
 	u32 addr = ((cmd[3] << 8) | cmd[4]);
 	u8* data = &cmd[5];
@@ -651,11 +573,9 @@ void	IController::CommandReadMemPack(u32 channel, u8 *cmd)
 	cmd[37] = CalculateDataCrc(data);
 }
 
-//*****************************************************************************
 // Returns new position to continue reading
 // i is the address of the first write info (after command itself)
-//*****************************************************************************
-void	IController::CommandWriteMemPack(u32 channel, u8 *cmd)
+void IController::CommandWriteMemPack(u32 channel, u8* cmd)
 {
 	u32 addr = ((cmd[3] << 8) | cmd[4]);
 	u8* data = &cmd[5];
@@ -678,76 +598,61 @@ void	IController::CommandWriteMemPack(u32 channel, u8 *cmd)
 	cmd[37] = CalculateDataCrc(data);
 }
 
-//*****************************************************************************
-//
-//
-//*****************************************************************************
-void	IController::CommandReadRumblePack(u8 *cmd)
+void IController::CommandReadRumblePack(u8* cmd)
 {
 	u32 addr = ((cmd[3] << 8) | cmd[4]) & 0xFFE0;
 
-	memset( &cmd[5], (addr == 0x8000) ? 0x80 : 0x00, 32 );
+	memset(&cmd[5], (addr == 0x8000) ? 0x80 : 0x00, 32);
 	cmd[37] = CalculateDataCrc(&cmd[5]);
 }
 
-//*****************************************************************************
-//
-//
-//*****************************************************************************
-void	IController::CommandWriteRumblePack(u8 *cmd)
+void IController::CommandWriteRumblePack(u8* cmd)
 {
 	u32 addr = ((cmd[3] << 8) | cmd[4]) & 0xFFE0;
 
-	if ( addr == 0xC000 )
+	if (addr == 0xC000)
 	{
-		gRumblePakActive = cmd[5] ? true : false;	//0 inactive and 1 for active
+		gRumblePakActive = cmd[5] ? true : false;  // 0 inactive and 1 for active
 	}
 
 	cmd[37] = CalculateDataCrc(&cmd[5]);
 }
 
-//*****************************************************************************
-//
-//
-//*****************************************************************************
-void	IController::CommandReadRTC(u8 *cmd)
+void IController::CommandReadRTC(u8* cmd)
 {
-	switch (cmd[3]) // block number
+	switch (cmd[3])  // block number
 	{
-	case 0:
-		cmd[4]	= 0x00;
-		cmd[5]	= 0x02;
-		cmd[12] = 0x00;
-		break;
-	case 1:
-		//DAEDALUS_ERROR("RTC command : Read Block %d", cmd[2]);
-		break;
-	case 2:
-		time_t curtime_time;
-		struct tm curtime;
+		case 0:
+			cmd[4]  = 0x00;
+			cmd[5]  = 0x02;
+			cmd[12] = 0x00;
+			break;
+		case 1:
+			// DAEDALUS_ERROR("RTC command : Read Block %d", cmd[2]);
+			break;
+		case 2:
+			time_t    curtime_time;
+			struct tm curtime;
 
-		time(&curtime_time);
-		memcpy(&curtime, localtime(&curtime_time), sizeof(curtime)); // fd's fix
+			time(&curtime_time);
+			memcpy(&curtime, localtime(&curtime_time), sizeof(curtime));  // fd's fix
 
-		cmd[4]	= Byte2Bcd(curtime.tm_sec);
-		cmd[5]	= Byte2Bcd(curtime.tm_min);
-		cmd[6]	= 0x80 + Byte2Bcd(curtime.tm_hour);
-		cmd[7]	= Byte2Bcd(curtime.tm_mday);
-		cmd[8]	= Byte2Bcd(curtime.tm_wday);
-		cmd[9]	= Byte2Bcd(curtime.tm_mon + 1);
-		cmd[10] = Byte2Bcd(curtime.tm_year);
-		cmd[11] = Byte2Bcd(curtime.tm_year / 100);
-		cmd[12] = 0x00;       // status
-		break;
-	default:
-		DAEDALUS_ERROR( "Unknown Eeprom command: %02x", cmd[3] );
-		break;
+			cmd[4]  = Byte2Bcd(curtime.tm_sec);
+			cmd[5]  = Byte2Bcd(curtime.tm_min);
+			cmd[6]  = 0x80 + Byte2Bcd(curtime.tm_hour);
+			cmd[7]  = Byte2Bcd(curtime.tm_mday);
+			cmd[8]  = Byte2Bcd(curtime.tm_wday);
+			cmd[9]  = Byte2Bcd(curtime.tm_mon + 1);
+			cmd[10] = Byte2Bcd(curtime.tm_year);
+			cmd[11] = Byte2Bcd(curtime.tm_year / 100);
+			cmd[12] = 0x00;  // status
+			break;
+		default:
+			DAEDALUS_ERROR("Unknown Eeprom command: %02x", cmd[3]);
+			break;
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
 //http://www.emutalk.net/threads/53217-N64-PIF-CIC-NUS-6105-Algorithm-Finally-Reversed
 //
 //Copyright 2011 X-Scale. All rights reserved.
@@ -760,7 +665,6 @@ void	IController::CommandReadRTC(u8 *cmd)
  * These challenge/response pairs were the only resource used during this
  * project. There was no kind of physical access to N64 hardware.
 */
-
 #define CHL_LEN 0x20
 void IController::n64_cic_nus_6105()
 {
