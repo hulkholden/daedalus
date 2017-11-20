@@ -88,7 +88,6 @@ bool ROMFile::SetHeaderMagic(u32 magic)
 {
 	mHeaderMagic = magic;
 
-#ifdef DAEDALUS_DEBUG_CONSOLE
 	switch (mHeaderMagic)
 	{
 		case 0x80371240:
@@ -100,7 +99,6 @@ bool ROMFile::SetHeaderMagic(u32 magic)
 			Console_Print("[CUnknown ROM format for %s: 0x%08x", mFilename.c_str(), magic);
 			return false;
 	}
-#endif
 
 	return true;
 }

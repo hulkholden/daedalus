@@ -23,32 +23,25 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define DEBUG_DBGCONSOLE_H_
 
 #include "Base/Macros.h"
-#include "Base/Types.h"
-#include "Base/Singleton.h"
+
+// TODO: always compile these in, but provide macros to strip calls out.
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 
-class CDebugConsole : public CSingleton<CDebugConsole>
-{
-   public:
-	virtual ~CDebugConsole();
+void DAEDALUS_VARARG_CALL_TYPE Console_Print(const char* format, ...);
 
-	virtual void DAEDALUS_VARARG_CALL_TYPE Print(const char* format, ...) = 0;
-
-	virtual void OverwriteStart() = 0;
-	virtual void DAEDALUS_VARARG_CALL_TYPE Overwrite(const char* format, ...) = 0;
-	virtual void OverwriteEnd() = 0;
-};
-
-#define Console_Print(...) CDebugConsole::Get()->Print(__VA_ARGS__)
+void Console_OverwriteStart();
+void DAEDALUS_VARARG_CALL_TYPE Console_Overwrite(const char* format, ...);
+void Console_OverwriteEnd();
+void Console_Flush();
 
 #else
 
-#define Console_Print(...)        \
-	do                             \
-	{                              \
-		DAEDALUS_USE(__VA_ARGS__); \
-	} while (0)
+#define Console_Print(...) DAEDALUS_USE(__VA_ARGS__)
+#define Console_OverwriteStart() (void)0
+#define Console_Overwrite(...) DAEDALUS_USE(__VA_ARGS__)
+#define Console_OverwriteEnd() (void)0
+#define Console_Flush() (void)0
 
 #endif  // DAEDALUS_DEBUG_CONSOLE
 

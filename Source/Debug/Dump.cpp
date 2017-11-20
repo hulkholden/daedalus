@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Daedalus.h"
 #include "Debug/Dump.h"
 
-#include "Debug/Console.h"
 #include "System/IO.h"
 #include "System/Paths.h"
 
@@ -30,13 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 std::string Dump_GetDumpDirectory(const std::string& subdir)
 {
 	std::string dump_dir = IO::Path::Join(GetOutputFilename("Dumps"), subdir);
-
-#ifdef DAEDALUS_DEBUG_CONSOLE
-	if (CDebugConsole::IsAvailable())
-	{
-		// Console_Print("Dump dir: [C%s]", dump_dir.c_str());
-	}
-#endif
 	IO::Directory::EnsureExists(dump_dir);
 	return dump_dir;
 }

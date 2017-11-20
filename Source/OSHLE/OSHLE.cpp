@@ -434,17 +434,13 @@ void Patch_RecurseAndFind()
 	// Keep looping until a pass does not resolve any more symbols
 	s32 num_found = 0;
 
-#ifdef DAEDALUS_DEBUG_CONSOLE
-	CDebugConsole::Get()->OverwriteStart();
-#endif
+	Console_OverwriteStart();
 
 	// Loops through all symbols, until name is null
 	for (u32 i = 0; i < nPatchSymbols && !gCPUState.IsJobSet(CPU_STOP_RUNNING); i++)
 	{
-#ifdef DAEDALUS_DEBUG_CONSOLE
-		CDebugConsole::Get()->Overwrite("OS HLE: %d / %d Looking for [G%s]", i, nPatchSymbols, g_PatchSymbols[i]->Name);
-		fflush(stdout);
-#endif  // DAEDALUS_DEBUG_CONSOLE
+		Console_Overwrite("OS HLE: %d / %d Looking for [G%s]", i, nPatchSymbols, g_PatchSymbols[i]->Name);
+		Console_Flush();
 		// Skip symbol if already found, or if it is a variable
 		if (g_PatchSymbols[i]->Found)
 			continue;
@@ -457,18 +453,12 @@ void Patch_RecurseAndFind()
 
 	if (gCPUState.IsJobSet(CPU_STOP_RUNNING))
 	{
-#ifdef DAEDALUS_DEBUG_CONSOLE
-		CDebugConsole::Get()->Overwrite("OS HLE: Aborted");
-		CDebugConsole::Get()->OverwriteEnd();
-#endif
-
+		Console_Overwrite("OS HLE: Aborted");
+		Console_OverwriteEnd();
 		return;
 	}
-#ifdef DAEDALUS_DEBUG_CONSOLE
-	CDebugConsole::Get()->Overwrite("OS HLE: %d / %d All done", nPatchSymbols, nPatchSymbols);
-
-	CDebugConsole::Get()->OverwriteEnd();
-#endif
+	Console_Overwrite("OS HLE: %d / %d All done", nPatchSymbols, nPatchSymbols);
+	Console_OverwriteEnd();
 
 	u32 first = u32(~0);
 	u32 last = 0;
@@ -519,9 +509,7 @@ void Patch_RecurseAndFind()
 				num_found++;
 			}
 		}
-#ifdef DAEDALUS_DEBUG_CONSOLE
 		Console_Print("%d/%d symbols identified, in range 0x%08x -> 0x%08x", num_found, nPatchSymbols, first, last);
-#endif
 	}
 
 	num_found = 0;
@@ -545,9 +533,7 @@ void Patch_RecurseAndFind()
 
 			num_found++;
 		}
-#ifdef DAEDALUS_DEBUG_CONSOLE
 		Console_Print("%d/%d variables identified", num_found, nPatchVariables);
-#endif
 	}
 }
 
@@ -627,9 +613,7 @@ bool Patch_VerifyLocation_CheckSignature(PatchSymbol* ps, PatchSignature* psig, 
 	if (pcr == NULL)
 		pcr = &dummy_cr;
 
-#ifdef DAEDALUS_DEBUG_CONSOLE
 	u32 last = pcr->Offset;
-#endif
 	u32 crc = 0;
 	u32 partial_crc = 0;
 	for (u32 m = 0; m < psig->NumOps; m++)
@@ -717,16 +701,10 @@ bool Patch_VerifyLocation_CheckSignature(PatchSymbol* ps, PatchSignature* psig, 
 			// ready for the next match.
 			pcr++;
 
-// If pcr->Offset == ~0, then there are no more in the array
-// This is okay, as the comparison with m above will never match
-#ifdef DAEDALUS_DEBUG_CONSOLE
-			if (pcr->Offset < last)
-			{
-				Console_Print("%s: CrossReference offsets out of order", ps->Name);
-			}
-
+			// If pcr->Offset == ~0, then there are no more in the array
+			// This is okay, as the comparison with m above will never match
+			DAEDALUS_ASSERT(pcr->Offset >= last, "%s: CrossReference offsets out of order", ps->Name);
 			last = pcr->Offset;
-#endif
 		}
 		else
 		{

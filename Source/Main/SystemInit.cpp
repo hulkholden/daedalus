@@ -112,9 +112,6 @@ static void UnloadROM()
 
 
 static const SysEntityEntry gSysInitTable[] = {
-#ifdef DAEDALUS_DEBUG_CONSOLE
-	{"DebugConsole", CDebugConsole::Create, CDebugConsole::Destroy},
-#endif
 #ifdef DAEDALUS_LOG
 	{"Logger", Debug_InitLogging, Debug_FinishLogging},
 #endif

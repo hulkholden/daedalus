@@ -462,12 +462,10 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 							Patch_PatchAll();
 #endif
 						}
-#ifdef DAEDALUS_DEBUG_CONSOLE
 						else
 						{
 							Console_Print("Safely skipped one flush");
 						}
-#endif
 						gResetFragmentCache = false;
 					}
 

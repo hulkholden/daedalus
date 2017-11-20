@@ -271,7 +271,6 @@ bool ROM_ReBoot()
 
 	g_ROM.cic_chip = ROM_GenerateCICType( rom_base );
 
-#ifdef DAEDALUS_DEBUG_CONSOLE
 	if (g_ROM.cic_chip == CIC_UNKNOWN)
 	{
 		//DAEDALUS_ERROR("Unknown CIC CRC: 0x%08x\nAssuming CIC-6102", crc);
@@ -282,7 +281,7 @@ bool ROM_ReBoot()
 	{
 		Console_Print("[MRom uses %s]", ROM_GetCicName( g_ROM.cic_chip ));
 	}
-#endif
+
 	// XXXX Update this rom's boot info
 #ifdef DAEDALUS_ENABLE_DYNAREC_PROFILE
 	g_dwNumFrames = 0;

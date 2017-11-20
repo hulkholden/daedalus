@@ -253,12 +253,7 @@ void CFragmentCache::InsertFragment( CFragment * p_fragment )
 
 void CFragmentCache::Clear()
 {
-#ifdef DAEDALUS_DEBUG_CONSOLE
-	if(CDebugConsole::IsAvailable())
-	{
-		Console_Print("Clearing fragment cache of %d fragments", mFragments.size());
-	}
-#endif
+	Console_Print("Clearing fragment cache of %d fragments", mFragments.size());
 	// Clear out all the framents
 	for(FragmentVec::iterator it = mFragments.begin(); it != mFragments.end(); ++it)
 	{

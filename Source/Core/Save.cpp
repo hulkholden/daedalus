@@ -54,12 +54,7 @@ std::string Save_GetDirectory(const char* extension)
 			// FIXME(strmnnrmn): for OSX I generate savegames in a subdir Save, to make it easier to clean up.
 			g_DaedalusConfig.SaveDir = IO::Path::Join(save_dir, "Save");
 
-#ifdef DAEDALUS_DEBUG_CONSOLE
-			if (CDebugConsole::IsAvailable())
-			{
-				Console_Print("SaveDir is still empty - defaulting to [C%s]", g_DaedalusConfig.SaveDir.c_str());
-			}
-#endif
+			Console_Print("SaveDir is still empty - defaulting to [C%s]", g_DaedalusConfig.SaveDir.c_str());
 		}
 	}
 

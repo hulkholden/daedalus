@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
+#include "Debug/Console.h"
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 
@@ -26,8 +27,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 
 #include "absl/strings/string_view.h"
-
-#include "Debug/Console.h"
 
 static const char* const kDefaultColour = "\033[0m";
 static const char* const kColour_r = "\033[0;31m";
@@ -45,31 +44,7 @@ static const char* const kColour_M = "\033[1;35m";
 static const char* const kColour_C = "\033[1;36m";
 static const char* const kColour_W = "\033[1;37m";
 
-class IDebugConsole : public CDebugConsole
-{
-   public:
-	void Print(const char *format, ...) override;
-
-	void OverwriteStart() override {}
-	void Overwrite(const char *format, ...) override;
-	void OverwriteEnd() override {}
-
-	const char* GetTerminalColourString(char c);
-	size_t ParseFormatString(const char *format, char *out);
-	void ApplyStyleAndPrint(const char *format, va_list args);
-};
-
-template <>
-bool CSingleton<CDebugConsole>::Create()
-{
-	DAEDALUS_ASSERT(mpInstance == nullptr, "Already initialised");
-	mpInstance = new IDebugConsole();
-	return true;
-}
-
-CDebugConsole::~CDebugConsole() {}
-
-const char* IDebugConsole::GetTerminalColourString(char c)
+static const char* GetTerminalColourString(char c)
 {
 	switch (c)
 	{
@@ -132,7 +107,7 @@ struct ParseFormatState
 	}
 };
 
-size_t IDebugConsole::ParseFormatString(const char *format, char *out)
+static size_t ParseFormatString(const char *format, char *out)
 {
 	bool colour_active = false;
 	ParseFormatState state = {out, 0};
@@ -171,8 +146,7 @@ size_t IDebugConsole::ParseFormatString(const char *format, char *out)
 	return state.len;
 }
 
-
-void IDebugConsole::ApplyStyleAndPrint(const char *format, va_list args)
+static void ApplyStyleAndPrint(const char *format, va_list args)
 {
 	char *temp = nullptr;
 
@@ -190,7 +164,7 @@ void IDebugConsole::ApplyStyleAndPrint(const char *format, va_list args)
 	if (temp) free(temp);
 }
 
-void IDebugConsole::Print(const char *format, ...)
+void DAEDALUS_VARARG_CALL_TYPE Console_Print(const char *format, ...)
 {
 	va_list marker;
 	va_start(marker, format);
@@ -198,12 +172,25 @@ void IDebugConsole::Print(const char *format, ...)
 	va_end(marker);
 }
 
-void IDebugConsole::Overwrite(const char *format, ...)
+void Console_OverwriteStart()
+{
+}
+
+void DAEDALUS_VARARG_CALL_TYPE Console_Overwrite(const char *format, ...)
 {
 	va_list marker;
 	va_start(marker, format);
 	ApplyStyleAndPrint(format, marker);
 	va_end(marker);
+}
+
+void Console_OverwriteEnd()
+{
+}
+
+void Console_Flush()
+{
+	fflush(stdout);
 }
 
 #endif

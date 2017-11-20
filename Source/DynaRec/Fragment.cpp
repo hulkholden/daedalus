@@ -700,9 +700,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 			u32			delay_address( ti.Address );
 #endif
 			/*
-#ifdef DAEDALUS_DEBUG_CONSOLE
 			OpCode		delay_op_code( ti.OpCode );
-#endif
 			if( delay_op_code.op == OP_COPRO1 && !checked_cop1_usable )
 			{
 				checked_cop1_usable = true;
