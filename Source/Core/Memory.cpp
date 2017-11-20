@@ -277,7 +277,7 @@ bool Memory_Reset()
 		}
 	}
 
-	gDMAUsed = false;
+	DMA_Reset();
 	return true;
 }
 
