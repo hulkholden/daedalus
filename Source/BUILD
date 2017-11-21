@@ -30,7 +30,7 @@ cc_binary(
         "//Debug",
         "//DynaRec:DynaRecCpp",
         "//Graphics",
-        "//HLEAudio:HLEAudioCpp",
+        "//HLEAudio",
         "//HLEGraphics",
         "//Interface:InterfaceCpp",
         "//Main",

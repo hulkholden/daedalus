@@ -66,7 +66,7 @@ cc_test(
     deps = [
         ":CoreCpp",
         # TODO(strmnnrn): Fix this mess of dependencies.
-        "//HLEAudio:HLEAudioCpp",
+        "//HLEAudio",
         "//Graphics:GL",
         "//Test:TestUtil",
         "@com_google_googletest//:gtest_main",
