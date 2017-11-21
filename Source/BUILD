@@ -31,7 +31,7 @@ cc_binary(
         "//DynaRec:DynaRecCpp",
         "//Graphics",
         "//HLEAudio:HLEAudioCpp",
-        "//HLEGraphics:HLEGraphicsCpp",
+        "//HLEGraphics",
         "//Interface:InterfaceCpp",
         "//Main",
         "//Main:SystemInit",
