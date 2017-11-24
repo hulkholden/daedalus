@@ -451,8 +451,6 @@ bool ROM_LoadFile(const RomID & rom_id, const RomSettings & settings, const SRom
 	Console_Print("DynaRec: [G%s]", gDynarecEnabled ? "on" : "off");
 	Console_Print("Cheats: [G%s]", gCheatsEnabled ? "on" : "off");
 
-	//Patch_ApplyPatches();
-
 	return true;
 }
 

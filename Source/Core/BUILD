@@ -3,6 +3,7 @@ cc_library(
     srcs = [
         "Cheats.cpp",
         "Disassemble.cpp",
+        "DMA.cpp",
         "FlashMem.cpp",
         "FramerateLimiter.cpp",
         "Interrupt.cpp",
@@ -12,7 +13,6 @@ cc_library(
         "ROMImage.cpp",
         "Registers.cpp",
         "TLB.cpp",
-
     ],
     hdrs = glob([
         "*.h",
@@ -36,7 +36,6 @@ cc_library(
     srcs = [
         "CPU.cpp",
         "Dynamo.cpp",
-        "DMA.cpp",
         "Interpret.cpp",
         "Memory.cpp",
         "PrintOpCode.cpp",

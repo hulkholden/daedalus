@@ -20,9 +20,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef OSHLE_OSHLE_H_
 #define OSHLE_OSHLE_H_
 
+bool OSHLE_Initialise();
+void OSHLE_Finalise();
+
 extern u32 gNumOfOSFunctions;
 void Patch_Reset();
-void Patch_ApplyPatches();
 void Patch_PatchAll();
 
 const char * Patch_GetJumpAddressName(u32 jump);

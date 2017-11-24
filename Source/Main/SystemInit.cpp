@@ -40,6 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Interface/RomDB.h"
 #include "Interface/SaveState.h"
 #include "Interface/UI.h"
+#include "OSHLE/OSHLE.h"
 
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_W32)
 #include "Debug/WebDebug.h"
@@ -164,6 +165,9 @@ static const RomEntityEntry gRomInitTable[] = {
 	{"Save", Save_Reset, Save_Fini},
 #ifdef DAEDALUS_ENABLE_SYNCHRONISATION
 	{"CSynchroniser", CSynchroniser::InitialiseSynchroniser, CSynchroniser::Destroy},
+#endif
+#ifdef DAEDALUS_ENABLE_OS_HOOKS
+	{"OSHLE", OSHLE_Initialise, OSHLE_Finalise},
 #endif
 };
 

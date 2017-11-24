@@ -38,4 +38,16 @@ bool DMA_HandleTransfer( u8 * p_dst, u32 dst_offset, u32 dst_size, const u8 * p_
 bool DMA_FLASH_CopyToDRAM(u32 dest, u32 StartOffset, u32 len);
 bool DMA_FLASH_CopyFromDRAM(u32 dest, u32 len);
 
+class DMAEventHandler
+{
+  public:
+	virtual ~DMAEventHandler();
+
+	// Called when a rom is copied to DRAM.
+	virtual void OnRomCopied() {}
+};
+
+void DMA_RegisterDMAEventHandler(DMAEventHandler* handler);
+void DMA_UnregisterDMAEventHandler(DMAEventHandler* handler);
+
 #endif // CORE_DMA_H_

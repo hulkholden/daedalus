@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Daedalus.h"
 #include "Core/DMA.h"
 
+#include <vector>
+
 #include "Core/CPU.h"
 #include "Core/Interrupt.h"
 #include "Core/Memory.h"
@@ -32,15 +34,30 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/Save.h"
 #include "Debug/Console.h"
 #include "Debug/DebugLog.h"
-#include "OSHLE/OSHLE.h"
-#include "OSHLE/OSTask.h"
 #include "Utility/FastMemcpy.h"
 
+static std::vector<DMAEventHandler*> gDMAEventHandlers;
 static bool gDMAUsed = false;
 
 void DMA_Reset()
 {
 	gDMAUsed = false;
+}
+
+DMAEventHandler::~DMAEventHandler() {}
+
+void DMA_RegisterDMAEventHandler(DMAEventHandler* handler)
+{
+	gDMAEventHandlers.push_back(handler);
+}
+
+void DMA_UnregisterDMAEventHandler(DMAEventHandler* handler)
+{
+	auto it = std::find(gDMAEventHandlers.begin(), gDMAEventHandlers.end(), handler);
+	if (it != gDMAEventHandlers.end())
+	{
+		gDMAEventHandlers.erase(it);
+	}
 }
 
 void DMA_SP_CopyFromRDRAM()
@@ -186,11 +203,10 @@ static void OnCopiedRom()
 	{
 		gDMAUsed = true;
 
-#ifdef DAEDALUS_ENABLE_OS_HOOKS
-		// Note the rom is only scanned when the ROM jumps to the game boot address
-		// ToDO: try to reapply patches - certain roms load in more of the OS after a number of transfers ?
-		Patch_ApplyPatches();
-#endif
+		for (DMAEventHandler* handler : gDMAEventHandlers)
+		{
+			handler->OnRomCopied();
+		}
 
 		// Set RDRAM size
 		u32 addr                   = (g_ROM.cic_chip != CIC_6105) ? 0x318 : 0x3F0;

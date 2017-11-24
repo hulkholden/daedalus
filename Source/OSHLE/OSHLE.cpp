@@ -104,9 +104,33 @@ static bool Patch_VerifyLocation_CheckSignature(PatchSymbol* ps, PatchSignature*
 static bool Patch_GetCache();
 static void Patch_FlushCache();
 
+static void Patch_ApplyPatches();
 static void Patch_ApplyPatch(u32 i);
 static u32 nPatchSymbols;
 static u32 nPatchVariables;
+
+class PatchDMAEventHandler : public DMAEventHandler
+{
+	void OnRomCopied() override
+	{
+		// Note the rom is only scanned when the ROM jumps to the game boot address
+		// ToDO: try to reapply patches - certain roms load in more of the OS after a number of transfers ?
+		Patch_ApplyPatches();
+	}
+};
+static PatchDMAEventHandler gPatchDMAEventHandler;
+
+
+bool OSHLE_Initialise()
+{
+	DMA_RegisterDMAEventHandler(&gPatchDMAEventHandler);
+	return true;
+}
+
+void OSHLE_Finalise()
+{
+	DMA_UnregisterDMAEventHandler(&gPatchDMAEventHandler);
+}
 
 void Patch_Reset()
 {
