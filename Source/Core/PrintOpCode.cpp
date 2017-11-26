@@ -561,14 +561,14 @@ void SprintOp_Patch(char* str, u32 address, OpCode op)
 {
 	sprintf(str, "Patch");
 
-	// Patch_GetJumpAddressName(JumpTarget(op, address)) );
+	// OSHLE_GetJumpAddressName(JumpTarget(op, address)) );
 }
 
 void SprintOp_J(char* str, u32 address, OpCode op)
 {
 	const char* p_name("?");
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-	p_name = Patch_GetJumpAddressName(JumpTarget(op, address));
+	p_name = OSHLE_GetJumpAddressName(JumpTarget(op, address));
 #endif
 	sprintf(str, "J         0x%08x        %s", JumpTarget(op, address), p_name);
 }
@@ -576,7 +576,7 @@ void SprintOp_JAL(char* str, u32 address, OpCode op)
 {
 	const char* p_name("?");
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-	p_name = Patch_GetJumpAddressName(JumpTarget(op, address));
+	p_name = OSHLE_GetJumpAddressName(JumpTarget(op, address));
 #endif
 	sprintf(str, "JAL       0x%08x        %s", JumpTarget(op, address), p_name);
 }

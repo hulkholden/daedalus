@@ -49,7 +49,7 @@ static void Dump_DisassembleMIPSRange(FILE* fh, u32 address_offset, const OpCode
 			{
 				fprintf(fp, "\n");
 				fprintf(fp, "\n");
-				fprintf(fp, "// %s():\n", Patch_GetJumpAddressName(current_pc));
+				fprintf(fp, "// %s():\n", OSHLE_GetJumpAddressName(current_pc));
 			}
 		}
 #endif

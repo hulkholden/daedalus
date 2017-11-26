@@ -406,7 +406,7 @@ static bool LoadStateFromFile( const std::string& filename )
 	stream.read_memory_buffer(MEM_SP_MEM); //, 0x84000000);
 
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-	Patch_PatchAll();
+	OSHLE_PatchAll();
 #endif
 
 	return true;

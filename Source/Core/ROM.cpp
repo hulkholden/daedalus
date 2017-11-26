@@ -286,7 +286,7 @@ bool ROM_ReBoot()
 #endif
 
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-	Patch_Reset();
+	OSHLE_Reset();
 #endif
 
 	// This will always return false since we always simulate boot code instead of loading from file

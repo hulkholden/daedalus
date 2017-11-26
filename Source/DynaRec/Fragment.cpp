@@ -891,7 +891,7 @@ void CFragment::DumpFragmentInfoHtml( FILE * fh, u64 total_cycles ) const
 		fprintf( fh, "<tr><td>Expansion ratio</td><td>%.2fx</td></tr>\n", f32( GetOutputLength() ) / f32( GetInputLength() ) );
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
 		if (mTraceBuffer.empty())
-			fprintf( fh,"<tr><td>function name</td><td>%s</td></tr>\n", Patch_GetJumpAddressName(mEntryAddress));
+			fprintf( fh,"<tr><td>function name</td><td>%s</td></tr>\n", OSHLE_GetJumpAddressName(mEntryAddress));
 #endif
 		fputs( "</table></div>\n", fh );
 

@@ -23,17 +23,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 bool OSHLE_Initialise();
 void OSHLE_Finalise();
 
-extern u32 gNumOfOSFunctions;
-void Patch_Reset();
-void Patch_PatchAll();
+extern u32 gNumOSFunctions;
+void OSHLE_Reset();
+void OSHLE_PatchAll();
 
-const char * Patch_GetJumpAddressName(u32 jump);
-u32 Patch_GetSymbolAddress(const char * name);
+const char * OSHLE_GetJumpAddressName(u32 jump);
 
 #ifdef DUMPOSFUNCTIONS
-void Patch_DumpOsThreadInfo();
-void Patch_DumpOsQueueInfo();
-void Patch_DumpOsEventInfo();
+void OSHLE_DumpOsThreadInfo();
+void OSHLE_DumpOsQueueInfo();
+void OSHLE_DumpOsEventInfo();
 #endif
 
 #endif // OSHLE_OSHLE_H_

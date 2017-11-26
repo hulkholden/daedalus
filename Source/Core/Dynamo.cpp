@@ -451,7 +451,7 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 					{
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
 						//Don't reset the cache if there is no fragment except OSHLE function stubs
-						if (gFragmentCache.GetCacheSize() >= gNumOfOSFunctions)
+						if (gFragmentCache.GetCacheSize() >= gNumOSFunctions)
 #else
 						if(true)
 #endif
@@ -459,7 +459,7 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 							gFragmentCache.Clear();
 							gHotTraceCountMap.clear();		// Makes sense to clear this now, to get accurate usage stats
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-							Patch_PatchAll();
+							OSHLE_PatchAll();
 #endif
 						}
 						else
@@ -474,7 +474,7 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 						gFragmentCache.Clear();
 						gHotTraceCountMap.clear();		// Makes sense to clear this now, to get accurate usage stats
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-						Patch_PatchAll();
+						OSHLE_PatchAll();
 #endif
 					}
 
@@ -487,7 +487,7 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 						gHotTraceCountMap.clear();
 						gFragmentCache.Clear();
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-						Patch_PatchAll();
+						OSHLE_PatchAll();
 #endif
 					}
 					else if( trace_count == gHotTraceThreshold )

@@ -79,7 +79,7 @@ static const char* const gEventStrings[23] = {
 };
 #endif  // DUMPOSFUNCTIONS
 
-u32 gNumOfOSFunctions;
+u32 gNumOSFunctions;
 
 #define TEST_DISABLE_FUNCS  // return PATCH_RET_NOT_PROCESSED;
 
@@ -96,18 +96,18 @@ static bool gPatchesApplied = false;
 // u32 g_dwOSStart = 0x00240000;
 // u32 g_dwOSEnd   = 0x00380000;
 
-void Patch_ResetSymbolTable();
-void Patch_RecurseAndFind();
-static bool Patch_LocateFunction(PatchSymbol* ps);
-static bool Patch_VerifyLocation(PatchSymbol* ps, u32 index);
-static bool Patch_VerifyLocation_CheckSignature(PatchSymbol* ps, PatchSignature* psig, u32 index);
-static bool Patch_GetCache();
-static void Patch_FlushCache();
+static void OSHLE_ResetSymbolTable();
+static void OSHLE_RecurseAndFind();
+static bool OSHLE_LocateFunction(PatchSymbol* ps);
+static bool OSHLE_VerifyLocation(PatchSymbol* ps, u32 index);
+static bool OSHLE_VerifyLocation_CheckSignature(PatchSymbol* ps, PatchSignature* psig, u32 index);
+static bool OSHLE_LoadCache();
+static void OSHLE_FlushCache();
 
-static void Patch_ApplyPatches();
-static void Patch_ApplyPatch(u32 i);
-static u32 nPatchSymbols;
-static u32 nPatchVariables;
+static void OSHLE_ApplyPatches();
+static void OSHLE_ApplyPatch(u32 i);
+static u32 gNumPatchSymbols;
+static u32 gNumPatchVariables;
 
 class PatchDMAEventHandler : public DMAEventHandler
 {
@@ -115,7 +115,7 @@ class PatchDMAEventHandler : public DMAEventHandler
 	{
 		// Note the rom is only scanned when the ROM jumps to the game boot address
 		// ToDO: try to reapply patches - certain roms load in more of the OS after a number of transfers ?
-		Patch_ApplyPatches();
+		OSHLE_ApplyPatches();
 	}
 };
 static PatchDMAEventHandler gPatchDMAEventHandler;
@@ -132,14 +132,14 @@ void OSHLE_Finalise()
 	DMA_UnregisterDMAEventHandler(&gPatchDMAEventHandler);
 }
 
-void Patch_Reset()
+void OSHLE_Reset()
 {
 	gPatchesApplied = false;
-	gNumOfOSFunctions = 0;
-	Patch_ResetSymbolTable();
+	gNumOSFunctions = 0;
+	OSHLE_ResetSymbolTable();
 }
 
-void Patch_ResetSymbolTable()
+void OSHLE_ResetSymbolTable()
 {
 	u32 i = 0;
 	// Loops through all symbols, until name is null
@@ -147,7 +147,7 @@ void Patch_ResetSymbolTable()
 	{
 		g_PatchSymbols[i]->Found = false;
 	}
-	nPatchSymbols = i;
+	gNumPatchSymbols = i;
 
 	for (i = 0; g_PatchVariables[i] != NULL; i++)
 	{
@@ -155,43 +155,43 @@ void Patch_ResetSymbolTable()
 		g_PatchVariables[i]->FoundHi = false;
 		g_PatchVariables[i]->FoundLo = false;
 	}
-	nPatchVariables = i;
+	gNumPatchVariables = i;
 }
 
-void Patch_ApplyPatches()
+void OSHLE_ApplyPatches()
 {
 	gPatchesApplied = true;
 
 	if (!gOSHooksEnabled)
 		return;
 
-	if (!Patch_GetCache())
+	if (!OSHLE_LoadCache())
 	{
-		Patch_RecurseAndFind();
+		OSHLE_RecurseAndFind();
 
 		// Tip : Disable this when working on oshle funcs, you save the time to delete
 		// hle cache everyttime you need to test :p
-		Patch_FlushCache();
+		OSHLE_FlushCache();
 	}
 
 	// Do this every time or just when originally patched
 	/*result = */ OS_Reset();
 }
 
-void Patch_PatchAll()
+void OSHLE_PatchAll()
 {
-	gNumOfOSFunctions = 0;
+	gNumOSFunctions = 0;
 
 	if (!gPatchesApplied)
 	{
-		Patch_ApplyPatches();
+		OSHLE_ApplyPatches();
 	}
 #ifdef DUMPOSFUNCTIONS
 	FILE* fp;
 	std::string path = IO::Path::Join(Dump_GetDumpDirectory(""), "n64.cfg");
 	fp = fopen(path.c_str(), "w");
 #endif
-	for (u32 i = 0; i < nPatchSymbols; i++)
+	for (u32 i = 0; i < gNumPatchSymbols; i++)
 	{
 		if (g_PatchSymbols[i]->Found)
 		{
@@ -204,8 +204,8 @@ void Patch_PatchAll()
 
 			fprintf(fp, "%s 0x%08x\n", ps->Name, PHYS_TO_K0(ps->Location));
 #endif
-			gNumOfOSFunctions++;
-			Patch_ApplyPatch(i);
+			gNumOSFunctions++;
+			OSHLE_ApplyPatch(i);
 		}
 	}
 #ifdef DUMPOSFUNCTIONS
@@ -213,7 +213,7 @@ void Patch_PatchAll()
 #endif
 }
 
-void Patch_ApplyPatch(u32 i)
+void OSHLE_ApplyPatch(u32 i)
 {
 #ifdef DAEDALUS_ENABLE_DYNAREC
 	u32 pc = g_PatchSymbols[i]->Location;
@@ -226,18 +226,12 @@ void Patch_ApplyPatch(u32 i)
 }
 
 // Return the location of a symbol
-u32 Patch_GetSymbolAddress(const char* name)
+static u32 OSHLE_GetSymbolAddress(const char* name)
 {
 	// Search new list
-	for (u32 p = 0; p < nPatchSymbols; p++)
+	for (u32 p = 0; p < gNumPatchSymbols; p++)
 	{
-		// Skip symbol if already found, or if it is a variable
-		if (!g_PatchSymbols[p]->Found)
-		{
-			continue;
-		}
-
-		if (_strcmpi(g_PatchSymbols[p]->Name, name) == 0)
+		if (g_PatchSymbols[p]->Found && _strcmpi(g_PatchSymbols[p]->Name, name) == 0)
 		{
 			return PHYS_TO_K0(g_PatchSymbols[p]->Location);
 		}
@@ -250,20 +244,20 @@ u32 Patch_GetSymbolAddress(const char* name)
 // Given a location, this function returns the name of the matching
 // symbol (if there is one)
 
-const char* Patch_GetJumpAddressName(u32 jump)
+const char* OSHLE_GetJumpAddressName(u32 jump)
 {
 	const void* mem_base;
 	if (!Memory_GetInternalReadAddress(jump, &mem_base))
 		return "??";
 
 	// Search new list
-	for (u32 p = 0; p < nPatchSymbols; p++)
+	for (u32 p = 0; p < gNumPatchSymbols; p++)
 	{
-		// Skip symbol if already found, or if it is a variable
+		// Skip symbol if already found.
 		if (!g_PatchSymbols[p]->Found)
 			continue;
 
-		const void* patch_base = gu32RamBase + (g_PatchSymbols[p]->Location >> 2);
+		const void* patch_base = gu32RamBase + (g_PatchSymbols[p]->Location / 4);
 
 		// Symbol not found, attempt to locate on this pass. This may
 		// fail if all dependent symbols are not found
@@ -279,7 +273,7 @@ const char* Patch_GetJumpAddressName(u32 jump)
 
 #ifdef DUMPOSFUNCTIONS
 
-void Patch_DumpOsThreadInfo()
+void OSHLE_DumpOsThreadInfo()
 {
 	u32 dwCurrentThread = Read32Bits(VAR_ADDRESS(osActiveThread));
 	u32 dwFirstThread = Read32Bits(VAR_ADDRESS(osGlobalThreadList));
@@ -319,7 +313,7 @@ void Patch_DumpOsThreadInfo()
 	}
 }
 
-void Patch_DumpOsQueueInfo()
+void OSHLE_DumpOsQueueInfo()
 {
 #ifdef DAED_OS_MESSAGE_QUEUES
 	Console_Print("There are %d Queues", g_MessageQueues.size());
@@ -382,7 +376,7 @@ void Patch_DumpOsQueueInfo()
 #endif
 }
 
-void Patch_DumpOsEventInfo()
+void OSHLE_DumpOsEventInfo()
 {
 	if (!VAR_FOUND(osEventMesgArray))
 	{
@@ -403,7 +397,7 @@ void Patch_DumpOsEventInfo()
 
 #endif  // DUMPOSFUNCTIONS
 
-bool Patch_Hacks(PatchSymbol* ps)
+bool OSHLE_Hacks(PatchSymbol* ps)
 {
 	bool found = false;
 
@@ -451,7 +445,7 @@ bool Patch_Hacks(PatchSymbol* ps)
 }
 
 // ToDo: Add Status bar for loading OSHLE Patch Symbols.
-void Patch_RecurseAndFind()
+void OSHLE_RecurseAndFind()
 {
 	Console_Print("Searching for os functions. This may take several seconds...");
 
@@ -461,9 +455,9 @@ void Patch_RecurseAndFind()
 	Console_OverwriteStart();
 
 	// Loops through all symbols, until name is null
-	for (u32 i = 0; i < nPatchSymbols && !gCPUState.IsJobSet(CPU_STOP_RUNNING); i++)
+	for (u32 i = 0; i < gNumPatchSymbols && !gCPUState.IsJobSet(CPU_STOP_RUNNING); i++)
 	{
-		Console_Overwrite("OS HLE: %d / %d Looking for [G%s]", i, nPatchSymbols, g_PatchSymbols[i]->Name);
+		Console_Overwrite("OS HLE: %d / %d Looking for [G%s]", i, gNumPatchSymbols, g_PatchSymbols[i]->Name);
 		Console_Flush();
 		// Skip symbol if already found, or if it is a variable
 		if (g_PatchSymbols[i]->Found)
@@ -471,7 +465,7 @@ void Patch_RecurseAndFind()
 
 		// Symbol not found, attempt to locate on this pass. This may
 		// fail if all dependent symbols are not found
-		if (Patch_LocateFunction(g_PatchSymbols[i]))
+		if (OSHLE_LocateFunction(g_PatchSymbols[i]))
 			num_found++;
 	}
 
@@ -481,14 +475,14 @@ void Patch_RecurseAndFind()
 		Console_OverwriteEnd();
 		return;
 	}
-	Console_Overwrite("OS HLE: %d / %d All done", nPatchSymbols, nPatchSymbols);
+	Console_Overwrite("OS HLE: %d / %d All done", gNumPatchSymbols, gNumPatchSymbols);
 	Console_OverwriteEnd();
 
 	u32 first = u32(~0);
 	u32 last = 0;
 
 	num_found = 0;
-	for (u32 i = 0; i < nPatchSymbols; i++)
+	for (u32 i = 0; i < gNumPatchSymbols; i++)
 	{
 		if (!g_PatchSymbols[i]->Found)
 		{
@@ -514,7 +508,7 @@ void Patch_RecurseAndFind()
 			}
 			// Disable certain os funcs where it causes issues in some games ex Zelda
 			//
-			if (Patch_Hacks(g_PatchSymbols[i]))
+			if (OSHLE_Hacks(g_PatchSymbols[i]))
 			{
 				Console_Print("[ROS Hack : Disabling %s]", g_PatchSymbols[i]->Name);
 				g_PatchSymbols[i]->Found = false;
@@ -529,15 +523,15 @@ void Patch_RecurseAndFind()
 					last = location;
 
 				// Actually patch:
-				Patch_ApplyPatch(i);
+				OSHLE_ApplyPatch(i);
 				num_found++;
 			}
 		}
-		Console_Print("%d/%d symbols identified, in range 0x%08x -> 0x%08x", num_found, nPatchSymbols, first, last);
+		Console_Print("%d/%d symbols identified, in range 0x%08x -> 0x%08x", num_found, gNumPatchSymbols, first, last);
 	}
 
 	num_found = 0;
-	for (u32 i = 0; i < nPatchVariables; i++)
+	for (u32 i = 0; i < gNumPatchVariables; i++)
 	{
 		if (!g_PatchVariables[i]->Found)
 		{
@@ -557,12 +551,12 @@ void Patch_RecurseAndFind()
 
 			num_found++;
 		}
-		Console_Print("%d/%d variables identified", num_found, nPatchVariables);
+		Console_Print("%d/%d variables identified", num_found, gNumPatchVariables);
 	}
 }
 
 // Attempt to locate this symbol.
-bool Patch_LocateFunction(PatchSymbol* ps)
+bool OSHLE_LocateFunction(PatchSymbol* ps)
 {
 	const u32* code_base = gu32RamBase;
 
@@ -582,7 +576,7 @@ bool Patch_LocateFunction(PatchSymbol* ps)
 				continue;
 
 			// See if function i exists at this location
-			if (Patch_VerifyLocation_CheckSignature(ps, psig, i))
+			if (OSHLE_VerifyLocation_CheckSignature(ps, psig, i))
 			{
 				return true;
 			}
@@ -595,7 +589,7 @@ bool Patch_LocateFunction(PatchSymbol* ps)
 #define JumpTarget(op, addr) (((addr)&0xF0000000) | (op.target << 2))
 
 // Check that the function i is located at address index
-bool Patch_VerifyLocation(PatchSymbol* ps, u32 index)
+bool OSHLE_VerifyLocation(PatchSymbol* ps, u32 index)
 {
 	// We may have already located this symbol.
 	if (ps->Found)
@@ -610,7 +604,7 @@ bool Patch_VerifyLocation(PatchSymbol* ps, u32 index)
 
 	for (u32 s = 0; s < ps->Signatures[s].NumOps; s++)
 	{
-		if (Patch_VerifyLocation_CheckSignature(ps, &ps->Signatures[s], index))
+		if (OSHLE_VerifyLocation_CheckSignature(ps, &ps->Signatures[s], index))
 		{
 			return true;
 		}
@@ -620,7 +614,7 @@ bool Patch_VerifyLocation(PatchSymbol* ps, u32 index)
 	return false;
 }
 
-bool Patch_VerifyLocation_CheckSignature(PatchSymbol* ps, PatchSignature* psig, u32 index)
+bool OSHLE_VerifyLocation_CheckSignature(PatchSymbol* ps, PatchSignature* psig, u32 index)
 {
 	PatchCrossRef* pcr = psig->CrossRefs;
 	bool cross_ref_var_set = false;
@@ -665,7 +659,7 @@ bool Patch_VerifyLocation_CheckSignature(PatchSymbol* ps, PatchSignature* psig, 
 
 					// This is a jump, the jump target must match the
 					// symbol pointed to by this function. Recurse
-					if (!Patch_VerifyLocation(pcr->Symbol, TargetIndex))
+					if (!OSHLE_VerifyLocation(pcr->Symbol, TargetIndex))
 						goto fail_find;
 
 					op.target = 0;  // Mask out jump location
@@ -805,7 +799,7 @@ fail_find:
 	return false;
 }
 
-static void Patch_FlushCache()
+static void OSHLE_FlushCache()
 {
 	std::string name = Save_GetDirectory(".hle");
 
@@ -821,7 +815,7 @@ static void Patch_FlushCache()
 	u32 data = MAGIC_HEADER;
 	fwrite(&data, 1, sizeof(data), fp);
 
-	for (u32 i = 0; i < nPatchSymbols; i++)
+	for (u32 i = 0; i < gNumPatchSymbols; i++)
 	{
 		if (g_PatchSymbols[i]->Found)
 		{
@@ -841,7 +835,7 @@ static void Patch_FlushCache()
 		}
 	}
 
-	for (u32 i = 0; i < nPatchVariables; i++)
+	for (u32 i = 0; i < gNumPatchVariables; i++)
 	{
 		if (g_PatchVariables[i]->Found)
 		{
@@ -859,7 +853,7 @@ static void Patch_FlushCache()
 	Console_Print("Wrote OSHLE cache: %s", name.c_str());
 }
 
-static bool Patch_GetCache()
+static bool OSHLE_LoadCache()
 {
 	std::string name = Save_GetDirectory(".hle");
 	FILE* fp = fopen(name.c_str(), "rb");
@@ -878,7 +872,7 @@ static bool Patch_GetCache()
 		return false;
 	}
 
-	for (u32 i = 0; i < nPatchSymbols; i++)
+	for (u32 i = 0; i < gNumPatchSymbols; i++)
 	{
 		fread(&data, 1, sizeof(data), fp);
 		if (data != 0)
@@ -892,7 +886,7 @@ static bool Patch_GetCache()
 			g_PatchSymbols[i]->Found = false;
 	}
 
-	for (u32 i = 0; i < nPatchVariables; i++)
+	for (u32 i = 0; i < gNumPatchVariables; i++)
 	{
 		fread(&data, 1, sizeof(data), fp);
 		if (data != 0)
