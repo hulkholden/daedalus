@@ -65,8 +65,14 @@ bool ServeResource(WebDebugConnection* connection, const char* resource_path);
 void Generate404(WebDebugConnection* connection, const char* request);
 void Generate500(WebDebugConnection* connection, const char* message);
 
-typedef void (*WebDebugHandler)(void* arg, WebDebugConnection* connection);
-void WebDebug_Register(const char* request, WebDebugHandler handler, void* arg);
+class WebDebugHandler {
+  public:
+	virtual ~WebDebugHandler();
+
+	virtual void HandleRequest(WebDebugConnection* connection) = 0;
+};
+
+void WebDebug_Register(const char* request, WebDebugHandler* handler);
 
 bool WebDebug_Init();
 void WebDebug_Fini();

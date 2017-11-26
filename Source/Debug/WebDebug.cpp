@@ -29,8 +29,7 @@ static const int kMaxConnections = 8;
 struct WebDebugHandlerEntry
 {
 	const char* Request;
-	WebDebugHandler Handler;
-	void* Arg;
+	WebDebugHandler* Handler;
 };
 
 struct StaticResource
@@ -56,10 +55,13 @@ const char* const kTextCSS = "text/css";
 const char* const kTextHTML = "text/html";
 const char* const kTextPlain = "text/plain";
 
-void WebDebug_Register(const char* request, WebDebugHandler handler, void* arg)
+WebDebugHandler::~WebDebugHandler()
 {
-	WebDebugHandlerEntry entry = {request, handler, arg};
-	gHandlers.push_back(entry);
+}
+
+void WebDebug_Register(const char* request, WebDebugHandler* handler)
+{
+	gHandlers.push_back({request, handler});
 }
 
 static void test_log(const char* text)
@@ -251,7 +253,7 @@ static int WebDebugDispatch(struct WebbyConnection* connection)
 	{
 		if (strcmp(connection->request.uri, entry.Request) == 0)
 		{
-			entry.Handler(entry.Arg, &dbg_connection);
+			entry.Handler->HandleRequest(&dbg_connection);
 
 			DAEDALUS_ASSERT(dbg_connection.GetState() == WebDebugConnection::kResponded,
 							"Failed to handle the response");

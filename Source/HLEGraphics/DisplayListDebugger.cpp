@@ -315,7 +315,12 @@ static void DoTask(WebDebugConnection *connection, DebugTask task)
 	ConditionWait(gMainThreadCond, gMainThreadMutex, kTimeoutInfinity);
 }
 
-static void DLDebugHandler(void *arg, WebDebugConnection *connection)
+class DLDebugHandler : public WebDebugHandler {
+  public:
+	virtual void HandleRequest(WebDebugConnection* connection);
+};
+
+void DLDebugHandler::HandleRequest(WebDebugConnection *connection)
 {
 	const WebDebugConnection::QueryParams &params = connection->GetQueryParams();
 	if (!params.empty())
@@ -373,10 +378,12 @@ static void DLDebugHandler(void *arg, WebDebugConnection *connection)
 	}
 }
 
+static DLDebugHandler gDLDebugHandler;
+
 bool DLDebugger_RegisterWebDebug()
 {
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	WebDebug_Register("/dldebugger", &DLDebugHandler, NULL);
+	WebDebug_Register("/dldebugger", &gDLDebugHandler);
 #endif
 	gMainThreadCond = ConditionCreate();
 	gMainThreadMutex = new Mutex();

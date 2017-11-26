@@ -8,8 +8,12 @@
 #include "System/DataSink.h"
 #include "System/Mutex.h"
 
+class TextureHandler : public WebDebugHandler {
+  public:
+	virtual void HandleRequest(WebDebugConnection* connection);
+};
 
-static void TextureHandler(void * arg, WebDebugConnection * connection)
+void TextureHandler::HandleRequest(WebDebugConnection * connection)
 {
 	const char * params = connection->GetQueryString();
 	if (!params) {
@@ -57,7 +61,12 @@ static void TextureHandler(void * arg, WebDebugConnection * connection)
 	connection->EndResponse();
 }
 
-static void TextureCacheHandler(void * arg, WebDebugConnection * connection)
+class TextureCacheHandler : public WebDebugHandler {
+  public:
+	virtual void HandleRequest(WebDebugConnection* connection);
+};
+
+void TextureCacheHandler::HandleRequest(WebDebugConnection * connection)
 {
 	connection->BeginResponse(200, -1, "text/html" );
 
@@ -131,11 +140,12 @@ static void TextureCacheHandler(void * arg, WebDebugConnection * connection)
 	connection->EndResponse();
 }
 
+static TextureHandler gTextureHandler;
+static TextureCacheHandler gTextureCacheHandler;
+
 bool TextureCache_RegisterWebDebug()
 {
-	WebDebug_Register( "/texture_cache", &TextureCacheHandler, nullptr );
-	WebDebug_Register( "/texture", &TextureHandler, nullptr );
+	WebDebug_Register( "/texture_cache", &gTextureCacheHandler );
+	WebDebug_Register( "/texture", &gTextureHandler );
 	return true;
 }
-
-
