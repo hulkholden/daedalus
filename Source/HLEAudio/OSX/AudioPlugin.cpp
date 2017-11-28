@@ -157,7 +157,7 @@ void AudioPluginOSX::DacrateChanged(int system_type)
 
 void AudioPluginOSX::LenChanged()
 {
-	if (gAudioPluginEnabled > APM_DISABLED)
+	if (gAudioPluginMode > AM_DISABLED)
 	{
 		u32 address = Memory_AI_GetRegister(AI_DRAM_ADDR_REG) & 0xFFFFFF;
 		u32 length = Memory_AI_GetRegister(AI_LEN_REG);
@@ -176,17 +176,17 @@ EProcessResult AudioPluginOSX::ProcessAList()
 
 	EProcessResult result = PR_NOT_STARTED;
 
-	switch (gAudioPluginEnabled)
+	switch (gAudioPluginMode)
 	{
-		case APM_DISABLED:
+		case AM_DISABLED:
 			result = PR_COMPLETED;
 			break;
-		case APM_ENABLED_ASYNC:
+		case AM_ENABLED_ASYNC:
 			DAEDALUS_ERROR("Async audio is unimplemented");
 			Audio_Ucode();
 			result = PR_COMPLETED;
 			break;
-		case APM_ENABLED_SYNC:
+		case AM_ENABLED_SYNC:
 			Audio_Ucode();
 			result = PR_COMPLETED;
 			break;

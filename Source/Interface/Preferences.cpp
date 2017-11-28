@@ -127,9 +127,9 @@ bool IPreferences::OpenPreferencesFile(const std::string& filename)
 		section->GetProperty("FogEnabled", &preferences.FogEnabled);
 		if (section->GetProperty("AudioEnabled", &int_value))
 		{
-			if (int_value >= APM_DISABLED && int_value <= APM_ENABLED_SYNC)
+			if (int_value >= AM_DISABLED && int_value <= AM_ENABLED_SYNC)
 			{
-				preferences.AudioEnabled = static_cast<EAudioPluginMode>(int_value);
+				preferences.AudioEnabled = static_cast<EAudioMode>(int_value);
 			}
 		}
 		section->GetProperty("MemoryAccessOptimisation", &preferences.MemoryAccessOptimisation);

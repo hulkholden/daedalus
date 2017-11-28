@@ -38,4 +38,4 @@ bool gCheatsEnabled = false;			// Enable cheat codes
 
 DaedalusConfig g_DaedalusConfig;
 
-EAudioPluginMode gAudioPluginEnabled = APM_DISABLED;
+EAudioMode gAudioPluginMode = AM_DISABLED;

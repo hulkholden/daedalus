@@ -122,7 +122,7 @@ void CAudioBuffer::AddSamples( const Sample * samples, u32 num_samples, u32 freq
 			// ToDo: Adjust Audio Frequency/ Look at Turok in this regard.
 			// We might want to put a Sleep in when executing on the SC?
 			//Give time to other threads when using SYNC mode.
-			if ( gAudioPluginEnabled == APM_ENABLED_SYNC )	ThreadYield();
+			if ( gAudioPluginMode == AM_ENABLED_SYNC )	ThreadYield();
 
 			read_ptr = mReadPtr;
 		}

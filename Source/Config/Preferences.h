@@ -46,7 +46,7 @@ struct SRomPreferences
 	bool FogEnabled;
 	bool MemoryAccessOptimisation;
 	bool CheatsEnabled;
-	EAudioPluginMode AudioEnabled;
+	EAudioMode AudioEnabled;
 	u32 SpeedSyncEnabled;
 	u32 ControllerIndex;
 

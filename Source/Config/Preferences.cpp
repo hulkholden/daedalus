@@ -40,7 +40,7 @@ void SRomPreferences::Reset()
 	FogEnabled = false;
 	MemoryAccessOptimisation = false;
 	CheatsEnabled = false;
-	AudioEnabled = APM_ENABLED_SYNC;
+	AudioEnabled = AM_ENABLED_SYNC;
 	SpeedSyncEnabled = 0;
 }
 
@@ -55,5 +55,5 @@ void SRomPreferences::Apply(const RomSettings& rom_settings) const
 	gClearDepthFrameBuffer = rom_settings.ClearDepthFrameBuffer || ClearDepthFrameBuffer;
 	gFogEnabled = rom_settings.FogEnabled || FogEnabled;
 	gCheatsEnabled = rom_settings.CheatsEnabled || CheatsEnabled;
-	gAudioPluginEnabled = AudioEnabled;
+	gAudioPluginMode = AudioEnabled;
 }

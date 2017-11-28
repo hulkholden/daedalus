@@ -45,13 +45,13 @@ extern bool gCleanSceneEnabled;
 extern bool gClearDepthFrameBuffer;
 
 // ToDo: Need moving to Audio plugin config
-enum EAudioPluginMode
+enum EAudioMode
 {
-	APM_DISABLED,
-	APM_ENABLED_ASYNC,
-	APM_ENABLED_SYNC,
+	AM_DISABLED,
+	AM_ENABLED_ASYNC,
+	AM_ENABLED_SYNC,
 };
 
-extern EAudioPluginMode gAudioPluginEnabled;
+extern EAudioMode gAudioPluginMode;
 
 #endif  // CONFIG_CONFIGOPTIONS_H_
