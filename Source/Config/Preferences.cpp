@@ -55,5 +55,5 @@ void SRomPreferences::Apply(const RomSettings& rom_settings) const
 	gClearDepthFrameBuffer = rom_settings.ClearDepthFrameBuffer || ClearDepthFrameBuffer;
 	gFogEnabled = rom_settings.FogEnabled || FogEnabled;
 	gCheatsEnabled = rom_settings.CheatsEnabled || CheatsEnabled;
-	gAudioPluginMode = AudioEnabled;
+	gAudioMode = AudioEnabled;
 }

@@ -148,7 +148,7 @@ bool CAudioPluginW32::Initialise()
 	if (CreateThread( "Audio", AudioThread, this ) == kInvalidThreadHandle)
 	{
 		DAEDALUS_ERROR("Failed to start the audio thread!");
-		gAudioPluginMode = AM_DISABLED;
+		gAudioMode = AM_DISABLED;
 	}
 #endif
 	return true;
@@ -201,7 +201,7 @@ void CAudioPluginW32::DacrateChanged( ESystemType SystemType )
 
 void CAudioPluginW32::LenChanged()
 {
-	if( gAudioPluginMode == AM_DISABLED )
+	if( gAudioMode == AM_DISABLED )
 		return;
 
 	u32 len, count;
@@ -332,7 +332,7 @@ EProcessResult	CAudioPluginW32::ProcessAList()
 
 	EProcessResult	result( PR_NOT_STARTED );
 
-	switch( gAudioPluginMode )
+	switch( gAudioMode )
 	{
 	case AM_DISABLED:
 		result = PR_COMPLETED;

@@ -158,7 +158,7 @@ void AudioPluginOSX::DacrateChanged(ESystemType system_type)
 
 void AudioPluginOSX::LenChanged()
 {
-	if (gAudioPluginMode > AM_DISABLED)
+	if (gAudioMode > AM_DISABLED)
 	{
 		u32 address = Memory_AI_GetRegister(AI_DRAM_ADDR_REG) & 0xFFFFFF;
 		u32 length = Memory_AI_GetRegister(AI_LEN_REG);
@@ -177,7 +177,7 @@ EProcessResult AudioPluginOSX::ProcessAList()
 
 	EProcessResult result = PR_NOT_STARTED;
 
-	switch (gAudioPluginMode)
+	switch (gAudioMode)
 	{
 		case AM_DISABLED:
 			result = PR_COMPLETED;

@@ -52,6 +52,6 @@ enum EAudioMode
 	AM_ENABLED_SYNC,
 };
 
-extern EAudioMode gAudioPluginMode;
+extern EAudioMode gAudioMode;
 
 #endif  // CONFIG_CONFIGOPTIONS_H_
