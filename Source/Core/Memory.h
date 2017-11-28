@@ -133,38 +133,38 @@ bool Memory_GetInternalReadAddress(u32 address, const void** p_translated);
 // Quick Read/Write methods that require a base returned by
 // ReadAddress or Memory_GetInternalReadAddress etc
 
-inline u64 QuickRead64Bits(u8* ptr, u32 offset)
+inline u64 QuickRead64Bits(const void* ptr, u32 offset)
 {
-	u64 data = *(u64*)(ptr + offset);
+	u64 data = *(u64*)(static_cast<const u8*>(ptr) + offset);
 	return (data >> 32) + (data << 32);
 }
 
-inline u32 QuickRead32Bits(u8* ptr, u32 offset)
+inline u32 QuickRead32Bits(const void* ptr, u32 offset)
 {
-	return *(u32*)(ptr + offset);
+	return *(u32*)(static_cast<const u8*>(ptr) + offset);
 }
 
-inline u16 QuickRead16Bits(u8* ptr, u32 offset)
+inline u16 QuickRead16Bits(const void* ptr, u32 offset)
 {
-	return *(u16*)((uintptr_t)(ptr + offset) ^ U16_TWIDDLE);
+	return *(u16*)((uintptr_t)(static_cast<const u8*>(ptr) + offset) ^ U16_TWIDDLE);
 }
 
-inline void QuickWrite16Bits(u8* ptr, u32 offset, u16 value)
+inline void QuickWrite16Bits(void* ptr, u32 offset, u16 value)
 {
-	*(u16*)((uintptr_t)(ptr + offset) ^ U16_TWIDDLE) = value;
+	*(u16*)((uintptr_t)(static_cast<u8*>(ptr) + offset) ^ U16_TWIDDLE) = value;
 }
 
-inline void QuickWrite64Bits(u8* ptr, u32 offset, u64 value)
+inline void QuickWrite64Bits(void* ptr, u32 offset, u64 value)
 {
-	*(u64*)(ptr + offset) = (value >> 32) + (value << 32);
+	*(u64*)(static_cast<u8*>(ptr) + offset) = (value >> 32) + (value << 32);
 }
 
-inline void QuickWrite32Bits(u8* ptr, u32 offset, u32 value)
+inline void QuickWrite32Bits(void* ptr, u32 offset, u32 value)
 {
-	*(u32*)(ptr + offset) = value;
+	*(u32*)(static_cast<u8*>(ptr) + offset) = value;
 }
 
-inline void QuickWrite32Bits(u8* ptr, u32 value)
+inline void QuickWrite32Bits(const void* ptr, u32 value)
 {
 	*(u32*)ptr = value;
 }
