@@ -59,7 +59,7 @@ public:
 	bool Initialise();
 
 	virtual ~CAudioPluginW32() {}
-	virtual void			StopEmulation();
+	void Stop();
 
 	virtual void			DacrateChanged( ESystemType SystemType );
 	virtual void			LenChanged();
@@ -106,11 +106,11 @@ void DestroyAudioPlugin()
 	// This stops other threads from trying to access the plugin
 	// while we're in the process of shutting it down.
 	// TODO(strmnnrmn): Still looks racey.
-	CAudioPlugin* plugin = gAudioPlugin;
+	CAudioPluginW32* plugin = static_cast<CAudioPluginW32*>(gAudioPlugin);
 	gAudioPlugin = nullptr;
 	if (plugin != nullptr)
 	{
-		plugin->StopEmulation();
+		plugin->Stop();
 		delete plugin;
 	}
 }
@@ -154,7 +154,7 @@ bool CAudioPluginW32::Initialise()
 	return true;
 }
 
-void CAudioPluginW32::StopEmulation()
+void CAudioPluginW32::Stop()
 {
 	Audio_Reset();
 

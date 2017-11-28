@@ -27,9 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 class CAudioPlugin
 {
   public:
-	virtual ~CAudioPlugin()
-	{
-	}
+	virtual ~CAudioPlugin() {}
 
 	enum ESystemType
 	{
@@ -38,7 +36,6 @@ class CAudioPlugin
 		ST_MPAL,
 	};
 
-	virtual void           StopEmulation()                        = 0;
 	virtual void           DacrateChanged(ESystemType SystemType) = 0;
 	virtual void           LenChanged()                           = 0;
 	virtual u32            ReadLength()                           = 0;

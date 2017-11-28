@@ -81,7 +81,7 @@ class AudioPluginOSX : public CAudioPlugin
 	AudioPluginOSX();
 	virtual ~AudioPluginOSX();
 
-	virtual void StopEmulation();
+	void Stop();
 
 	virtual void DacrateChanged(ESystemType system_type);
 	virtual void LenChanged();
@@ -120,11 +120,11 @@ void DestroyAudioPlugin()
 	// This stops other threads from trying to access the plugin
 	// while we're in the process of shutting it down.
 	// TODO(strmnnrmn): Still looks racey.
-	CAudioPlugin* plugin = gAudioPlugin;
+	AudioPluginOSX* plugin = static_cast<AudioPluginOSX*>(gAudioPlugin);
 	gAudioPlugin = nullptr;
 	if (plugin != nullptr)
 	{
-		plugin->StopEmulation();
+		plugin->Stop();
 		delete plugin;
 	}
 }
@@ -140,7 +140,7 @@ AudioPluginOSX::AudioPluginOSX()
 
 AudioPluginOSX::~AudioPluginOSX() { StopAudio(); }
 
-void AudioPluginOSX::StopEmulation()
+void AudioPluginOSX::Stop()
 {
 	Audio_Reset();
 	StopAudio();
