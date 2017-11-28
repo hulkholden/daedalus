@@ -38,7 +38,6 @@ class CAudioPlugin
 
 	virtual void           DacrateChanged(ESystemType SystemType) = 0;
 	virtual void           LenChanged()                           = 0;
-	virtual u32            ReadLength()                           = 0;
 	virtual EProcessResult ProcessAList()                         = 0;
 	virtual void           UpdateOnVbl(bool wait)                 = 0;
 };

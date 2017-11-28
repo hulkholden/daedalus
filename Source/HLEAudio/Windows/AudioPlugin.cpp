@@ -63,7 +63,6 @@ public:
 
 	virtual void			DacrateChanged( ESystemType SystemType );
 	virtual void			LenChanged();
-	virtual u32				ReadLength();
 	virtual EProcessResult	ProcessAList();
 	virtual void			UpdateOnVbl( bool wait );
 private:
@@ -180,7 +179,7 @@ u32	DAEDALUS_THREAD_CALL_TYPE CAudioPluginW32::AudioThread(void * arg)
 	CAudioPluginW32 * plugin = static_cast<CAudioPluginW32 *>(arg);
 	while(1)
 	{
-		plugin->Update(true);
+		plugin->UpdateOnVbl(true);
 		ThreadSleepMs(1);
 	}
 
@@ -243,13 +242,8 @@ void CAudioPluginW32::LenChanged()
 		FillBuffer((2 + offset) & 3);
 	}
 #ifndef AUDIO_THREADED
-	Update(false);
+	UpdateOnVbl(false);
 #endif
-}
-
-u32	 CAudioPluginW32::ReadLength()
-{
-	return Snd1Len;
 }
 
 void	CAudioPluginW32::UpdateOnVbl( bool Wait )

@@ -85,7 +85,6 @@ class AudioPluginOSX : public CAudioPlugin
 
 	virtual void DacrateChanged(ESystemType system_type);
 	virtual void LenChanged();
-	virtual u32 ReadLength() { return 0; }
 	virtual EProcessResult ProcessAList();
 	virtual void UpdateOnVbl(bool wait) {}
 
