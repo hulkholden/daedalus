@@ -32,27 +32,11 @@ typedef u32 (*PatchFunction)();
 #define VAR_ADDRESS(name)  (g_##name##_v.Location)
 #define VAR_FOUND(name)  (g_##name##_v.Found)
 
-
-enum PATCH_CROSSREF_TYPE
-{
-	PX_JUMP,
-	PX_VARIABLE_HI,
-	PX_VARIABLE_LO
-};
-
-struct _PatchSymbol;
-
-typedef struct
-{
-	u32 					Offset;		// Opcode offset
-	PATCH_CROSSREF_TYPE		Type;		// Type - J/JAL/LUI/ORI
-	struct _PatchSymbol *	Symbol;		// Only one of these is valid
-	struct _PatchVariable *	Variable;
-} PatchCrossRef;
-
 #define PATCH_PARTIAL_CRC_LEN 4
 
-typedef struct
+struct PatchCrossRef;
+
+struct PatchSignature
 {
 	u32					NumOps;
 	PatchCrossRef *		CrossRefs;
@@ -61,10 +45,9 @@ typedef struct
 	u32					FirstOp;		// First op in signature (used for rapid scanning)
 	u32					PartialCRC;		// Crc after 4 ops (ignoring symbol bits)
 	u32					CRC;			// Crc for entire buffer (ignoring symbol bits)
-} PatchSignature;
+};
 
-
-typedef struct _PatchSymbol
+struct PatchSymbol
 {
 	bool 				Found;		// Has this symbol been found?
 	u32 				Location;	// What is the address of the symbol?
@@ -73,9 +56,9 @@ typedef struct _PatchSymbol
 	PatchSignature *	Signatures; // Crossrefs for this code (Function symbols only)
 
 	PatchFunction 		Function;	// The installed patch Emulated function call (Function symbols only)
-} PatchSymbol;
+};
 
-typedef struct _PatchVariable
+struct PatchVariable
 {
 	bool 				Found;		// Has this symbol been found?
 	u32					Location;	// What is the address of the symbol?
@@ -87,9 +70,22 @@ typedef struct _PatchVariable
 	bool 				FoundLo;
 	u16 				HiWord;
 	u16 				LoWord;
+};
 
-} PatchVariable;
-///////////////////////////////////////////////////////////////
+enum PATCH_CROSSREF_TYPE
+{
+	PX_JUMP,
+	PX_VARIABLE_HI,
+	PX_VARIABLE_LO
+};
+
+struct PatchCrossRef
+{
+	u32 					Offset;		// Opcode offset
+	PATCH_CROSSREF_TYPE		Type;		// Type - J/JAL/LUI/ORI
+	PatchSymbol *			Symbol;		// Only one of these is valid
+	PatchVariable*          Variable;
+};
 
 #define BEGIN_PATCH_XREFS(label) \
 static PatchCrossRef g_##label##_x[] = {
@@ -155,8 +151,8 @@ NULL};
 
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
 
-extern PatchSymbol * g_PatchSymbols[];
-extern PatchVariable * g_PatchVariables[];
+extern PatchSymbol * gPatchSymbols[];
+extern PatchVariable * gPatchVariables[];
 
 #endif
 
