@@ -83,10 +83,11 @@ class AudioPluginOSX : public CAudioPlugin
 
 	virtual void StopEmulation();
 
-	virtual void DacrateChanged(int system_type);
+	virtual void DacrateChanged(ESystemType system_type);
 	virtual void LenChanged();
 	virtual u32 ReadLength() { return 0; }
 	virtual EProcessResult ProcessAList();
+	virtual void UpdateOnVbl(bool wait) {}
 
 	void AddBuffer(void *ptr, u32 length);  // Uploads a new buffer and returns status
 
@@ -145,7 +146,7 @@ void AudioPluginOSX::StopEmulation()
 	StopAudio();
 }
 
-void AudioPluginOSX::DacrateChanged(int system_type)
+void AudioPluginOSX::DacrateChanged(ESystemType system_type)
 {
 	u32 clock = (system_type == ST_NTSC) ? VI_NTSC_CLOCK : VI_PAL_CLOCK;
 	u32 dacrate = Memory_AI_GetRegister(AI_DACRATE_REG);

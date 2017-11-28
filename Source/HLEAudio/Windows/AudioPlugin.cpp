@@ -61,11 +61,11 @@ public:
 	virtual ~CAudioPluginW32() {}
 	virtual void			StopEmulation();
 
-	virtual void			DacrateChanged( int SystemType );
+	virtual void			DacrateChanged( ESystemType SystemType );
 	virtual void			LenChanged();
 	virtual u32				ReadLength();
 	virtual EProcessResult	ProcessAList();
-	virtual void			Update( bool wait );
+	virtual void			UpdateOnVbl( bool wait );
 private:
 	u32 Frequency, Dacrate, Snd1Len, SpaceLeft, SndBuffer[3], Playing;
 	u8 *Snd1ReadPos;
@@ -188,7 +188,7 @@ u32	DAEDALUS_THREAD_CALL_TYPE CAudioPluginW32::AudioThread(void * arg)
 }
 #endif
 
-void CAudioPluginW32::DacrateChanged( int SystemType )
+void CAudioPluginW32::DacrateChanged( ESystemType SystemType )
 {
 	if (Dacrate != Memory_AI_GetRegister(AI_DACRATE_REG))
 	{
@@ -252,7 +252,7 @@ u32	 CAudioPluginW32::ReadLength()
 	return Snd1Len;
 }
 
-void	CAudioPluginW32::Update( bool Wait )
+void	CAudioPluginW32::UpdateOnVbl( bool Wait )
 {
 	u32 status, count, dwEvt;
 

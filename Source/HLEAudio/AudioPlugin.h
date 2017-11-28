@@ -26,10 +26,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class CAudioPlugin
 {
-public:
-	virtual ~CAudioPlugin() {}
-
-	virtual void		StopEmulation() = 0;
+  public:
+	virtual ~CAudioPlugin()
+	{
+	}
 
 	enum ESystemType
 	{
@@ -38,13 +38,12 @@ public:
 		ST_MPAL,
 	};
 
-	virtual void			DacrateChanged( int SystemType ) = 0;
-	virtual void			LenChanged() = 0;
-	virtual u32				ReadLength() = 0;
-	virtual EProcessResult	ProcessAList() = 0;
-#ifdef DAEDALUS_W32
-	virtual void			Update( bool wait ) = 0;
-#endif
+	virtual void           StopEmulation()                        = 0;
+	virtual void           DacrateChanged(ESystemType SystemType) = 0;
+	virtual void           LenChanged()                           = 0;
+	virtual u32            ReadLength()                           = 0;
+	virtual EProcessResult ProcessAList()                         = 0;
+	virtual void           UpdateOnVbl(bool wait)                 = 0;
 };
 
 bool CreateAudioPlugin();

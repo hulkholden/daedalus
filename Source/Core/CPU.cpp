@@ -42,14 +42,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Console.h"
 #include "Debug/DebugLog.h"
 #include "Debug/Synchroniser.h"
+#include "HLEAudio/AudioPlugin.h"
 #include "System/AtomicPrimitives.h"
 #include "System/Thread.h"
 #include "Ultra/ultra_R4300.h"
 #include "Utility/Hash.h"
 
-#ifdef DAEDALUS_W32
-#include "HLEAudio/AudioPlugin.h"
-#endif
 
 extern void R4300_Init();
 
@@ -517,9 +515,10 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			gVerticalInterrupts++;
 
 			FramerateLimiter_Limit();
-#ifdef DAEDALUS_W32
-			if (gAudioPlugin != NULL) gAudioPlugin->Update(false);
-#endif
+			if (gAudioPlugin != NULL)
+			{
+				gAudioPlugin->UpdateOnVbl(false);
+			}
 			Memory_MI_SetRegisterBits(MI_INTR_REG, MI_INTR_VI);
 			R4300_Interrupt_UpdateCause3();
 
@@ -533,7 +532,9 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			//   interrupt the dynamo tracer for instance)
 			// TODO(strmnnrmn): should register this with CPU_RegisterCpuEventHandler.
 			if ((gVerticalInterrupts & 0x3F) == 0)  // once every 60 VBLs
+			{
 				Save_Flush();
+			}
 
 			for (CpuEventHandler* handler : gCpuEventHandlers)
 			{
