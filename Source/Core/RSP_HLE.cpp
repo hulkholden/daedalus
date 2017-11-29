@@ -190,11 +190,7 @@ static EProcessResult ProcessAudTask()
 {
 	DAEDALUS_PROFILE( "HLE: Audio" );
 
-	if (gAudioPlugin != NULL)
-	{
-		return gAudioPlugin->ProcessAList();
-	}
-	return PR_COMPLETED;
+	return gAudioPlugin->ProcessAList();
 }
 
 // ProcessJpegTask and RSP_HLE_CICX105 were borrowed from Mupen64plus

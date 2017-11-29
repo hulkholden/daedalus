@@ -515,10 +515,7 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			gVerticalInterrupts++;
 
 			FramerateLimiter_Limit();
-			if (gAudioPlugin != NULL)
-			{
-				gAudioPlugin->UpdateOnVbl(false);
-			}
+			gAudioPlugin->UpdateOnVbl(false);
 			Memory_MI_SetRegisterBits(MI_INTR_REG, MI_INTR_VI);
 			R4300_Interrupt_UpdateCause3();
 
