@@ -20,8 +20,8 @@
 
 #pragma once
 
-#ifndef CORE_SAVESTATE_H_
-#define CORE_SAVESTATE_H_
+#ifndef INTERFACE_SAVESTATE_H_
+#define INTERFACE_SAVESTATE_H_
 
 #include <string>
 
@@ -31,4 +31,4 @@ void SaveState_Finalise();
 bool SaveState_RequestSave(const std::string& filename);
 bool SaveState_RequestLoad(const std::string& filename);
 
-#endif // CORE_SAVESTATE_H_
+#endif // INTERFACE_SAVESTATE_H_

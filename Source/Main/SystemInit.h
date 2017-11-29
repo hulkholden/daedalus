@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef SYSTEM_SYSTEMINIT_H_
-#define SYSTEM_SYSTEMINIT_H_
+#ifndef MAIN_SYSTEMINIT_H_
+#define MAIN_SYSTEMINIT_H_
 
 #include <string>
 
@@ -36,4 +36,4 @@ void System_Close();
 // Finalize the whole system
 void System_Finalize();
 
-#endif  // SYSTEM_SYSTEMINIT_H_
+#endif  // MAIN_SYSTEMINIT_H_

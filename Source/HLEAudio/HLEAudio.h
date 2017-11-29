@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef PLUGINS_AUDIOPLUGIN_H_
-#define PLUGINS_AUDIOPLUGIN_H_
+#ifndef HLEAUDIO_HLEAUDIO_H_
+#define HLEAUDIO_HLEAUDIO_H_
 
 #include "Core/RSP_HLE.h"
 
@@ -47,4 +47,4 @@ void DestroyAudioPlugin();
 
 extern HLEAudio *	gHLEAudio;
 
-#endif // PLUGINS_AUDIOPLUGIN_H_
+#endif // HLEAUDIO_HLEAUDIO_H_

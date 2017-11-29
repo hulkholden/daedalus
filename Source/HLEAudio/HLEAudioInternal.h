@@ -18,8 +18,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef HLEAUDIO_AUDIOHLE_H_
-#define HLEAUDIO_AUDIOHLE_H_
+#ifndef HLEAUDIO_HLEAUDIOINTERNAL_H_
+#define HLEAUDIO_HLEAUDIOINTERNAL_H_
 
 #include "Base/Types.h"
 
@@ -409,4 +409,4 @@ typedef void ( * AudioHLEInstruction )( AudioHLECommand command );
 void Audio_Ucode();
 void Audio_Reset();
 
-#endif // HLEAUDIO_AUDIOHLE_H_
+#endif // HLEAUDIO_HLEAUDIOINTERNAL_H_

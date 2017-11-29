@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef DEBUG_DBGCONSOLE_H_
-#define DEBUG_DBGCONSOLE_H_
+#ifndef DEBUG_CONSOLE_H_
+#define DEBUG_CONSOLE_H_
 
 #include "Base/Macros.h"
 
@@ -45,4 +45,4 @@ void Console_Flush();
 
 #endif  // DAEDALUS_DEBUG_CONSOLE
 
-#endif  // DEBUG_DBGCONSOLE_H_
+#endif  // DEBUG_CONSOLE_H_

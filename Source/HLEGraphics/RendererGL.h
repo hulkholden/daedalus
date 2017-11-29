@@ -1,5 +1,5 @@
-#ifndef SYSGL_HLEGRAPHICS_RENDERERGL_H_
-#define SYSGL_HLEGRAPHICS_RENDERERGL_H_
+#ifndef HLEGRAPHICS_RENDERERGL_H_
+#define HLEGRAPHICS_RENDERERGL_H_
 
 #include "HLEGraphics/BaseRenderer.h"
 
@@ -33,4 +33,4 @@ class RendererGL : public BaseRenderer
 bool Renderer_Initialise();
 void Renderer_Finalise();
 
-#endif // SYSGL_HLEGRAPHICS_RENDERERGL_H_
+#endif // HLEGRAPHICS_RENDERERGL_H_
