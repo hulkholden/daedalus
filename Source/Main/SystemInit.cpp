@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DebugLog.h"
 #include "Debug/Synchroniser.h"
 #include "Graphics/GraphicsContext.h"
-#include "HLEAudio/AudioPlugin.h"
+#include "HLEAudio/HLEAudio.h"
 #include "HLEGraphics/HLEGraphics.h"
 #include "HLEGraphics/RendererGL.h"
 #include "Input/InputManager.h"
