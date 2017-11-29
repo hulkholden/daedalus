@@ -10,10 +10,10 @@ cc_library(
         "HLEMain.cpp",
     ] + select({
         "//:darwin": [
-            "OSX/AudioPlugin.cpp",
+            "OSX/HLEAudio.cpp",
         ],
         "//:windows": [
-            "Windows/AudioPlugin.cpp",
+            "Windows/HLEAudio.cpp",
         ],
     }),
     hdrs = glob(["*.h"]),
