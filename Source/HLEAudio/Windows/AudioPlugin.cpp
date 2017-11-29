@@ -52,13 +52,13 @@ inline void Soundmemcpy(void * dest, const void * src, size_t count)
 }
 
 
-class CAudioPluginW32 : public CAudioPlugin
+class HLEAudioImpl : public HLEAudio
 {
 public:
-	CAudioPluginW32();
+	HLEAudioImpl();
 	bool Initialise();
 
-	virtual ~CAudioPluginW32() {}
+	virtual ~HLEAudioImpl() {}
 	void Stop();
 
 	virtual void			DacrateChanged( ESystemType SystemType );
@@ -79,23 +79,23 @@ private:
 	DSBPOSITIONNOTIFY    rgdscbpn[NUMCAPTUREEVENTS+1];
 
 	void SetupDSoundBuffers();
-	bool CAudioPluginW32::FillBufferWithSilence( LPDIRECTSOUNDBUFFER lpDsb );
+	bool HLEAudioImpl::FillBufferWithSilence( LPDIRECTSOUNDBUFFER lpDsb );
 
 	void FillSectionWithSilence( int buffer );
 	void FillBuffer            ( int buffer );
 };
 
-CAudioPlugin* gAudioPlugin = nullptr;
+HLEAudio* gHLEAudio = nullptr;
 
 
 bool CreateAudioPlugin()
 {
-	CAudioPluginW32* plugin = new CAudioPluginW32();
+	HLEAudioImpl* plugin = new HLEAudioImpl();
 	if (!plugin->Initialise())
 	{
 		return false;
 	}
-	gAudioPlugin = plugin;
+	gHLEAudio = plugin;
 	return true;
 }
 
@@ -105,8 +105,8 @@ void DestroyAudioPlugin()
 	// This stops other threads from trying to access the plugin
 	// while we're in the process of shutting it down.
 	// TODO(strmnnrmn): Still looks racey.
-	CAudioPluginW32* plugin = static_cast<CAudioPluginW32*>(gAudioPlugin);
-	gAudioPlugin = nullptr;
+	HLEAudioImpl* plugin = static_cast<HLEAudioImpl*>(gHLEAudio);
+	gHLEAudio = nullptr;
 	if (plugin != nullptr)
 	{
 		plugin->Stop();
@@ -114,7 +114,7 @@ void DestroyAudioPlugin()
 	}
 }
 
-CAudioPluginW32::CAudioPluginW32()
+HLEAudioImpl::HLEAudioImpl()
 :	Dacrate(0)
 ,	AIReady(false)
 ,	lpds(NULL)
@@ -123,7 +123,7 @@ CAudioPluginW32::CAudioPluginW32()
 {
 }
 
-bool CAudioPluginW32::Initialise()
+bool HLEAudioImpl::Initialise()
 {
 	HRESULT hr;
 	if ( FAILED( hr = DirectSoundCreate( NULL, &lpds, NULL ) ) ) {
@@ -153,7 +153,7 @@ bool CAudioPluginW32::Initialise()
 	return true;
 }
 
-void CAudioPluginW32::Stop()
+void HLEAudioImpl::Stop()
 {
 	Audio_Reset();
 
@@ -174,9 +174,9 @@ void CAudioPluginW32::Stop()
 	}
 }
 #ifdef AUDIO_THREADED
-u32	DAEDALUS_THREAD_CALL_TYPE CAudioPluginW32::AudioThread(void * arg)
+u32	DAEDALUS_THREAD_CALL_TYPE HLEAudioImpl::AudioThread(void * arg)
 {
-	CAudioPluginW32 * plugin = static_cast<CAudioPluginW32 *>(arg);
+	HLEAudioImpl * plugin = static_cast<HLEAudioImpl *>(arg);
 	while(1)
 	{
 		plugin->UpdateOnVbl(true);
@@ -187,7 +187,7 @@ u32	DAEDALUS_THREAD_CALL_TYPE CAudioPluginW32::AudioThread(void * arg)
 }
 #endif
 
-void CAudioPluginW32::DacrateChanged( ESystemType SystemType )
+void HLEAudioImpl::DacrateChanged( ESystemType SystemType )
 {
 	if (Dacrate != Memory_AI_GetRegister(AI_DACRATE_REG))
 	{
@@ -198,7 +198,7 @@ void CAudioPluginW32::DacrateChanged( ESystemType SystemType )
 	}
 }
 
-void CAudioPluginW32::LenChanged()
+void HLEAudioImpl::LenChanged()
 {
 	if( gAudioMode == AM_DISABLED )
 		return;
@@ -246,7 +246,7 @@ void CAudioPluginW32::LenChanged()
 #endif
 }
 
-void	CAudioPluginW32::UpdateOnVbl( bool Wait )
+void	HLEAudioImpl::UpdateOnVbl( bool Wait )
 {
 	u32 status, count, dwEvt;
 
@@ -320,7 +320,7 @@ void	CAudioPluginW32::UpdateOnVbl( bool Wait )
 	}
 }
 
-EProcessResult	CAudioPluginW32::ProcessAList()
+EProcessResult	HLEAudioImpl::ProcessAList()
 {
 	Memory_SP_SetRegisterBits(SP_STATUS_REG, SP_STATUS_HALT);
 
@@ -341,7 +341,7 @@ EProcessResult	CAudioPluginW32::ProcessAList()
 	return result;
 }
 
-void CAudioPluginW32::SetupDSoundBuffers(void) {
+void HLEAudioImpl::SetupDSoundBuffers(void) {
 	LPDIRECTSOUNDBUFFER lpdsb;
 	DSBUFFERDESC        dsPrimaryBuff, dsbdesc;
 	WAVEFORMATEX        wfm;
@@ -407,7 +407,7 @@ void CAudioPluginW32::SetupDSoundBuffers(void) {
 	IDirectSoundBuffer_Play(lpdsbuf, 0, 0, 0 );
 }
 
-bool CAudioPluginW32::FillBufferWithSilence( LPDIRECTSOUNDBUFFER lpDsb ) {
+bool HLEAudioImpl::FillBufferWithSilence( LPDIRECTSOUNDBUFFER lpDsb ) {
 	WAVEFORMATEX    wfx;
 	u32           dwSizeWritten;
 
@@ -428,7 +428,7 @@ bool CAudioPluginW32::FillBufferWithSilence( LPDIRECTSOUNDBUFFER lpDsb ) {
 	return false;
 }
 
-void CAudioPluginW32::FillSectionWithSilence( int buffer ) {
+void HLEAudioImpl::FillSectionWithSilence( int buffer ) {
 	u32 dwBytesLocked;
 	VOID *lpvData;
 
@@ -443,7 +443,7 @@ void CAudioPluginW32::FillSectionWithSilence( int buffer ) {
 	IDirectSoundBuffer8_Unlock(lpdsbuf, lpvData, dwBytesLocked, NULL, 0 );
 }
 
-void CAudioPluginW32::FillBuffer ( int buffer ) {
+void HLEAudioImpl::FillBuffer ( int buffer ) {
 	u32 dwBytesLocked;
 	VOID *lpvData;
 

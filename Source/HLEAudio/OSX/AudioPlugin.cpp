@@ -42,7 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Thread.h"
 #include "System/Timing.h"
 
-CAudioPlugin* gAudioPlugin = nullptr;
+HLEAudio* gHLEAudio = nullptr;
 
 #define DEBUG_AUDIO 0
 
@@ -75,11 +75,11 @@ static const u32 kMaxBufferLengthMs = 30;
 static const u32 kNumBuffers = 3;
 static const u32 kAudioQueueBufferLength = 1 * 1024;
 
-class AudioPluginOSX : public CAudioPlugin
+class HLEAudioImpl : public HLEAudio
 {
    public:
-	AudioPluginOSX();
-	virtual ~AudioPluginOSX();
+	HLEAudioImpl();
+	virtual ~HLEAudioImpl();
 
 	void Stop();
 
@@ -108,8 +108,8 @@ class AudioPluginOSX : public CAudioPlugin
 
 bool CreateAudioPlugin()
 {
-	DAEDALUS_ASSERT(gAudioPlugin == nullptr, "Why is there already an audio plugin?");
-	gAudioPlugin = new AudioPluginOSX();
+	DAEDALUS_ASSERT(gHLEAudio == nullptr, "Why is there already an audio plugin?");
+	gHLEAudio = new HLEAudioImpl();
 	return true;
 }
 
@@ -119,8 +119,8 @@ void DestroyAudioPlugin()
 	// This stops other threads from trying to access the plugin
 	// while we're in the process of shutting it down.
 	// TODO(strmnnrmn): Still looks racey.
-	AudioPluginOSX* plugin = static_cast<AudioPluginOSX*>(gAudioPlugin);
-	gAudioPlugin = nullptr;
+	HLEAudioImpl* plugin = static_cast<HLEAudioImpl*>(gHLEAudio);
+	gHLEAudio = nullptr;
 	if (plugin != nullptr)
 	{
 		plugin->Stop();
@@ -128,7 +128,7 @@ void DestroyAudioPlugin()
 	}
 }
 
-AudioPluginOSX::AudioPluginOSX()
+HLEAudioImpl::HLEAudioImpl()
 	: mAudioBuffer(kAudioBufferSize),
 	  mFrequency(44100),
 	  mAudioThread(kInvalidThreadHandle),
@@ -137,15 +137,15 @@ AudioPluginOSX::AudioPluginOSX()
 {
 }
 
-AudioPluginOSX::~AudioPluginOSX() { StopAudio(); }
+HLEAudioImpl::~HLEAudioImpl() { StopAudio(); }
 
-void AudioPluginOSX::Stop()
+void HLEAudioImpl::Stop()
 {
 	Audio_Reset();
 	StopAudio();
 }
 
-void AudioPluginOSX::DacrateChanged(ESystemType system_type)
+void HLEAudioImpl::DacrateChanged(ESystemType system_type)
 {
 	u32 clock = (system_type == ST_NTSC) ? VI_NTSC_CLOCK : VI_PAL_CLOCK;
 	u32 dacrate = Memory_AI_GetRegister(AI_DACRATE_REG);
@@ -155,7 +155,7 @@ void AudioPluginOSX::DacrateChanged(ESystemType system_type)
 	mFrequency = frequency;
 }
 
-void AudioPluginOSX::LenChanged()
+void HLEAudioImpl::LenChanged()
 {
 	if (gAudioMode > AM_DISABLED)
 	{
@@ -170,7 +170,7 @@ void AudioPluginOSX::LenChanged()
 	}
 }
 
-EProcessResult AudioPluginOSX::ProcessAList()
+EProcessResult HLEAudioImpl::ProcessAList()
 {
 	Memory_SP_SetRegisterBits(SP_STATUS_REG, SP_STATUS_HALT);
 
@@ -195,7 +195,7 @@ EProcessResult AudioPluginOSX::ProcessAList()
 	return result;
 }
 
-void AudioPluginOSX::AddBuffer(void *ptr, u32 length)
+void HLEAudioImpl::AddBuffer(void *ptr, u32 length)
 {
 	if (length == 0) {
 		return;
@@ -213,9 +213,9 @@ void AudioPluginOSX::AddBuffer(void *ptr, u32 length)
 	DPF_AUDIO("Queuing %d samples @%dHz - %.2fms - bufferlen now %d\n", num_samples, mFrequency, ms, mBufferLenMs);
 }
 
-void AudioPluginOSX::AudioCallback(void *arg, AudioQueueRef queue, AudioQueueBufferRef buffer)
+void HLEAudioImpl::AudioCallback(void *arg, AudioQueueRef queue, AudioQueueBufferRef buffer)
 {
-	AudioPluginOSX *plugin = static_cast<AudioPluginOSX *>(arg);
+	HLEAudioImpl *plugin = static_cast<HLEAudioImpl *>(arg);
 
 	u32 num_samples = buffer->mAudioDataBytesCapacity / sizeof(Sample);
 	u32 samples_written = plugin->mAudioBuffer.Drain(static_cast<Sample *>(buffer->mAudioData), num_samples);
@@ -247,9 +247,9 @@ void AudioPluginOSX::AudioCallback(void *arg, AudioQueueRef queue, AudioQueueBuf
 	}
 }
 
-u32 AudioPluginOSX::AudioThread(void *arg)
+u32 HLEAudioImpl::AudioThread(void *arg)
 {
-	AudioPluginOSX *plugin = static_cast<AudioPluginOSX *>(arg);
+	HLEAudioImpl *plugin = static_cast<HLEAudioImpl *>(arg);
 
 	AudioStreamBasicDescription format;
 
@@ -292,9 +292,9 @@ u32 AudioPluginOSX::AudioThread(void *arg)
 	return 0;
 }
 
-void AudioPluginOSX::AudioSyncFunction(void *arg)
+void HLEAudioImpl::AudioSyncFunction(void *arg)
 {
-	AudioPluginOSX *plugin = static_cast<AudioPluginOSX *>(arg);
+	HLEAudioImpl *plugin = static_cast<HLEAudioImpl *>(arg);
 #if DEBUG_AUDIO
 	static u64 last_time = 0;
 	u64 now;
@@ -313,7 +313,7 @@ void AudioPluginOSX::AudioSyncFunction(void *arg)
 	}
 }
 
-void AudioPluginOSX::StartAudio()
+void HLEAudioImpl::StartAudio()
 {
 	if (mAudioThread != kInvalidThreadHandle) {
 		return;
@@ -333,7 +333,7 @@ void AudioPluginOSX::StartAudio()
 	}
 }
 
-void AudioPluginOSX::StopAudio()
+void HLEAudioImpl::StopAudio()
 {
 	if (mAudioThread == kInvalidThreadHandle) {
 		return;

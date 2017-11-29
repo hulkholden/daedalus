@@ -24,10 +24,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Core/RSP_HLE.h"
 
-class CAudioPlugin
+class HLEAudio
 {
   public:
-	virtual ~CAudioPlugin() {}
+	virtual ~HLEAudio() {}
 
 	enum ESystemType
 	{
@@ -45,6 +45,6 @@ class CAudioPlugin
 bool CreateAudioPlugin();
 void DestroyAudioPlugin();
 
-extern CAudioPlugin *	gAudioPlugin;
+extern HLEAudio *	gHLEAudio;
 
 #endif // PLUGINS_AUDIOPLUGIN_H_

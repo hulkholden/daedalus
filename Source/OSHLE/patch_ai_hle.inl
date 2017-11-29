@@ -41,8 +41,8 @@ TEST_DISABLE_AI_FUNCS
 	Memory_AI_SetRegister( AI_LEN_REG, len );
 	Memory_AI_SetRegister( AI_DRAM_ADDR_REG, addr );
 
-	DAEDALUS_ASSERT( gAudioPlugin, "Audio plugin is not initialized");
-	gAudioPlugin->LenChanged();
+	DAEDALUS_ASSERT( gHLEAudio, "Audio plugin is not initialized");
+	gHLEAudio->LenChanged();
 
 	// Return 0 if succesfully DMA'd audio, otherwise -1 if busy
 	gGPR[REG_v0]._s64 = 0;

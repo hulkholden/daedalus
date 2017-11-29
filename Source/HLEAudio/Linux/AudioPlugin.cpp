@@ -2,7 +2,7 @@
 #include "HLEAudio/AudioPlugin.h"
 #include "Config/ConfigOptions.h"
 
-CAudioPlugin* gAudioPlugin = nullptr;
+HLEAudio* gHLEAudio = nullptr;
 
 bool CreateAudioPlugin()
 {

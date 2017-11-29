@@ -248,7 +248,7 @@ static void WriteValue_8450_845F( u32 address, u32 value )
 	case 0x4:	//AI_LEN_REG
 		// LS 3 bits ignored
 		*(u32 *)((u8 *)gMemBuffers[MEM_AI_REG] + offset) = value;
-		gAudioPlugin->LenChanged();
+		gHLEAudio->LenChanged();
 		break;
 
 	case 0x0c:	//AI_STATUS_REG
@@ -261,7 +261,7 @@ static void WriteValue_8450_845F( u32 address, u32 value )
 
 		//When we set PAL mode for PAL games it corrects the sound pitch to the same as
 		//NTSC games but it will also limit FPS 2% higher as well //Corn
-		gAudioPlugin->DacrateChanged( g_ROM.TvType ? CAudioPlugin::ST_NTSC : CAudioPlugin::ST_PAL );
+		gHLEAudio->DacrateChanged( g_ROM.TvType ? HLEAudio::ST_NTSC : HLEAudio::ST_PAL );
 		break;
 	default:
 		*(u32 *)((u8 *)gMemBuffers[MEM_AI_REG] + offset) = value;
