@@ -37,29 +37,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Ultra/ultra_gbi.h"
 #include "Utility/Profiler.h"
 
-// Vertex allocation.
-// AllocVerts/FreeVerts:
-//   Allocate vertices whose lifetime must extend beyond the current scope.
-//   On OSX we just use malloc, though we could use a scratch allocator to simplify.
-//   On PSP we again use sceGuGetMemory.
 struct TempVerts
 {
 	TempVerts()
-	:	Verts(NULL)
+	:	Verts(nullptr)
 	,	Count(0)
 	{
 	}
 
 	~TempVerts()
 	{
-		free(Verts);
+		delete [] Verts;
 	}
 
 	DaedalusVtx * Alloc(u32 count)
 	{
-		u32 bytes = count * sizeof(DaedalusVtx);
-		Verts = static_cast<DaedalusVtx*>(malloc(bytes));
-
+		Verts = new DaedalusVtx[count];
 		Count = count;
 		return Verts;
 	}
@@ -67,12 +60,6 @@ struct TempVerts
 	DaedalusVtx *	Verts;
 	u32				Count;
 };
-
-#define GL_TRUE                           1
-#define GL_FALSE                          0
-
-#undef min
-#undef max
 
 extern bool gRumblePakActive;
 extern u32 gAuxAddr;
@@ -83,12 +70,6 @@ u32 uViWidth = 320;
 u32 uViHeight = 240;
 
 static f32 gZoomX = 1.0f;
-
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-// General purpose variable used for debugging
-f32 TEST_VARX = 0.0f;
-f32 TEST_VARY = 0.0f;
-#endif
 
 extern void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
 
@@ -1506,6 +1487,16 @@ inline void FixUV(u32 * wrap, s16 * c0_, s16 * c1_, s16 offset, u32 size)
 	*c1_ = c1;
 }
 
+inline s16 ApplyShift(s16 c, u8 shift)
+{
+	if (shift <= 10)
+	{
+		return c << shift;
+	}
+
+	return c >> (16 - shift);
+}
+
 // puv0, puv1 are in/out arguments.
 void BaseRenderer::PrepareTexRectUVs(TexCoord * puv0, TexCoord * puv1)
 {
@@ -1576,7 +1567,7 @@ void BaseRenderer::SetScissor( u32 x0, u32 y0, u32 x1, u32 y1 )
 	glScissor( l, (s32)mScreenHeight - (t + h), w, h );
 }
 
-void BaseRenderer::SetProjection(const u32 address, bool bReplace)
+void BaseRenderer::SetProjection(u32 address, bool bReplace)
 {
 	// Projection
 	if (bReplace)
@@ -1611,7 +1602,7 @@ void BaseRenderer::SetProjection(const u32 address, bool bReplace)
 		mProjectionMat.m[3][0], mProjectionMat.m[3][1], mProjectionMat.m[3][2], mProjectionMat.m[3][3]);
 }
 
-void BaseRenderer::SetDKRMat(const u32 address, bool mul, u32 idx)
+void BaseRenderer::SetDKRMat(u32 address, bool mul, u32 idx)
 {
 	mDKRMatIdx = idx;
 	mWPmodified = true;
@@ -1641,7 +1632,7 @@ void BaseRenderer::SetDKRMat(const u32 address, bool mul, u32 idx)
 #endif
 }
 
-void BaseRenderer::SetWorldView(const u32 address, bool bPush, bool bReplace)
+void BaseRenderer::SetWorldView(u32 address, bool bPush, bool bReplace)
 {
 	// ModelView
 	if (bPush && (mModelViewTop < mMatStackSize))
@@ -1783,7 +1774,7 @@ void BaseRenderer::InsertMatrix(u32 w0, u32 w1)
 }
 
 // Replaces the WorldProject matrix //Corn
-void BaseRenderer::ForceMatrix(const u32 address)
+void BaseRenderer::ForceMatrix(u32 address)
 {
 	mWorldProjectValid = true;
 	mWPmodified = true;	//Signal that Worldproject matrix is changed

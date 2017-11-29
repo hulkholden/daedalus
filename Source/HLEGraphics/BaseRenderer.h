@@ -221,14 +221,14 @@ public:
 	// Fog stuff
 	inline void			SetFogMultOffs(f32 Mult, f32 Offs)		{ mTnL.FogMult=Mult/255.0f; mTnL.FogOffs=Offs/255.0f;}
 	inline void			SetFogMinMax(f32 fog_near, f32 fog_far)	{ /* TODO(strmnnrmn) */ }
-	inline void			SetFogColour( c32 colour )				{ mFogColour = colour; }
+	inline void			SetFogColour(c32 colour)				{ mFogColour = colour; }
 
-	inline void			SetPrimitiveDepth( u32 z )				{ mPrimDepth = (f32)(z - 0x4000) / (f32)0x4000;}
-	inline void			SetPrimitiveLODFraction( f32 f )		{ mPrimLODFraction = f; }
-	inline void			SetPrimitiveColour( c32 colour )		{ mPrimitiveColour = colour; }
-	inline void			SetEnvColour( c32 colour )				{ mEnvColour = colour; }
-	inline void			SetBlendColour( c32 colour )			{ mBlendColour = colour; }
-	inline void			SetFillColour( u32 colour )				{ mFillColour = colour; }
+	inline void			SetPrimitiveDepth(u32 z)				{ mPrimDepth = (f32)(z - 0x4000) / (f32)0x4000;}
+	inline void			SetPrimitiveLODFraction(f32 f)			{ mPrimLODFraction = f; }
+	inline void			SetPrimitiveColour(c32 colour)			{ mPrimitiveColour = colour; }
+	inline void			SetEnvColour(c32 colour)				{ mEnvColour = colour; }
+	inline void			SetBlendColour(c32 colour)				{ mBlendColour = colour; }
+	inline void			SetFillColour(u32 colour)				{ mFillColour = colour; }
 
 	inline void			SetNumLights(u32 num)					{ mTnL.NumLights = num; }
 	inline void			SetLightCol(u32 l, u8 r, u8 g, u8 b)	{ mTnL.Lights[l].SkipIfZero=(r+g+b); mTnL.Lights[l].Colour.x= r/255.0f; mTnL.Lights[l].Colour.y= g/255.0f; mTnL.Lights[l].Colour.z= b/255.0f; }
@@ -237,35 +237,35 @@ public:
 	inline void			SetLightCBFD(u32 l, u8 nonzero)			{ mTnL.Lights[l].Iscale=(f32)(nonzero << 12); mTnL.Lights[l].SkipIfZero = mTnL.Lights[l].SkipIfZero&&nonzero; }
 	inline void			SetLightEx(u32 l, f32 ca, f32 la, f32 qa) { mTnL.Lights[l].ca=ca/16.0f; mTnL.Lights[l].la=la/65535.0f; mTnL.Lights[l].qa=qa/(8.0f*65535.0f); }
 
-	inline f32			GetCoordMod( u32 idx )					{ return mTnL.CoordMod[idx]; }
-	inline void			SetCoordMod( u32 idx, f32 mod )			{ mTnL.CoordMod[idx] = mod; }
-	inline void			SetMux( u64 mux )						{ mMux = mux; }
+	inline f32			GetCoordMod(u32 idx)					{ return mTnL.CoordMod[idx]; }
+	inline void			SetCoordMod(u32 idx, f32 mod)			{ mTnL.CoordMod[idx] = mod; }
+	inline void			SetMux(u64 mux)							{ mMux = mux; }
 
 	inline void			SetTextureScale(float fScaleX, float fScaleY)	{ mTnL.TextureScaleX = fScaleX; mTnL.TextureScaleY = fScaleY; }
 
 	// TextRect stuff
-	virtual void		TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord st0, TexCoord st1 ) = 0;
-	virtual void		TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord st0, TexCoord st1 ) = 0;
-	virtual void		FillRect( const v2 & xy0, const v2 & xy1, u32 color ) = 0;
+	virtual void		TexRect(u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord st0, TexCoord st1 ) = 0;
+	virtual void		TexRectFlip(u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord st0, TexCoord st1 ) = 0;
+	virtual void		FillRect(const v2 & xy0, const v2 & xy1, u32 color ) = 0;
 
 	// Texture stuff
 	virtual void		Draw2DTexture(f32 x0, f32 y0, f32 x1, f32 y1, f32 u0, f32 v0, f32 u1, f32 v1, const CNativeTexture * texture) = 0;
 	virtual void		Draw2DTextureR(f32 x0, f32 y0, f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 s, f32 t) = 0;
 
 	// Viewport stuff
-	void				SetN64Viewport( const v2 & scale, const v2 & trans );
-	void				SetScissor( u32 x0, u32 y0, u32 x1, u32 y1 );
+	void				SetN64Viewport(const v2 & scale, const v2 & trans);
+	void				SetScissor(u32 x0, u32 y0, u32 x1, u32 y1);
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	void				PrintActive();
 #endif
 	void				ResetMatrices(u32 size);
-	void				SetDKRMat(const u32 address, bool mul, u32 idx);
-	void				SetProjection(const u32 address, bool bReplace);
-	void				SetWorldView(const u32 address, bool bPush, bool bReplace);
+	void				SetDKRMat(u32 address, bool mul, u32 idx);
+	void				SetProjection(u32 address, bool bReplace);
+	void				SetWorldView(u32 address, bool bPush, bool bReplace);
 	inline void			PopWorldView(u32 num = 1)	{if (mModelViewTop > (num-1))	 mModelViewTop-=num;	mWorldProjectValid = false;}
 	void				InsertMatrix(u32 w0, u32 w1);
-	void				ForceMatrix(const u32 address);
+	void				ForceMatrix(u32 address);
 	inline void			DKRMtxChanged( u32 idx )	{mWPmodified = true; mDKRMatIdx = idx;}
 
 	// Vertex stuff
@@ -274,11 +274,11 @@ public:
 	void				SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboard);	// Assumes dwAddress has already been checked!
 	void				SetNewVertexInfoPD(u32 address, u32 v0, u32 n);	// Assumes dwAddress has already been checked!
 	void				ModifyVertexInfo(u32 whered, u32 vert, u32 val);
-	void				SetVtxColor( u32 vert, u32 color );
-	inline void			SetVtxTextureCoord( u32 vert, s16 tu, s16 tv ) { mVtxProjected[vert].Texture.x = (f32)tu * (1.0f / 32.0f); mVtxProjected[vert].Texture.y = (f32)tv * (1.0f / 32.0f); }
-	inline void			SetVtxXY( u32 vert, float x, float y );
-	void				SetVtxZ( u32 vert, float z );
-	inline void			CopyVtx( u32 vert_src, u32 vert_dst ) { mVtxProjected[vert_dst] = mVtxProjected[vert_src]; }
+	void				SetVtxColor(u32 vert, u32 color);
+	inline void			SetVtxTextureCoord(u32 vert, s16 tu, s16 tv) { mVtxProjected[vert].Texture.x = (f32)tu * (1.0f / 32.0f); mVtxProjected[vert].Texture.y = (f32)tv * (1.0f / 32.0f); }
+	inline void			SetVtxXY(u32 vert, float x, float y);
+	void				SetVtxZ(u32 vert, float z);
+	inline void			CopyVtx(u32 vert_src, u32 vert_dst) { mVtxProjected[vert_dst] = mVtxProjected[vert_src]; }
 
 	// Returns true if triangle visible, false otherwise
 	bool				AddTri(u32 v0, u32 v1, u32 v2);
@@ -287,37 +287,37 @@ public:
 	void				FlushTris();
 
 	// Returns true if bounding volume is visible within NDC box, false if culled
-	inline bool			TestVerts( u32 v0, u32 vn ) const		{ u32 f=mVtxProjected[v0].ClipFlags; for( u32 i=v0+1; i<=vn; i++ ) f&=mVtxProjected[i].ClipFlags; return f==0; }
-	inline s32			GetVtxDepth( u32 i ) const				{ return (s32)mVtxProjected[ i ].ProjectedPos.z; }
-	inline v4			GetTransformedVtxPos( u32 i ) const		{ return mVtxProjected[ i ].TransformedPos; }
-	inline v4			GetProjectedVtxPos( u32 i ) const		{ return mVtxProjected[ i ].ProjectedPos; }
-	inline u32			GetVtxFlags( u32 i ) const				{ return mVtxProjected[ i ].ClipFlags; }
+	inline bool			TestVerts(u32 v0, u32 vn) const		{ u32 f=mVtxProjected[v0].ClipFlags; for(u32 i=v0+1; i<=vn; i++) f&=mVtxProjected[i].ClipFlags; return f==0; }
+	inline s32			GetVtxDepth(u32 i) const			{ return (s32)mVtxProjected[ i ].ProjectedPos.z; }
+	inline v4			GetTransformedVtxPos(u32 i) const	{ return mVtxProjected[ i ].TransformedPos; }
+	inline v4			GetProjectedVtxPos(u32 i) const		{ return mVtxProjected[ i ].ProjectedPos; }
+	inline u32			GetVtxFlags(u32 i) const			{ return mVtxProjected[ i ].ClipFlags; }
 
-	inline u64			GetMux() const							{ return mMux; }
-	inline c32			GetPrimitiveColour() const				{ return mPrimitiveColour; }
-	inline c32			GetEnvColour() const					{ return mEnvColour; }
-	inline c32			GetFogColour() const					{ return mFogColour; }
-	inline c32			GetBlendColour() const					{ return mBlendColour; }
-	inline u32			GetFillColour() const					{ return mFillColour; }
+	inline u64			GetMux() const						{ return mMux; }
+	inline c32			GetPrimitiveColour() const			{ return mPrimitiveColour; }
+	inline c32			GetEnvColour() const				{ return mEnvColour; }
+	inline c32			GetFogColour() const				{ return mFogColour; }
+	inline c32			GetBlendColour() const				{ return mBlendColour; }
+	inline u32			GetFillColour() const				{ return mFillColour; }
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	// Rendering stats
-	inline u32			GetNumTrisRendered() const				{ return mNumTrisRendered; }
-	inline u32			GetNumTrisClipped() const				{ return mNumTrisClipped; }
-	inline u32			GetNumRect() const						{ return mNumRect; }
+	inline u32			GetNumTrisRendered() const			{ return mNumTrisRendered; }
+	inline u32			GetNumTrisClipped() const			{ return mNumTrisClipped; }
+	inline u32			GetNumRect() const					{ return mNumRect; }
 
 
-	virtual void 		ResetDebugState()						{}
+	virtual void 		ResetDebugState()					{}
 #endif
 
-	inline float		N64ToScreenX(float x) const				{ return x * mN64ToScreenScale.x + mN64ToScreenTranslate.x; }
-	inline float		N64ToScreenY(float y) const				{ return y * mN64ToScreenScale.y + mN64ToScreenTranslate.y; }
+	inline float		N64ToScreenX(float x) const			{ return x * mN64ToScreenScale.x + mN64ToScreenTranslate.x; }
+	inline float		N64ToScreenY(float y) const			{ return y * mN64ToScreenScale.y + mN64ToScreenTranslate.y; }
 
-	CRefPtr<CNativeTexture> LoadTextureDirectly( const TextureInfo & ti );
+	CRefPtr<CNativeTexture> LoadTextureDirectly(const TextureInfo & ti );
 
 protected:
-	inline void			UpdateFogEnable()						{ if(gFogEnabled) mTnL.Flags.Fog ? glEnable(GL_FOG) : glDisable(GL_FOG); }
-	inline void			UpdateShadeModel()						{ glShadeModel( mTnL.Flags.Shade ? GL_SMOOTH : GL_FLAT ); }
+	inline void			UpdateFogEnable()					{ if(gFogEnabled) mTnL.Flags.Fog ? glEnable(GL_FOG) : glDisable(GL_FOG); }
+	inline void			UpdateShadeModel()					{ glShadeModel(mTnL.Flags.Shade ? GL_SMOOTH : GL_FLAT ); }
 	void				UpdateTileSnapshots( u32 tile_idx );
 	void				UpdateTileSnapshot( u32 index, u32 tile_idx );
 
@@ -329,26 +329,26 @@ protected:
 	// We round these value here, so that when we scale up the coords to our screen
 	// coords we don't get any gaps.
 	//*****************************************************************************
-	inline void ConvertN64ToScreen( const v2 & n64_coords, v2 & answ ) const
+	inline void ConvertN64ToScreen(const v2& n64_coords, v2& answ) const
 	{
-		answ.x = roundf( N64ToScreenX( roundf( n64_coords.x ) ) );
-		answ.y = roundf( N64ToScreenY( roundf( n64_coords.y ) ) );
+		answ.x = roundf(N64ToScreenX(roundf(n64_coords.x)));
+		answ.y = roundf(N64ToScreenY(roundf(n64_coords.y)));
 	}
 
-	virtual void		RenderTriangles( DaedalusVtx * p_vertices, u32 num_vertices, bool disable_zbuffer ) = 0;
+	virtual void RenderTriangles(DaedalusVtx* p_vertices, u32 num_vertices, bool disable_zbuffer) = 0;
 
-	void 				TestVFPUVerts( u32 v0, u32 num, const FiddledVtx * verts, const Matrix4x4 & mat_world );
+	void TestVFPUVerts(u32 v0, u32 num, const FiddledVtx* verts, const Matrix4x4& mat_world);
 
-	template< bool FogEnable, int TextureMode >
-	void 				ProcessVerts( u32 v0, u32 num, const FiddledVtx * verts, const Matrix4x4 & mat_world );
+	template <bool FogEnable, int TextureMode>
+	void ProcessVerts(u32 v0, u32 num, const FiddledVtx* verts, const Matrix4x4& mat_world);
 
-	void				PrepareTrisClipped( TempVerts * temp_verts ) const;
-	void				PrepareTrisUnclipped( TempVerts * temp_verts ) const;
+	void PrepareTrisClipped(TempVerts* temp_verts) const;
+	void PrepareTrisUnclipped(TempVerts* temp_verts) const;
 
-	v3					LightVert( const v3 & norm ) const;
-	v3					LightPointVert( const v4 & w ) const;
+	v3 LightVert(const v3& norm) const;
+	v3 LightPointVert(const v4& w) const;
 
-private:
+  private:
 	void				InitViewport();
 	void				UpdateViewport();
 
@@ -359,26 +359,26 @@ private:
 protected:
 	static const u32 kMaxN64Vertices = 80;		// F3DLP.Rej supports up to 80 verts!
 
-	TnLParams			mTnL;
+	TnLParams mTnL;
 
-	v2					mN64ToScreenScale;
-	v2					mN64ToScreenTranslate;
+	v2 mN64ToScreenScale;
+	v2 mN64ToScreenTranslate;
 
-	v2					mVpScale;
-	v2					mVpTrans;
+	v2 mVpScale;
+	v2 mVpTrans;
 
-	u64					mMux;
+	u64 mMux;
 
-	u32					mTextureTile;
+	u32 mTextureTile;
 
-	f32					mPrimDepth;
-	f32					mPrimLODFraction;
+	f32 mPrimDepth;
+	f32 mPrimLODFraction;
 
-	c32					mFogColour;				// Blender
-	c32					mPrimitiveColour;		// Combiner
-	c32					mEnvColour;				// Combiner
-	c32					mBlendColour;			// Blender
-	u32					mFillColour;			// RDP. NB u32 not c32 as this is typically 2 16-bit colour values.
+	c32 mFogColour;        // Blender
+	c32 mPrimitiveColour;  // Combiner
+	c32 mEnvColour;        // Combiner
+	c32 mBlendColour;      // Blender
+	u32 mFillColour;       // RDP. NB u32 not c32 as this is typically 2 16-bit colour values.
 
 	// Texturing
 	struct TextureWrap
@@ -393,44 +393,45 @@ protected:
 	};
 	static const u32 kNumBoundTextures = 2;
 
-	TextureInfo				mBoundTextureInfo[ kNumBoundTextures ];
-	CRefPtr<CNativeTexture>	mBoundTexture[ kNumBoundTextures ];
+	TextureInfo             mBoundTextureInfo[kNumBoundTextures];
+	CRefPtr<CNativeTexture> mBoundTexture[kNumBoundTextures];
 
-	TexCoord				mTileTopLeft[ kNumBoundTextures ];
-	TextureWrap				mTexWrap[ kNumBoundTextures ];
+	TexCoord    mTileTopLeft[kNumBoundTextures];
+	TextureWrap mTexWrap[kNumBoundTextures];
 
 	// Index of the corresponding tile state.
-	u8						mActiveTile[ kNumBoundTextures ];
+	u8 mActiveTile[kNumBoundTextures];
 
 	// Max is 18 according to the manual //Corn
 	// I think we should make this more deep to avoid any issues //Salvy
 	static const u32 MATRIX_STACK_SIZE = 20;
 
-	mutable Matrix4x4	mWorldProject;
-	Matrix4x4			mTempMat;
-	Matrix4x4			mProjectionMat;
-	Matrix4x4			mModelViewStack[MATRIX_STACK_SIZE];	//DKR reuses these and need at least 4 //Corn
-	u32					mModelViewTop;
-	u32					mMatStackSize;
-	mutable bool		mWorldProjectValid;
-	Matrix4x4			mProjection;
-	bool				mReloadProj;
-	bool				mWPmodified;
-	u32					mDKRMatIdx;
+	mutable Matrix4x4 mWorldProject;
+	Matrix4x4         mTempMat;
+	Matrix4x4         mProjectionMat;
+	Matrix4x4         mModelViewStack[MATRIX_STACK_SIZE];  // DKR reuses these and need at least 4 //Corn
+	u32               mModelViewTop;
+	u32               mMatStackSize;
+	mutable bool      mWorldProjectValid;
+	Matrix4x4         mProjection;
+	bool              mReloadProj;
+	bool              mWPmodified;
+	u32               mDKRMatIdx;
 
-	float				mScreenWidth;
-	float				mScreenHeight;
+	float     mScreenWidth;
+	float     mScreenHeight;
+	Matrix4x4 mScreenToDevice;  // Scales screen coords (0..640 etc) to device coords (-1..+1)
 
-	Matrix4x4			mScreenToDevice;					// Used by OSX renderer - scales screen coords (0..640 etc) to device coords (-1..+1)
+	// We need at least 80 verts * 3 = 240? But Flying Dragon uses more than 256 //Corn
+	static const u32 kMaxIndices = 320;
+	u16 mIndexBuffer[kMaxIndices];
+	u32 mNumIndices;
 
-	static const u32 	kMaxIndices = 320;					// We need at least 80 verts * 3 = 240? But Flying Dragon uses more than 256 //Corn
-	u16					mIndexBuffer[kMaxIndices];
-	u32					mNumIndices;
-
-	// Processed vertices waiting for output...
-	DaedalusVtx4		mVtxProjected[kMaxN64Vertices];		// Transformed and projected vertices (suitable for clipping etc)
-	u32					mVtxClipFlagsUnion;					// Bitwise OR of all the vertex flags added to the current batch. If this is 0, we can trivially accept everything without clipping
-
+	// Transformed and projected vertices (suitable for clipping etc)
+	DaedalusVtx4 mVtxProjected[kMaxN64Vertices];
+	// Bitwise OR of all the vertex flags added to the current batch. If this is 0, we can
+	// trivially accept everything without clipping
+	u32 mVtxClipFlagsUnion;
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	// Stats
@@ -441,13 +442,5 @@ protected:
 };
 
 extern BaseRenderer * gRenderer;
-
-inline s16 ApplyShift(s16 c, u8 shift)
-{
-	if (shift <= 10)
-		return c << shift;
-
-	return c >> (16 - shift);
-}
 
 #endif // HLEGRAPHICS_BASERENDERER_H_
