@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/ROMBuffer.h"
 #include "Debug/Console.h"
 #include "Debug/DebugLog.h"
-#include "HLEAudio/AudioPlugin.h"
+#include "HLEAudio/HLEAudio.h"
 #include "Ultra/ultra_R4300.h"
 
 static const u32 kMaximumMemSize = MEMORY_8_MEG;

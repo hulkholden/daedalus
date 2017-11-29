@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Console.h"
 #include "Debug/DebugLog.h"
 #include "Debug/Dump.h"
-#include "HLEAudio/AudioPlugin.h"
+#include "HLEAudio/HLEAudio.h"
 #include "System/IO.h"
 #include "Ultra/ultra_mbi.h"
 #include "Ultra/ultra_rcp.h"
