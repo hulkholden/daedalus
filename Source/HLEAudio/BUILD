@@ -6,7 +6,7 @@ cc_library(
         "ABI3.cpp",
         "ABI3mp3.cpp",
         "AudioBuffer.cpp",
-        "AudioHLEProcessor.cpp",
+        "HLEAudioState.cpp",
         "HLEMain.cpp",
     ] + select({
         "//:darwin": [

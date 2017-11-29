@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Daedalus.h"
 #include "HLEAudio/HLEAudioInternal.h"
-#include "HLEAudio/AudioHLEProcessor.h"
+#include "HLEAudio/HLEAudioState.h"
 
 #include "Ultra/ultra_sptask.h"
 
@@ -114,8 +114,8 @@ void Audio_Ucode()
 		Audio_Ucode_Detect( pTask );
 	}
 
-	gAudioHLEState.LoopVal = 0;
-	//memset( gAudioHLEState.Segments, 0, sizeof( gAudioHLEState.Segments ) );
+	gHLEAudioState.LoopVal = 0;
+	//memset( gHLEAudioState.Segments, 0, sizeof( gHLEAudioState.Segments ) );
 
 	u32 * p_alist = (u32 *)(gu8RamBase + (u32)pTask->t.data_ptr);
 	u32 ucode_size = (pTask->t.data_size >> 3);	//ABI5 can return 0 here!!!

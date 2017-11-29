@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 
 #include "Base/Daedalus.h"
-#include "HLEAudio/AudioHLEProcessor.h"
+#include "HLEAudio/HLEAudioState.h"
 
 #include <string.h>
 
@@ -49,15 +49,15 @@ inline s32		FixedPointMul15( s32 a, s32 b )
 	return s32( ( a * b ) >> 15 );
 }
 
-AudioHLEState gAudioHLEState;
+HLEAudioState gHLEAudioState;
 
-void	AudioHLEState::ClearBuffer( u16 addr, u16 count )
+void	HLEAudioState::ClearBuffer( u16 addr, u16 count )
 {
 	// XXXX check endianness
 	memset( Buffer+(addr & 0xfffc), 0, (count+3) & 0xfffc );
 }
 
-void	AudioHLEState::EnvMixer( u8 flags, u32 address )
+void	HLEAudioState::EnvMixer( u8 flags, u32 address )
 {
 	//static
 	// ********* Make sure these conditions are met... ***********
@@ -305,7 +305,7 @@ void	AudioHLEState::EnvMixer( u8 flags, u32 address )
 }
 
 #if 1 //1->fast, 0->original Azimer //Corn calc two sample (s16) at once so we get to save a u32
-void	AudioHLEState::Resample( u8 flags, u32 pitch, u32 address )
+void	HLEAudioState::Resample( u8 flags, u32 pitch, u32 address )
 {
 	DAEDALUS_ASSERT( (flags & 0x2) == 0, "Resample: unhandled flags %02x", flags );		// Was breakpoint - StrmnNrmn
 
@@ -387,7 +387,7 @@ const u16 ResampleLUT[0x200] =
 	0xFFD8, 0x0E5F, 0x6696, 0x0B39, 0xFFDF, 0x0D46, 0x66AD, 0x0C39
 };
 
-void	AudioHLEState::Resample( u8 flags, u32 pitch, u32 address )
+void	HLEAudioState::Resample( u8 flags, u32 pitch, u32 address )
 {
 	bool	init( (flags & 0x1) != 0 );
 	DAEDALUS_ASSERT( (flags & 0x2) == 0, "Resample: unhandled flags %02x", flags );		// Was breakpoint - StrmnNrmn
@@ -446,7 +446,7 @@ void	AudioHLEState::Resample( u8 flags, u32 pitch, u32 address )
 }
 #endif
 
-inline void AudioHLEState::ExtractSamplesScale( s32 * output, u32 inPtr, s32 vscale ) const
+inline void HLEAudioState::ExtractSamplesScale( s32 * output, u32 inPtr, s32 vscale ) const
 {
 	u8 icode;
 
@@ -465,7 +465,7 @@ inline void AudioHLEState::ExtractSamplesScale( s32 * output, u32 inPtr, s32 vsc
 	*output++ = FixedPointMul16( (s16)((icode&0x0f)<<12), vscale );
 }
 
-inline void AudioHLEState::ExtractSamples( s32 * output, u32 inPtr ) const
+inline void HLEAudioState::ExtractSamples( s32 * output, u32 inPtr ) const
 {
 	u8 icode;
 
@@ -640,7 +640,7 @@ inline void DecodeSamples( s16 * out, s32 & l1, s32 & l2, const s32 * input, con
 }
 #endif
 
-void AudioHLEState::ADPCMDecode( u8 flags, u32 address )
+void HLEAudioState::ADPCMDecode( u8 flags, u32 address )
 {
 	bool	init( (flags&0x1) != 0 );
 	bool	loop( (flags&0x2) != 0 );
@@ -709,17 +709,17 @@ void AudioHLEState::ADPCMDecode( u8 flags, u32 address )
 	memcpy(&rdram[address],out,32);
 }
 
-void	AudioHLEState::LoadBuffer( u32 address )
+void	HLEAudioState::LoadBuffer( u32 address )
 {
 	LoadBuffer( InBuffer, address, Count );
 }
 
-void	AudioHLEState::SaveBuffer( u32 address )
+void	HLEAudioState::SaveBuffer( u32 address )
 {
 	SaveBuffer( address, OutBuffer, Count );
 }
 
-void	AudioHLEState::LoadBuffer( u16 dram_dst, u32 ram_src, u16 count )
+void	HLEAudioState::LoadBuffer( u16 dram_dst, u32 ram_src, u16 count )
 {
 	if( count > 0 )
 	{
@@ -729,7 +729,7 @@ void	AudioHLEState::LoadBuffer( u16 dram_dst, u32 ram_src, u16 count )
 }
 
 
-void	AudioHLEState::SaveBuffer( u32 ram_dst, u16 dmem_src, u16 count )
+void	HLEAudioState::SaveBuffer( u32 ram_dst, u16 dmem_src, u16 count )
 {
 	if( count > 0 )
 	{
@@ -738,14 +738,14 @@ void	AudioHLEState::SaveBuffer( u32 ram_dst, u16 dmem_src, u16 count )
 	}
 }
 /*
-void	AudioHLEState::SetSegment( u8 segment, u32 address )
+void	HLEAudioState::SetSegment( u8 segment, u32 address )
 {
 	DAEDALUS_ASSERT( segment < 16, "Invalid segment" );
 
 	Segments[segment&0xf] = address;
 }
 */
-void	AudioHLEState::SetLoop( u32 loopval )
+void	HLEAudioState::SetLoop( u32 loopval )
 {
 	LoopVal = loopval;
 	//VolTrgLeft  = (s16)(LoopVal>>16);		// m_LeftVol
@@ -753,7 +753,7 @@ void	AudioHLEState::SetLoop( u32 loopval )
 }
 
 
-void	AudioHLEState::SetBuffer( u8 flags, u16 in, u16 out, u16 count )
+void	HLEAudioState::SetBuffer( u8 flags, u16 in, u16 out, u16 count )
 {
 	if (flags & 0x8)
 	{
@@ -771,7 +771,7 @@ void	AudioHLEState::SetBuffer( u8 flags, u16 in, u16 out, u16 count )
 	}
 }
 
-void	AudioHLEState::DmemMove( u32 dst, u32 src, u16 count )
+void	HLEAudioState::DmemMove( u32 dst, u32 src, u16 count )
 {
 	count = (count + 3) & 0xfffc;
 
@@ -785,7 +785,7 @@ void	AudioHLEState::DmemMove( u32 dst, u32 src, u16 count )
 #endif
 }
 
-void	AudioHLEState::LoadADPCM( u32 address, u16 count )
+void	HLEAudioState::LoadADPCM( u32 address, u16 count )
 {
 	u32	loops( count / 16 );
 
@@ -807,7 +807,7 @@ void	AudioHLEState::LoadADPCM( u32 address, u16 count )
 	}
 }
 
-void	AudioHLEState::Interleave( u16 outaddr, u16 laddr, u16 raddr, u16 count )
+void	HLEAudioState::Interleave( u16 outaddr, u16 laddr, u16 raddr, u16 count )
 {
 	u32 *		out = (u32 *)(Buffer + outaddr);	//Save some bandwith also corrected left and right//Corn
 	const u16 *	inr = (const u16 *)(Buffer + raddr);
@@ -823,12 +823,12 @@ void	AudioHLEState::Interleave( u16 outaddr, u16 laddr, u16 raddr, u16 count )
 	}
 }
 
-void	AudioHLEState::Interleave( u16 laddr, u16 raddr )
+void	HLEAudioState::Interleave( u16 laddr, u16 raddr )
 {
 	Interleave( OutBuffer, laddr, raddr, Count );
 }
 
-void	AudioHLEState::Mixer( u16 dmemout, u16 dmemin, s32 gain, u16 count )
+void	HLEAudioState::Mixer( u16 dmemout, u16 dmemin, s32 gain, u16 count )
 {
 #if 1	//1->fast, 0->safe/slow //Corn
 
@@ -853,7 +853,7 @@ void	AudioHLEState::Mixer( u16 dmemout, u16 dmemin, s32 gain, u16 count )
 #endif
 }
 
-void	AudioHLEState::Deinterleave( u16 outaddr, u16 inaddr, u16 count )
+void	HLEAudioState::Deinterleave( u16 outaddr, u16 inaddr, u16 count )
 {
 	while( count-- )
 	{
@@ -863,7 +863,7 @@ void	AudioHLEState::Deinterleave( u16 outaddr, u16 inaddr, u16 count )
 	}
 }
 
-void	AudioHLEState::Mixer( u16 dmemout, u16 dmemin, s32 gain )
+void	HLEAudioState::Mixer( u16 dmemout, u16 dmemin, s32 gain )
 {
 	Mixer( dmemout, dmemin, gain, Count );
 }

@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Daedalus.h"
 
 #include "HLEAudio/HLEAudioInternal.h"
-#include "HLEAudio/AudioHLEProcessor.h"
+#include "HLEAudio/HLEAudioState.h"
 
 #include "Base/MathUtil.h"
 
@@ -76,7 +76,7 @@ void CLEARBUFF( AudioHLECommand command )
 	u16 addr( command.Abi1ClearBuffer.Address );
 	u16 count( command.Abi1ClearBuffer.Count );
 
-	gAudioHLEState.ClearBuffer( addr, count );
+	gHLEAudioState.ClearBuffer( addr, count );
 }
 
 //FILE *dfile = fopen ("d:\\envmix.txt", "wt");
@@ -85,18 +85,18 @@ static void ENVMIXER( AudioHLECommand command )
 {
 	//static int envmixcnt = 0;
 	u8	flags( command.Abi1EnvMixer.Flags );
-	u32 address( command.Abi1EnvMixer.Address );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
+	u32 address( command.Abi1EnvMixer.Address );// + gHLEAudioState.Segments[(command.cmd1>>24)&0xf];
 
-	gAudioHLEState.EnvMixer( flags, address );
+	gHLEAudioState.EnvMixer( flags, address );
 }
 
 static void RESAMPLE( AudioHLECommand command )
 {
 	u8 flags(command.Abi1Resample.Flags);
 	u32 pitch(command.Abi1Resample.Pitch);
-	u32 address(command.Abi1Resample.Address);// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
+	u32 address(command.Abi1Resample.Address);// + gHLEAudioState.Segments[(command.cmd1>>24)&0xf];
 
-	gAudioHLEState.Resample( flags, pitch, address );
+	gHLEAudioState.Resample( flags, pitch, address );
 }
 
 static void SETVOL( AudioHLECommand command )
@@ -109,20 +109,20 @@ static void SETVOL( AudioHLECommand command )
 
 	if (flags & A_AUX)
 	{
-		gAudioHLEState.EnvDry = vol;				// m_MainVol
-		gAudioHLEState.EnvWet = (s16)volrate;		// m_AuxVol
+		gHLEAudioState.EnvDry = vol;				// m_MainVol
+		gHLEAudioState.EnvWet = (s16)volrate;		// m_AuxVol
 	}
 	else if(flags & A_VOL)
 	{
 		// Set the Source(start) Volumes
 		if(flags & A_LEFT)
 		{
-			gAudioHLEState.VolLeft = vol;
+			gHLEAudioState.VolLeft = vol;
 		}
 		else
 		{
 			// A_RIGHT
-			gAudioHLEState.VolRight = vol;
+			gHLEAudioState.VolRight = vol;
 		}
 	}
 	else
@@ -130,14 +130,14 @@ static void SETVOL( AudioHLECommand command )
 		// Set the Ramping values Target, Ramp
 		if(flags & A_LEFT)
 		{
-			gAudioHLEState.VolTrgLeft  = (s16)(command.cmd0 & 0xffff);		// m_LeftVol
-			gAudioHLEState.VolRampLeft = command.cmd1;
+			gHLEAudioState.VolTrgLeft  = (s16)(command.cmd0 & 0xffff);		// m_LeftVol
+			gHLEAudioState.VolRampLeft = command.cmd1;
 		}
 		else
 		{
 			// A_RIGHT
-			gAudioHLEState.VolTrgRight  = (s16)(command.cmd0 & 0xffff);		// m_RightVol
-			gAudioHLEState.VolRampRight = command.cmd1;
+			gHLEAudioState.VolTrgRight  = (s16)(command.cmd0 & 0xffff);		// m_RightVol
+			gHLEAudioState.VolRampRight = command.cmd1;
 		}
 	}
 }
@@ -148,34 +148,34 @@ static void UNKNOWN( AudioHLECommand command )
 
 static void SETLOOP( AudioHLECommand command )
 {
-	u32	loopval( command.Abi1SetLoop.LoopVal );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
+	u32	loopval( command.Abi1SetLoop.LoopVal );// + gHLEAudioState.Segments[(command.cmd1>>24)&0xf];
 
-	gAudioHLEState.SetLoop( loopval );
+	gHLEAudioState.SetLoop( loopval );
 }
 
 static void ADPCM( AudioHLECommand command ) // Work in progress! :)
 {
 	u8		flags( command.Abi1ADPCM.Flags );
 	//u16	gain( command.Abi1ADPCM.Gain );		// Not used?
-	u32		address( command.Abi1ADPCM.Address );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
+	u32		address( command.Abi1ADPCM.Address );// + gHLEAudioState.Segments[(command.cmd1>>24)&0xf];
 
-	gAudioHLEState.ADPCMDecode( flags, address );
+	gHLEAudioState.ADPCMDecode( flags, address );
 }
 
 // memcpy causes static... endianess issue :(
 static void LOADBUFF( AudioHLECommand command )
 {
-	u32 addr(command.Abi1LoadBuffer.Address );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
+	u32 addr(command.Abi1LoadBuffer.Address );// + gHLEAudioState.Segments[(command.cmd1>>24)&0xf];
 
-	gAudioHLEState.LoadBuffer( addr );
+	gHLEAudioState.LoadBuffer( addr );
 }
 
 // memcpy causes static... endianess issue :(
 static void SAVEBUFF( AudioHLECommand command )
 {
-	u32 addr(command.Abi1SaveBuffer.Address );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
+	u32 addr(command.Abi1SaveBuffer.Address );// + gHLEAudioState.Segments[(command.cmd1>>24)&0xf];
 
-	gAudioHLEState.SaveBuffer( addr );
+	gHLEAudioState.SaveBuffer( addr );
 }
 
 // Should work
@@ -185,7 +185,7 @@ static void SEGMENT( AudioHLECommand command )
 	u8	segment( command.Abi1SetSegment.Segment & 0xf );
 	u32	address( command.Abi1SetSegment.Address );
 
-	gAudioHLEState.SetSegment( segment, address );
+	gHLEAudioState.SetSegment( segment, address );
 }
 */
 // Should work ;-)
@@ -196,7 +196,7 @@ static void SETBUFF( AudioHLECommand command )
 	u16		out( command.Abi1SetBuffer.Out );
 	u16		count( command.Abi1SetBuffer.Count );
 
-	gAudioHLEState.SetBuffer( flags, in, out, count );
+	gHLEAudioState.SetBuffer( flags, in, out, count );
 }
 
 // Doesn't sound just right?... will fix when HLE is ready - 03-11-01
@@ -206,16 +206,16 @@ static void DMEMMOVE( AudioHLECommand command )
 	u16 dst( command.Abi1DmemMove.Dst );
 	u16 count( command.Abi1DmemMove.Count );
 
-	gAudioHLEState.DmemMove( dst, src, count );
+	gHLEAudioState.DmemMove( dst, src, count );
 }
 
 // Loads an ADPCM table - Works 100% Now 03-13-01
 static void LOADADPCM( AudioHLECommand command )
 {
-	u32		address(command.Abi1LoadADPCM.Address );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
+	u32		address(command.Abi1LoadADPCM.Address );// + gHLEAudioState.Segments[(command.cmd1>>24)&0xf];
 	u16		count( command.Abi1LoadADPCM.Count );
 
-	gAudioHLEState.LoadADPCM( address, count );
+	gHLEAudioState.LoadADPCM( address, count );
 }
 
 // Works... - 3-11-01
@@ -224,7 +224,7 @@ static void INTERLEAVE( AudioHLECommand command )
 	u16 inL( command.Abi1Interleave.LAddr );
 	u16 inR( command.Abi1Interleave.RAddr );
 
-	gAudioHLEState.Interleave( inL, inR );
+	gHLEAudioState.Interleave( inL, inR );
 }
 
 // Fixed a sign issue... 03-14-01
@@ -234,7 +234,7 @@ static void MIXER( AudioHLECommand command )
 	u16 dmemout( command.Abi1Mixer.DmemOut );
 	s32 gain( command.Abi1Mixer.Gain );
 
-	gAudioHLEState.Mixer( dmemout, dmemin, gain );
+	gHLEAudioState.Mixer( dmemout, dmemin, gain );
 }
 
 
