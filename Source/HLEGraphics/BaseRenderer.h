@@ -404,12 +404,12 @@ protected:
 
 	// Max is 18 according to the manual //Corn
 	// I think we should make this more deep to avoid any issues //Salvy
-	static const u32 MATRIX_STACK_SIZE = 20;
+	static const u32 kMatrixStackSize = 20;
 
 	mutable Matrix4x4 mWorldProject;
 	Matrix4x4         mTempMat;
 	Matrix4x4         mProjectionMat;
-	Matrix4x4         mModelViewStack[MATRIX_STACK_SIZE];  // DKR reuses these and need at least 4 //Corn
+	Matrix4x4         mModelViewStack[kMatrixStackSize];  // DKR reuses these and need at least 4 //Corn
 	u32               mModelViewTop;
 	u32               mMatStackSize;
 	mutable bool      mWorldProjectValid;

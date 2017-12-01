@@ -64,47 +64,39 @@ struct TempVerts
 extern bool gRumblePakActive;
 extern u32 gAuxAddr;
 
-static f32 fViWidth = 320.0f;
+static f32 gZoomX    = 1.0f;
+static f32 fViWidth  = 320.0f;
 static f32 fViHeight = 240.0f;
-u32 uViWidth = 320;
-u32 uViHeight = 240;
-
-static f32 gZoomX = 1.0f;
+u32        uViWidth  = 320;
+u32        uViHeight = 240;
 
 extern void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
 
-
 BaseRenderer::BaseRenderer()
-:	mN64ToScreenScale( 2.0f, 2.0f )
-,	mN64ToScreenTranslate( 0.0f, 0.0f )
-,	mMux( 0 )
-
-,	mTextureTile(0)
-
-,	mPrimDepth( 0.0f )
-,	mPrimLODFraction( 0.f )
-
-,	mFogColour(0x00ffffff)			// NB top bits not set. Intentional?
-,	mPrimitiveColour(0xffffffff)
-,	mEnvColour(0xffffffff)
-,	mBlendColour(255, 255, 255, 0)
-,	mFillColour(0xffffffff)
-
-,	mModelViewTop(0)
-,	mWorldProjectValid(false)
-,	mReloadProj(true)
-,	mWPmodified(false)
-
-,	mScreenWidth(0.f)
-,	mScreenHeight(0.f)
-
-,	mNumIndices(0)
-,	mVtxClipFlagsUnion( 0 )
-
+    : mN64ToScreenScale(2.0f, 2.0f),
+      mN64ToScreenTranslate(0.0f, 0.0f),
+      mMux(0),
+      mTextureTile(0),
+      mPrimDepth(0.0f),
+      mPrimLODFraction(0.f),
+      mFogColour(0x00ffffff),  // NB top bits not set. Intentional?
+      mPrimitiveColour(0xffffffff),
+      mEnvColour(0xffffffff),
+      mBlendColour(255, 255, 255, 0),
+      mFillColour(0xffffffff),
+      mModelViewTop(0),
+      mWorldProjectValid(false),
+      mReloadProj(true),
+      mWPmodified(false),
+      mScreenWidth(0.f),
+      mScreenHeight(0.f),
+      mNumIndices(0),
+      mVtxClipFlagsUnion(0)
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-,	mNumTrisRendered( 0 )
-,	mNumTrisClipped( 0 )
-,	mNumRect( 0 )
+      ,
+      mNumTrisRendered(0),
+      mNumTrisClipped(0),
+      mNumRect(0)
 #endif
 {
 	for ( u32 i = 0; i < kNumBoundTextures; i++ )
@@ -1313,10 +1305,16 @@ inline void BaseRenderer::SetVtxXY( u32 vert, float x, float y )
 void BaseRenderer::ResetMatrices(u32 size)
 {
 	//Tigger's Honey Hunt
-	if(size == 0)
-		size = MATRIX_STACK_SIZE;
+	if (size == 0)
+	{
+		size = kMatrixStackSize;
+	}
+	else if (size > kMatrixStackSize)
+	{
+		size = kMatrixStackSize;
+	}
 
-	mMatStackSize = (size > MATRIX_STACK_SIZE) ? MATRIX_STACK_SIZE : size;
+	mMatStackSize = size;
 	mModelViewTop = 0;
 	mProjectionMat = mModelViewStack[0] = gMatrixIdentity;
 	mWorldProjectValid = false;
@@ -1392,7 +1390,6 @@ void BaseRenderer::UpdateTileSnapshot( u32 index, u32 tile_idx )
 	}
 
 	// Initialise the clamping state. When the mask is 0, it forces clamp mode.
-	//
 	u32 mode_u = (rdp_tile.clamp_s | (rdp_tile.mask_s == 0)) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
 	u32 mode_v = (rdp_tile.clamp_t | (rdp_tile.mask_t == 0)) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
 
