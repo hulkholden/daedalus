@@ -443,6 +443,7 @@ void BaseRenderer::FlushTris()
 	// Hack to fix the sun in Zelda OOT/MM
 	const f32 scale = ( g_ROM.ZELDA_HACK && (gRDPOtherMode.L == 0x0c184241) ) ? 16.f : 32.f;
 
+	// TODO(strmnnrmn): Reuse this to avoid repeated allocation.
 	TempVerts temp_verts(uv_scale, uv_trans, scale);
 
 	// If any bit is set here it means we have to clip the trianlges since PSP HW clipping sux!
@@ -488,8 +489,6 @@ void BaseRenderer::FlushTris()
 	// Check for depth source, this is for Nascar games, hopefully won't mess up anything
 	DAEDALUS_ASSERT( !gRDPOtherMode.depth_source, " Warning : Using depth source in flushtris" );
 
-	//
-	//	Render out our vertices
 	RenderTriangles( temp_verts.Positions, temp_verts.TexCoords, temp_verts.Colours, temp_verts.Count, gRDPOtherMode.depth_source ? true : false );
 
 	mNumIndices = 0;

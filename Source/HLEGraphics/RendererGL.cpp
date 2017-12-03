@@ -972,13 +972,14 @@ void RendererGL::RenderTriangles(const float* positions, const TexCoord* uvs, co
 {
 	DAEDALUS_PROFILE( "RenderTriangles" );
 
-	int buffer_idx = PrepareRenderState(mProjection, disable_zbuffer);
-
 	// Avoid crashing in the unlikely even that our buffers aren't long enough.
-	DAEDALUS_ASSERT(num_vertices <= kMaxVertices, "Too many vertices!");
 	if (num_vertices > kMaxVertices)
+	{
+		DAEDALUS_ASSERT(false, "Too many vertices! %d", num_vertices);
 		num_vertices = kMaxVertices;
+	}
 
+	int buffer_idx = PrepareRenderState(mProjection, disable_zbuffer);
 	RenderDaedalusVtxStreams(GL_TRIANGLES, buffer_idx, positions, uvs, colours, num_vertices);
 }
 
