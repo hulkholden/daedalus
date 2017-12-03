@@ -49,6 +49,9 @@ static f32 gViHeight = 240.0f;
 u32        gViWidthMinusOne  = 319;
 u32        gViHeightMinusOne = 239;
 
+// Flying Dragon clips more than 256
+static const u32 kMaxClippedVerts = 320;
+
 extern void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
 
 BaseRenderer::BaseRenderer()
@@ -576,15 +579,6 @@ static u32 ClipTriToFrustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
 	return vOut;
 }
 
-
-namespace
-{
-	DaedalusVtx4		temp_a[ 8 ];
-	DaedalusVtx4		temp_b[ 8 ];
-	// Flying Dragon clips more than 256
-	const u32			kMaxClippedVerts = 320;
-}
-
 void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 {
 	DAEDALUS_PROFILE( "BaseRenderer::PrepareTrisClipped" );
@@ -598,6 +592,8 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 	//	suffers from various precision issues. Carrying around both sets of coordinates gives
 	//	us the best of both worlds :)
 	//
+	DaedalusVtx4 temp_a[8];
+	DaedalusVtx4 temp_b[8];
 	temp_verts->Alloc(kMaxClippedVerts);
 
 	for (u32 i = 0; i < (mNumIndices - 2);)
