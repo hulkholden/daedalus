@@ -160,15 +160,10 @@ static const char ** gUcodeName = gNormalInstructionName[ 0 ];
 static const char * gCustomInstructionName[256];
 
 #ifdef DAEDALUS_ENABLE_PROFILING
-SProfileItemHandle * gpProfileItemHandles[ 256 ];
 
-#define PROFILE_DL_CMD( cmd )								\
-	if(gpProfileItemHandles[ (cmd) ] == NULL)				\
-	{														\
-		gpProfileItemHandles[ (cmd) ] = new SProfileItemHandle( CProfiler::Get()->AddItem( gUcodeName[ cmd ] ));		\
-	}														\
-	CAutoProfile		_auto_profile( *gpProfileItemHandles[ (cmd) ] )
-
+#define PROFILE_DL_CMD( cmd )		\
+        rmt_BeginCPUSampleDynamic(gUcodeName[ cmd ], RMTSF_Aggregate);  \
+        rmt_EndCPUSampleOnScopeExit rmt_ScopedCPUSampleDl;
 #else
 
 #define PROFILE_DL_CMD( cmd )		do { } while(0)

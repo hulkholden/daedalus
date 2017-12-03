@@ -62,3 +62,11 @@ new_http_archive(
     strip_prefix = "zlib-1.2.11",
     build_file = "third_party/BUILD.zlib",
 )
+
+new_http_archive(
+    name = "remotery",
+    url = "https://github.com/Celtoys/Remotery/archive/35906994408efa767ddc05ba0b427a1f6b84dc0c.zip",
+    sha256 = "18f76c2c5517553db1bd9e163382a6e9470567f4485beb4f570533b59004a361",
+    strip_prefix = "Remotery-35906994408efa767ddc05ba0b427a1f6b84dc0c",
+    build_file = "third_party/BUILD.remotery",
+)

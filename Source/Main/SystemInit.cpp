@@ -57,25 +57,17 @@ struct SysEntityEntry
 };
 
 #ifdef DAEDALUS_ENABLE_PROFILING
-static void ProfilerVblCallback(void* arg)
-{
-	CProfiler::Get()->Update();
-	CProfiler::Get()->Display();
-}
+static Remotery* gRemotery;
 
 static bool Profiler_Init()
 {
-	if (!CProfiler::Create()) return false;
-
-	CPU_RegisterVblCallback(&ProfilerVblCallback, NULL);
-
+	rmt_CreateGlobalInstance(&gRemotery);
 	return true;
 }
 
 static void Profiler_Fini()
 {
-	CPU_UnregisterVblCallback(&ProfilerVblCallback, NULL);
-	CProfiler::Destroy();
+	rmt_DestroyGlobalInstance(gRemotery);
 }
 #endif
 
