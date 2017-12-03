@@ -1012,10 +1012,8 @@ void RendererGL::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord
 
 	PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
-	v2 screen0;
-	v2 screen1;
-	ConvertN64ToScreen( xy0, screen0 );
-	ConvertN64ToScreen( xy1, screen1 );
+	v2 screen0 = ConvertN64ToScreen(xy0);
+	v2 screen1 = ConvertN64ToScreen(xy1);
 
 	DL_PF( "    Screen:  %.1f,%.1f -> %.1f,%.1f", screen0.x, screen0.y, screen1.x, screen1.y );
 	DL_PF( "    Texture: %.1f,%.1f -> %.1f,%.1f", st0.s / 32.f, st0.t / 32.f, st1.s / 32.f, st1.t / 32.f );
@@ -1060,10 +1058,8 @@ void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexC
 
 	PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
-	v2 screen0;
-	v2 screen1;
-	ConvertN64ToScreen( xy0, screen0 );
-	ConvertN64ToScreen( xy1, screen1 );
+	v2 screen0 = ConvertN64ToScreen(xy0);
+	v2 screen1 = ConvertN64ToScreen(xy1);
 
 	DL_PF( "    Screen:  %.1f,%.1f -> %.1f,%.1f", screen0.x, screen0.y, screen1.x, screen1.y );
 	DL_PF( "    Texture: %.1f,%.1f -> %.1f,%.1f", st0.s / 32.f, st0.t / 32.f, st1.s / 32.f, st1.t / 32.f );
@@ -1102,10 +1098,8 @@ void RendererGL::FillRect( const v2 & xy0, const v2 & xy1, u32 color )
 {
 	PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
-	v2 screen0;
-	v2 screen1;
-	ConvertN64ToScreen( xy0, screen0 );
-	ConvertN64ToScreen( xy1, screen1 );
+	v2 screen0 = ConvertN64ToScreen(xy0);
+	v2 screen1 = ConvertN64ToScreen(xy1);
 
 	DL_PF( "    Screen:  %.1f,%.1f -> %.1f,%.1f", screen0.x, screen0.y, screen1.x, screen1.y );
 

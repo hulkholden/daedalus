@@ -329,10 +329,11 @@ protected:
 	// We round these value here, so that when we scale up the coords to our screen
 	// coords we don't get any gaps.
 	//*****************************************************************************
-	inline void ConvertN64ToScreen(const v2& n64_coords, v2& answ) const
+	inline v2 ConvertN64ToScreen(const v2& n64_coords) const
 	{
-		answ.x = roundf(N64ToScreenX(roundf(n64_coords.x)));
-		answ.y = roundf(N64ToScreenY(roundf(n64_coords.y)));
+		float x = roundf(N64ToScreenX(roundf(n64_coords.x)));
+		float y = roundf(N64ToScreenY(roundf(n64_coords.y)));
+		return v2(x, y);
 	}
 
 	virtual void RenderTriangles(DaedalusVtx* p_vertices, u32 num_vertices, bool disable_zbuffer) = 0;

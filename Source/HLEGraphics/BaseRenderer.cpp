@@ -271,17 +271,13 @@ void BaseRenderer::UpdateViewport()
 	v2		n64_min( mVpTrans.x - mVpScale.x, mVpTrans.y - mVpScale.y );
 	v2		n64_max( mVpTrans.x + mVpScale.x, mVpTrans.y + mVpScale.y );
 
-	v2		screen_min;
-	v2		scfreen_max;
-	ConvertN64ToScreen( n64_min, screen_min );
-	ConvertN64ToScreen( n64_max, scfreen_max );
+	v2      screen_min = ConvertN64ToScreen(n64_min);
+	v2      screen_max = ConvertN64ToScreen(n64_max);
 
 	s32		vp_x = s32( screen_min.x );
 	s32		vp_y = s32( screen_min.y );
-	s32		vp_w = s32( scfreen_max.x - screen_min.x );
-	s32		vp_h = s32( scfreen_max.y - screen_min.y );
-
-	//Console_Print("[WViewport Changed (%d) (%d)]",vp_w,vp_h);
+	s32		vp_w = s32( screen_max.x - screen_min.x );
+	s32		vp_h = s32( screen_max.y - screen_min.y );
 
 	glViewport(vp_x, (s32)mScreenHeight - (vp_h + vp_y), vp_w, vp_h);
 }
@@ -1545,10 +1541,8 @@ void BaseRenderer::SetScissor( u32 x0, u32 y0, u32 x1, u32 y1 )
 	v2 n64_tl( (f32)x0, (f32)y0 );
 	v2 n64_br( (f32)x1, (f32)y1 );
 
-	v2 screen_tl;
-	v2 screen_br;
-	ConvertN64ToScreen( n64_tl, screen_tl );
-	ConvertN64ToScreen( n64_br, screen_br );
+	v2 screen_tl = ConvertN64ToScreen(n64_tl);
+	v2 screen_br = ConvertN64ToScreen(n64_br);
 
 	//Clamp TOP and LEFT values to 0 if < 0 , needed for zooming //Corn
 	s32 l = Max<s32>( s32(screen_tl.x), 0 );
