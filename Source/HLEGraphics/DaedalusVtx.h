@@ -31,7 +31,6 @@ struct DaedalusVtx4
 	v2 Texture;
 
 	u32 ClipFlags;
-	u32 Pad;
 
 	void Interpolate(const DaedalusVtx4& lhs, const DaedalusVtx4& rhs, float factor);
 };

@@ -498,53 +498,48 @@ void BaseRenderer::FlushTris()
 //	The following clipping code was taken from The Irrlicht Engine.
 //	See http://irrlicht.sourceforge.net/ for more information.
 //	Copyright (C) 2002-2006 Nikolaus Gebhardt/Alten Thomas
-//
-// Croping triangles just outside the NDC box and let PSP HW do the final crop
-// improves quality but fails in some games (Rocket Robot/Lego racers)//Corn
-ALIGNED_TYPE(const v4, NDCPlane[6], 16) =
+const v4 kNDCPlane[6] =
 {
 	v4(  0.f,  0.f, -1.f, -1.f ),	// near
 	v4(  0.f,  0.f,  1.f, -1.f ),	// far
 	v4(  1.f,  0.f,  0.f, -1.f ),	// left
 	v4( -1.f,  0.f,  0.f, -1.f ),	// right
 	v4(  0.f,  1.f,  0.f, -1.f ),	// bottom
-	v4(  0.f, -1.f,  0.f, -1.f )	// top
+	v4(  0.f, -1.f,  0.f, -1.f ),	// top
 };
 
-// CPU line clip to plane
-static u32 clipToHyperPlane( DaedalusVtx4 * dest, const DaedalusVtx4 * source, u32 inCount, const v4 &plane )
+static u32 ClipToHyperPlane(DaedalusVtx4* dest, const DaedalusVtx4* source, u32 inCount, const v4& plane)
 {
-	u32 outCount(0);
-	DaedalusVtx4 * out(dest);
+	u32           outCount(0);
+	DaedalusVtx4* out(dest);
 
-	const DaedalusVtx4 * a;
-	const DaedalusVtx4 * b(source);
+	const DaedalusVtx4* b = source;
 
-	f32 bDotPlane = b->ProjectedPos.Dot( plane );
+	f32 b_dot_plane = b->ProjectedPos.Dot(plane);
 
-	for( u32 i = 1; i < inCount + 1; ++i)
+	for (u32 i = 1; i < inCount + 1; ++i)
 	{
-		//a = &source[i%inCount];
 		const s32 condition = i - inCount;
-		const s32 index = (( ( condition >> 31 ) & ( i ^ condition ) ) ^ condition );
-		a = &source[index];
+		const s32 index     = (((condition >> 31) & (i ^ condition)) ^ condition);
 
-		f32 aDotPlane = a->ProjectedPos.Dot( plane );
+		const DaedalusVtx4* a = &source[index];
+
+		f32 a_dot_plane = a->ProjectedPos.Dot(plane);
 
 		// current point inside
-		if ( aDotPlane <= 0.f )
+		if (a_dot_plane <= 0.f)
 		{
 			// last point outside
-			if ( bDotPlane > 0.f )
+			if (b_dot_plane > 0.f)
 			{
 				// intersect line segment with plane
-				out->Interpolate( *b, *a, bDotPlane / (b->ProjectedPos - a->ProjectedPos).Dot( plane ) );
+				out->Interpolate(*b, *a, b_dot_plane / (b->ProjectedPos - a->ProjectedPos).Dot(plane));
 				out++;
 				outCount++;
 			}
 			// copy current to out
 			*out = *a;
-			b = out;
+			b    = out;
 
 			out++;
 			outCount++;
@@ -552,34 +547,32 @@ static u32 clipToHyperPlane( DaedalusVtx4 * dest, const DaedalusVtx4 * source, u
 		else
 		{
 			// current point outside
-			if ( bDotPlane <= 0.f )
+			if (b_dot_plane <= 0.f)
 			{
 				// previous was inside, intersect line segment with plane
-				out->Interpolate( *b, *a, bDotPlane / (b->ProjectedPos - a->ProjectedPos).Dot( plane ) );
+				out->Interpolate(*b, *a, b_dot_plane / (b->ProjectedPos - a->ProjectedPos).Dot(plane));
 				out++;
 				outCount++;
 			}
 			b = a;
 		}
 
-		bDotPlane = aDotPlane;
+		b_dot_plane = a_dot_plane;
 	}
 
 	return outCount;
 }
 
-// CPU tris clip to frustum
-u32 clip_tri_to_frustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
+static u32 ClipTriToFrustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
 {
 	u32 vOut = 3;
 
-	vOut = clipToHyperPlane( v1, v0, vOut, NDCPlane[0] ); if ( vOut < 3 ) return vOut;		// near
-	vOut = clipToHyperPlane( v0, v1, vOut, NDCPlane[1] ); if ( vOut < 3 ) return vOut;		// far
-	vOut = clipToHyperPlane( v1, v0, vOut, NDCPlane[2] ); if ( vOut < 3 ) return vOut;		// left
-	vOut = clipToHyperPlane( v0, v1, vOut, NDCPlane[3] ); if ( vOut < 3 ) return vOut;		// right
-	vOut = clipToHyperPlane( v1, v0, vOut, NDCPlane[4] ); if ( vOut < 3 ) return vOut;		// bottom
-	vOut = clipToHyperPlane( v0, v1, vOut, NDCPlane[5] );									// top
-
+	vOut = ClipToHyperPlane( v1, v0, vOut, kNDCPlane[0] ); if ( vOut < 3 ) return vOut;		// near
+	vOut = ClipToHyperPlane( v0, v1, vOut, kNDCPlane[1] ); if ( vOut < 3 ) return vOut;		// far
+	vOut = ClipToHyperPlane( v1, v0, vOut, kNDCPlane[2] ); if ( vOut < 3 ) return vOut;		// left
+	vOut = ClipToHyperPlane( v0, v1, vOut, kNDCPlane[3] ); if ( vOut < 3 ) return vOut;		// right
+	vOut = ClipToHyperPlane( v1, v0, vOut, kNDCPlane[4] ); if ( vOut < 3 ) return vOut;		// bottom
+	vOut = ClipToHyperPlane( v0, v1, vOut, kNDCPlane[5] );									// top
 	return vOut;
 }
 
@@ -596,7 +589,6 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 {
 	DAEDALUS_PROFILE( "BaseRenderer::PrepareTrisClipped" );
 
-	//
 	//	At this point all vertices are lit/projected and have both transformed and projected
 	//	vertex positions. For the best results we clip against the projected vertex positions,
 	//	but use the resulting intersections to interpolate the transformed positions.
@@ -606,8 +598,6 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 	//	suffers from various precision issues. Carrying around both sets of coordinates gives
 	//	us the best of both worlds :)
 	//
-	//  Convert directly to PSP hardware format, that way we only copy 24 bytes instead of 64 bytes //Corn
-	//
 	temp_verts->Alloc(kMaxClippedVerts);
 
 	for (u32 i = 0; i < (mNumIndices - 2);)
@@ -616,16 +606,16 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 		const u32 & idx1 = mIndexBuffer[ i++ ];
 		const u32 & idx2 = mIndexBuffer[ i++ ];
 
-		//Check if any of the vertices are outside the clipbox (NDC), if so we need to clip the triangle
+		// Check if any of the vertices are outside the clipbox (NDC), if so we need to clip the triangle
 		if (mVtxProjected[idx0].ClipFlags | mVtxProjected[idx1].ClipFlags | mVtxProjected[idx2].ClipFlags)
 		{
 			temp_a[ 0 ] = mVtxProjected[ idx0 ];
 			temp_a[ 1 ] = mVtxProjected[ idx1 ];
 			temp_a[ 2 ] = mVtxProjected[ idx2 ];
 
-			u32 out = clip_tri_to_frustum( temp_a, temp_b );
-			//If we have less than 3 vertices left after the clipping
-			//we can't make a triangle so we bail and skip rendering it.
+			u32 out = ClipTriToFrustum( temp_a, temp_b );
+			// If we have less than 3 vertices left after the clipping
+			// we can't make a triangle so we bail and skip rendering it.
 			DL_PF("    Clip & re-tesselate [%d,%d,%d] with %d vertices", i-3, i-2, i-1, out);
 			DL_PF("    %#5.3f, %#5.3f, %#5.3f", mVtxProjected[ idx0 ].ProjectedPos.x/mVtxProjected[ idx0 ].ProjectedPos.w, mVtxProjected[ idx0 ].ProjectedPos.y/mVtxProjected[ idx0 ].ProjectedPos.w, mVtxProjected[ idx0 ].ProjectedPos.z/mVtxProjected[ idx0 ].ProjectedPos.w);
 			DL_PF("    %#5.3f, %#5.3f, %#5.3f", mVtxProjected[ idx1 ].ProjectedPos.x/mVtxProjected[ idx1 ].ProjectedPos.w, mVtxProjected[ idx1 ].ProjectedPos.y/mVtxProjected[ idx1 ].ProjectedPos.w, mVtxProjected[ idx1 ].ProjectedPos.z/mVtxProjected[ idx1 ].ProjectedPos.w);
