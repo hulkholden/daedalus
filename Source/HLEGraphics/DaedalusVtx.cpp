@@ -53,3 +53,11 @@ void DaedalusVtx4::InitClipFlags()
 	else if (ProjectedPos.z > ProjectedPos.w)	clip_flags |= Z_NEG;
 	ClipFlags = clip_flags;
 }
+
+void DaedalusVtx4::SetColour(const v3& col, f32 a)
+{
+	Colour.x = col.x;
+	Colour.y = col.y;
+	Colour.z = col.z;
+	Colour.w = a;
+}

@@ -766,20 +766,9 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 			vecTransformedNormal = mat_world.TransformNormal( model_normal );
 			vecTransformedNormal.Normalise();
 
-			v3 col;
-
-			if ( mTnL.Flags.PointLight )
-			{//POINT LIGHT
-				col = LightPointVert(w); // Majora's Mask uses this
-			}
-			else
-			{//NORMAL LIGHT
-				col = LightVert(vecTransformedNormal);
-			}
-			vtx.Colour.x = col.x;
-			vtx.Colour.y = col.y;
-			vtx.Colour.z = col.z;
-			vtx.Colour.w = vert.rgba_a * (1.0f / 255.0f);
+			// Majora's Mask uses point lights.
+			v3 col = (mTnL.Flags.PointLight) ? LightPointVert(w) : LightVert(vecTransformedNormal);
+			vtx.SetColour(col, vert.rgba_a * (1.0f / 255.0f));
 
 			// ENV MAPPING
 			//
@@ -1103,12 +1092,8 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 
 		v4 w( f32( vert.x ), f32( vert.y ), f32( vert.z ), 1.0f );
 
-		// VTX Transform
-		//
-		v4 & transformed( vtx.TransformedPos );
-		transformed = mat_world.Transform( w );
-		v4 & projected( vtx.ProjectedPos );
-		projected = mat_project.Transform( transformed );
+		vtx.TransformedPos = mat_world.Transform( w );
+		vtx.ProjectedPos = mat_project.Transform( vtx.TransformedPos );
 
 		vtx.InitClipFlags();
 
@@ -1116,15 +1101,11 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 		{
 			v3	model_normal((f32)mn[vert.cidx+3], (f32)mn[vert.cidx+2], (f32)mn[vert.cidx+1] );
 
-			v3 vecTransformedNormal;
-			vecTransformedNormal = mat_world.TransformNormal( model_normal );
+			v3 vecTransformedNormal = mat_world.TransformNormal( model_normal );
 			vecTransformedNormal.Normalise();
 
-			const v3 col = LightVert(vecTransformedNormal);
-			vtx.Colour.x = col.x;
-			vtx.Colour.y = col.y;
-			vtx.Colour.z = col.z;
-			vtx.Colour.w = (f32)mn[vert.cidx+0] * (1.0f / 255.0f);
+			const f32 a = (f32)mn[vert.cidx+0] * (1.0f / 255.0f);
+			vtx.SetColour(LightVert(vecTransformedNormal), a);
 
 			if ( mTnL.Flags.TexGen )
 			{
@@ -1150,13 +1131,15 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 		}
 		else
 		{
-			vtx.Colour.x = (f32)mn[vert.cidx+3] * (1.0f / 255.0f);
-			vtx.Colour.y = (f32)mn[vert.cidx+2] * (1.0f / 255.0f);
-			vtx.Colour.z = (f32)mn[vert.cidx+1] * (1.0f / 255.0f);
-			vtx.Colour.w = (f32)mn[vert.cidx+0] * (1.0f / 255.0f);
+			const f32 r = (f32)mn[vert.cidx+3] * (1.0f / 255.0f);
+			const f32 g = (f32)mn[vert.cidx+2] * (1.0f / 255.0f);
+			const f32 b = (f32)mn[vert.cidx+1] * (1.0f / 255.0f);
+			const f32 a = (f32)mn[vert.cidx+0] * (1.0f / 255.0f);
+			const f32 s = (float)vert.tu * mTnL.TextureScaleX;
+			const f32 t = (float)vert.tv * mTnL.TextureScaleY;
 
-			vtx.Texture.x = (float)vert.tu * mTnL.TextureScaleX;
-			vtx.Texture.y = (float)vert.tv * mTnL.TextureScaleY;
+			vtx.Colour = v4(r, g, b, a);
+			vtx.Texture = v2(s, t);
 		}
 	}
 }

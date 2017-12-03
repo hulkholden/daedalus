@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define HLEGRAPHICS_DAEDALUSVTX_H_
 
 #include "Math/Vector2.h"
+#include "Math/Vector3.h"
 #include "Math/Vector4.h"
 
 struct DaedalusVtx4
@@ -35,6 +36,7 @@ struct DaedalusVtx4
 	void Interpolate(const DaedalusVtx4& lhs, const DaedalusVtx4& rhs, float factor);
 
 	void InitClipFlags();
+	void SetColour(const v3& col, f32 a);
 };
 
 struct TexCoord
