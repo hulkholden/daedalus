@@ -12,6 +12,7 @@
 #include "HLEGraphics/RendererGL.h"
 #include "HLEGraphics/TextureCache.h"
 #include "System/Timing.h"
+#include "Utility/Profiler.h"
 
 HLEGraphics* 	gHLEGraphics = NULL;
 
@@ -166,6 +167,8 @@ void HLEGraphics::OnOriginChanged(u32 origin)
 
 void HLEGraphics::UpdateScreen()
 {
+	DAEDALUS_PROFILE( "UpdateScreen" );
+
 	// TODO: this is actually lagging a frame behind
 	u32 current_origin = Memory_VI_GetRegister(VI_ORIGIN_REG);
 	if (current_origin == LastOrigin)

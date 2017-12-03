@@ -176,6 +176,8 @@ void CGraphicsContext::EndFrame()
 
 void CGraphicsContext::UpdateFrame()
 {
+	DAEDALUS_PROFILE( "UpdateFrame" );
+
 	glfwSwapBuffers(gWindow);
 //	if( gCleanSceneEnabled ) //TODO: This should be optional
 	{

@@ -289,8 +289,6 @@ void BaseRenderer::UpdateViewport()
 // Returns true if triangle visible and rendered, false otherwise
 bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 {
-	//DAEDALUS_PROFILE( "BaseRenderer::AddTri" );
-
 	DAEDALUS_ASSERT( v0 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v0 );
 	DAEDALUS_ASSERT( v1 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v1 );
 	DAEDALUS_ASSERT( v2 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v2 );

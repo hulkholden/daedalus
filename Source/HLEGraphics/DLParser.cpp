@@ -393,6 +393,7 @@ void DLParser_InitMicrocode( u32 code_base, u32 code_size, u32 data_base, u32 da
 // Process the entire display list in one go
 static u32 DLParser_ProcessDList(u32 instruction_limit)
 {
+	DAEDALUS_PROFILE( "DLParser_ProcessDList" );
 	MicroCodeCommand command;
 
 	u32 current_instruction_count = 0;

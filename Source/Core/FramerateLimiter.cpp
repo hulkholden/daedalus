@@ -25,6 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/ROM.h"
 #include "System/Thread.h"
 #include "System/Timing.h"
+#include "Utility/Profiler.h"
+
 
 static u32				gTicksBetweenVbls = 0;			// How many ticks we want to delay between vertical blanks
 static u32				gTicksPerSecond = 0;			// How many ticks there are per second
@@ -88,6 +90,8 @@ static u32 FramerateLimiter_UpdateAverageTicksPerVbl( u32 elapsed_ticks )
 
 void FramerateLimiter_Limit()
 {
+	DAEDALUS_PROFILE( "FramerateLimiter_Limit" );
+
 	gVblsSinceFlip++;
 
 	// Only do framerate limiting on frames that correspond to a flip

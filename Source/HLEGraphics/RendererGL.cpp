@@ -834,7 +834,7 @@ inline u32 MakeMirror(u32 mirror, u32 m)
 
 void RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zbuffer)
 {
-	DAEDALUS_PROFILE( "RendererGL::PrepareRenderState" );
+	DAEDALUS_PROFILE( "PrepareRenderState" );
 
 	if ( disable_zbuffer )
 	{
@@ -968,6 +968,8 @@ extern u32 gRDPFrame;
 // It ends up copying colour/uv coords when not needed, and can use a shader uniform for the fill colour.
 void RendererGL::RenderTriangles( DaedalusVtx * p_vertices, u32 num_vertices, bool disable_zbuffer )
 {
+	DAEDALUS_PROFILE( "RenderTriangles" );
+
 	if (mTnL.Flags.Texture)
 	{
 		UpdateTileSnapshots( mTextureTile );
