@@ -621,6 +621,13 @@ void RendererGL::RenderDaedalusVtxStreams(int prim, int buffer_idx, const float*
 {
 	DAEDALUS_PROFILE("RenderDaedalusVtxStreams");
 
+	// Ensure we're not trying to render more verts than the underlying VBOs have capacity for.
+	if (count > kMaxVertices)
+	{
+		DAEDALUS_ASSERT(false, "Too many vertices! %d", count);
+		count = kMaxVertices;
+	}
+
 	glBindBuffer(GL_ARRAY_BUFFER, gBufferData[buffer_idx].PositionsVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 3 * count, positions);
 
@@ -971,14 +978,6 @@ void RendererGL::RenderTriangles(const float* positions, const TexCoord* uvs, co
                                  bool disable_zbuffer)
 {
 	DAEDALUS_PROFILE( "RenderTriangles" );
-
-	// Avoid crashing in the unlikely even that our buffers aren't long enough.
-	if (num_vertices > kMaxVertices)
-	{
-		DAEDALUS_ASSERT(false, "Too many vertices! %d", num_vertices);
-		num_vertices = kMaxVertices;
-	}
-
 	int buffer_idx = PrepareRenderState(mProjection, disable_zbuffer);
 	RenderDaedalusVtxStreams(GL_TRIANGLES, buffer_idx, positions, uvs, colours, num_vertices);
 }
