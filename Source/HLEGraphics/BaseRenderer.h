@@ -336,7 +336,8 @@ protected:
 		return v2(x, y);
 	}
 
-	virtual void RenderTriangles(DaedalusVtx* p_vertices, u32 num_vertices, bool disable_zbuffer) = 0;
+	virtual void RenderTriangles(const float* positions, const TexCoord* uvs, const u32* colours, u32 num_vertices,
+	                             bool disable_zbuffer) = 0;
 
 	void TestVFPUVerts(u32 v0, u32 num, const FiddledVtx* verts, const Matrix4x4& mat_world);
 

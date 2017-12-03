@@ -37,30 +37,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Ultra/ultra_gbi.h"
 #include "Utility/Profiler.h"
 
-struct TempVerts
-{
-	TempVerts()
-	:	Verts(nullptr)
-	,	Count(0)
-	{
-	}
-
-	~TempVerts()
-	{
-		delete [] Verts;
-	}
-
-	DaedalusVtx * Alloc(u32 count)
-	{
-		Verts = new DaedalusVtx[count];
-		Count = count;
-		return Verts;
-	}
-
-	DaedalusVtx *	Verts;
-	u32				Count;
-};
-
 extern bool gRumblePakActive;
 extern u32 gAuxAddr;
 
@@ -370,6 +346,60 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 	return true;
 }
 
+// Helper for composing position/uv/colour streams.
+struct TempVerts
+{
+	TempVerts(const v2& uv_scale, const v2& uv_trans, float uv_frac)
+	:	UVScale(uv_scale)
+	,	UVTrans(uv_trans)
+	,	UVFrac(uv_frac)
+	,	Positions(nullptr)
+	,	TexCoords(nullptr)
+	,	Colours(nullptr)
+	,	Count(0)
+	{
+	}
+
+	~TempVerts()
+	{
+		delete [] Positions;
+		delete [] TexCoords;
+		delete [] Colours;
+	}
+
+	void Alloc(u32 limit)
+	{
+		Positions = new float[limit * 3];
+		TexCoords = new TexCoord[limit];
+		Colours   = new u32[limit];
+		Limit     = limit;
+		Count     = 0;
+	}
+
+	void AddVert(const DaedalusVtx4& vtx)
+	{
+		DAEDALUS_ASSERT(Count < Limit, "Too many vertices");
+		float s = (vtx.Texture.x * UVScale.x) + UVTrans.x;
+		float t = (vtx.Texture.y * UVScale.y) + UVTrans.y;
+
+		Positions[Count * 3 + 0] = vtx.TransformedPos.x;
+		Positions[Count * 3 + 1] = vtx.TransformedPos.y;
+		Positions[Count * 3 + 2] = vtx.TransformedPos.z;
+		TexCoords[Count]         = TexCoord((s16)(s * UVFrac), (s16)(t * UVFrac));
+		Colours[Count]           = c32(vtx.Colour).GetColour();
+		Count++;
+	}
+
+	v2        UVScale;
+	v2        UVTrans;
+	float     UVFrac;
+	float*    Positions;
+	TexCoord* TexCoords;
+	u32*      Colours;
+	u32       Count;
+	u32       Limit;
+};
+
 void BaseRenderer::FlushTris()
 {
 	DAEDALUS_PROFILE( "BaseRenderer::FlushTris" );
@@ -383,7 +413,37 @@ void BaseRenderer::FlushTris()
 	*/
 	DAEDALUS_ASSERT( mNumIndices, "Call to FlushTris() with nothing to render" );
 
-	TempVerts temp_verts;
+	v2 uv_scale(1.0f, 1.0f);
+	v2 uv_trans(0.0f, 0.0f);
+
+	if (mTnL.Flags.Texture)
+	{
+		UpdateTileSnapshots( mTextureTile );
+
+		// FIXME: this should be applied in SetNewVertexInfo, and use TextureScaleX/Y to set the scale
+		if (mTnL.Flags.Light && mTnL.Flags.TexGen)
+		{
+			if (CNativeTexture * texture = mBoundTexture[0])
+			{
+				// FIXME(strmnnrmn): I don't understand why the tile t/l is used here,
+				// but without it the Goldeneye Rareware logo looks off.
+				// It implies that the RSP code is checking RDP tile state, which seems wrong.
+				// gsDPSetHilite1Tile might set up some RSP state?
+				float x = (float)mTileTopLeft[0].s / 4.f;
+				float y = (float)mTileTopLeft[0].t / 4.f;
+				float w = (float)texture->GetCorrectedWidth();
+				float h = (float)texture->GetCorrectedHeight();
+
+				uv_scale = v2(w, h);
+				uv_trans = v2(x, y);
+			}
+		}
+	}
+
+	// Hack to fix the sun in Zelda OOT/MM
+	const f32 scale = ( g_ROM.ZELDA_HACK && (gRDPOtherMode.L == 0x0c184241) ) ? 16.f : 32.f;
+
+	TempVerts temp_verts(uv_scale, uv_trans, scale);
 
 	// If any bit is set here it means we have to clip the trianlges since PSP HW clipping sux!
 	if(mVtxClipFlagsUnion != 0)
@@ -430,7 +490,7 @@ void BaseRenderer::FlushTris()
 
 	//
 	//	Render out our vertices
-	RenderTriangles( temp_verts.Verts, temp_verts.Count, gRDPOtherMode.depth_source ? true : false );
+	RenderTriangles( temp_verts.Positions, temp_verts.TexCoords, temp_verts.Colours, temp_verts.Count, gRDPOtherMode.depth_source ? true : false );
 
 	mNumIndices = 0;
 	mVtxClipFlagsUnion = 0;
@@ -530,8 +590,7 @@ namespace
 	DaedalusVtx4		temp_a[ 8 ];
 	DaedalusVtx4		temp_b[ 8 ];
 	// Flying Dragon clips more than 256
-	const u32			MAX_CLIPPED_VERTS = 320;
-	DaedalusVtx			clip_vtx[MAX_CLIPPED_VERTS];
+	const u32			kMaxClippedVerts = 320;
 }
 
 void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
@@ -550,16 +609,16 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 	//
 	//  Convert directly to PSP hardware format, that way we only copy 24 bytes instead of 64 bytes //Corn
 	//
-	u32 num_vertices = 0;
+	temp_verts->Alloc(kMaxClippedVerts);
 
-	for(u32 i = 0; i < (mNumIndices - 2);)
+	for (u32 i = 0; i < (mNumIndices - 2);)
 	{
 		const u32 & idx0 = mIndexBuffer[ i++ ];
 		const u32 & idx1 = mIndexBuffer[ i++ ];
 		const u32 & idx2 = mIndexBuffer[ i++ ];
 
 		//Check if any of the vertices are outside the clipbox (NDC), if so we need to clip the triangle
-		if(mVtxProjected[idx0].ClipFlags | mVtxProjected[idx1].ClipFlags | mVtxProjected[idx2].ClipFlags)
+		if (mVtxProjected[idx0].ClipFlags | mVtxProjected[idx1].ClipFlags | mVtxProjected[idx2].ClipFlags)
 		{
 			temp_a[ 0 ] = mVtxProjected[ idx0 ];
 			temp_a[ 1 ] = mVtxProjected[ idx1 ];
@@ -573,109 +632,53 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 			DL_PF("    %#5.3f, %#5.3f, %#5.3f", mVtxProjected[ idx1 ].ProjectedPos.x/mVtxProjected[ idx1 ].ProjectedPos.w, mVtxProjected[ idx1 ].ProjectedPos.y/mVtxProjected[ idx1 ].ProjectedPos.w, mVtxProjected[ idx1 ].ProjectedPos.z/mVtxProjected[ idx1 ].ProjectedPos.w);
 			DL_PF("    %#5.3f, %#5.3f, %#5.3f", mVtxProjected[ idx2 ].ProjectedPos.x/mVtxProjected[ idx2 ].ProjectedPos.w, mVtxProjected[ idx2 ].ProjectedPos.y/mVtxProjected[ idx2 ].ProjectedPos.w, mVtxProjected[ idx2 ].ProjectedPos.z/mVtxProjected[ idx2 ].ProjectedPos.w);
 
-			if( out < 3 )
+			if (out < 3)
+			{
 				continue;
+			}
 
 			// Retesselate
-			u32 new_num_vertices( num_vertices + (out - 3) * 3 );
-			if( new_num_vertices > MAX_CLIPPED_VERTS )
+			u32 new_num_vertices = temp_verts->Count + (out - 3) * 3;
+			if (new_num_vertices > kMaxClippedVerts)
 			{
-				DAEDALUS_ERROR( "Too many clipped verts: %d", new_num_vertices );
+				DAEDALUS_ERROR("Too many clipped verts: %d", new_num_vertices);
 				break;
 			}
-			//Make new triangles from the vertices we got back from clipping the original triangle
-			for( u32 j = 0; j <= out - 3; ++j)
+			// Make new triangles from the vertices we got back from clipping the original triangle
+			for (u32 j = 0; j <= out - 3; ++j)
 			{
-				clip_vtx[ num_vertices ].Texture = temp_a[ 0 ].Texture;
-				clip_vtx[ num_vertices ].Colour = c32( temp_a[ 0 ].Colour );
-				clip_vtx[ num_vertices ].Position.x = temp_a[ 0 ].TransformedPos.x;
-				clip_vtx[ num_vertices ].Position.y = temp_a[ 0 ].TransformedPos.y;
-				clip_vtx[ num_vertices++ ].Position.z = temp_a[ 0 ].TransformedPos.z;
-
-				clip_vtx[ num_vertices ].Texture = temp_a[ j + 1 ].Texture;
-				clip_vtx[ num_vertices ].Colour = c32( temp_a[ j + 1 ].Colour );
-				clip_vtx[ num_vertices ].Position.x = temp_a[ j + 1 ].TransformedPos.x;
-				clip_vtx[ num_vertices ].Position.y = temp_a[ j + 1 ].TransformedPos.y;
-				clip_vtx[ num_vertices++ ].Position.z = temp_a[ j + 1 ].TransformedPos.z;
-
-				clip_vtx[ num_vertices ].Texture = temp_a[ j + 2 ].Texture;
-				clip_vtx[ num_vertices ].Colour = c32( temp_a[ j + 2 ].Colour );
-				clip_vtx[ num_vertices ].Position.x = temp_a[ j + 2 ].TransformedPos.x;
-				clip_vtx[ num_vertices ].Position.y = temp_a[ j + 2 ].TransformedPos.y;
-				clip_vtx[ num_vertices++ ].Position.z = temp_a[ j + 2 ].TransformedPos.z;
+				temp_verts->AddVert(temp_a[0]);
+				temp_verts->AddVert(temp_a[j + 1]);
+				temp_verts->AddVert(temp_a[j + 2]);
 			}
 		}
-		else	//Triangle is inside the clipbox so we just add it as it is.
+		else  // Triangle is inside the clipbox so we just add it as it is.
 		{
-			if( num_vertices > (MAX_CLIPPED_VERTS - 3) )
+			if (temp_verts->Count > (kMaxClippedVerts - 3))
 			{
-				DAEDALUS_ERROR( "Too many clipped verts: %d", num_vertices + 3 );
+				DAEDALUS_ERROR("Too many clipped verts: %d", temp_verts->Count + 3);
 				break;
 			}
 
-			clip_vtx[ num_vertices ].Texture = mVtxProjected[ idx0 ].Texture;
-			clip_vtx[ num_vertices ].Colour = c32( mVtxProjected[ idx0 ].Colour );
-			clip_vtx[ num_vertices ].Position.x = mVtxProjected[ idx0 ].TransformedPos.x;
-			clip_vtx[ num_vertices ].Position.y = mVtxProjected[ idx0 ].TransformedPos.y;
-			clip_vtx[ num_vertices++ ].Position.z = mVtxProjected[ idx0 ].TransformedPos.z;
-
-			clip_vtx[ num_vertices ].Texture = mVtxProjected[ idx1 ].Texture;
-			clip_vtx[ num_vertices ].Colour = c32( mVtxProjected[ idx1 ].Colour );
-			clip_vtx[ num_vertices ].Position.x = mVtxProjected[ idx1 ].TransformedPos.x;
-			clip_vtx[ num_vertices ].Position.y = mVtxProjected[ idx1 ].TransformedPos.y;
-			clip_vtx[ num_vertices++ ].Position.z = mVtxProjected[ idx1 ].TransformedPos.z;
-
-			clip_vtx[ num_vertices ].Texture = mVtxProjected[ idx2 ].Texture;
-			clip_vtx[ num_vertices ].Colour = c32( mVtxProjected[ idx2 ].Colour );
-			clip_vtx[ num_vertices ].Position.x = mVtxProjected[ idx2 ].TransformedPos.x;
-			clip_vtx[ num_vertices ].Position.y = mVtxProjected[ idx2 ].TransformedPos.y;
-			clip_vtx[ num_vertices++ ].Position.z = mVtxProjected[ idx2 ].TransformedPos.z;
+			temp_verts->AddVert(mVtxProjected[idx0]);
+			temp_verts->AddVert(mVtxProjected[idx1]);
+			temp_verts->AddVert(mVtxProjected[idx2]);
 		}
-	}
-
-	//	Now the vertices have been clipped we need to write them into
-	//	a buffer we obtain this from the display list.
-	if (num_vertices > 0)
-	{
-		DaedalusVtx * p_vertices = temp_verts->Alloc(num_vertices);
-
-		memcpy( p_vertices, clip_vtx, num_vertices * sizeof(DaedalusVtx) );	//std memcpy() is as fast as VFPU here!
 	}
 }
-
 
 void BaseRenderer::PrepareTrisUnclipped( TempVerts * temp_verts ) const
 {
 	DAEDALUS_PROFILE( "BaseRenderer::PrepareTrisUnclipped" );
 	DAEDALUS_ASSERT( mNumIndices > 0, "The number of indices should have been checked" );
 
-	const u32		num_vertices = mNumIndices;
-	DaedalusVtx *	p_vertices   = temp_verts->Alloc(num_vertices);
-
-	//
-	//	Previously this code set up an index buffer to avoid processing the
-	//	same vertices more than once - we avoid this now as there is apparently
-	//	quite a large performance penalty associated with using these on the PSP.
-	//
-	//	http://forums.ps2dev.org/viewtopic.php?t=4703
-	//
-	//DAEDALUS_STATIC_ASSERT( MAX_CLIPPED_VERTS > ARRAYSIZE(mIndexBuffer) );
-
-	//
-	//	Now we just shuffle all the data across directly (potentially duplicating verts)
-	//
-	for( u32 i = 0; i < num_vertices; ++i )
+	temp_verts->Alloc(mNumIndices);
+	for (u32 i = 0; i < mNumIndices; ++i)
 	{
-		u32 index = mIndexBuffer[ i ];
-
-		p_vertices[ i ].Texture = mVtxProjected[ index ].Texture;
-		p_vertices[ i ].Colour = c32( mVtxProjected[ index ].Colour );
-		p_vertices[ i ].Position.x = mVtxProjected[ index ].TransformedPos.x;
-		p_vertices[ i ].Position.y = mVtxProjected[ index ].TransformedPos.y;
-		p_vertices[ i ].Position.z = mVtxProjected[ index ].TransformedPos.z;
+		const u32 index = mIndexBuffer[i];
+		temp_verts->AddVert(mVtxProjected[index]);
 	}
 }
-
 
 v3 BaseRenderer::LightVert( const v3 & norm ) const
 {

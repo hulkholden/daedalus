@@ -83,10 +83,6 @@ struct BufferData
 };
 static BufferData gBufferData[kNumBuffers];
 
-static float    gPositionBuffer[kMaxVertices][3];
-static TexCoord gTexCoordBuffer[kMaxVertices];
-static u32      gColorBuffer[kMaxVertices];
-
 static const char* const kShaderSource = "HLEGraphics/n64.psh";
 
 bool Renderer_Initialise()
@@ -123,13 +119,13 @@ bool Renderer_Initialise()
 		buffer_data.ColoursVBO   = vbos[vbo_idx++];
 
 		glBindBuffer(GL_ARRAY_BUFFER, buffer_data.PositionsVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(gPositionBuffer), nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, kMaxVertices * sizeof(float) * 3, nullptr, GL_DYNAMIC_DRAW);
 
 		glBindBuffer(GL_ARRAY_BUFFER, buffer_data.TexCoordsVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(gTexCoordBuffer), nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, kMaxVertices * sizeof(TexCoord), nullptr, GL_DYNAMIC_DRAW);
 
 		glBindBuffer(GL_ARRAY_BUFFER, buffer_data.ColoursVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(gColorBuffer), nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, kMaxVertices * sizeof(u32), nullptr, GL_DYNAMIC_DRAW);
 	}
 	DAEDALUS_ASSERT(vbo_idx == kNumVBOs, "Used wrong number of vbos");
 	delete [] vbos;
@@ -971,66 +967,19 @@ int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zb
 
 // FIXME(strmnnrmn): for fill/copy modes this does more work than needed.
 // It ends up copying colour/uv coords when not needed, and can use a shader uniform for the fill colour.
-void RendererGL::RenderTriangles( DaedalusVtx * vertices, u32 num_vertices, bool disable_zbuffer )
+void RendererGL::RenderTriangles(const float* positions, const TexCoord* uvs, const u32* colours, u32 num_vertices,
+                                 bool disable_zbuffer)
 {
 	DAEDALUS_PROFILE( "RenderTriangles" );
 
-	if (mTnL.Flags.Texture)
-	{
-		UpdateTileSnapshots( mTextureTile );
-
-		// FIXME: this should be applied in SetNewVertexInfo, and use TextureScaleX/Y to set the scale
-		if (mTnL.Flags.Light && mTnL.Flags.TexGen)
-		{
-			if (CNativeTexture * texture = mBoundTexture[0])
-			{
-				// FIXME(strmnnrmn): I don't understand why the tile t/l is used here,
-				// but without it the Goldeneye Rareware logo looks off.
-				// It implies that the RSP code is checking RDP tile state, which seems wrong.
-				// gsDPSetHilite1Tile might set up some RSP state?
-				float x = (float)mTileTopLeft[0].s / 4.f;
-				float y = (float)mTileTopLeft[0].t / 4.f;
-				float w = (float)texture->GetCorrectedWidth();
-				float h = (float)texture->GetCorrectedHeight();
-				for (u32 i = 0; i < num_vertices; ++i)
-				{
-					vertices[i].Texture.x = (vertices[i].Texture.x * w) + x;
-					vertices[i].Texture.y = (vertices[i].Texture.y * h) + y;
-				}
-			}
-		}
-	}
-
 	int buffer_idx = PrepareRenderState(mProjection, disable_zbuffer);
 
-	// Strip out vertex stream into separate buffers.
-	// TODO(strmnnrmn): Renderer should support generating this data directly.
-	DAEDALUS_ASSERT(num_vertices <= kMaxVertices, "Too many vertices!");
-
 	// Avoid crashing in the unlikely even that our buffers aren't long enough.
+	DAEDALUS_ASSERT(num_vertices <= kMaxVertices, "Too many vertices!");
 	if (num_vertices > kMaxVertices)
 		num_vertices = kMaxVertices;
 
-	// Hack to fix the sun in Zelda OOT/MM
-	const f32 scale = ( g_ROM.ZELDA_HACK &&(gRDPOtherMode.L == 0x0c184241) ) ? 16.f : 32.f;
-
-	for (int i = 0; i < num_vertices; ++i)
-	{
-		const DaedalusVtx * vtx = &vertices[i];
-
-		gPositionBuffer[i][0] = vtx->Position.x;
-		gPositionBuffer[i][1] = vtx->Position.y;
-		gPositionBuffer[i][2] = vtx->Position.z;
-
-		// FIXME(strmnnrmn): maintain the texture coords in 10.5 format.
-		gTexCoordBuffer[i].s = (int)(vtx->Texture.x * scale);
-		gTexCoordBuffer[i].t = (int)(vtx->Texture.y * scale);
-
-		gColorBuffer[i] = vtx->Colour.GetColour();
-	}
-
-	RenderDaedalusVtxStreams(GL_TRIANGLES, buffer_idx, &gPositionBuffer[0][0], &gTexCoordBuffer[0], &gColorBuffer[0],
-	                         num_vertices);
+	RenderDaedalusVtxStreams(GL_TRIANGLES, buffer_idx, positions, uvs, colours, num_vertices);
 }
 
 void RendererGL::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord st0, TexCoord st1 )

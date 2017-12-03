@@ -20,9 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_DAEDALUSVTX_H_
 #define HLEGRAPHICS_DAEDALUSVTX_H_
 
-#include "Graphics/ColourValue.h"
 #include "Math/Vector2.h"
-#include "Math/Vector3.h"
 #include "Math/Vector4.h"
 
 struct DaedalusVtx4
@@ -49,27 +47,6 @@ struct TexCoord
 	TexCoord(s16 s_, s16 t_) : s(s_), t(t_)
 	{
 	}
-	TexCoord(float s_, float t_) : s((s16)(s_ * 32.f)), t((s16)(t_ * 32.f))
-	{
-	}
 };
-
-// The ordering of these elements is determined by the PSP hardware
-struct DaedalusVtx
-{
-	DaedalusVtx()
-	{
-	}
-	DaedalusVtx(const v3& position, const u32 colour, const v2& texture)
-	    : Texture(texture), Colour(colour), Position(position)
-	{
-	}
-
-	v2  Texture;
-	c32 Colour;
-	v3  Position;
-};
-
-DAEDALUS_STATIC_ASSERT(sizeof(DaedalusVtx) == 24);
 
 #endif  // HLEGRAPHICS_DAEDALUSVTX_H_

@@ -10,7 +10,8 @@ class RendererGL : public BaseRenderer
   public:
 	virtual void RestoreRenderStates();
 
-	virtual void RenderTriangles(DaedalusVtx* p_vertices, u32 num_vertices, bool disable_zbuffer);
+	virtual void RenderTriangles(const float* positions, const TexCoord* uvs,
+	                              const u32* colours, u32 num_vertices, bool disable_zbuffer);
 
 	virtual void TexRect(u32 tile_idx, const v2& xy0, const v2& xy1, TexCoord st0, TexCoord st1);
 	virtual void TexRectFlip(u32 tile_idx, const v2& xy0, const v2& xy1, TexCoord st0, TexCoord st1);
