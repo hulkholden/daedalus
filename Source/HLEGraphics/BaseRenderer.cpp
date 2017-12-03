@@ -76,30 +76,30 @@ u32        gViHeightMinusOne = 239;
 extern void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
 
 BaseRenderer::BaseRenderer()
-    : mN64ToScreenScale(2.0f, 2.0f),
-      mN64ToScreenTranslate(0.0f, 0.0f),
-      mMux(0),
-      mTextureTile(0),
-      mPrimDepth(0.0f),
-      mPrimLODFraction(0.f),
-      mFogColour(0x00ffffff),  // NB top bits not set. Intentional?
-      mPrimitiveColour(0xffffffff),
-      mEnvColour(0xffffffff),
-      mBlendColour(255, 255, 255, 0),
-      mFillColour(0xffffffff),
-      mModelViewTop(0),
-      mWorldProjectValid(false),
-      mReloadProj(true),
-      mWPmodified(false),
-      mScreenWidth(0.f),
-      mScreenHeight(0.f),
-      mNumIndices(0),
-      mVtxClipFlagsUnion(0)
+	: mN64ToScreenScale(2.0f, 2.0f),
+	  mN64ToScreenTranslate(0.0f, 0.0f),
+	  mMux(0),
+	  mTextureTile(0),
+	  mPrimDepth(0.0f),
+	  mPrimLODFraction(0.f),
+	  mFogColour(0x00ffffff),  // NB top bits not set. Intentional?
+	  mPrimitiveColour(0xffffffff),
+	  mEnvColour(0xffffffff),
+	  mBlendColour(255, 255, 255, 0),
+	  mFillColour(0xffffffff),
+	  mModelViewTop(0),
+	  mWorldProjectValid(false),
+	  mReloadProj(true),
+	  mWPmodified(false),
+	  mScreenWidth(0.f),
+	  mScreenHeight(0.f),
+	  mNumIndices(0),
+	  mVtxClipFlagsUnion(0)
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-      ,
-      mNumTrisRendered(0),
-      mNumTrisClipped(0),
-      mNumRect(0)
+	  ,
+	  mNumTrisRendered(0),
+	  mNumTrisClipped(0),
+	  mNumRect(0)
 #endif
 {
 	for ( u32 i = 0; i < kNumBoundTextures; i++ )
