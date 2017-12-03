@@ -65,10 +65,13 @@ extern bool gRumblePakActive;
 extern u32 gAuxAddr;
 
 static f32 gZoomX    = 1.0f;
-static f32 fViWidth  = 320.0f;
-static f32 fViHeight = 240.0f;
-u32        uViWidth  = 320;
-u32        uViHeight = 240;
+static f32 gViWidth  = 320.0f;
+static f32 gViHeight = 240.0f;
+
+// TODO(strmnnrmn): Tidy this up. These are actually gViWidth/Height -1, which is
+// weird and possibly not intended for anything but the scissor code...
+u32        gViWidthMinusOne  = 319;
+u32        gViHeightMinusOne = 239;
 
 extern void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
 
@@ -146,23 +149,29 @@ void BaseRenderer::SetVIScales()
 		hend = (u32)(width / fScaleX);
 	}
 
-	fViWidth  =  (hend-hstart) * fScaleX;
-	fViHeight =  (vend-vstart) * fScaleY * (240.f/237.f);
+	f32 vi_width  =  (hend-hstart) * fScaleX;
+	f32 vi_height =  (vend-vstart) * fScaleY * (240.f/237.f);
 
 	// XXX Need to check PAL games.
 	//if(g_ROM.TvType != OS_TV_NTSC) sRatio = 9/11.0f;
 
-	//printf("width[%d] ViWidth[%f] ViHeight[%f]\n", width, fViWidth, fViHeight);
+	//printf("width[%d] ViWidth[%f] ViHeight[%f]\n", width, vi_width, vi_height);
 
-	//This corrects height in various games ex : Megaman 64, Cyber Tiger. 40Winks need width >= ((u32)fViWidth << 1) for menus //Corn
-	if( width > 0x300 || width >= ((u32)fViWidth << 1) )
+	//This corrects height in various games ex : Megaman 64, Cyber Tiger. 40Winks need width >= ((u32)vi_width << 1) for menus //Corn
+	if (width > 0x300 || width >= ((u32)vi_width * 2))
 	{
-		fViHeight += fViHeight;
+		vi_height *= 2;
 	}
 
+	// Avoid a divide by zero in the viewport code.
+	if (vi_width == 0) vi_width = 320;
+	if (vi_height == 0) vi_height = 240;
+
+	gViWidth = vi_width;
+	gViHeight = vi_height;
 	//Used to set a limit on Scissors //Corn
-	uViWidth  = (u32)fViWidth - 1;
-	uViHeight = (u32)fViHeight - 1;
+	gViWidthMinusOne  = (u32)vi_width - 1;
+	gViHeightMinusOne = (u32)vi_height - 1;
 }
 
 // Reset for a new frame
@@ -224,15 +233,15 @@ void BaseRenderer::InitViewport()
 	s32 display_x = 0;
 	s32 display_y = 0;
 
-	mN64ToScreenScale.x = gZoomX * mScreenWidth  / fViWidth;
-	mN64ToScreenScale.y = gZoomX * mScreenHeight / fViHeight;
+	mN64ToScreenScale.x = gZoomX * mScreenWidth  / gViWidth;
+	mN64ToScreenScale.y = gZoomX * mScreenHeight / gViHeight;
 
-	mN64ToScreenTranslate.x  = (f32)display_x - roundf(0.55f * (gZoomX - 1.0f) * fViWidth);
-	mN64ToScreenTranslate.y  = (f32)display_y - roundf(0.55f * (gZoomX - 1.0f) * fViHeight);
+	mN64ToScreenTranslate.x  = (f32)display_x - roundf(0.55f * (gZoomX - 1.0f) * gViWidth);
+	mN64ToScreenTranslate.y  = (f32)display_y - roundf(0.55f * (gZoomX - 1.0f) * gViHeight);
 
 	if( gRumblePakActive )
 	{
-	    mN64ToScreenTranslate.x += (FastRand() & 3);
+		mN64ToScreenTranslate.x += (FastRand() & 3);
 		mN64ToScreenTranslate.y += (FastRand() & 3);
 	}
 
@@ -241,8 +250,8 @@ void BaseRenderer::InitViewport()
 
 	mScreenToDevice = Matrix4x4(
 		2.f / w,       0.f,     0.f,     0.f,
-		    0.f,  -2.f / h,     0.f,     0.f,
-		    0.f,       0.f,     1.f,     0.f,
+			0.f,  -2.f / h,     0.f,     0.f,
+			0.f,       0.f,     1.f,     0.f,
 		  -1.0f,       1.f,     0.f,     1.f
 	);
 
@@ -1222,28 +1231,13 @@ void BaseRenderer::ModifyVertexInfo(u32 whered, u32 vert, u32 val)
 				s16 y = (u16)(val & 0xFFFF) >> 2;
 
 				// Fixes the blocks lining up backwards in New Tetris
-				//
-				x -= uViWidth / 2;
-				y = uViHeight / 2 - y;
+				x -= u32(gViWidth) / 2;
+				y = u32(gViHeight) / 2 - y;
 
 				DL_PF("    Modify vert %d: x=%d, y=%d", vert, x, y);
 
-#if 1
 				// Megaman and other games
-				SetVtxXY( vert, f32(x<<1) / fViWidth, f32(y<<1) / fViHeight );
-#else
-				u32 current_scale = Memory_VI_GetRegister(VI_X_SCALE_REG);
-				if((current_scale&0xF) != 0 )
-				{
-					// Tarzan... I don't know why is so different...
-					SetVtxXY( vert, f32(x) / fViWidth, f32(y) / fViHeight );
-				}
-				else
-				{
-					// Megaman and other games
-					SetVtxXY( vert, f32(x<<1) / fViWidth, f32(y<<1) / fViHeight );
-				}
-#endif
+				SetVtxXY( vert, f32(x*2) / gViWidth, f32(y*2) / gViHeight );
 			}
 			break;
 
@@ -1535,8 +1529,8 @@ CRefPtr<CNativeTexture> BaseRenderer::LoadTextureDirectly( const TextureInfo & t
 void BaseRenderer::SetScissor( u32 x0, u32 y0, u32 x1, u32 y1 )
 {
 	//Clamp scissor to max N64 screen resolution //Corn
-	if( x1 > uViWidth )  x1 = uViWidth;
-	if( y1 > uViHeight ) y1 = uViHeight;
+	if( x1 > gViWidthMinusOne )  x1 = gViWidthMinusOne;
+	if( y1 > gViHeightMinusOne ) y1 = gViHeightMinusOne;
 
 	v2 n64_tl( (f32)x0, (f32)y0 );
 	v2 n64_br( (f32)x1, (f32)y1 );

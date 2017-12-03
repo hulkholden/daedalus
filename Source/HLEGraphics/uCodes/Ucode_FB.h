@@ -34,13 +34,13 @@ static inline CRefPtr<CNativeTexture> LoadFrameBuffer(u32 origin)
 		// DAEDALUS_ERROR("Loading small frame buffer not supported");
 		return NULL;
 	}
-// ToDO: We should use uViWidth+1 and uViHeight+1
+// ToDO: We should use gViWidthMinusOne+1 and gViHeightMinusOne+1
 #define FB_WIDTH 320
 #define FB_HEIGHT 240
 
 	DAEDALUS_ASSERT(g_CI.Size == G_IM_SIZ_16b, "32b frame buffer is not supported");
-	// DAEDALUS_ASSERT((uViWidth+1) == FB_WIDTH,"Variable width is not handled");
-	// DAEDALUS_ASSERT((uViHeight+1) == FB_HEIGHT,"Variable height is not handled");
+	// DAEDALUS_ASSERT((gViWidthMinusOne+1) == FB_WIDTH,"Variable width is not handled");
+	// DAEDALUS_ASSERT((gViHeightMinusOne+1) == FB_HEIGHT,"Variable height is not handled");
 
 	TextureInfo ti;
 

@@ -208,8 +208,8 @@ u32			gNumRectsClipped;
 u32 gRDPFrame		= 0;
 u32 gAuxAddr		= 0;
 
-extern u32 uViWidth;
-extern u32 uViHeight;
+extern u32 gViWidthMinusOne;
+extern u32 gViHeightMinusOne;
 
 // Include ucode header files
 #include "uCodes/Ucode_GBI0.h"
@@ -970,7 +970,7 @@ void DLParser_FillRect( MicroCodeCommand command )
 			u32 clear_screen_y = command.fillrect.y1 - command.fillrect.y0;
 
 			// Clear color buffer (screen clear)
-			if( uViWidth == clear_screen_x && uViHeight == clear_screen_y )
+			if( gViWidthMinusOne == clear_screen_x && gViHeightMinusOne == clear_screen_y )
 			{
 				CGraphicsContext::Get()->ClearColBuffer( colour );
 				DL_PF("    Clearing Colour Buffer");
