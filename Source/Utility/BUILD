@@ -9,7 +9,6 @@ cc_library(
         "FastMemcpy.cpp",
         "Hash.cpp",
         "IniFile.cpp",
-        "Profiler.cpp",
         "Timer.cpp",
     ],
     hdrs = [
