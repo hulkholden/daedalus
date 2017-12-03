@@ -41,6 +41,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEAudio/HLEAudioInternal.h"
 #include "System/Thread.h"
 #include "System/Timing.h"
+#include "Utility/Profiler.h"
 
 HLEAudio* gHLEAudio = nullptr;
 
@@ -294,6 +295,8 @@ u32 HLEAudioImpl::AudioThread(void *arg)
 
 void HLEAudioImpl::AudioSyncFunction(void *arg)
 {
+	DAEDALUS_PROFILE("AudioSyncFunction");
+
 	HLEAudioImpl *plugin = static_cast<HLEAudioImpl *>(arg);
 #if DEBUG_AUDIO
 	static u64 last_time = 0;

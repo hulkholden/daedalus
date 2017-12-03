@@ -41,6 +41,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Interface/SaveState.h"
 #include "Interface/UI.h"
 #include "OSHLE/OSHLE.h"
+#include "Utility/Profiler.h"
 
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_W32)
 #include "Debug/WebDebug.h"

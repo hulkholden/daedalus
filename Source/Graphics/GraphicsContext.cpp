@@ -1,12 +1,14 @@
 
 #include "Base/Daedalus.h"
+#include "Graphics/GraphicsContext.h"
 
 #include <stdio.h>
 
-#include "Graphics/GL.h"
-#include "Graphics/GraphicsContext.h"
-
+#include "Config/ConfigOptions.h"
 #include "Graphics/ColourValue.h"
+#include "Graphics/GL.h"
+#include "Utility/Profiler.h"
+
 
 static u32 SCR_WIDTH = 640;
 static u32 SCR_HEIGHT = 480;
@@ -80,7 +82,7 @@ bool CGraphicsContext::Initialise()
 	//glfwEnable( GLFW_STICKY_KEYS );
 
 	// Enable vertical sync (on cards that support it)
-	glfwSwapInterval( 1 );
+	glfwSwapInterval( gSpeedSyncEnabled ? 1 : 0 );
 
 	// Initialise GLEW
 	//glewExperimental = GL_TRUE;

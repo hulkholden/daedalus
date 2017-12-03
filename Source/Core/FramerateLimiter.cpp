@@ -97,7 +97,7 @@ void FramerateLimiter_Limit()
 	// Only do framerate limiting on frames that correspond to a flip
 	u32 current_origin = Memory_VI_GetRegister(VI_ORIGIN_REG);
 
-	if (gAuxSyncFn)
+	if (gSpeedSyncEnabled && gAuxSyncFn)
 	{
 		gAuxSyncFn(gAuxSyncArg);
 	}
@@ -116,7 +116,7 @@ void FramerateLimiter_Limit()
 	{
 		u32 required_ticks = gTicksBetweenVbls * gVblsSinceFlip;
 
-		if( gSpeedSyncEnabled == 2 ) required_ticks = required_ticks * 2;	// Slow down to 1/2 speed //Corn
+		if( gSpeedSyncEnabled == 2 ) required_ticks *= 2;	// Slow down to 1/2 speed //Corn
 
 		// FIXME the constant here will need to be adjusted for different platforms.
 		s32	delay_ticks = required_ticks - elapsed_ticks - 50;	//Remove ~50 ticks for additional processing

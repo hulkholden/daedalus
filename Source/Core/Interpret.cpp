@@ -32,7 +32,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Synchroniser.h"
 #include "OSHLE/OSHLE.h"
 #include "Ultra/ultra_R4300.h"
-#include "Utility/Profiler.h"
 
 //*****************************************************************************
 //	Execute a single MIPS op. The conditionals for the templated arguments
@@ -133,8 +132,6 @@ template< bool TranslateOp > DAEDALUS_FORCEINLINE void CPU_EXECUTE_OP()
 //*****************************************************************************
 void CPU_Go()
 {
-	DAEDALUS_PROFILE( __FUNCTION__ );
-
 	while (CPU_KeepRunning())
 	{
 		//
