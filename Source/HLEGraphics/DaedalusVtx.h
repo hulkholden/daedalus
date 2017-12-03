@@ -33,6 +33,8 @@ struct DaedalusVtx4
 	u32 ClipFlags;
 
 	void Interpolate(const DaedalusVtx4& lhs, const DaedalusVtx4& rhs, float factor);
+
+	void InitClipFlags();
 };
 
 struct TexCoord

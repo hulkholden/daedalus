@@ -746,27 +746,16 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 	for (u32 i = v0; i < v0 + n; i++)
 	{
 		const FiddledVtx & vert = pVtxBase[i - v0];
+		DaedalusVtx4& vtx = mVtxProjected[i];
 
 		// VTX Transform
 		//
 		v4 w( f32( vert.x ), f32( vert.y ), f32( vert.z ), 1.0f );
 
-		v4 & projected( mVtxProjected[i].ProjectedPos );
-		projected = mat_world_project.Transform( w );
-		mVtxProjected[i].TransformedPos = mat_world.Transform( w );
+		vtx.ProjectedPos = mat_world_project.Transform( w );
+		vtx.TransformedPos = mat_world.Transform( w );
 
-		//	Initialise the clipping flags
-		//
-		u32 clip_flags = 0;
-		if		(projected.x < -projected.w)	clip_flags |= X_POS;
-		else if (projected.x > projected.w)		clip_flags |= X_NEG;
-
-		if		(projected.y < -projected.w)	clip_flags |= Y_POS;
-		else if (projected.y > projected.w)		clip_flags |= Y_NEG;
-
-		if		(projected.z < -projected.w)	clip_flags |= Z_POS;
-		else if (projected.z > projected.w)		clip_flags |= Z_NEG;
-		mVtxProjected[i].ClipFlags = clip_flags;
+		vtx.InitClipFlags();
 
 		// LIGHTING OR COLOR
 		//
@@ -787,10 +776,10 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 			{//NORMAL LIGHT
 				col = LightVert(vecTransformedNormal);
 			}
-			mVtxProjected[i].Colour.x = col.x;
-			mVtxProjected[i].Colour.y = col.y;
-			mVtxProjected[i].Colour.z = col.z;
-			mVtxProjected[i].Colour.w = vert.rgba_a * (1.0f / 255.0f);
+			vtx.Colour.x = col.x;
+			vtx.Colour.y = col.y;
+			vtx.Colour.z = col.z;
+			vtx.Colour.w = vert.rgba_a * (1.0f / 255.0f);
 
 			// ENV MAPPING
 			//
@@ -807,40 +796,40 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 
 				if( mTnL.Flags.TexGenLin )
 				{
-					mVtxProjected[i].Texture.x = 0.5f * ( 1.0f + norm.x );
-					mVtxProjected[i].Texture.y = 0.5f * ( 1.0f + norm.y );
+					vtx.Texture.x = 0.5f * ( 1.0f + norm.x );
+					vtx.Texture.y = 0.5f * ( 1.0f + norm.y );
 				}
 				else
 				{
 					//Cheap way to do Acos(x)/Pi (abs() fixes star in SM64, sort of) //Corn
 					f32 NormX = fabsf( norm.x );
 					f32 NormY = fabsf( norm.y );
-					mVtxProjected[i].Texture.x =  0.5f - 0.25f * NormX - 0.25f * NormX * NormX * NormX;
-					mVtxProjected[i].Texture.y =  0.5f - 0.25f * NormY - 0.25f * NormY * NormY * NormY;
+					vtx.Texture.x =  0.5f - 0.25f * NormX - 0.25f * NormX * NormX * NormX;
+					vtx.Texture.y =  0.5f - 0.25f * NormY - 0.25f * NormY * NormY * NormY;
 				}
 			}
 			else
 			{
 				//Set Texture coordinates
-				mVtxProjected[i].Texture.x = (float)vert.tu * mTnL.TextureScaleX;
-				mVtxProjected[i].Texture.y = (float)vert.tv * mTnL.TextureScaleY;
+				vtx.Texture.x = (float)vert.tu * mTnL.TextureScaleX;
+				vtx.Texture.y = (float)vert.tv * mTnL.TextureScaleY;
 			}
 		}
 		else
 		{
 			//if( mTnL.Flags.Shade )
 			{// FLAT shade
-				mVtxProjected[i].Colour = v4( vert.rgba_r * (1.0f / 255.0f), vert.rgba_g * (1.0f / 255.0f), vert.rgba_b * (1.0f / 255.0f), vert.rgba_a * (1.0f / 255.0f) );
+				vtx.Colour = v4( vert.rgba_r * (1.0f / 255.0f), vert.rgba_g * (1.0f / 255.0f), vert.rgba_b * (1.0f / 255.0f), vert.rgba_a * (1.0f / 255.0f) );
 			}
 			/*else
 			{// PRIM shade, SSV uses this, doesn't seem to do anything????
-				mVtxProjected[i].Colour = mPrimitiveColour.GetColourV4();
+				vtx.Colour = mPrimitiveColour.GetColourV4();
 			}*/
 
 
 			//Set Texture coordinates
-			mVtxProjected[i].Texture.x = (float)vert.tu * mTnL.TextureScaleX;
-			mVtxProjected[i].Texture.y = (float)vert.tv * mTnL.TextureScaleY;
+			vtx.Texture.x = (float)vert.tu * mTnL.TextureScaleX;
+			vtx.Texture.y = (float)vert.tv * mTnL.TextureScaleY;
 		}
 
 #ifdef DAEDALUS_PSP
@@ -852,11 +841,11 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 				f32 eye_z = projected.z / projected.w;
 				f32 fog_alpha = eye_z * mTnL.FogMult + mTnL.FogOffs;
 				//f32 fog_alpha = eye_z * 20.0f - 19.0f;	//Fog test line
-				mVtxProjected[i].Colour.w = Clamp< f32 >( fog_alpha, 0.0f, 1.0f );
+				vtx.Colour.w = Clamp< f32 >( fog_alpha, 0.0f, 1.0f );
 			}
 			else
 			{
-				mVtxProjected[i].Colour.w = 0.0f;
+				vtx.Colour.w = 0.0f;
 			}
 		}
 #endif
@@ -880,41 +869,31 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 	// Transform and Project + Lighting or Transform and Project with Colour
 	for (u32 i = v0; i < v0 + n; i++)
 	{
-		const FiddledVtx & vert = pVtxBase[i - v0];
+		const FiddledVtx & vert_in = pVtxBase[i - v0];
+		DaedalusVtx4& vtx = mVtxProjected[i];
 
 		// VTX Transform
 		//
-		v4 w( f32( vert.x ), f32( vert.y ), f32( vert.z ), 1.0f );
+		v4 w( f32( vert_in.x ), f32( vert_in.y ), f32( vert_in.z ), 1.0f );
 
-		v4 & transformed( mVtxProjected[i].TransformedPos );
+		v4 & transformed( vtx.TransformedPos );
 		transformed = mat_world.Transform( w );
 
-		v4 & projected( mVtxProjected[i].ProjectedPos );
+		v4 & projected( vtx.ProjectedPos );
 		projected = mat_project.Transform( transformed );
 
-		//	Initialise the clipping flags
-		//
-		u32 clip_flags = 0;
-		if		(projected.x < -projected.w)	clip_flags |= X_POS;
-		else if (projected.x > projected.w)		clip_flags |= X_NEG;
+		vtx.InitClipFlags();
 
-		if		(projected.y < -projected.w)	clip_flags |= Y_POS;
-		else if (projected.y > projected.w)		clip_flags |= Y_NEG;
-
-		if		(projected.z < -projected.w)	clip_flags |= Z_POS;
-		else if (projected.z > projected.w)		clip_flags |= Z_NEG;
-		mVtxProjected[i].ClipFlags = clip_flags;
-
-		mVtxProjected[i].Colour.x = (f32)vert.rgba_r * (1.0f / 255.0f);
-		mVtxProjected[i].Colour.y = (f32)vert.rgba_g * (1.0f / 255.0f);
-		mVtxProjected[i].Colour.z = (f32)vert.rgba_b * (1.0f / 255.0f);
-		mVtxProjected[i].Colour.w = (f32)vert.rgba_a * (1.0f / 255.0f);	//Pass alpha channel unmodified
+		vtx.Colour.x = (f32)vert_in.rgba_r * (1.0f / 255.0f);
+		vtx.Colour.y = (f32)vert_in.rgba_g * (1.0f / 255.0f);
+		vtx.Colour.z = (f32)vert_in.rgba_b * (1.0f / 255.0f);
+		vtx.Colour.w = (f32)vert_in.rgba_a * (1.0f / 255.0f);	//Pass alpha channel unmodified
 
 		// LIGHTING OR COLOR
 		//
 		if ( mTnL.Flags.Light )
 		{
-			v3 model_normal( mn[((i<<1)+0)^3], mn[((i<<1)+1)^3], vert.normz );
+			v3 model_normal( mn[((i<<1)+0)^3], mn[((i<<1)+1)^3], vert_in.normz );
 			v3 vecTransformedNormal = mat_world.TransformNormal( model_normal );
 			vecTransformedNormal.Normalise();
 			const v3 & norm = vecTransformedNormal;
@@ -974,34 +953,34 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 			}
 
 			//Clamp result to 1.0
-			if( result.x < 1.0f ) mVtxProjected[i].Colour.x *= result.x;
-			if( result.y < 1.0f ) mVtxProjected[i].Colour.y *= result.y;
-			if( result.z < 1.0f ) mVtxProjected[i].Colour.z *= result.z;
+			if( result.x < 1.0f ) vtx.Colour.x *= result.x;
+			if( result.y < 1.0f ) vtx.Colour.y *= result.y;
+			if( result.z < 1.0f ) vtx.Colour.z *= result.z;
 
 			// ENV MAPPING
 			if ( mTnL.Flags.TexGen )
 			{
 				if( mTnL.Flags.TexGenLin )
 				{
-					mVtxProjected[i].Texture.x =  0.5f - 0.25f * norm.x - 0.25f * norm.x * norm.x * norm.x;	//Cheap way to do ~Acos(x)/Pi //Corn
-					mVtxProjected[i].Texture.y =  0.5f - 0.25f * norm.y - 0.25f * norm.y * norm.y * norm.y;
+					vtx.Texture.x =  0.5f - 0.25f * norm.x - 0.25f * norm.x * norm.x * norm.x;	//Cheap way to do ~Acos(x)/Pi //Corn
+					vtx.Texture.y =  0.5f - 0.25f * norm.y - 0.25f * norm.y * norm.y * norm.y;
 				}
 				else
 				{
-					mVtxProjected[i].Texture.x = 0.5f * ( 1.0f + norm.x );
-					mVtxProjected[i].Texture.y = 0.5f * ( 1.0f + norm.y );
+					vtx.Texture.x = 0.5f * ( 1.0f + norm.x );
+					vtx.Texture.y = 0.5f * ( 1.0f + norm.y );
 				}
 			}
 			else
 			{	//TEXTURE SCALE
-				mVtxProjected[i].Texture.x = (f32)vert.tu * mTnL.TextureScaleX;
-				mVtxProjected[i].Texture.y = (f32)vert.tv * mTnL.TextureScaleY;
+				vtx.Texture.x = (f32)vert_in.tu * mTnL.TextureScaleX;
+				vtx.Texture.y = (f32)vert_in.tv * mTnL.TextureScaleY;
 			}
 		}
 		else
 		{	//TEXTURE SCALE
-			mVtxProjected[i].Texture.x = (f32)vert.tu * mTnL.TextureScaleX;
-			mVtxProjected[i].Texture.y = (f32)vert.tv * mTnL.TextureScaleY;
+			vtx.Texture.x = (f32)vert_in.tu * mTnL.TextureScaleX;
+			vtx.Texture.y = (f32)vert_in.tv * mTnL.TextureScaleY;
 		}
 	}
 }
@@ -1037,6 +1016,8 @@ void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboar
 
 		for (u32 i = v0; i < v0 + n; i++)
 		{
+			DaedalusVtx4& vtx = mVtxProjected[i];
+
 			v3 w;
 			w.x = *(s16*)((pVtxBase + 0) ^ 2);
 			w.y = *(s16*)((pVtxBase + 2) ^ 2);
@@ -1044,23 +1025,23 @@ void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboar
 
 			w = mat.TransformNormal( w );
 
-			v4 & transformed( mVtxProjected[i].TransformedPos );
+			v4 & transformed( vtx.TransformedPos );
 			transformed.x = BaseVec.x + w.x;
 			transformed.y = BaseVec.y + w.y;
 			transformed.z = BaseVec.z + w.z;
 			transformed.w = 1.0f;
 
 			// Set Clipflags, zero clippflags if billbording //Corn
-			mVtxProjected[i].ClipFlags = 0;
+			vtx.ClipFlags = 0;
 
 			// Assign true vert colour
 			const u32 WL = *(u16*)((pVtxBase + 6) ^ 2);
 			const u32 WH = *(u16*)((pVtxBase + 8) ^ 2);
 
-			mVtxProjected[i].Colour.x = (1.0f / 255.0f) * (WL >> 8);
-			mVtxProjected[i].Colour.y = (1.0f / 255.0f) * (WL & 0xFF);
-			mVtxProjected[i].Colour.z = (1.0f / 255.0f) * (WH >> 8);
-			mVtxProjected[i].Colour.w = (1.0f / 255.0f) * (WH & 0xFF);
+			vtx.Colour.x = (1.0f / 255.0f) * (WL >> 8);
+			vtx.Colour.y = (1.0f / 255.0f) * (WL & 0xFF);
+			vtx.Colour.z = (1.0f / 255.0f) * (WH >> 8);
+			vtx.Colour.w = (1.0f / 255.0f) * (WH & 0xFF);
 
 			pVtxBase += 10;
 		}
@@ -1074,35 +1055,27 @@ void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboar
 		}
 		for (u32 i = v0; i < v0 + n; i++)
 		{
-			v4 & transformed( mVtxProjected[i].TransformedPos );
+			DaedalusVtx4& vtx = mVtxProjected[i];
+
+			v4 & transformed( vtx.TransformedPos );
 			transformed.x = *(s16*)((pVtxBase + 0) ^ 2);
 			transformed.y = *(s16*)((pVtxBase + 2) ^ 2);
 			transformed.z = *(s16*)((pVtxBase + 4) ^ 2);
 			transformed.w = 1.0f;
 
-			v4 & projected( mVtxProjected[i].ProjectedPos );
+			v4 & projected( vtx.ProjectedPos );
 			projected = mat_world_project.Transform( transformed );	//Do projection
 
-			// Set Clipflags
-			u32 clip_flags = 0;
-			if		(projected.x < -projected.w)	clip_flags |= X_POS;
-			else if (projected.x > projected.w)		clip_flags |= X_NEG;
-
-			if		(projected.y < -projected.w)	clip_flags |= Y_POS;
-			else if (projected.y > projected.w)		clip_flags |= Y_NEG;
-
-			if		(projected.z < -projected.w)	clip_flags |= Z_POS;
-			else if (projected.z > projected.w)		clip_flags |= Z_NEG;
-			mVtxProjected[i].ClipFlags = clip_flags;
+			vtx.InitClipFlags();
 
 			// Assign true vert colour
 			const u32 WL = *(u16*)((pVtxBase + 6) ^ 2);
 			const u32 WH = *(u16*)((pVtxBase + 8) ^ 2);
 
-			mVtxProjected[i].Colour.x = (1.0f / 255.0f) * (WL >> 8);
-			mVtxProjected[i].Colour.y = (1.0f / 255.0f) * (WL & 0xFF);
-			mVtxProjected[i].Colour.z = (1.0f / 255.0f) * (WH >> 8);
-			mVtxProjected[i].Colour.w = (1.0f / 255.0f) * (WH & 0xFF);
+			vtx.Colour.x = (1.0f / 255.0f) * (WL >> 8);
+			vtx.Colour.y = (1.0f / 255.0f) * (WL & 0xFF);
+			vtx.Colour.z = (1.0f / 255.0f) * (WH >> 8);
+			vtx.Colour.w = (1.0f / 255.0f) * (WH & 0xFF);
 
 			pVtxBase += 10;
 		}
@@ -1126,28 +1099,18 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 	for (u32 i = v0; i < v0 + n; i++)
 	{
 		const FiddledVtxPD & vert = pVtxBase[i - v0];
+		DaedalusVtx4& vtx = mVtxProjected[i];
 
 		v4 w( f32( vert.x ), f32( vert.y ), f32( vert.z ), 1.0f );
 
 		// VTX Transform
 		//
-		v4 & transformed( mVtxProjected[i].TransformedPos );
+		v4 & transformed( vtx.TransformedPos );
 		transformed = mat_world.Transform( w );
-		v4 & projected( mVtxProjected[i].ProjectedPos );
+		v4 & projected( vtx.ProjectedPos );
 		projected = mat_project.Transform( transformed );
 
-
-		// Set Clipflags //Corn
-		u32 clip_flags = 0;
-		if		(projected.x < -projected.w)	clip_flags |= X_POS;
-		else if (projected.x > projected.w)		clip_flags |= X_NEG;
-
-		if		(projected.y < -projected.w)	clip_flags |= Y_POS;
-		else if (projected.y > projected.w)		clip_flags |= Y_NEG;
-
-		if		(projected.z < -projected.w)	clip_flags |= Z_POS;
-		else if (projected.z > projected.w)		clip_flags |= Z_NEG;
-		mVtxProjected[i].ClipFlags = clip_flags;
+		vtx.InitClipFlags();
 
 		if( mTnL.Flags.Light )
 		{
@@ -1158,10 +1121,10 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 			vecTransformedNormal.Normalise();
 
 			const v3 col = LightVert(vecTransformedNormal);
-			mVtxProjected[i].Colour.x = col.x;
-			mVtxProjected[i].Colour.y = col.y;
-			mVtxProjected[i].Colour.z = col.z;
-			mVtxProjected[i].Colour.w = (f32)mn[vert.cidx+0] * (1.0f / 255.0f);
+			vtx.Colour.x = col.x;
+			vtx.Colour.y = col.y;
+			vtx.Colour.z = col.z;
+			vtx.Colour.w = (f32)mn[vert.cidx+0] * (1.0f / 255.0f);
 
 			if ( mTnL.Flags.TexGen )
 			{
@@ -1170,30 +1133,30 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 				//Env mapping
 				if( mTnL.Flags.TexGenLin )
 				{	//Cheap way to do Acos(x)/Pi //Corn
-					mVtxProjected[i].Texture.x =  0.5f - 0.25f * norm.x - 0.25f * norm.x * norm.x * norm.x;
-					mVtxProjected[i].Texture.y =  0.5f - 0.25f * norm.y - 0.25f * norm.y * norm.y * norm.y;
+					vtx.Texture.x =  0.5f - 0.25f * norm.x - 0.25f * norm.x * norm.x * norm.x;
+					vtx.Texture.y =  0.5f - 0.25f * norm.y - 0.25f * norm.y * norm.y * norm.y;
 				}
 				else
 				{
-					mVtxProjected[i].Texture.x = 0.5f * ( 1.0f + norm.x );
-					mVtxProjected[i].Texture.y = 0.5f * ( 1.0f + norm.y );
+					vtx.Texture.x = 0.5f * ( 1.0f + norm.x );
+					vtx.Texture.y = 0.5f * ( 1.0f + norm.y );
 				}
 			}
 			else
 			{
-				mVtxProjected[i].Texture.x = (float)vert.tu * mTnL.TextureScaleX;
-				mVtxProjected[i].Texture.y = (float)vert.tv * mTnL.TextureScaleY;
+				vtx.Texture.x = (float)vert.tu * mTnL.TextureScaleX;
+				vtx.Texture.y = (float)vert.tv * mTnL.TextureScaleY;
 			}
 		}
 		else
 		{
-			mVtxProjected[i].Colour.x = (f32)mn[vert.cidx+3] * (1.0f / 255.0f);
-			mVtxProjected[i].Colour.y = (f32)mn[vert.cidx+2] * (1.0f / 255.0f);
-			mVtxProjected[i].Colour.z = (f32)mn[vert.cidx+1] * (1.0f / 255.0f);
-			mVtxProjected[i].Colour.w = (f32)mn[vert.cidx+0] * (1.0f / 255.0f);
+			vtx.Colour.x = (f32)mn[vert.cidx+3] * (1.0f / 255.0f);
+			vtx.Colour.y = (f32)mn[vert.cidx+2] * (1.0f / 255.0f);
+			vtx.Colour.z = (f32)mn[vert.cidx+1] * (1.0f / 255.0f);
+			vtx.Colour.w = (f32)mn[vert.cidx+0] * (1.0f / 255.0f);
 
-			mVtxProjected[i].Texture.x = (float)vert.tu * mTnL.TextureScaleX;
-			mVtxProjected[i].Texture.y = (float)vert.tv * mTnL.TextureScaleY;
+			vtx.Texture.x = (float)vert.tu * mTnL.TextureScaleX;
+			vtx.Texture.y = (float)vert.tv * mTnL.TextureScaleY;
 		}
 	}
 }

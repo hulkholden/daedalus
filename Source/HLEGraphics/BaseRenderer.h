@@ -174,19 +174,6 @@ struct TnLParams
 	f32				FogOffs;		//Fog offset
 };
 
-// Bits for clipping
-// 543210
-// +++---
-// zyxzyx
-// NB: These are ordered such that the VFPU can generate them easily - make sure you keep the VFPU code up to date if changing these.
-#define X_NEG  0x01	//left
-#define Y_NEG  0x02	//bottom
-#define Z_NEG  0x04	//far
-#define X_POS  0x08	//right
-#define Y_POS  0x10	//top
-#define Z_POS  0x20	//near
-#define CLIP_TEST_FLAGS ( X_POS | X_NEG | Y_POS | Y_NEG | Z_POS | Z_NEG )
-
 enum CycleType
 {
 	CYCLE_1CYCLE = 0,		// Please keep in this order - matches RDP
