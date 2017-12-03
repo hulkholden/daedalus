@@ -37,6 +37,8 @@ struct DaedalusVtx4
 
 	void InitClipFlags();
 	void SetColour(const v3& col, f32 a);
+
+	void GenerateTexCoord(const v3& norm, bool linear, bool mario_hack);
 };
 
 struct TexCoord

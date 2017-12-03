@@ -762,12 +762,12 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 		if ( mTnL.Flags.Light )
 		{
 			v3 model_normal(f32( vert.norm_x ), f32( vert.norm_y ), f32( vert.norm_z ) );
-			v3 vecTransformedNormal;
-			vecTransformedNormal = mat_world.TransformNormal( model_normal );
-			vecTransformedNormal.Normalise();
+			v3 norm;
+			norm = mat_world.TransformNormal( model_normal );
+			norm.Normalise();
 
 			// Majora's Mask uses point lights.
-			v3 col = (mTnL.Flags.PointLight) ? LightPointVert(w) : LightVert(vecTransformedNormal);
+			v3 col = (mTnL.Flags.PointLight) ? LightPointVert(w) : LightVert(norm);
 			vtx.SetColour(col, vert.rgba_a * (1.0f / 255.0f));
 
 			// ENV MAPPING
@@ -777,25 +777,10 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 				// Update texture coords n.b. need to divide tu/tv by bogus scale on addition to buffer
 				// If the vert is already lit, then there is no normal (and hence we can't generate tex coord)
 #if 1			// 1->Lets use mat_world_project instead of mat_world for nicer effect (see SSV space ship) //Corn
-				vecTransformedNormal = mat_world_project.TransformNormal( model_normal );
-				vecTransformedNormal.Normalise();
+				norm = mat_world_project.TransformNormal( model_normal );
+				norm.Normalise();
 #endif
-
-				const v3 & norm = vecTransformedNormal;
-
-				if( mTnL.Flags.TexGenLin )
-				{
-					vtx.Texture.x = 0.5f * ( 1.0f + norm.x );
-					vtx.Texture.y = 0.5f * ( 1.0f + norm.y );
-				}
-				else
-				{
-					//Cheap way to do Acos(x)/Pi (abs() fixes star in SM64, sort of) //Corn
-					f32 NormX = fabsf( norm.x );
-					f32 NormY = fabsf( norm.y );
-					vtx.Texture.x =  0.5f - 0.25f * NormX - 0.25f * NormX * NormX * NormX;
-					vtx.Texture.y =  0.5f - 0.25f * NormY - 0.25f * NormY * NormY * NormY;
-				}
+				vtx.GenerateTexCoord(norm, mTnL.Flags.TexGenLin, true);
 			}
 			else
 			{
@@ -883,9 +868,8 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 		if ( mTnL.Flags.Light )
 		{
 			v3 model_normal( mn[((i<<1)+0)^3], mn[((i<<1)+1)^3], vert_in.normz );
-			v3 vecTransformedNormal = mat_world.TransformNormal( model_normal );
-			vecTransformedNormal.Normalise();
-			const v3 & norm = vecTransformedNormal;
+			v3 norm = mat_world.TransformNormal( model_normal );
+			norm.Normalise();
 			const v3 & col = mTnL.Lights[mTnL.NumLights].Colour;
 
 			v4 Pos;
@@ -949,16 +933,8 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 			// ENV MAPPING
 			if ( mTnL.Flags.TexGen )
 			{
-				if( mTnL.Flags.TexGenLin )
-				{
-					vtx.Texture.x =  0.5f - 0.25f * norm.x - 0.25f * norm.x * norm.x * norm.x;	//Cheap way to do ~Acos(x)/Pi //Corn
-					vtx.Texture.y =  0.5f - 0.25f * norm.y - 0.25f * norm.y * norm.y * norm.y;
-				}
-				else
-				{
-					vtx.Texture.x = 0.5f * ( 1.0f + norm.x );
-					vtx.Texture.y = 0.5f * ( 1.0f + norm.y );
-				}
+				// For some reason TexGenLin is inverted.
+				vtx.GenerateTexCoord(norm, !mTnL.Flags.TexGenLin, false);
 			}
 			else
 			{	//TEXTURE SCALE
@@ -1101,27 +1077,16 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 		{
 			v3	model_normal((f32)mn[vert.cidx+3], (f32)mn[vert.cidx+2], (f32)mn[vert.cidx+1] );
 
-			v3 vecTransformedNormal = mat_world.TransformNormal( model_normal );
-			vecTransformedNormal.Normalise();
+			v3 norm = mat_world.TransformNormal( model_normal );
+			norm.Normalise();
 
 			const f32 a = (f32)mn[vert.cidx+0] * (1.0f / 255.0f);
-			vtx.SetColour(LightVert(vecTransformedNormal), a);
+			vtx.SetColour(LightVert(norm), a);
 
 			if ( mTnL.Flags.TexGen )
 			{
-				const v3 & norm = vecTransformedNormal;
-
-				//Env mapping
-				if( mTnL.Flags.TexGenLin )
-				{	//Cheap way to do Acos(x)/Pi //Corn
-					vtx.Texture.x =  0.5f - 0.25f * norm.x - 0.25f * norm.x * norm.x * norm.x;
-					vtx.Texture.y =  0.5f - 0.25f * norm.y - 0.25f * norm.y * norm.y * norm.y;
-				}
-				else
-				{
-					vtx.Texture.x = 0.5f * ( 1.0f + norm.x );
-					vtx.Texture.y = 0.5f * ( 1.0f + norm.y );
-				}
+				// For some reason TexGenLin is inverted.
+				vtx.GenerateTexCoord(norm, !mTnL.Flags.TexGenLin, false);
 			}
 			else
 			{

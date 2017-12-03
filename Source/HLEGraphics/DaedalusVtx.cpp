@@ -61,3 +61,26 @@ void DaedalusVtx4::SetColour(const v3& col, f32 a)
 	Colour.z = col.z;
 	Colour.w = a;
 }
+
+void DaedalusVtx4::GenerateTexCoord(const v3& norm, bool linear, bool mario_hack)
+{
+	f32 nx = norm.x;
+	f32 ny = norm.y;
+
+	if (linear)
+	{
+		Texture.x = 0.5f * ( 1.0f + nx );
+		Texture.y = 0.5f * ( 1.0f + ny );
+	}
+	else
+	{
+		//Cheap way to do Acos(x)/Pi (abs() fixes star in SM64, sort of) //Corn
+		if (mario_hack)
+		{
+			nx = fabsf(nx);
+			ny = fabsf(ny);
+		}
+		Texture.x =  0.5f - 0.25f * nx - 0.25f * nx * nx * nx;
+		Texture.y =  0.5f - 0.25f * ny - 0.25f * ny * ny * ny;
+	}
+}
