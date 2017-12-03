@@ -572,27 +572,15 @@ static ShaderProgram * GetShaderForConfig(const ShaderConfiguration & config)
 
 void RendererGL::RestoreRenderStates()
 {
-	// Initialise the device to our default state
-
-	// No fog
 	glDisable(GL_FOG);
-
-	// We do our own culling
 	glDisable(GL_CULL_FACE);
-
-	u32 width, height;
-	CGraphicsContext::Get()->GetScreenSize(&width, &height);
-
-	glScissor(0,0, width,height);
-	glEnable(GL_SCISSOR_TEST);
-
-	// We do our own lighting
 	glDisable(GL_LIGHTING);
+	// Enable this for rendering decals (glPolygonOffset).
+	glEnable(GL_POLYGON_OFFSET_FILL);
 
 	glBlendColor(0.f, 0.f, 0.f, 0.f);
-	glBlendEquation(GL_ADD);
+	glBlendEquation(GL_FUNC_ADD);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	glDisable( GL_BLEND );
 
 	// Default is ZBuffer disabled
@@ -600,13 +588,13 @@ void RendererGL::RestoreRenderStates()
 	glDepthFunc(GL_LEQUAL);
 	glDisable(GL_DEPTH_TEST);
 
-	// Initialise all the renderstate to our defaults.
+	// TODO(strmnnrmn): Figure out why this is producing GL_INVALID_OPERATION.
 	glShadeModel(GL_SMOOTH);
 
-	//glFog(near,far,mFogColour);
-
-	// Enable this for rendering decals (glPolygonOffset).
-	glEnable(GL_POLYGON_OFFSET_FILL);
+	u32 width, height;
+	CGraphicsContext::Get()->GetScreenSize(&width, &height);
+	glScissor(0,0, width,height);
+	glEnable(GL_SCISSOR_TEST);
 }
 
 // Strip out vertex stream into separate buffers.
