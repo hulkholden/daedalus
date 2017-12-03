@@ -508,18 +508,18 @@ const v4 kNDCPlane[6] =
 	v4(  0.f, -1.f,  0.f, -1.f ),	// top
 };
 
-static u32 ClipToHyperPlane(DaedalusVtx4* dest, const DaedalusVtx4* source, u32 inCount, const v4& plane)
+static u32 ClipToHyperPlane(DaedalusVtx4* dest, const DaedalusVtx4* source, u32 in_count, const v4& plane)
 {
-	u32           outCount(0);
-	DaedalusVtx4* out(dest);
+	u32           out_count = 0;
+	DaedalusVtx4* out       = dest;
 
 	const DaedalusVtx4* b = source;
 
 	f32 b_dot_plane = b->ProjectedPos.Dot(plane);
 
-	for (u32 i = 1; i < inCount + 1; ++i)
+	for (u32 i = 1; i < in_count + 1; ++i)
 	{
-		const s32 condition = i - inCount;
+		const s32 condition = i - in_count;
 		const s32 index     = (((condition >> 31) & (i ^ condition)) ^ condition);
 
 		const DaedalusVtx4* a = &source[index];
@@ -535,14 +535,14 @@ static u32 ClipToHyperPlane(DaedalusVtx4* dest, const DaedalusVtx4* source, u32 
 				// intersect line segment with plane
 				out->Interpolate(*b, *a, b_dot_plane / (b->ProjectedPos - a->ProjectedPos).Dot(plane));
 				out++;
-				outCount++;
+				out_count++;
 			}
 			// copy current to out
 			*out = *a;
 			b    = out;
 
 			out++;
-			outCount++;
+			out_count++;
 		}
 		else
 		{
@@ -552,7 +552,7 @@ static u32 ClipToHyperPlane(DaedalusVtx4* dest, const DaedalusVtx4* source, u32 
 				// previous was inside, intersect line segment with plane
 				out->Interpolate(*b, *a, b_dot_plane / (b->ProjectedPos - a->ProjectedPos).Dot(plane));
 				out++;
-				outCount++;
+				out_count++;
 			}
 			b = a;
 		}
@@ -560,7 +560,7 @@ static u32 ClipToHyperPlane(DaedalusVtx4* dest, const DaedalusVtx4* source, u32 
 		b_dot_plane = a_dot_plane;
 	}
 
-	return outCount;
+	return out_count;
 }
 
 static u32 ClipTriToFrustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
