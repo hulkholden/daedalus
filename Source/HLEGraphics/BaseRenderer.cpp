@@ -665,59 +665,66 @@ void BaseRenderer::PrepareTrisUnclipped( TempVerts * temp_verts ) const
 	}
 }
 
-v3 BaseRenderer::LightVert( const v3 & norm ) const
+v3 BaseRenderer::LightVert(const v3& norm) const
 {
-	const v3 & col = mTnL.Lights[mTnL.NumLights].Colour;
-	v3 result( col.x, col.y, col.z );
+	const v3& col = mTnL.Lights[mTnL.NumLights].Colour;
+	v3        result(col.x, col.y, col.z);
 
-	for ( u32 l = 0; l < mTnL.NumLights; l++ )
+	for (u32 l = 0; l < mTnL.NumLights; l++)
 	{
-		f32 fCosT = norm.Dot( mTnL.Lights[l].Direction );
-		if (fCosT > 0.0f)
+		f32 norm_dot_ldir = norm.Dot(mTnL.Lights[l].Direction);
+		if (norm_dot_ldir > 0.0f)
 		{
-			result.x += mTnL.Lights[l].Colour.x * fCosT;
-			result.y += mTnL.Lights[l].Colour.y * fCosT;
-			result.z += mTnL.Lights[l].Colour.z * fCosT;
+			result.x += mTnL.Lights[l].Colour.x * norm_dot_ldir;
+			result.y += mTnL.Lights[l].Colour.y * norm_dot_ldir;
+			result.z += mTnL.Lights[l].Colour.z * norm_dot_ldir;
 		}
 	}
 
-	//Clamp to 1.0
-	if( result.x > 1.0f ) result.x = 1.0f;
-	if( result.y > 1.0f ) result.y = 1.0f;
-	if( result.z > 1.0f ) result.z = 1.0f;
+	// Clamp to 1.0
+	if (result.x > 1.0f)
+		result.x = 1.0f;
+	if (result.y > 1.0f)
+		result.y = 1.0f;
+	if (result.z > 1.0f)
+		result.z = 1.0f;
 
 	return result;
 }
 
-v3 BaseRenderer::LightPointVert( const v4 & w ) const
+v3 BaseRenderer::LightPointVert(const v4& w) const
 {
-	const v3 & col = mTnL.Lights[mTnL.NumLights].Colour;
-	v3 result( col.x, col.y, col.z );
+	const v3& col = mTnL.Lights[mTnL.NumLights].Colour;
+	v3        result(col.x, col.y, col.z);
 
-	for ( u32 l = 0; l < mTnL.NumLights; l++ )
+	for (u32 l = 0; l < mTnL.NumLights; l++)
 	{
-		if ( mTnL.Lights[l].SkipIfZero )
+		if (mTnL.Lights[l].SkipIfZero)
 		{
-			v3 distance_vec( mTnL.Lights[l].Position.x-w.x, mTnL.Lights[l].Position.y-w.y, mTnL.Lights[l].Position.z-w.z );
+			v3 distance_vec(mTnL.Lights[l].Position.x - w.x, mTnL.Lights[l].Position.y - w.y,
+			                mTnL.Lights[l].Position.z - w.z);
 
 			f32 light_qlen = distance_vec.LengthSq();
-			f32 light_llen = sqrtf( light_qlen );
+			f32 light_llen = sqrtf(light_qlen);
 
 			f32 at = mTnL.Lights[l].ca + mTnL.Lights[l].la * light_llen + mTnL.Lights[l].qa * light_qlen;
 			if (at > 0.0f)
 			{
-				f32 fCosT = 1.0f/at;
-				result.x += mTnL.Lights[l].Colour.x * fCosT;
-				result.y += mTnL.Lights[l].Colour.y * fCosT;
-				result.z += mTnL.Lights[l].Colour.z * fCosT;
+				f32 inv_at = 1.0f / at;
+				result.x += mTnL.Lights[l].Colour.x * inv_at;
+				result.y += mTnL.Lights[l].Colour.y * inv_at;
+				result.z += mTnL.Lights[l].Colour.z * inv_at;
 			}
 		}
 	}
 
-	//Clamp to 1.0
-	if( result.x > 1.0f ) result.x = 1.0f;
-	if( result.y > 1.0f ) result.y = 1.0f;
-	if( result.z > 1.0f ) result.z = 1.0f;
+	// Clamp to 1.0
+	if (result.x > 1.0f)
+		result.x = 1.0f;
+	if (result.y > 1.0f)
+		result.y = 1.0f;
+	if (result.z > 1.0f)
+		result.z = 1.0f;
 
 	return result;
 }
