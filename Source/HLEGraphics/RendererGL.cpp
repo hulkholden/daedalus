@@ -65,23 +65,27 @@ const float kShiftScales[] = {
 };
 DAEDALUS_STATIC_ASSERT(ARRAYSIZE(kShiftScales) == 16);
 
-enum
-{
-	kPositionBuffer,
-	kTexCoordBuffer,
-	kColorBuffer,
-
-	kNumBuffers,
-};
+// Create a large number of buffers an rotate through them. Otherwise the CPU
+// becomes blocked on waiting for the GPU to finish rendering the buffer.
+static const int kNumBuffers = 5000;
+static int gBufferIndex = 0;
 
 static GLuint gVAO;
-static GLuint gVBOs[kNumBuffers];
-
 const int kMaxVertices = 1000;
 
-static float 	gPositionBuffer[kMaxVertices][3];
+
+static const int kNumBufferTypes = 3;	// position, tex coords, colour.
+struct BufferData
+{
+	GLuint PositionsVBO;
+	GLuint TexCoordsVBO;
+	GLuint ColoursVBO;
+};
+static BufferData gBufferData[kNumBuffers];
+
+static float    gPositionBuffer[kMaxVertices][3];
 static TexCoord gTexCoordBuffer[kMaxVertices];
-static u32 		gColorBuffer[kMaxVertices];
+static u32      gColorBuffer[kMaxVertices];
 
 static const char* const kShaderSource = "HLEGraphics/n64.psh";
 
@@ -105,16 +109,30 @@ bool Renderer_Initialise()
 	pglGenVertexArrays(1, &gVAO);
 	pglBindVertexArray(gVAO);
 
-	glGenBuffers(kNumBuffers, gVBOs);
+	const int kNumVBOs = kNumBuffers * kNumBufferTypes;
+	GLuint* vbos = new GLuint[kNumVBOs];
+	glGenBuffers(kNumVBOs, vbos);
 
-	glBindBuffer(GL_ARRAY_BUFFER, gVBOs[kPositionBuffer]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(gPositionBuffer), gPositionBuffer, GL_DYNAMIC_DRAW);
+	int vbo_idx = 0;
+	for (int i = 0; i < kNumBuffers; i++)
+	{
+		BufferData& buffer_data = gBufferData[i];
 
-	glBindBuffer(GL_ARRAY_BUFFER, gVBOs[kTexCoordBuffer]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(gTexCoordBuffer), gTexCoordBuffer, GL_DYNAMIC_DRAW);
+		buffer_data.PositionsVBO = vbos[vbo_idx++];
+		buffer_data.TexCoordsVBO = vbos[vbo_idx++];
+		buffer_data.ColoursVBO   = vbos[vbo_idx++];
 
-	glBindBuffer(GL_ARRAY_BUFFER, gVBOs[kColorBuffer]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(gColorBuffer), gColorBuffer, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, buffer_data.PositionsVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(gPositionBuffer), nullptr, GL_DYNAMIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, buffer_data.TexCoordsVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(gTexCoordBuffer), nullptr, GL_DYNAMIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, buffer_data.ColoursVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(gColorBuffer), nullptr, GL_DYNAMIC_DRAW);
+	}
+	DAEDALUS_ASSERT(vbo_idx == kNumVBOs, "Used wrong number of vbos");
+	delete [] vbos;
 
 	DAEDALUS_ASSERT_Q(gRenderer == NULL);
 	gRenderer = new RendererGL();
@@ -465,20 +483,23 @@ static void InitShaderProgram(ShaderProgram * program, const ShaderConfiguration
 	program->uloc_tilemirror[1] = glGetUniformLocation(shader_program, "uTileMirror1");
 	program->uloc_texscale[1]   = glGetUniformLocation(shader_program, "uTexScale1");
 	program->uloc_texture[1]    = glGetUniformLocation(shader_program, "uTexture1");
+}
 
+static void BindBuffers(const ShaderProgram* program, const BufferData& buffer_data)
+{
 	GLuint attrloc;
 	attrloc = glGetAttribLocation(program->program, "in_pos");
-	glBindBuffer(GL_ARRAY_BUFFER, gVBOs[kPositionBuffer]);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer_data.PositionsVBO);
 	glEnableVertexAttribArray(attrloc);
 	glVertexAttribPointer(attrloc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	attrloc = glGetAttribLocation(program->program, "in_uv");
-	glBindBuffer(GL_ARRAY_BUFFER, gVBOs[kTexCoordBuffer]);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer_data.TexCoordsVBO);
 	glEnableVertexAttribArray(attrloc);
 	glVertexAttribPointer(attrloc, 2, GL_SHORT, GL_FALSE, 0, 0);
 
 	attrloc = glGetAttribLocation(program->program, "in_col");
-	glBindBuffer(GL_ARRAY_BUFFER, gVBOs[kColorBuffer]);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer_data.ColoursVBO);
 	glEnableVertexAttribArray(attrloc);
 	glVertexAttribPointer(attrloc, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
 }
@@ -545,7 +566,9 @@ static ShaderProgram * GetShaderForConfig(const ShaderConfiguration & config)
 	for (ShaderProgram* program : gShaders)
 	{
 		if (program->config == config)
+		{
 			return program;
+		}
 	}
 
 	char frag_shader[2048];
@@ -597,46 +620,18 @@ void RendererGL::RestoreRenderStates()
 	glEnable(GL_SCISSOR_TEST);
 }
 
-// Strip out vertex stream into separate buffers.
-// TODO(strmnnrmn): Renderer should support generating this data directly.
-void RendererGL::RenderDaedalusVtx(int prim, const DaedalusVtx * vertices, int count)
+void RendererGL::RenderDaedalusVtxStreams(int prim, int buffer_idx, const float* positions,
+                                          const TexCoord* uvs, const u32* colours, int count)
 {
-	DAEDALUS_ASSERT(count <= kMaxVertices, "Too many vertices!");
+	DAEDALUS_PROFILE("RenderDaedalusVtxStreams");
 
-	// Avoid crashing in the unlikely even that our buffers aren't long enough.
-	if (count > kMaxVertices)
-		count = kMaxVertices;
-
-	// Hack to fix the sun in Zelda OOT/MM
-	const f32 scale = ( g_ROM.ZELDA_HACK &&(gRDPOtherMode.L == 0x0c184241) ) ? 16.f : 32.f;
-
-	for (int i = 0; i < count; ++i)
-	{
-		const DaedalusVtx * vtx = &vertices[i];
-
-		gPositionBuffer[i][0] = vtx->Position.x;
-		gPositionBuffer[i][1] = vtx->Position.y;
-		gPositionBuffer[i][2] = vtx->Position.z;
-
-		// FIXME(strmnnrmn): maintain the texture coords in 10.5 format.
-		gTexCoordBuffer[i].s = (int)(vtx->Texture.x * scale);
-		gTexCoordBuffer[i].t = (int)(vtx->Texture.y * scale);
-
-		gColorBuffer[i] = vtx->Colour.GetColour();
-	}
-
-	RenderDaedalusVtxStreams(prim, &gPositionBuffer[0][0], &gTexCoordBuffer[0], &gColorBuffer[0], count);
-}
-
-void RendererGL::RenderDaedalusVtxStreams(int prim, const float * positions, const TexCoord * uvs, const u32 * colours, int count)
-{
-	glBindBuffer(GL_ARRAY_BUFFER, gVBOs[kPositionBuffer]);
+	glBindBuffer(GL_ARRAY_BUFFER, gBufferData[buffer_idx].PositionsVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 3 * count, positions);
 
-	glBindBuffer(GL_ARRAY_BUFFER, gVBOs[kTexCoordBuffer]);
+	glBindBuffer(GL_ARRAY_BUFFER, gBufferData[buffer_idx].TexCoordsVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(TexCoord) * count, uvs);
 
-	glBindBuffer(GL_ARRAY_BUFFER, gVBOs[kColorBuffer]);
+	glBindBuffer(GL_ARRAY_BUFFER, gBufferData[buffer_idx].ColoursVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(u32) * count, colours);
 
 	glDrawArrays(prim, 0, count);
@@ -832,7 +827,7 @@ inline u32 MakeMirror(u32 mirror, u32 m)
 	return (mirror && m) ? (1<<m) : 0;
 }
 
-void RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zbuffer)
+int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zbuffer)
 {
 	DAEDALUS_PROFILE( "PrepareRenderState" );
 
@@ -882,29 +877,37 @@ void RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_z
 	ShaderConfiguration config;
 	MakeShaderConfigFromCurrentState(&config);
 
+	int buffer_idx = gBufferIndex++;
+	if (gBufferIndex >= kNumBuffers)
+	{
+		gBufferIndex = 0;
+	}
+
 	const ShaderProgram * program = GetShaderForConfig(config);
 	if (program == NULL)
 	{
 		// There must have been some failure to compile the shader. Abort!
 		Console_Print("Couldn't generate a shader for mux %llx, cycle %d, alpha %d\n", config.Mux, config.CycleType, config.AlphaThreshold);
-		return;
+		return buffer_idx;
 	}
+
+	BindBuffers(program, gBufferData[buffer_idx]);
 
 	glUseProgram(program->program);
 
 	glUniformMatrix4fv(program->uloc_project, 1, GL_FALSE, mat_project.mRaw);
 
 	glUniform4f(program->uloc_primcol, mPrimitiveColour.GetRf(), mPrimitiveColour.GetGf(), mPrimitiveColour.GetBf(), mPrimitiveColour.GetAf());
-	glUniform4f(program->uloc_envcol,  mEnvColour.GetRf(),       mEnvColour.GetGf(),       mEnvColour.GetBf(),       mEnvColour.GetAf());
+	glUniform4f(program->uloc_envcol, mEnvColour.GetRf(), mEnvColour.GetGf(), mEnvColour.GetBf(), mEnvColour.GetAf());
 	glUniform1f(program->uloc_primlodfrac, mPrimLODFraction);
 
 	// Second texture is sampled in 2 cycle mode if text_lod is clear (when set,
-	// gRDPOtherMode.text_lod enables mipmapping, but we just set lod_frac to 0.
+	// gRDPOtherMode.text_lod enables mipmapping, but we just set lod_frac to 0).
 	bool use_t1 = cycle_mode == CYCLE_2CYCLE;
 
 	bool install_textures[] = { true, use_t1 };
 
-extern u32 gRDPFrame;
+	extern u32 gRDPFrame;
 	glUniform1i(program->uloc_foo, gRDPFrame);
 
 	for (u32 i = 0; i < kNumTextures; ++i)
@@ -962,11 +965,13 @@ extern u32 gRDPFrame;
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mTexWrap[i].v);
 		}
 	}
+
+	return buffer_idx;
 }
 
 // FIXME(strmnnrmn): for fill/copy modes this does more work than needed.
 // It ends up copying colour/uv coords when not needed, and can use a shader uniform for the fill colour.
-void RendererGL::RenderTriangles( DaedalusVtx * p_vertices, u32 num_vertices, bool disable_zbuffer )
+void RendererGL::RenderTriangles( DaedalusVtx * vertices, u32 num_vertices, bool disable_zbuffer )
 {
 	DAEDALUS_PROFILE( "RenderTriangles" );
 
@@ -989,15 +994,43 @@ void RendererGL::RenderTriangles( DaedalusVtx * p_vertices, u32 num_vertices, bo
 				float h = (float)texture->GetCorrectedHeight();
 				for (u32 i = 0; i < num_vertices; ++i)
 				{
-					p_vertices[i].Texture.x = (p_vertices[i].Texture.x * w) + x;
-					p_vertices[i].Texture.y = (p_vertices[i].Texture.y * h) + y;
+					vertices[i].Texture.x = (vertices[i].Texture.x * w) + x;
+					vertices[i].Texture.y = (vertices[i].Texture.y * h) + y;
 				}
 			}
 		}
 	}
 
-	PrepareRenderState(mProjection, disable_zbuffer);
-	RenderDaedalusVtx(GL_TRIANGLES, p_vertices, num_vertices);
+	int buffer_idx = PrepareRenderState(mProjection, disable_zbuffer);
+
+	// Strip out vertex stream into separate buffers.
+	// TODO(strmnnrmn): Renderer should support generating this data directly.
+	DAEDALUS_ASSERT(num_vertices <= kMaxVertices, "Too many vertices!");
+
+	// Avoid crashing in the unlikely even that our buffers aren't long enough.
+	if (num_vertices > kMaxVertices)
+		num_vertices = kMaxVertices;
+
+	// Hack to fix the sun in Zelda OOT/MM
+	const f32 scale = ( g_ROM.ZELDA_HACK &&(gRDPOtherMode.L == 0x0c184241) ) ? 16.f : 32.f;
+
+	for (int i = 0; i < num_vertices; ++i)
+	{
+		const DaedalusVtx * vtx = &vertices[i];
+
+		gPositionBuffer[i][0] = vtx->Position.x;
+		gPositionBuffer[i][1] = vtx->Position.y;
+		gPositionBuffer[i][2] = vtx->Position.z;
+
+		// FIXME(strmnnrmn): maintain the texture coords in 10.5 format.
+		gTexCoordBuffer[i].s = (int)(vtx->Texture.x * scale);
+		gTexCoordBuffer[i].t = (int)(vtx->Texture.y * scale);
+
+		gColorBuffer[i] = vtx->Colour.GetColour();
+	}
+
+	RenderDaedalusVtxStreams(GL_TRIANGLES, buffer_idx, &gPositionBuffer[0][0], &gTexCoordBuffer[0], &gColorBuffer[0],
+	                         num_vertices);
 }
 
 void RendererGL::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord st0, TexCoord st1 )
@@ -1010,7 +1043,7 @@ void RendererGL::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord
 	// We have to do it before PrepareRenderState, because those values are applied to the graphics state.
 	PrepareTexRectUVs(&st0, &st1);
 
-	PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
+	int buffer_idx = PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
 	v2 screen0 = ConvertN64ToScreen(xy0);
 	v2 screen1 = ConvertN64ToScreen(xy1);
@@ -1041,7 +1074,7 @@ void RendererGL::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord
 		0xffffffff,
 	};
 
-	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, positions, uvs, colours, 4);
+	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, colours, 4);
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	++mNumRect;
@@ -1056,7 +1089,7 @@ void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexC
 	// We have to do it before PrepareRenderState, because those values are applied to the graphics state.
 	PrepareTexRectUVs(&st0, &st1);
 
-	PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
+	int buffer_idx = PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
 	v2 screen0 = ConvertN64ToScreen(xy0);
 	v2 screen1 = ConvertN64ToScreen(xy1);
@@ -1087,7 +1120,7 @@ void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexC
 		0xffffffff,
 	};
 
-	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, positions, uvs, colours, 4);
+	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, colours, 4);
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	++mNumRect;
@@ -1096,7 +1129,7 @@ void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexC
 
 void RendererGL::FillRect( const v2 & xy0, const v2 & xy1, u32 color )
 {
-	PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
+	int buffer_idx = PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
 	v2 screen0 = ConvertN64ToScreen(xy0);
 	v2 screen1 = ConvertN64ToScreen(xy1);
@@ -1127,7 +1160,7 @@ void RendererGL::FillRect( const v2 & xy0, const v2 & xy1, u32 color )
 		color,
 	};
 
-	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, positions, uvs, colours, 4);
+	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, colours, 4);
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	++mNumRect;
@@ -1143,7 +1176,7 @@ void RendererGL::Draw2DTexture(f32 x0, f32 y0, f32 x1, f32 y1,
 	// FIXME(strmnnrmn): is this right? Gross anyway.
 	gRDPOtherMode.cycle_type = CYCLE_COPY;
 
-	PrepareRenderState(mScreenToDevice, false /* disable_depth */);
+	int buffer_idx = PrepareRenderState(mScreenToDevice, false /* disable_depth */);
 
 	glEnable(GL_BLEND);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1180,7 +1213,7 @@ void RendererGL::Draw2DTexture(f32 x0, f32 y0, f32 x1, f32 y1,
 		0xffffffff,
 	};
 
-	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, positions, uvs, colours, 4);
+	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, colours, 4);
 }
 
 void RendererGL::Draw2DTextureR(f32 x0, f32 y0,
@@ -1194,7 +1227,7 @@ void RendererGL::Draw2DTextureR(f32 x0, f32 y0,
 	// FIXME(strmnnrmn): is this right? Gross anyway.
 	gRDPOtherMode.cycle_type = CYCLE_COPY;
 
-	PrepareRenderState(mScreenToDevice, false /* disable_depth */);
+	int buffer_idx = PrepareRenderState(mScreenToDevice, false /* disable_depth */);
 
 	glEnable(GL_BLEND);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1225,5 +1258,5 @@ void RendererGL::Draw2DTextureR(f32 x0, f32 y0,
 		0xffffffff,
 	};
 
-	RenderDaedalusVtxStreams(GL_TRIANGLE_FAN, positions, uvs, colours, 4);
+	RenderDaedalusVtxStreams(GL_TRIANGLE_FAN, buffer_idx, positions, uvs, colours, 4);
 }
