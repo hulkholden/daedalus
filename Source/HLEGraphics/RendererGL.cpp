@@ -34,17 +34,6 @@ static std::string	 					gN64FramentLibrary;
 
 static const u32 kNumTextures = 2;
 
-#define RESOLVE_GL_FCN(type, var, name) \
-    if (status == GL_TRUE) \
-    {\
-        var = (type)glfwGetProcAddress((name));\
-        if ((var) == NULL)\
-        {\
-            status = GL_FALSE;\
-        }\
-    }
-
-
 static const float kShiftScales[] = {
     1.f / (float)(1 << 0),
     1.f / (float)(1 << 1),
@@ -105,11 +94,15 @@ bool Renderer_Initialise()
 	}
 
 	// FIXME(strmnnrmn): we shouldn't need these with GLEW, but they don't seem to resolve on OSX.
-    GLboolean status = GL_TRUE;
-    RESOLVE_GL_FCN(PFN_glGenVertexArrays, pglGenVertexArrays, "glGenVertexArrays");
-    RESOLVE_GL_FCN(PFN_glDeleteVertexArrays, pglDeleteVertexArrays, "glDeleteVertexArrays");
-    RESOLVE_GL_FCN(PFN_glBindVertexArray, pglBindVertexArray, "glBindVertexArray");
+    pglGenVertexArrays = (PFN_glGenVertexArrays)glfwGetProcAddress("glGenVertexArrays");
+    pglDeleteVertexArrays = (PFN_glDeleteVertexArrays)glfwGetProcAddress("glDeleteVertexArrays");
+    pglBindVertexArray = (PFN_glBindVertexArray)glfwGetProcAddress("glBindVertexArray");
 
+    if (!pglGenVertexArrays || !pglBindVertexArray)
+    {
+		fprintf(stderr, "ERROR: required OpenGL methods not found\n");
+		return false;
+    }
 	pglGenVertexArrays(1, &gVAO);
 	pglBindVertexArray(gVAO);
 
