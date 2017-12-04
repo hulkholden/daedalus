@@ -850,11 +850,8 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 		//
 		v4 w( f32( vert_in.x ), f32( vert_in.y ), f32( vert_in.z ), 1.0f );
 
-		v4 & transformed( vtx.TransformedPos );
-		transformed = mat_world.Transform( w );
-
-		v4 & projected( vtx.ProjectedPos );
-		projected = mat_project.Transform( transformed );
+		vtx.TransformedPos = mat_world.Transform( w );
+		vtx.ProjectedPos = mat_project.Transform( vtx.TransformedPos );
 
 		vtx.InitClipFlags();
 
@@ -872,11 +869,11 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 			norm.Normalise();
 			const v3 & col = mTnL.Lights[mTnL.NumLights].Colour;
 
-			v4 Pos;
-			Pos.x = (projected.x + mTnL.CoordMod[8]) * mTnL.CoordMod[12];
-			Pos.y = (projected.y + mTnL.CoordMod[9]) * mTnL.CoordMod[13];
-			Pos.z = (projected.z + mTnL.CoordMod[10])* mTnL.CoordMod[14];
-			Pos.w = (projected.w + mTnL.CoordMod[11])* mTnL.CoordMod[15];
+			v4 pos;
+			pos.x = (vtx.ProjectedPos.x + mTnL.CoordMod[8]) * mTnL.CoordMod[12];
+			pos.y = (vtx.ProjectedPos.y + mTnL.CoordMod[9]) * mTnL.CoordMod[13];
+			pos.z = (vtx.ProjectedPos.z + mTnL.CoordMod[10])* mTnL.CoordMod[14];
+			pos.w = (vtx.ProjectedPos.w + mTnL.CoordMod[11])* mTnL.CoordMod[15];
 
 			v3 result( col.x, col.y, col.z );
 
@@ -890,7 +887,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 						f32 fCosT = norm.Dot( mTnL.Lights[l].Direction );
 						if (fCosT > 0.0f)
 						{
-							f32 pi = mTnL.Lights[l].Iscale / (Pos - mTnL.Lights[l].Position).LengthSq();
+							f32 pi = mTnL.Lights[l].Iscale / (pos - mTnL.Lights[l].Position).LengthSq();
 							if (pi < 1.0f) fCosT *= pi;
 
 							result.x += mTnL.Lights[l].Colour.x * fCosT;
@@ -914,7 +911,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 				{
 					if ( mTnL.Lights[l].SkipIfZero )
 					{
-						f32 pi = mTnL.Lights[l].Iscale / (Pos - mTnL.Lights[l].Position).LengthSq();
+						f32 pi = mTnL.Lights[l].Iscale / (pos - mTnL.Lights[l].Position).LengthSq();
 						if (pi > 1.0f) pi = 1.0f;
 
 						result.x += mTnL.Lights[l].Colour.x * pi;
@@ -989,11 +986,10 @@ void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboar
 
 			w = mat.TransformNormal( w );
 
-			v4 & transformed( vtx.TransformedPos );
-			transformed.x = BaseVec.x + w.x;
-			transformed.y = BaseVec.y + w.y;
-			transformed.z = BaseVec.z + w.z;
-			transformed.w = 1.0f;
+			vtx.TransformedPos.x = BaseVec.x + w.x;
+			vtx.TransformedPos.y = BaseVec.y + w.y;
+			vtx.TransformedPos.z = BaseVec.z + w.z;
+			vtx.TransformedPos.w = 1.0f;
 
 			// Set Clipflags, zero clippflags if billbording //Corn
 			vtx.ClipFlags = 0;
@@ -1017,18 +1013,17 @@ void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboar
 			mWPmodified = false;
 			SetProjectionMatrix(mat_world_project);
 		}
+
 		for (u32 i = v0; i < v0 + n; i++)
 		{
 			DaedalusVtx4& vtx = mVtxProjected[i];
 
-			v4 & transformed( vtx.TransformedPos );
-			transformed.x = *(s16*)((pVtxBase + 0) ^ 2);
-			transformed.y = *(s16*)((pVtxBase + 2) ^ 2);
-			transformed.z = *(s16*)((pVtxBase + 4) ^ 2);
-			transformed.w = 1.0f;
+			vtx.TransformedPos.x = *(s16*)((pVtxBase + 0) ^ 2);
+			vtx.TransformedPos.y = *(s16*)((pVtxBase + 2) ^ 2);
+			vtx.TransformedPos.z = *(s16*)((pVtxBase + 4) ^ 2);
+			vtx.TransformedPos.w = 1.0f;
 
-			v4 & projected( vtx.ProjectedPos );
-			projected = mat_world_project.Transform( transformed );	//Do projection
+			vtx.ProjectedPos = mat_world_project.Transform( vtx.TransformedPos );
 
 			vtx.InitClipFlags();
 
