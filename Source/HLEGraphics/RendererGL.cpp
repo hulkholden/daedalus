@@ -504,61 +504,6 @@ static void BindBuffers(const ShaderProgram* program, const BufferData& buffer_d
 	glVertexAttribPointer(attrloc, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
 }
 
-void RendererGL::MakeShaderConfigFromCurrentState(ShaderConfiguration * config) const
-{
-	config->Mux = mMux;
-	config->CycleType = gRDPOtherMode.cycle_type;
-	config->AlphaThreshold = 0;
-	config->BilerpFilter = true;
-	config->ClampS0 = false;
-	config->ClampT0 = false;
-	config->ClampS1 = false;
-	config->ClampT1 = false;
-
-	// Initiate Alpha test
-	if( (gRDPOtherMode.alpha_compare == G_AC_THRESHOLD) && !gRDPOtherMode.alpha_cvg_sel )
-	{
-		// G_AC_THRESHOLD || G_AC_DITHER
-		// FIXME(strmnnrmn): alpha func: (mAlphaThreshold | g_ROM.ALPHA_HACK) ? GL_GEQUAL : GL_GREATER
-		config->AlphaThreshold = mBlendColour.GetA();
-	}
-	else if (gRDPOtherMode.cvg_x_alpha)
-	{
-		// Going over 0x70 brakes OOT, but going lesser than that makes lines on games visible...ex: Paper Mario.
-		// ALso going over 0x30 breaks the birds in Tarzan :(. Need to find a better way to leverage this.
-		config->AlphaThreshold = 0x70;
-	}
-	else
-	{
-		// Use CVG for pixel alpha
-		config->AlphaThreshold = 0;
-	}
-
-	// In fill/cycle modes, we ignore the mux. Set it to zero so we don't create unecessary shaders.
-	u32 cycle_type = config->CycleType;
-	if (cycle_type == CYCLE_FILL || cycle_type == CYCLE_COPY)
-		config->Mux = 0;
-
-	// Not sure about this. Should CYCLE_FILL have alpha kill?
-	if (cycle_type == CYCLE_FILL)
-		config->AlphaThreshold = 0;
-
-	config->BilerpFilter = (gRDPOtherMode.text_filt != G_TF_POINT) || (gGlobalPreferences.ForceLinearFilter);
-
-	// If running the bilinear filter, check if we need to clamp in S or T.
-	// Really, this is checking to see how we set mTexWrap in PrepareTexRectUVs.
-	// Fixes California Speed, Mario Kart backgrounds.
-	// (NB: better fix for California Speed is just to force a point filter...)
-	if (config->BilerpFilter)
-	{
-		config->ClampS0 = mTexWrap[0].u == GL_CLAMP_TO_EDGE;
-		config->ClampT0 = mTexWrap[0].v == GL_CLAMP_TO_EDGE;
-
-		config->ClampS1 = mTexWrap[1].u == GL_CLAMP_TO_EDGE;
-		config->ClampT1 = mTexWrap[1].v == GL_CLAMP_TO_EDGE;
-	}
-}
-
 static ShaderProgram * GetShaderForConfig(const ShaderConfiguration & config)
 {
 	DAEDALUS_ASSERT( !gN64FramentLibrary.empty(), "Haven't initialised the n64 fragment library" );
@@ -589,57 +534,6 @@ static ShaderProgram * GetShaderForConfig(const ShaderConfiguration & config)
 	gShaders.push_back(program);
 
 	return program;
-}
-
-void RendererGL::RestoreRenderStates()
-{
-	glDisable(GL_FOG);
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_LIGHTING);
-	// Enable this for rendering decals (glPolygonOffset).
-	glEnable(GL_POLYGON_OFFSET_FILL);
-
-	glBlendColor(0.f, 0.f, 0.f, 0.f);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable( GL_BLEND );
-
-	// Default is ZBuffer disabled
-	glDepthMask(GL_FALSE);		// GL_FALSE to disable z-writes
-	glDepthFunc(GL_LEQUAL);
-	glDisable(GL_DEPTH_TEST);
-
-	// TODO(strmnnrmn): Figure out why this is producing GL_INVALID_OPERATION.
-	glShadeModel(GL_SMOOTH);
-
-	u32 width, height;
-	CGraphicsContext::Get()->GetScreenSize(&width, &height);
-	glScissor(0,0, width,height);
-	glEnable(GL_SCISSOR_TEST);
-}
-
-void RendererGL::RenderDaedalusVtxStreams(int prim, int buffer_idx, const float* positions,
-                                          const TexCoord* uvs, const u32* colours, int count)
-{
-	DAEDALUS_PROFILE("RenderDaedalusVtxStreams");
-
-	// Ensure we're not trying to render more verts than the underlying VBOs have capacity for.
-	if (count > kMaxVertices)
-	{
-		DAEDALUS_ASSERT(false, "Too many vertices! %d", count);
-		count = kMaxVertices;
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, gBufferData[buffer_idx].PositionsVBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 3 * count, positions);
-
-	glBindBuffer(GL_ARRAY_BUFFER, gBufferData[buffer_idx].TexCoordsVBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(TexCoord) * count, uvs);
-
-	glBindBuffer(GL_ARRAY_BUFFER, gBufferData[buffer_idx].ColoursVBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(u32) * count, colours);
-
-	glDrawArrays(prim, 0, count);
 }
 
 /*
@@ -974,6 +868,88 @@ int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zb
 	return buffer_idx;
 }
 
+void RendererGL::MakeShaderConfigFromCurrentState(ShaderConfiguration * config) const
+{
+	config->Mux = mMux;
+	config->CycleType = gRDPOtherMode.cycle_type;
+	config->AlphaThreshold = 0;
+	config->BilerpFilter = true;
+	config->ClampS0 = false;
+	config->ClampT0 = false;
+	config->ClampS1 = false;
+	config->ClampT1 = false;
+
+	// Initiate Alpha test
+	if( (gRDPOtherMode.alpha_compare == G_AC_THRESHOLD) && !gRDPOtherMode.alpha_cvg_sel )
+	{
+		// G_AC_THRESHOLD || G_AC_DITHER
+		// FIXME(strmnnrmn): alpha func: (mAlphaThreshold | g_ROM.ALPHA_HACK) ? GL_GEQUAL : GL_GREATER
+		config->AlphaThreshold = mBlendColour.GetA();
+	}
+	else if (gRDPOtherMode.cvg_x_alpha)
+	{
+		// Going over 0x70 brakes OOT, but going lesser than that makes lines on games visible...ex: Paper Mario.
+		// ALso going over 0x30 breaks the birds in Tarzan :(. Need to find a better way to leverage this.
+		config->AlphaThreshold = 0x70;
+	}
+	else
+	{
+		// Use CVG for pixel alpha
+		config->AlphaThreshold = 0;
+	}
+
+	// In fill/cycle modes, we ignore the mux. Set it to zero so we don't create unecessary shaders.
+	u32 cycle_type = config->CycleType;
+	if (cycle_type == CYCLE_FILL || cycle_type == CYCLE_COPY)
+		config->Mux = 0;
+
+	// Not sure about this. Should CYCLE_FILL have alpha kill?
+	if (cycle_type == CYCLE_FILL)
+		config->AlphaThreshold = 0;
+
+	config->BilerpFilter = (gRDPOtherMode.text_filt != G_TF_POINT) || (gGlobalPreferences.ForceLinearFilter);
+
+	// If running the bilinear filter, check if we need to clamp in S or T.
+	// Really, this is checking to see how we set mTexWrap in PrepareTexRectUVs.
+	// Fixes California Speed, Mario Kart backgrounds.
+	// (NB: better fix for California Speed is just to force a point filter...)
+	if (config->BilerpFilter)
+	{
+		config->ClampS0 = mTexWrap[0].u == GL_CLAMP_TO_EDGE;
+		config->ClampT0 = mTexWrap[0].v == GL_CLAMP_TO_EDGE;
+
+		config->ClampS1 = mTexWrap[1].u == GL_CLAMP_TO_EDGE;
+		config->ClampT1 = mTexWrap[1].v == GL_CLAMP_TO_EDGE;
+	}
+}
+
+void RendererGL::RestoreRenderStates()
+{
+	glDisable(GL_FOG);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_LIGHTING);
+	// Enable this for rendering decals (glPolygonOffset).
+	glEnable(GL_POLYGON_OFFSET_FILL);
+
+	glBlendColor(0.f, 0.f, 0.f, 0.f);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable( GL_BLEND );
+
+	// Default is ZBuffer disabled
+	glDepthMask(GL_FALSE);		// GL_FALSE to disable z-writes
+	glDepthFunc(GL_LEQUAL);
+	glDisable(GL_DEPTH_TEST);
+
+	// TODO(strmnnrmn): Figure out why this is producing GL_INVALID_OPERATION.
+	glShadeModel(GL_SMOOTH);
+
+	u32 width, height;
+	CGraphicsContext::Get()->GetScreenSize(&width, &height);
+	glScissor(0,0, width,height);
+	glEnable(GL_SCISSOR_TEST);
+}
+
 // FIXME(strmnnrmn): for fill/copy modes this does more work than needed.
 // It ends up copying colour/uv coords when not needed, and can use a shader uniform for the fill colour.
 void RendererGL::RenderTriangles(const float* positions, const TexCoord* uvs, const u32* colours, u32 num_vertices,
@@ -1182,4 +1158,28 @@ void RendererGL::Draw2DTextureR(f32 x0, f32 y0,
 	};
 
 	RenderDaedalusVtxStreams(GL_TRIANGLE_FAN, buffer_idx, positions, uvs, kAllWhite, 4);
+}
+
+void RendererGL::RenderDaedalusVtxStreams(int prim, int buffer_idx, const float* positions,
+                                          const TexCoord* uvs, const u32* colours, int count)
+{
+	DAEDALUS_PROFILE("RenderDaedalusVtxStreams");
+
+	// Ensure we're not trying to render more verts than the underlying VBOs have capacity for.
+	if (count > kMaxVertices)
+	{
+		DAEDALUS_ASSERT(false, "Too many vertices! %d", count);
+		count = kMaxVertices;
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, gBufferData[buffer_idx].PositionsVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 3 * count, positions);
+
+	glBindBuffer(GL_ARRAY_BUFFER, gBufferData[buffer_idx].TexCoordsVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(TexCoord) * count, uvs);
+
+	glBindBuffer(GL_ARRAY_BUFFER, gBufferData[buffer_idx].ColoursVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(u32) * count, colours);
+
+	glDrawArrays(prim, 0, count);
 }
