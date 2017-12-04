@@ -879,16 +879,15 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 			Pos.w = (projected.w + mTnL.CoordMod[11])* mTnL.CoordMod[15];
 
 			v3 result( col.x, col.y, col.z );
-			f32 fCosT;
-			u32 l;
 
 			if ( mTnL.Flags.PointLight )
 			{	//POINT LIGHT
+				int l;
 				for (l = 0; l < mTnL.NumLights-1; l++)
 				{
 					if ( mTnL.Lights[l].SkipIfZero )
 					{
-						fCosT = norm.Dot( mTnL.Lights[l].Direction );
+						f32 fCosT = norm.Dot( mTnL.Lights[l].Direction );
 						if (fCosT > 0.0f)
 						{
 							f32 pi = mTnL.Lights[l].Iscale / (Pos - mTnL.Lights[l].Position).LengthSq();
@@ -901,7 +900,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 					}
 				}
 
-				fCosT = norm.Dot( mTnL.Lights[l].Direction );
+				f32 fCosT = norm.Dot( mTnL.Lights[l].Direction );
 				if (fCosT > 0.0f)
 				{
 					result.x += mTnL.Lights[l].Colour.x * fCosT;
@@ -911,7 +910,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 			}
 			else
 			{	//NORMAL LIGHT
-				for (l = 0; l < mTnL.NumLights; l++)
+				for (int l = 0; l < mTnL.NumLights; l++)
 				{
 					if ( mTnL.Lights[l].SkipIfZero )
 					{
