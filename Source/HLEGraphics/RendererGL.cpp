@@ -178,6 +178,8 @@ inline bool operator==(const ShaderConfiguration & a, const ShaderConfiguration 
 
 struct ShaderProgram
 {
+	ShaderProgram(const ShaderConfiguration & config, GLuint shader_program);
+
 	ShaderConfiguration config;
 	GLuint 				program;
 
@@ -456,34 +458,31 @@ static void SprintShader(char (&frag_shader)[2048], const ShaderConfiguration & 
 	sprintf(frag_shader, default_fragment_shader_fmt, body);
 }
 
-static void InitShaderProgram(ShaderProgram * program, const ShaderConfiguration & config, GLuint shader_program)
+ShaderProgram::ShaderProgram(const ShaderConfiguration& shader_config, GLuint shader_program)
+    : config(shader_config), program(shader_program)
 {
-	program->config            = config;
-	program->program           = shader_program;
-	program->uloc_project      = glGetUniformLocation(shader_program, "uProject");
-	program->uloc_primcol      = glGetUniformLocation(shader_program, "uPrimColour");
-	program->uloc_envcol       = glGetUniformLocation(shader_program, "uEnvColour");
-	program->uloc_primlodfrac  = glGetUniformLocation(shader_program, "uPrimLODFrac");
+	uloc_project     = glGetUniformLocation(shader_program, "uProject");
+	uloc_primcol     = glGetUniformLocation(shader_program, "uPrimColour");
+	uloc_envcol      = glGetUniformLocation(shader_program, "uEnvColour");
+	uloc_primlodfrac = glGetUniformLocation(shader_program, "uPrimLODFrac");
 
-	program->uloc_foo			= glGetUniformLocation(shader_program, "uFoo");
+	uloc_tileclamp[0]  = glGetUniformLocation(shader_program, "uTileClampEnable0");
+	uloc_tiletl[0]     = glGetUniformLocation(shader_program, "uTileTL0");
+	uloc_tilebr[0]     = glGetUniformLocation(shader_program, "uTileBR0");
+	uloc_tileshift[0]  = glGetUniformLocation(shader_program, "uTileShift0");
+	uloc_tilemask[0]   = glGetUniformLocation(shader_program, "uTileMask0");
+	uloc_tilemirror[0] = glGetUniformLocation(shader_program, "uTileMirror0");
+	uloc_texscale[0]   = glGetUniformLocation(shader_program, "uTexScale0");
+	uloc_texture[0]    = glGetUniformLocation(shader_program, "uTexture0");
 
-	program->uloc_tileclamp[0]  = glGetUniformLocation(shader_program, "uTileClampEnable0");
-	program->uloc_tiletl[0]     = glGetUniformLocation(shader_program, "uTileTL0");
-	program->uloc_tilebr[0]     = glGetUniformLocation(shader_program, "uTileBR0");
-	program->uloc_tileshift[0]  = glGetUniformLocation(shader_program, "uTileShift0");
-	program->uloc_tilemask[0]   = glGetUniformLocation(shader_program, "uTileMask0");
-	program->uloc_tilemirror[0] = glGetUniformLocation(shader_program, "uTileMirror0");
-	program->uloc_texscale[0]   = glGetUniformLocation(shader_program, "uTexScale0");
-	program->uloc_texture [0]   = glGetUniformLocation(shader_program, "uTexture0");
-
-	program->uloc_tileclamp[1]  = glGetUniformLocation(shader_program, "uTileClampEnable1");
-	program->uloc_tiletl[1]     = glGetUniformLocation(shader_program, "uTileTL1");
-	program->uloc_tilebr[1]     = glGetUniformLocation(shader_program, "uTileBR1");
-	program->uloc_tileshift[1]  = glGetUniformLocation(shader_program, "uTileShift1");
-	program->uloc_tilemask[1]   = glGetUniformLocation(shader_program, "uTileMask1");
-	program->uloc_tilemirror[1] = glGetUniformLocation(shader_program, "uTileMirror1");
-	program->uloc_texscale[1]   = glGetUniformLocation(shader_program, "uTexScale1");
-	program->uloc_texture[1]    = glGetUniformLocation(shader_program, "uTexture1");
+	uloc_tileclamp[1]  = glGetUniformLocation(shader_program, "uTileClampEnable1");
+	uloc_tiletl[1]     = glGetUniformLocation(shader_program, "uTileTL1");
+	uloc_tilebr[1]     = glGetUniformLocation(shader_program, "uTileBR1");
+	uloc_tileshift[1]  = glGetUniformLocation(shader_program, "uTileShift1");
+	uloc_tilemask[1]   = glGetUniformLocation(shader_program, "uTileMask1");
+	uloc_tilemirror[1] = glGetUniformLocation(shader_program, "uTileMirror1");
+	uloc_texscale[1]   = glGetUniformLocation(shader_program, "uTexScale1");
+	uloc_texture[1]    = glGetUniformLocation(shader_program, "uTexture1");
 }
 
 static void BindBuffers(const ShaderProgram* program, const BufferData& buffer_data)
@@ -586,8 +585,7 @@ static ShaderProgram * GetShaderForConfig(const ShaderConfiguration & config)
 		return NULL;
 	}
 
-	ShaderProgram * program = new ShaderProgram;
-	InitShaderProgram(program, config, shader_program);
+	ShaderProgram * program = new ShaderProgram(config, shader_program);
 	gShaders.push_back(program);
 
 	return program;

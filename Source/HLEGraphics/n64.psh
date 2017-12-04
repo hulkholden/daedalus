@@ -26,8 +26,6 @@ uniform vec2  uTileShift1;
 uniform ivec2 uTileMask1;
 uniform ivec2 uTileMirror1;
 
-uniform int uFoo;
-
 
 ivec2 imix(ivec2 a, ivec2 b, bvec2 c)
 {
