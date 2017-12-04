@@ -45,7 +45,7 @@ static const u32 kNumTextures = 2;
     }
 
 
-const float kShiftScales[] = {
+static const float kShiftScales[] = {
     1.f / (float)(1 << 0),
     1.f / (float)(1 << 1),
     1.f / (float)(1 << 2),
@@ -64,6 +64,14 @@ const float kShiftScales[] = {
     (float)(1 << 1),
 };
 DAEDALUS_STATIC_ASSERT(ARRAYSIZE(kShiftScales) == 16);
+
+static const u32 kAllWhite[] = {
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+};
+
 
 // Create a large number of buffers an rotate through them. Otherwise the CPU
 // becomes blocked on waiting for the GPU to finish rendering the buffer.
@@ -1016,14 +1024,7 @@ void RendererGL::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord
 		TexCoord( st1.s, st1.t ),
 	};
 
-	u32 colours[] = {
-		0xffffffff,
-		0xffffffff,
-		0xffffffff,
-		0xffffffff,
-	};
-
-	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, colours, 4);
+	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, kAllWhite, 4);
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	++mNumRect;
@@ -1062,14 +1063,7 @@ void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexC
 		TexCoord( st1.s, st1.t ),
 	};
 
-	u32 colours[] = {
-		0xffffffff,
-		0xffffffff,
-		0xffffffff,
-		0xffffffff,
-	};
-
-	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, colours, 4);
+	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, kAllWhite, 4);
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	++mNumRect;
@@ -1155,14 +1149,7 @@ void RendererGL::Draw2DTexture(f32 x0, f32 y0, f32 x1, f32 y1,
 		TexCoord( u1, v1 ),
 	};
 
-	u32 colours[] = {
-		0xffffffff,
-		0xffffffff,
-		0xffffffff,
-		0xffffffff,
-	};
-
-	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, colours, 4);
+	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, kAllWhite, 4);
 }
 
 void RendererGL::Draw2DTextureR(f32 x0, f32 y0,
@@ -1200,12 +1187,5 @@ void RendererGL::Draw2DTextureR(f32 x0, f32 y0,
 		TexCoord( 0.f,   t ),
 	};
 
-	u32 colours[] = {
-		0xffffffff,
-		0xffffffff,
-		0xffffffff,
-		0xffffffff,
-	};
-
-	RenderDaedalusVtxStreams(GL_TRIANGLE_FAN, buffer_idx, positions, uvs, colours, 4);
+	RenderDaedalusVtxStreams(GL_TRIANGLE_FAN, buffer_idx, positions, uvs, kAllWhite, 4);
 }
