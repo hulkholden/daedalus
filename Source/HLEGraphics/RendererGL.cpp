@@ -174,24 +174,26 @@ struct ShaderProgram
 	ShaderProgram(const ShaderConfiguration & config, GLuint shader_program);
 
 	ShaderConfiguration config;
-	GLuint 				program;
+	GLuint              program;
 
-	GLint				uloc_project;
-	GLint				uloc_primcol;
-	GLint				uloc_envcol;
-	GLint				uloc_primlodfrac;
+	GLint uloc_project;
+	GLint uloc_primcol;
+	GLint uloc_envcol;
+	GLint uloc_primlodfrac;
 
-	GLint				uloc_tileclamp[kNumTextures];
-	GLint				uloc_tiletl[kNumTextures];
-	GLint				uloc_tilebr[kNumTextures];
-	GLint				uloc_tileshift[kNumTextures];
-	GLint				uloc_tilemask[kNumTextures];
-	GLint				uloc_tilemirror[kNumTextures];
+	GLint uloc_tileclamp[kNumTextures];
+	GLint uloc_tiletl[kNumTextures];
+	GLint uloc_tilebr[kNumTextures];
+	GLint uloc_tileshift[kNumTextures];
+	GLint uloc_tilemask[kNumTextures];
+	GLint uloc_tilemirror[kNumTextures];
 
-	GLint				uloc_texscale[kNumTextures];
-	GLint				uloc_texture[kNumTextures];
+	GLint uloc_texscale[kNumTextures];
+	GLint uloc_texture[kNumTextures];
 
-	GLint				uloc_foo;
+	GLuint pos_loc;
+	GLuint uv_loc;
+	GLuint col_loc;
 };
 static std::vector<ShaderProgram *>		gShaders;
 
@@ -476,25 +478,25 @@ ShaderProgram::ShaderProgram(const ShaderConfiguration& shader_config, GLuint sh
 	uloc_tilemirror[1] = glGetUniformLocation(shader_program, "uTileMirror1");
 	uloc_texscale[1]   = glGetUniformLocation(shader_program, "uTexScale1");
 	uloc_texture[1]    = glGetUniformLocation(shader_program, "uTexture1");
+
+	pos_loc = glGetAttribLocation(program, "in_pos");
+	uv_loc = glGetAttribLocation(program, "in_uv");
+	col_loc = glGetAttribLocation(program, "in_col");
 }
 
 static void BindBuffers(const ShaderProgram* program, const BufferData& buffer_data)
 {
-	GLuint attrloc;
-	attrloc = glGetAttribLocation(program->program, "in_pos");
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_data.PositionsVBO);
-	glEnableVertexAttribArray(attrloc);
-	glVertexAttribPointer(attrloc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(program->pos_loc);
+	glVertexAttribPointer(program->pos_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	attrloc = glGetAttribLocation(program->program, "in_uv");
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_data.TexCoordsVBO);
-	glEnableVertexAttribArray(attrloc);
-	glVertexAttribPointer(attrloc, 2, GL_SHORT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(program->uv_loc);
+	glVertexAttribPointer(program->uv_loc, 2, GL_SHORT, GL_FALSE, 0, 0);
 
-	attrloc = glGetAttribLocation(program->program, "in_col");
 	glBindBuffer(GL_ARRAY_BUFFER, buffer_data.ColoursVBO);
-	glEnableVertexAttribArray(attrloc);
-	glVertexAttribPointer(attrloc, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
+	glEnableVertexAttribArray(program->col_loc);
+	glVertexAttribPointer(program->col_loc, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, 0);
 }
 
 static ShaderProgram * GetShaderForConfig(const ShaderConfiguration & config)
@@ -798,9 +800,6 @@ int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zb
 	bool use_t1 = cycle_mode == CYCLE_2CYCLE;
 
 	bool install_textures[] = { true, use_t1 };
-
-	extern u32 gRDPFrame;
-	glUniform1i(program->uloc_foo, gRDPFrame);
 
 	for (u32 i = 0; i < kNumTextures; ++i)
 	{
