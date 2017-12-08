@@ -263,7 +263,6 @@ inline bool CPU_ProcessEventCycles(u32 cycles)
 #ifdef DAEDALUS_PROFILE_EXECUTION
 extern u64 gTotalInstructionsExecuted;
 extern u64 gTotalInstructionsEmulated;
-extern u32 g_HardwareInterrupt;
 #endif
 
 extern u32 CPU_ProduceRegisterHash();
