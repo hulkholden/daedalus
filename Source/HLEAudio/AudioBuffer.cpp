@@ -62,8 +62,8 @@ void CAudioBuffer::AddSamples( const Sample * samples, u32 num_samples, u32 freq
 	//fwrite( samples, sizeof( Sample ), num_samples, fh );
 	//fflush( fh );
 
-	const Sample *	read_ptr( mReadPtr );		// No need to invalidate, as this is uncached/volatile
-	Sample *		write_ptr( mWritePtr );
+	const Sample* read_ptr  = mReadPtr;
+	Sample*       write_ptr = mWritePtr;
 
 	//
 	//	'r' is the number of input samples we progress through for each output sample.
@@ -73,10 +73,10 @@ void CAudioBuffer::AddSamples( const Sample * samples, u32 num_samples, u32 freq
 	//	and reduce s by 1.0 (to keep it in the range 0.0 .. 1.0)
 	//	Principle is the same but rewritten to integer mode (faster & less ASM) //Corn
 
-	const s32 r( (frequency << 12)  / output_freq );
-	s32		  s( 0 );
-	u32		  in_idx( 0 );
-	u32		  output_samples( (( num_samples * output_freq ) / frequency) - 1);
+	const s32 r = (frequency << 12)  / output_freq;
+	s32		  s = 0;
+	u32		  in_idx = 0;
+	u32		  output_samples = (( num_samples * output_freq ) / frequency) - 1;
 
 	for( u32 i = output_samples; i != 0 ; i-- )
 	{
@@ -122,7 +122,10 @@ void CAudioBuffer::AddSamples( const Sample * samples, u32 num_samples, u32 freq
 			// ToDo: Adjust Audio Frequency/ Look at Turok in this regard.
 			// We might want to put a Sleep in when executing on the SC?
 			//Give time to other threads when using SYNC mode.
-			if ( gAudioMode == AM_ENABLED_SYNC )	ThreadYield();
+			if ( gAudioMode == AM_ENABLED_SYNC )
+			{
+				ThreadYield();
+			}
 
 			read_ptr = mReadPtr;
 		}
@@ -130,11 +133,7 @@ void CAudioBuffer::AddSamples( const Sample * samples, u32 num_samples, u32 freq
 		*write_ptr = out;
 	}
 
-	//Todo: Check Cache Routines
-	// Ensure samples array is written back before mWritePtr
-	//dcache_wbinv_range_unaligned( mBufferBegin, mBufferEnd );
-
-	mWritePtr = write_ptr;		// Needs cache wbinv
+	mWritePtr = write_ptr;
 }
 
 #ifdef DAEDALUS_PSP
