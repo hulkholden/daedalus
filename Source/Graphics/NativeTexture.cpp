@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/MathUtil.h"
 #include "Graphics/ColourValue.h"
 #include "Graphics/NativePixelFormat.h"
+#include "Utility/Profiler.h"
 
 inline u32 CalcBytesRequired( u32 pixels )
 {
@@ -220,6 +221,8 @@ CRefPtr<CNativeTexture>	CNativeTexture::CreateFromPng( const char * p_filename )
 
 void CNativeTexture::SetData( NativePf8888 * data )
 {
+	DAEDALUS_PROFILE("Texture SetData");
+
 	// It's pretty gross that we don't pass this in, or better yet, provide a way for
 	// the caller to write directly to our buffers instead of setting the data.
 	size_t data_len = GetBytesRequired();

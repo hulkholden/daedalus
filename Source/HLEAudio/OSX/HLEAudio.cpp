@@ -173,6 +173,8 @@ void HLEAudioImpl::LenChanged()
 
 EProcessResult HLEAudioImpl::ProcessAList()
 {
+	DAEDALUS_PROFILE("ProcessAList");
+
 	Memory_SP_SetRegisterBits(SP_STATUS_REG, SP_STATUS_HALT);
 
 	EProcessResult result = PR_NOT_STARTED;
@@ -198,6 +200,8 @@ EProcessResult HLEAudioImpl::ProcessAList()
 
 void HLEAudioImpl::AddBuffer(void *ptr, u32 length)
 {
+	DAEDALUS_PROFILE("Audio AddBuffer");
+
 	if (length == 0) {
 		return;
 	}
@@ -216,6 +220,8 @@ void HLEAudioImpl::AddBuffer(void *ptr, u32 length)
 
 void HLEAudioImpl::AudioCallback(void *arg, AudioQueueRef queue, AudioQueueBufferRef buffer)
 {
+	DAEDALUS_PROFILE("AudioCallback");
+
 	HLEAudioImpl *plugin = static_cast<HLEAudioImpl *>(arg);
 
 	u32 num_samples = buffer->mAudioDataBytesCapacity / sizeof(Sample);
@@ -250,6 +256,8 @@ void HLEAudioImpl::AudioCallback(void *arg, AudioQueueRef queue, AudioQueueBuffe
 
 u32 HLEAudioImpl::AudioThread(void *arg)
 {
+	DAEDALUS_PROFILE("AudioThread");
+
 	HLEAudioImpl *plugin = static_cast<HLEAudioImpl *>(arg);
 
 	AudioStreamBasicDescription format;

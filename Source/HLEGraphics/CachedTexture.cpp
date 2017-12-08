@@ -45,6 +45,7 @@ static std::vector<u8>		gTexelBuffer;
 static bool GenerateTexels(NativePf8888 ** p_texels, const TextureInfo & ti,
 						   u32 pitch, u32 buffer_size)
 {
+	DAEDALUS_PROFILE("GenerateTexels");
 	if( gTexelBuffer.size() < buffer_size )
 	{
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
