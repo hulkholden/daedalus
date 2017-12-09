@@ -314,7 +314,7 @@ void	HLEAudioImpl::UpdateOnVbl( bool Wait )
 	}
 
 	// Speed Sync
-	if (Playing && (SndBuffer[2] == Buffer_Full) ||(SndBuffer[1] == Buffer_Full) ||(SndBuffer[0] == Buffer_Full))
+	if (gSpeedSyncEnabled && Playing && ((SndBuffer[2] == Buffer_Full) || (SndBuffer[1] == Buffer_Full) || (SndBuffer[0] == Buffer_Full)))
 	{
 		ThreadSleepMs(10);
 	}
