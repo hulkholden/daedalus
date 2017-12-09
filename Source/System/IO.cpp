@@ -55,6 +55,10 @@ namespace Path
 const char kPathSeparator = '/';
 const char kPathSeparatorStr[] = "/";
 
+#ifdef DAEDALUS_W32
+const char kPathSeparatorWin = '\\';
+#endif
+
 std::string Join(absl::string_view a, absl::string_view b)
 {
 	if (absl::EndsWith(a, kPathSeparatorStr))
@@ -93,6 +97,15 @@ bool RemoveFileSpec(std::string* path)
 		path->resize(idx);
 		return true;
 	}
+#ifdef DAEDALUS_W32
+	idx = path->rfind(kPathSeparatorWin);
+	if (idx != std::string::npos)
+	{
+		path->resize(idx);
+		return true;
+	}
+#endif
+
 	return false;
 }
 
@@ -103,6 +116,13 @@ bool RemoveBackslash(std::string* path)
 	{
 		path->pop_back();
 	}
+#ifdef DAEDALUS_W32
+	while (!path->empty() && path->back() == kPathSeparatorWin)
+	{
+		path->pop_back();
+	}
+#endif
+
 	return len != path->length();
 }
 
