@@ -7,7 +7,11 @@
 
 static std::string gDaedalusExePath;
 
+#if defined(DAEDALUS_W32)
+constexpr char kRunfilesDir[] = "/daedalus.exe.runfiles/";
+#else
 constexpr char kRunfilesDir[] = "/daedalus.runfiles/daedalus/";
+#endif
 
 void SetExeFilename(const std::string& filename)
 {
