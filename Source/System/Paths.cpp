@@ -24,7 +24,7 @@ std::string GetRunfilePath(absl::string_view filename)
 bool LoadRunfile(absl::string_view filename, std::string* out)
 {
 	std::string fullpath = GetRunfilePath(filename);
-	FILE * fh = fopen(fullpath.c_str(), "r");
+	FILE * fh = fopen(fullpath.c_str(), "rb");
 	if (!fh)
 	{
 		return false;
@@ -32,9 +32,14 @@ bool LoadRunfile(absl::string_view filename, std::string* out)
 
 	fseek(fh, 0, SEEK_END);
 	size_t len = ftell(fh);
-	fseek(fh, 0, SEEK_SET);
+	rewind(fh);
 	char * p = (char *)malloc(len+1);
-	fread(p, len, 1, fh);
+	size_t read = fread(p, 1, len, fh);
+	if (read != len) {
+		free(p);
+		fclose(fh);
+		return false;
+	}
 	p[len] = 0;
 	fclose(fh);
 	*out = p;
