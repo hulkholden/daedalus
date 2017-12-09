@@ -145,12 +145,7 @@ void InputManager::GetState( OSContPad (&pPad)[4] )
 		pPad[cont].stick_y = 0;
 	}
 
-	// Check if a gamepad is connected, If not fallback to keyboard
-	if(mGamePadAvailable)
-	{
-		GetJoyPad(&pPad[0]);
-	}
-	else if(GLFWwindow* window = gWindow)
+	if(GLFWwindow* window = gWindow)
 	{
 		if (glfwGetKey( window, 'X' ))		pPad[0].button |= A_BUTTON;
 		if (glfwGetKey( window, 'C' ))		pPad[0].button |= B_BUTTON;
@@ -175,5 +170,10 @@ void InputManager::GetState( OSContPad (&pPad)[4] )
 		if (glfwGetKey( window, GLFW_KEY_RIGHT ))		pPad[0].stick_x = +80;
 		if (glfwGetKey( window, GLFW_KEY_UP ))			pPad[0].stick_y = +80;
 		if (glfwGetKey( window, GLFW_KEY_DOWN ))		pPad[0].stick_y = -80;
+	}
+	// Override the keyboard with the gamepad if it's available.
+	if (mGamePadAvailable)
+	{
+		GetJoyPad(&pPad[0]);
 	}
 }
