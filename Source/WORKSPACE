@@ -16,8 +16,8 @@ http_archive(
 
 http_archive(
     name = "com_github_gflags_gflags",
-    url = "https://github.com/gflags/gflags/archive/77592648e3f3be87d6c7123eb81cbad75f9aef5a.zip",
-    strip_prefix = "gflags-77592648e3f3be87d6c7123eb81cbad75f9aef5a",
+    url = "https://github.com/hulkholden/gflags/archive/da19113cf72df774b5f7d29f8d66c63a3921b600.zip",
+    strip_prefix = "gflags-da19113cf72df774b5f7d29f8d66c63a3921b600",
 )
 
 bind(
