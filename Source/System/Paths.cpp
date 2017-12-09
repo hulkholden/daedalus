@@ -14,7 +14,7 @@ static std::string gDaedalusExePath;
 #if defined(DAEDALUS_W32)
 constexpr char kRunfilesDir[] = "/daedalus.exe.runfiles/";
 #else
-constexpr char kRunfilesDir[] = "/daedalus.runfiles/daedalus/";
+constexpr char kRunfilesDir[] = "/daedalus.runfiles/";
 #endif
 
 static bool gHaveManifest = false;
@@ -40,6 +40,7 @@ static bool _LoadManifest(std::unordered_map<std::string, std::string>* manifest
 	FILE * fh = fopen(fullpath.c_str(), "r");
 	if (!fh)
 	{
+		fprintf(stderr, "Manifest not found at %s\n", fullpath.c_str());
 		return false;
 	}
 
@@ -97,6 +98,12 @@ bool LoadRunfile(absl::string_view filename, std::string* out)
 	}
 	std::string key = absl::StrCat("daedalus/", filename);
 	std::string fullpath = gManifestMap[key];
+	if (fullpath.empty())
+	{
+		fprintf(stderr, "File %s didn't exist in manifest\n", key.c_str());
+		return false;
+	}
+	fprintf(stderr, "File %s mapped to %s\n", key.c_str(), fullpath.c_str());
 	return _LoadFile(fullpath, out);
 }
 
