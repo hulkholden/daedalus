@@ -4,10 +4,11 @@
 		{
 			"path": ".",
 			"folder_exclude_patterns": [
-				"out",
-				"Roms",
 				".git",
-				"Source/bazel-genfiles",
+				".vscode",
+				"Source/bazel-bin",
+				"Source/bazel-out",
+				"Source/bazel-source",
 				"Source/bazel-testlogs",
 			],
 		}
