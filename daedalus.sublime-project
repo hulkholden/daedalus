@@ -22,21 +22,21 @@
 			"file_patterns": ["*.cpp", "*.h", "*.inl", "BUILD"],
 			"file_regex": "([^\\s:]*):(\\d+):(\\d+:)? ([^\\n]+)",
 
-			"cmd": ["bazel build //:daedalus"],
+			"cmd": ["bazel", "build", "//:daedalus"],
 			"osx": {
-				"cmd": ["bazel build //:daedalus --apple_platform_type=macos"],
+				"cmd": ["bazel", "build", "//:daedalus", "--apple_platform_type=macos"],
 			},
 			"variants": [{
 				"name": "test",
-				"cmd": ["bazel test //... --test_output=errors"],
+				"cmd": ["bazel", "test", "//...", "--test_output=errors"],
 				"osx": {
-					"cmd": ["bazel test //... --test_output=errors --apple_platform_type=macos"],
+					"cmd": ["bazel", "test", "//...", "--test_output=errors", "--apple_platform_type=macos"],
 				},
 			},{
 				"name": "test opt",
-				"cmd": ["bazel test -c opt //... --test_output=errors"],
+				"cmd": ["bazel", "test", "-c opt", "//...", "--test_output=errors"],
 				"osx": {
-					"cmd": ["bazel test -c opt //... --test_output=errors --apple_platform_type=macos"],
+					"cmd": ["bazel", "test", "-c opt", "//...", "--test_output=errors", "--apple_platform_type=macos"],
 				},
 			},],
 		},
