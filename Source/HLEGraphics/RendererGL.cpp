@@ -64,11 +64,11 @@ static const u32 kAllWhite[] = {
 
 // Create a large number of buffers an rotate through them. Otherwise the CPU
 // becomes blocked on waiting for the GPU to finish rendering the buffer.
-static const int kNumBuffers = 5000;
+static const int kNumBuffers = 15000;
 static int gBufferIndex = 0;
 
 static GLuint gVAO;
-const int kMaxVertices = 1000;
+const int kMaxVertices = 120;
 
 
 static const int kNumBufferTypes = 3;	// position, tex coords, colour.
