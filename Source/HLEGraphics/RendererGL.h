@@ -2,6 +2,7 @@
 #define HLEGRAPHICS_RENDERERGL_H_
 
 #include "HLEGraphics/BaseRenderer.h"
+#include "HLEGraphics/RDP.h"
 
 struct BufferData;
 
@@ -22,9 +23,9 @@ class RendererGL : public BaseRenderer
 	virtual void Draw2DTextureR(f32 x0, f32 y0, f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 s, f32 t);
 
   private:
-	void MakeShaderConfigFromCurrentState(struct ShaderConfiguration* config) const;
+	void MakeShaderConfigFromCurrentState(const RDP_OtherMode& rdp_mode, struct ShaderConfiguration* config) const;
 
-	int PrepareRenderState(const Matrix4x4& mat_project, bool disable_zbuffer);
+	int PrepareRenderState(const RDP_OtherMode& rdp_mode, const Matrix4x4& mat_project, bool disable_zbuffer);
 
 	void RenderDaedalusVtxStreams(int prim, int buffer_idx, const float* positions, const TexCoord* uvs,
 	                              const u32* colours, int count);

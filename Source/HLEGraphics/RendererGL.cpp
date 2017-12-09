@@ -324,7 +324,7 @@ static const char * kAlphaParams8[8] = {
 	"one.a",      "zero.a"
 };
 
-static const char* default_vertex_shader =
+static const char* kDefaultVertexShader =
 "#version 150\n"
 "uniform mat4 uProject;\n"
 "in      vec3 in_pos;\n"
@@ -341,7 +341,7 @@ static const char* default_vertex_shader =
 "}\n";
 
 // FIXME(strmnnrmn): texel fetch filter changes between cycles.
-static const char* default_fragment_shader_fmt =
+static const char* kDefaultFragmentShaderTemplate =
 "void main()\n"
 "{\n"
 "	ivec2 sti = ivec2(v_st);\n"
@@ -450,7 +450,7 @@ static void SprintShader(char (&frag_shader)[2048], const ShaderConfiguration & 
 		sprintf(p, "\tif(col.a < %f) discard;\n", (float)config.AlphaThreshold / 255.f);
 	}
 
-	sprintf(frag_shader, default_fragment_shader_fmt, body);
+	sprintf(frag_shader, kDefaultFragmentShaderTemplate, body);
 }
 
 ShaderProgram::ShaderProgram(const ShaderConfiguration& shader_config, GLuint shader_program)
@@ -514,7 +514,7 @@ static ShaderProgram * GetShaderForConfig(const ShaderConfiguration & config)
 	char frag_shader[2048];
 	SprintShader(frag_shader, config);
 
-	const char * vertex_lines[] = { default_vertex_shader };
+	const char * vertex_lines[] = { kDefaultVertexShader };
 	const char * fragment_lines[] = { gN64FramentLibrary.c_str(), frag_shader };
 
 	GLuint shader_program =
@@ -586,12 +586,12 @@ static inline void DebugBlender(u32 cycle_type, u32 blender, u32 alpha_cvg_sel, 
 }
 #endif
 
-static void InitBlenderMode()
+static void InitBlenderMode(const RDP_OtherMode& rdp_mode)
 {
-	u32 cycle_type    = gRDPOtherMode.cycle_type;
-	u32 cvg_x_alpha   = gRDPOtherMode.cvg_x_alpha;
-	u32 alpha_cvg_sel = gRDPOtherMode.alpha_cvg_sel;
-	u32 blendmode     = gRDPOtherMode.blender;
+	u32 cycle_type    = rdp_mode.cycle_type;
+	u32 cvg_x_alpha   = rdp_mode.cvg_x_alpha;
+	u32 alpha_cvg_sel = rdp_mode.alpha_cvg_sel;
+	u32 blendmode     = rdp_mode.blender;
 
 	// NB: If we're running in 1cycle mode, ignore the 2nd cycle.
 	u32 active_mode = (cycle_type == CYCLE_2CYCLE) ? blendmode : (blendmode & 0xcccc);
@@ -721,7 +721,7 @@ inline u32 MakeMirror(u32 mirror, u32 m)
 	return (mirror && m) ? (1<<m) : 0;
 }
 
-int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zbuffer)
+int RendererGL::PrepareRenderState(const RDP_OtherMode& rdp_mode, const Matrix4x4& mat_project, bool disable_zbuffer)
 {
 	DAEDALUS_PROFILE( "PrepareRenderState" );
 
@@ -733,7 +733,7 @@ int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zb
 	else
 	{
 		// Decal mode
-		if( gRDPOtherMode.zmode == 3 )
+		if( rdp_mode.zmode == 3 )
 		{
 			glPolygonOffset(-1.0, -1.0);
 		}
@@ -743,7 +743,7 @@ int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zb
 		}
 
 		// Enable or Disable ZBuffer test
-		if ( (mTnL.Flags.Zbuffer & gRDPOtherMode.z_cmp) | gRDPOtherMode.z_upd )
+		if ( (mTnL.Flags.Zbuffer & rdp_mode.z_cmp) | rdp_mode.z_upd )
 		{
 			glEnable(GL_DEPTH_TEST);
 		}
@@ -752,16 +752,16 @@ int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zb
 			glDisable(GL_DEPTH_TEST);
 		}
 
-		glDepthMask(gRDPOtherMode.z_upd ? GL_TRUE : GL_FALSE);
+		glDepthMask(rdp_mode.z_upd ? GL_TRUE : GL_FALSE);
 	}
 
 
-	u32 cycle_mode = gRDPOtherMode.cycle_type;
+	u32 cycle_mode = rdp_mode.cycle_type;
 
 	// Initiate Blender
-	if(cycle_mode < CYCLE_COPY && gRDPOtherMode.force_bl)
+	if(cycle_mode < CYCLE_COPY && rdp_mode.force_bl)
 	{
-		InitBlenderMode();
+		InitBlenderMode(rdp_mode);
 	}
 	else
 	{
@@ -769,7 +769,7 @@ int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zb
 	}
 
 	ShaderConfiguration config;
-	MakeShaderConfigFromCurrentState(&config);
+	MakeShaderConfigFromCurrentState(rdp_mode, &config);
 
 	int buffer_idx = gBufferIndex++;
 	if (gBufferIndex >= kNumBuffers)
@@ -796,7 +796,7 @@ int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zb
 	glUniform1f(program->uloc_primlodfrac, mPrimLODFraction);
 
 	// Second texture is sampled in 2 cycle mode if text_lod is clear (when set,
-	// gRDPOtherMode.text_lod enables mipmapping, but we just set lod_frac to 0).
+	// rdp_mode.text_lod enables mipmapping, but we just set lod_frac to 0).
 	bool use_t1 = cycle_mode == CYCLE_2CYCLE;
 
 	bool install_textures[] = { true, use_t1 };
@@ -841,7 +841,7 @@ int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zb
 
 			glUniform2f(program->uloc_texscale[i], 1.f / texture->GetCorrectedWidth(), 1.f / texture->GetCorrectedHeight());
 
-			if( (gRDPOtherMode.text_filt != G_TF_POINT) | (gGlobalPreferences.ForceLinearFilter) )
+			if( (rdp_mode.text_filt != G_TF_POINT) | (gGlobalPreferences.ForceLinearFilter) )
 			{
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -860,10 +860,10 @@ int RendererGL::PrepareRenderState(const Matrix4x4& mat_project, bool disable_zb
 	return buffer_idx;
 }
 
-void RendererGL::MakeShaderConfigFromCurrentState(ShaderConfiguration * config) const
+void RendererGL::MakeShaderConfigFromCurrentState(const RDP_OtherMode& rdp_mode, ShaderConfiguration * config) const
 {
 	config->Mux = mMux;
-	config->CycleType = gRDPOtherMode.cycle_type;
+	config->CycleType = rdp_mode.cycle_type;
 	config->AlphaThreshold = 0;
 	config->BilerpFilter = true;
 	config->ClampS0 = false;
@@ -872,13 +872,13 @@ void RendererGL::MakeShaderConfigFromCurrentState(ShaderConfiguration * config) 
 	config->ClampT1 = false;
 
 	// Initiate Alpha test
-	if( (gRDPOtherMode.alpha_compare == G_AC_THRESHOLD) && !gRDPOtherMode.alpha_cvg_sel )
+	if( (rdp_mode.alpha_compare == G_AC_THRESHOLD) && !rdp_mode.alpha_cvg_sel )
 	{
 		// G_AC_THRESHOLD || G_AC_DITHER
 		// FIXME(strmnnrmn): alpha func: (mAlphaThreshold | g_ROM.ALPHA_HACK) ? GL_GEQUAL : GL_GREATER
 		config->AlphaThreshold = mBlendColour.GetA();
 	}
-	else if (gRDPOtherMode.cvg_x_alpha)
+	else if (rdp_mode.cvg_x_alpha)
 	{
 		// Going over 0x70 brakes OOT, but going lesser than that makes lines on games visible...ex: Paper Mario.
 		// ALso going over 0x30 breaks the birds in Tarzan :(. Need to find a better way to leverage this.
@@ -899,7 +899,7 @@ void RendererGL::MakeShaderConfigFromCurrentState(ShaderConfiguration * config) 
 	if (cycle_type == CYCLE_FILL)
 		config->AlphaThreshold = 0;
 
-	config->BilerpFilter = (gRDPOtherMode.text_filt != G_TF_POINT) || (gGlobalPreferences.ForceLinearFilter);
+	config->BilerpFilter = (rdp_mode.text_filt != G_TF_POINT) || (gGlobalPreferences.ForceLinearFilter);
 
 	// If running the bilinear filter, check if we need to clamp in S or T.
 	// Really, this is checking to see how we set mTexWrap in PrepareTexRectUVs.
@@ -948,7 +948,7 @@ void RendererGL::RenderTriangles(const float* positions, const TexCoord* uvs, co
                                  bool disable_zbuffer)
 {
 	DAEDALUS_PROFILE( "RenderTriangles" );
-	int buffer_idx = PrepareRenderState(mProjection, disable_zbuffer);
+	int buffer_idx = PrepareRenderState(gRDPOtherMode, mProjection, disable_zbuffer);
 	RenderDaedalusVtxStreams(GL_TRIANGLES, buffer_idx, positions, uvs, colours, num_vertices);
 }
 
@@ -962,7 +962,7 @@ void RendererGL::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord
 	// We have to do it before PrepareRenderState, because those values are applied to the graphics state.
 	PrepareTexRectUVs(&st0, &st1);
 
-	int buffer_idx = PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
+	int buffer_idx = PrepareRenderState(gRDPOtherMode, mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
 	v2 screen0 = ConvertN64ToScreen(xy0);
 	v2 screen1 = ConvertN64ToScreen(xy1);
@@ -1001,7 +1001,7 @@ void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexC
 	// We have to do it before PrepareRenderState, because those values are applied to the graphics state.
 	PrepareTexRectUVs(&st0, &st1);
 
-	int buffer_idx = PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
+	int buffer_idx = PrepareRenderState(gRDPOtherMode, mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
 	v2 screen0 = ConvertN64ToScreen(xy0);
 	v2 screen1 = ConvertN64ToScreen(xy1);
@@ -1034,7 +1034,7 @@ void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexC
 
 void RendererGL::FillRect( const v2 & xy0, const v2 & xy1, u32 color )
 {
-	int buffer_idx = PrepareRenderState(mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
+	int buffer_idx = PrepareRenderState(gRDPOtherMode, mScreenToDevice, gRDPOtherMode.depth_source ? false : true);
 
 	v2 screen0 = ConvertN64ToScreen(xy0);
 	v2 screen1 = ConvertN64ToScreen(xy1);
@@ -1079,9 +1079,10 @@ void RendererGL::Draw2DTexture(f32 x0, f32 y0, f32 x1, f32 y1,
 	DAEDALUS_PROFILE( "RendererGL::Draw2DTexture" );
 
 	// FIXME(strmnnrmn): is this right? Gross anyway.
-	gRDPOtherMode.cycle_type = CYCLE_COPY;
+	RDP_OtherMode rdp_mode = gRDPOtherMode;
+	rdp_mode.cycle_type = CYCLE_COPY;
 
-	int buffer_idx = PrepareRenderState(mScreenToDevice, false /* disable_depth */);
+	int buffer_idx = PrepareRenderState(rdp_mode, mScreenToDevice, false /* disable_depth */);
 
 	glEnable(GL_BLEND);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1123,9 +1124,10 @@ void RendererGL::Draw2DTextureR(f32 x0, f32 y0,
 	DAEDALUS_PROFILE( "RendererGL::Draw2DTextureR" );
 
 	// FIXME(strmnnrmn): is this right? Gross anyway.
-	gRDPOtherMode.cycle_type = CYCLE_COPY;
+	RDP_OtherMode rdp_mode = gRDPOtherMode;
+	rdp_mode.cycle_type = CYCLE_COPY;
 
-	int buffer_idx = PrepareRenderState(mScreenToDevice, false /* disable_depth */);
+	int buffer_idx = PrepareRenderState(rdp_mode, mScreenToDevice, false /* disable_depth */);
 
 	glEnable(GL_BLEND);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
