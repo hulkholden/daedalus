@@ -270,12 +270,30 @@ void BaseRenderer::UpdateViewport()
 	glViewport(vp_x, (s32)mScreenHeight - (vp_h + vp_y), vp_w, vp_h);
 }
 
+bool BaseRenderer::TestVerts(u32 v0, u32 vn) const
+{
+	DAEDALUS_ASSERT( v0 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v0 );
+
+	if (v0 >= kMaxN64Vertices) return false;
+
+	u32 f = mVtxProjected[v0].ClipFlags;
+	for (u32 i = v0 + 1; i <= vn && i < kMaxN64Vertices; i++)
+	{
+		f &= mVtxProjected[i].ClipFlags;
+	}
+	return f == 0;
+}
+
 // Returns true if triangle visible and rendered, false otherwise
 bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 {
 	DAEDALUS_ASSERT( v0 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v0 );
 	DAEDALUS_ASSERT( v1 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v1 );
 	DAEDALUS_ASSERT( v2 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v2 );
+
+	if (v0 >= kMaxN64Vertices) return false;
+	if (v1 >= kMaxN64Vertices) return false;
+	if (v2 >= kMaxN64Vertices) return false;
 
 	const u32 & f0 = mVtxProjected[v0].ClipFlags;
 	const u32 & f1 = mVtxProjected[v1].ClipFlags;
