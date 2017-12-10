@@ -90,11 +90,11 @@ void CTextureCache::PurgeOldTextures()
 
 			if( mpCacheHashTable[ixa] == texture )
 			{
-				mpCacheHashTable[ixa] = NULL;
+				mpCacheHashTable[ixa] = nullptr;
 			}
 			if( mpCacheHashTable[ixb] == texture )
 			{
-				mpCacheHashTable[ixb] = NULL;
+				mpCacheHashTable[ixb] = nullptr;
 			}
 
 			mTextures.erase( mTextures.begin() + i );
@@ -115,7 +115,7 @@ void CTextureCache::DropTextures()
 	mTextures.clear();
 	for( u32 i = 0; i < HASH_TABLE_SIZE; ++i )
 	{
-		mpCacheHashTable[i] = NULL;
+		mpCacheHashTable[i] = nullptr;
 	}
 }
 
@@ -180,15 +180,11 @@ CachedTexture * CTextureCache::GetOrCreateCachedTexture(const TextureInfo & ti)
 	// NB: this is a no-op in normal builds.
 	MutexLock lock(GetDebugMutex());
 
-	//
 	// Retrieve the texture from the cache (if it already exists)
-	//
 	u32	ixa = MakeHashIdxA( ti );
 	if( mpCacheHashTable[ixa] && mpCacheHashTable[ixa]->GetTextureInfo() == ti )
 	{
 		RECORD_CACHE_HIT( 1, 0 );
-		mpCacheHashTable[ixa]->UpdateIfNecessary();
-
 		return mpCacheHashTable[ixa];
 	}
 
@@ -196,8 +192,6 @@ CachedTexture * CTextureCache::GetOrCreateCachedTexture(const TextureInfo & ti)
 	if( mpCacheHashTable[ixb] && mpCacheHashTable[ixb]->GetTextureInfo() == ti )
 	{
 		RECORD_CACHE_HIT( 1, 0 );
-		mpCacheHashTable[ixb]->UpdateIfNecessary();
-
 		return mpCacheHashTable[ixb];
 	}
 
@@ -205,25 +199,22 @@ CachedTexture * CTextureCache::GetOrCreateCachedTexture(const TextureInfo & ti)
 	TextureVec::iterator	it = std::lower_bound( mTextures.begin(), mTextures.end(), ti, SSortTextureEntries() );
 	if( it != mTextures.end() && (*it)->GetTextureInfo() == ti )
 	{
-		texture = *it;
 		RECORD_CACHE_HIT( 0, 1 );
+		texture = *it;
 	}
 	else
 	{
+		RECORD_CACHE_HIT( 0, 0 );
 		texture = CachedTexture::Create( ti );
 		if (texture != nullptr)
 		{
 			mTextures.insert( it, texture );
 		}
-
-		RECORD_CACHE_HIT( 0, 0 );
 	}
 
 	// Update the hashtable
 	if( texture )
 	{
-		texture->UpdateIfNecessary();
-
 		mpCacheHashTable[ixa] = texture;
 		mpCacheHashTable[ixb] = texture;
 	}
@@ -239,19 +230,20 @@ CRefPtr<CNativeTexture> CTextureCache::GetOrCreateTexture(const TextureInfo & ti
 		return nullptr;
 	}
 
+	base_texture->UpdateIfNecessary();
 	return base_texture->GetTexture();
 }
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-void CTextureCache::Snapshot(const MutexLock & lock, std::vector< STextureInfoSnapshot > & snapshot) const
+void CTextureCache::Snapshot(const MutexLock& lock, std::vector<STextureInfoSnapshot>& snapshot) const
 {
 	DAEDALUS_ASSERT(lock.HasLock(mDebugMutex), "No debug lock");
 
 	snapshot.clear();
-	for( const auto& it : mTextures )
+	for (const auto& it : mTextures)
 	{
-		STextureInfoSnapshot	info( it->GetTextureInfo(), it->GetTexture() );
-		snapshot.push_back( info );
+		STextureInfoSnapshot info(it->GetTextureInfo(), it->GetTexture());
+		snapshot.push_back(info);
 	}
 }
 #endif // DAEDALUS_DEBUG_DISPLAYLIST

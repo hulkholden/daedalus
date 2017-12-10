@@ -40,6 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/IO.h"
 #include "Utility/Profiler.h"
 
+extern u32 gRDPFrame;
 static std::vector<u8>		gTexelBuffer;
 
 static bool GenerateTexels(NativePf8888 ** p_texels, const TextureInfo & ti,
@@ -77,27 +78,26 @@ static bool GenerateTexels(NativePf8888 ** p_texels, const TextureInfo & ti,
 	return true;
 }
 
-static void UpdateTexture( const TextureInfo & ti, CNativeTexture * texture )
+static void UpdateTexture(const TextureInfo& ti, CNativeTexture* texture)
 {
-	DAEDALUS_PROFILE( "Texture Conversion" );
+	DAEDALUS_PROFILE("Texture Conversion");
 
-	DAEDALUS_ASSERT( texture != NULL, "No texture" );
+	DAEDALUS_ASSERT(texture != NULL, "No texture");
 
-	if ( texture != NULL && texture->HasData() )
+	if (texture != NULL && texture->HasData())
 	{
 		u32 stride = texture->GetStride();
 
-		NativePf8888 *	texels;
-		if( GenerateTexels( &texels, ti, stride, texture->GetBytesRequired() ) )
+		NativePf8888* texels;
+		if (GenerateTexels(&texels, ti, stride, texture->GetBytesRequired()))
 		{
-			//
-			//	Clamp edges. We do this so that non power-of-2 textures whose whose width/height
-			//	is less than the mask value clamp correctly. It still doesn't fix those
-			//	textures with a width which is greater than the power-of-2 size.
-			//
-			ClampTexels( texels, ti.GetWidth(), ti.GetHeight(), texture->GetCorrectedWidth(), texture->GetCorrectedHeight(), stride );
+			// Clamp edges. We do this so that non power-of-2 textures whose whose width/height
+			// is less than the mask value clamp correctly. It still doesn't fix those
+			// textures with a width which is greater than the power-of-2 size.
+			ClampTexels(texels, ti.GetWidth(), ti.GetHeight(),
+						texture->GetCorrectedWidth(), texture->GetCorrectedHeight(), stride);
 
-			texture->SetData( texels );
+			texture->SetData(texels);
 		}
 	}
 }
@@ -107,62 +107,27 @@ CachedTexture * CachedTexture::Create( const TextureInfo & ti )
 	if( ti.GetWidth() == 0 || ti.GetHeight() == 0 )
 	{
 		DAEDALUS_ERROR( "Trying to create 0 width/height texture" );
-		return NULL;
+		return nullptr;
 	}
 
-	CachedTexture *	texture = new CachedTexture( ti );
-	if (!texture->Initialise())
+	CRefPtr<CNativeTexture> native_texture = CNativeTexture::Create( ti.GetWidth(), ti.GetHeight() );
+	if (!native_texture)
 	{
-		return NULL;
+		return nullptr;
 	}
 
-	return texture;
-}
-
-CachedTexture::CachedTexture( const TextureInfo & ti )
-:	mTextureInfo( ti )
-,	mpTexture(NULL)
-,	mFrameLastUpToDate( gRDPFrame )
-,	mFrameLastUsed( gRDPFrame )
-{
-}
-
-CachedTexture::~CachedTexture()
-{
-}
-
-bool CachedTexture::Initialise()
-{
-	DAEDALUS_ASSERT_Q(mpTexture == NULL);
-
-	u32 width  = mTextureInfo.GetWidth();
-	u32 height = mTextureInfo.GetHeight();
-
-	mpTexture = CNativeTexture::Create( width, height );
-	if( mpTexture != NULL )
-	{
-		UpdateTexture( mTextureInfo, mpTexture );
-	}
-
-	return mpTexture != NULL;
+	return new CachedTexture( ti, native_texture );
 }
 
 void CachedTexture::UpdateIfNecessary()
 {
-	if( !IsFresh() )
+	if (gRDPFrame != mFrameLastUsed)
 	{
 		UpdateTexture( mTextureInfo, mpTexture );
-
 		mFrameLastUpToDate = gRDPFrame;
 	}
 
 	mFrameLastUsed = gRDPFrame;
-}
-
-// Has this cached texture been updated recently?
-bool CachedTexture::IsFresh() const
-{
-	return gRDPFrame == mFrameLastUsed;
 }
 
 bool CachedTexture::HasExpired() const

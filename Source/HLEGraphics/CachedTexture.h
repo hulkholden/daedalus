@@ -26,38 +26,39 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Graphics/NativeTexture.h"
 #include "TextureInfo.h"
 
-extern u32 gRDPFrame;
-
 class CachedTexture
 {
-	protected:
-		explicit CachedTexture( const TextureInfo & ti );
-		~CachedTexture();
+  protected:
+	explicit CachedTexture(const TextureInfo& ti, CNativeTexture* texture) : mTextureInfo(ti), mpTexture(texture)
+	{
+	}
 
-	public:
-		static CachedTexture *			Create( const TextureInfo & ti );
+  public:
+	static CachedTexture* Create(const TextureInfo& ti);
 
-		inline const CRefPtr<CNativeTexture> &	GetTexture() const			{ return mpTexture; }
-		inline const TextureInfo &		GetTextureInfo() const				{ return mTextureInfo; }
+	inline const CRefPtr<CNativeTexture>& GetTexture() const
+	{
+		return mpTexture;
+	}
+	inline const TextureInfo& GetTextureInfo() const
+	{
+		return mTextureInfo;
+	}
 
-		bool							HasExpired() const;
+	bool HasExpired() const;
 
-	private:
-		friend class CTextureCache;
-		void							UpdateIfNecessary();
+  private:
+	friend class CTextureCache;
+	void UpdateIfNecessary();
 
-		bool							Initialise();
-		bool							IsFresh() const;
-		bool							UpdateTextureHash();
+  private:
+	const TextureInfo mTextureInfo;
 
-	private:
-		const TextureInfo				mTextureInfo;
+	CRefPtr<CNativeTexture> mpTexture;
 
-		CRefPtr<CNativeTexture>			mpTexture;
-
-		u32								mFrameLastUpToDate;	// Frame # that this was last updated
-		u32								mFrameLastUsed;		// Frame # that this was last used
+	// Initialise to zero so we always update on the first use.
+	u32 mFrameLastUpToDate = 0;
+	u32 mFrameLastUsed     = 0;
 };
-
 
 #endif // HLEGRAPHICS_CACHEDTEXTURE_H_

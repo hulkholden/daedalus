@@ -56,14 +56,14 @@ template <typename T>
 class CRefPtr
 {
    public:
-	CRefPtr() : mPtr(NULL) {}
+	CRefPtr() : mPtr(nullptr) {}
 	CRefPtr(T* ptr) : mPtr(ptr)
 	{
-		if (mPtr != NULL) mPtr->AddRef();
+		if (mPtr != nullptr) mPtr->AddRef();
 	}
 	CRefPtr(const CRefPtr& rhs) : mPtr(rhs.mPtr)
 	{
-		if (mPtr != NULL) mPtr->AddRef();
+		if (mPtr != nullptr) mPtr->AddRef();
 	}
 
 	T* operator=(const CRefPtr& rhs)
@@ -104,7 +104,7 @@ class CRefPtr
    private:
 	void Assign(T* ptr)
 	{
-		if (ptr != NULL) ptr->AddRef();
+		if (ptr != nullptr) ptr->AddRef();
 		if (mPtr) mPtr->Release();
 		mPtr = ptr;
 	}
