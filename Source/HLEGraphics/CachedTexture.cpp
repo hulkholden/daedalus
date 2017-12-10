@@ -171,32 +171,3 @@ bool CachedTexture::HasExpired() const
 	//Spread trashing them over time so not all get killed at once (lower value uses less VRAM) //Corn
 	return gRDPFrame - mFrameLastUsed > (20 + (FastRand() & 0x3));
 }
-
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-void CachedTexture::DumpTexture( const TextureInfo & ti, const CNativeTexture * texture )
-{
-	DAEDALUS_ASSERT(texture != NULL, "Should have a texture");
-
-	if( texture != NULL && texture->HasData() )
-	{
-		char filename[256];
-		sprintf( filename, "%08x-%s_%dbpp-%dx%d-%dx%d.png",
-							ti.GetLoadAddress(), ti.GetFormatName(), ti.GetSizeInBits(),
-							0, 0,		// Left/Top
-							ti.GetWidth(), ti.GetHeight() );
-
-		std::string dumpdir = IO::Path::Join(g_ROM.settings.GameName, "Textures");
-		std::string filepath = IO::Path::Join(Dump_GetDumpDirectory(dumpdir), filename);
-
-		NativePf8888 *	texels;
-
-		// Note that we re-convert the texels because those in the native texture may well already
-		// be swizzle. Maybe we should just have an unswizzle routine?
-		if( GenerateTexels( &texels, ti, texture->GetStride(), texture->GetBytesRequired() ) )
-		{
-			// NB - this does not include the mirrored texels
-			PngSaveImage( filepath, texels, texture->GetStride(), ti.GetWidth(), ti.GetHeight(), true );
-		}
-	}
-}
-#endif // DAEDALUS_DEBUG_DISPLAYLIST

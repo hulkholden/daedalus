@@ -40,9 +40,6 @@ class CachedTexture
 		inline const CRefPtr<CNativeTexture> &	GetTexture() const			{ return mpTexture; }
 		inline const TextureInfo &		GetTextureInfo() const				{ return mTextureInfo; }
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-		static void						DumpTexture( const TextureInfo & ti, const CNativeTexture * texture );
-#endif
 		bool							HasExpired() const;
 
 	private:
