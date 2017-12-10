@@ -1295,6 +1295,7 @@ void BaseRenderer::UpdateTileSnapshot( u32 index, u32 tile_idx )
 		}
 	}
 
+	// TODO(strmnnrmn): Is this needed, or does the shader handle this?
 	// Initialise the clamping state. When the mask is 0, it forces clamp mode.
 	u32 mode_u = (rdp_tile.clamp_s | (rdp_tile.mask_s == 0)) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
 	u32 mode_v = (rdp_tile.clamp_t | (rdp_tile.mask_t == 0)) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
@@ -1337,6 +1338,7 @@ void BaseRenderer::UpdateTileSnapshot( u32 index, u32 tile_idx )
 }
 
 
+// TODO(strmnnrmn): Is this needed, or does the shader handle this?
 // This transforms UVs so that they're positive. The aim is to ensure UVs are in the
 // range [(0,0),(w,h)]. If we can do this, we can specify GL_CLAMP_TO_EDGE/GL_CLAMP_TO_EDGE,
 // which fixes some artifacts when rendering, such as bleed from wrapping at the edges
