@@ -78,30 +78,6 @@ static bool GenerateTexels(NativePf8888 ** p_texels, const TextureInfo & ti,
 	return true;
 }
 
-static void UpdateTexture(const TextureInfo& ti, CNativeTexture* texture)
-{
-	DAEDALUS_PROFILE("Texture Conversion");
-
-	DAEDALUS_ASSERT(texture != NULL, "No texture");
-
-	if (texture != NULL && texture->HasData())
-	{
-		u32 stride = texture->GetStride();
-
-		NativePf8888* texels;
-		if (GenerateTexels(&texels, ti, stride, texture->GetBytesRequired()))
-		{
-			// Clamp edges. We do this so that non power-of-2 textures whose whose width/height
-			// is less than the mask value clamp correctly. It still doesn't fix those
-			// textures with a width which is greater than the power-of-2 size.
-			ClampTexels(texels, ti.GetWidth(), ti.GetHeight(),
-						texture->GetCorrectedWidth(), texture->GetCorrectedHeight(), stride);
-
-			texture->SetData(texels);
-		}
-	}
-}
-
 CachedTexture * CachedTexture::Create( const TextureInfo & ti )
 {
 	if( ti.GetWidth() == 0 || ti.GetHeight() == 0 )
@@ -123,11 +99,36 @@ void CachedTexture::UpdateIfNecessary()
 {
 	if (gRDPFrame != mFrameLastUsed)
 	{
-		UpdateTexture( mTextureInfo, mpTexture );
+		UpdateTexels();
 		mFrameLastUpToDate = gRDPFrame;
 	}
 
 	mFrameLastUsed = gRDPFrame;
+}
+
+void CachedTexture::UpdateTexels()
+{
+	DAEDALUS_PROFILE("Texture Conversion");
+
+	DAEDALUS_ASSERT(mpTexture != nullptr, "No texture");
+	if (!mpTexture || !mpTexture->HasData())
+	{
+		return;
+	}
+
+	u32 stride = mpTexture->GetStride();
+
+	NativePf8888* texels;
+	if (GenerateTexels(&texels, mTextureInfo, stride, mpTexture->GetBytesRequired()))
+	{
+		// Clamp edges. We do this so that non power-of-2 textures whose whose width/height
+		// is less than the mask value clamp correctly. It still doesn't fix those
+		// textures with a width which is greater than the power-of-2 size.
+		ClampTexels(texels, mTextureInfo.GetWidth(), mTextureInfo.GetHeight(),
+					mpTexture->GetCorrectedWidth(), mpTexture->GetCorrectedHeight(), stride);
+
+		mpTexture->SetData(texels);
+	}
 }
 
 bool CachedTexture::HasExpired() const

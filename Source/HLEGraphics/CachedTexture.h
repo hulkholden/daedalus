@@ -50,6 +50,7 @@ class CachedTexture
   private:
 	friend class CTextureCache;
 	void UpdateIfNecessary();
+	void UpdateTexels();
 
   private:
 	const TextureInfo mTextureInfo;
