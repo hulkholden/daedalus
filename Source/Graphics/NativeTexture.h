@@ -51,7 +51,7 @@ class CNativeTexture : public CRefCounted
 		inline const NativePf8888 *		GetData() const					{ return mpData; }
 		inline NativePf8888 *			GetData()						{ return mpData; }
 
-		u32								GetBytesRequired() const;
+		size_t							GetBytesRequired() const;
 		bool							HasData() const;				// If we run out of texture memory, this will return true
 
 	private:

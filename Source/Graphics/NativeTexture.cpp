@@ -31,6 +31,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Graphics/NativePixelFormat.h"
 #include "Utility/Profiler.h"
 
+static const u32 kMaxTextureSize = 100 * 1024 * 1024;
+
 inline u32 CalcBytesRequired( u32 pixels )
 {
 	return pixels * 4;
@@ -72,6 +74,7 @@ CNativeTexture::CNativeTexture( u32 w, u32 h )
 	glGenTextures( 1, &mTextureId );
 
 	size_t data_len = GetBytesRequired();
+	DAEDALUS_ASSERT(data_len < kMaxTextureSize, "Suspiciously large texture: %dx%d", w, h);
 	mpData = reinterpret_cast<NativePf8888*>(malloc(data_len));
 	memset(mpData, 0, data_len);
 }
@@ -243,7 +246,7 @@ u32	CNativeTexture::GetStride() const
 	return CalcBytesRequired( mTextureBlockWidth );
 }
 
-u32 CNativeTexture::GetBytesRequired() const
+size_t CNativeTexture::GetBytesRequired() const
 {
-	return GetStride() * mCorrectedHeight;
+	return static_cast<size_t>(GetStride()) * static_cast<size_t>(mCorrectedHeight);
 }

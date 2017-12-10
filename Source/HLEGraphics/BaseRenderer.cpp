@@ -1356,7 +1356,7 @@ void BaseRenderer::UpdateTileSnapshot( u32 index, u32 tile_idx )
 // and everything works correctly.
 inline void FixUV(u32 * wrap, s16 * c0_, s16 * c1_, s16 offset, u32 size)
 {
-	DAEDALUS_ASSERT(size > 0, "Texture has crazy width/height");
+	DAEDALUS_ASSERT(size > 0, "Texture has crazy width/height: %d", size);
 
 	s16 offset_10_5 = offset << 3;
 

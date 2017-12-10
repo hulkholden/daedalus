@@ -171,6 +171,12 @@ CachedTexture * CTextureCache::GetOrCreateCachedTexture(const TextureInfo & ti)
 {
 	DAEDALUS_PROFILE( "CTextureCache::GetOrCreateCachedTexture" );
 
+	if (ti.GetWidth() > 4096 || ti.GetHeight() > 4096)
+	{
+		DAEDALUS_ERROR("Texture is too large: %d x %d", ti.GetWidth(), ti.GetHeight());
+		return nullptr;
+	}
+
 	// NB: this is a no-op in normal builds.
 	MutexLock lock(GetDebugMutex());
 
@@ -195,7 +201,7 @@ CachedTexture * CTextureCache::GetOrCreateCachedTexture(const TextureInfo & ti)
 		return mpCacheHashTable[ixb];
 	}
 
-	CachedTexture *	texture = NULL;
+	CachedTexture *	texture = nullptr;
 	TextureVec::iterator	it = std::lower_bound( mTextures.begin(), mTextures.end(), ti, SSortTextureEntries() );
 	if( it != mTextures.end() && (*it)->GetTextureInfo() == ti )
 	{
@@ -205,7 +211,7 @@ CachedTexture * CTextureCache::GetOrCreateCachedTexture(const TextureInfo & ti)
 	else
 	{
 		texture = CachedTexture::Create( ti );
-		if (texture != NULL)
+		if (texture != nullptr)
 		{
 			mTextures.insert( it, texture );
 		}
@@ -230,7 +236,7 @@ CRefPtr<CNativeTexture> CTextureCache::GetOrCreateTexture(const TextureInfo & ti
 	CachedTexture * base_texture = GetOrCreateCachedTexture(ti);
 	if (!base_texture)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	return base_texture->GetTexture();
