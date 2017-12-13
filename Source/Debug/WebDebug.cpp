@@ -3,6 +3,7 @@
 #include "Debug/WebDebug.h"
 
 #include "absl/strings/str_split.h"
+#include "absl/strings/strip.h"
 #include "external/webby/webby.h"
 
 #ifdef DAEDALUS_W32
@@ -20,7 +21,6 @@
 #include "Base/MathUtil.h"
 #include "Debug/Console.h"
 #include "Debug/WebDebugTemplate.h"
-#include "System/IO.h"
 #include "System/Paths.h"
 #include "System/Thread.h"
 
@@ -368,35 +368,20 @@ static u32 DAEDALUS_THREAD_CALL_TYPE WebDebugThread(void* arg)
 	return 0;
 }
 
-static void AddStaticContent(const std::string& dir, const std::string& root)
+static void AddStaticContent(const std::string& prefix)
 {
-	IO::FindHandleT find_handle;
-	IO::FindDataT find_data;
+	Console_Print("Looking for static resource in [C%s]", prefix.c_str());
 
-	if (IO::FindFileOpen(dir, &find_handle, find_data))
+	for (const auto& it : GetRunfiles(prefix))
 	{
-		do
-		{
-			std::string full_path = IO::Path::Join(dir, find_data.Name);
-			std::string resource_path = IO::Path::Join(root, find_data.Name);
+		absl::string_view relative = absl::StripPrefix(it.first, prefix);
+		StaticResource resource;
+		resource.Resource = std::string(relative);
+		resource.FullPath = it.second;
 
-			if (IO::Directory::IsDirectory(full_path))
-			{
-				AddStaticContent(full_path, resource_path);
-			}
-			else if (IO::File::Exists(full_path))
-			{
-				StaticResource resource;
-				resource.Resource = resource_path;
-				resource.FullPath = full_path;
+		Console_Print(" adding [M%s] -> [C%s]", resource.Resource.c_str(), resource.FullPath.c_str());
 
-				Console_Print(" adding [M%s] -> [C%s]", resource.Resource.c_str(), resource.FullPath.c_str());
-
-				gStaticResources.push_back(resource);
-			}
-		} while (IO::FindFileNext(find_handle, find_data));
-
-		IO::FindFileClose(find_handle);
+		gStaticResources.push_back(resource);
 	}
 }
 
@@ -441,9 +426,7 @@ bool WebDebug_Init()
 		return false;
 	}
 
-	std::string data_path = GetRunfilePath("Debug/Web");
-	Console_Print("Looking for static resource in [C%s]", data_path.c_str());
-	AddStaticContent(data_path, "");
+	AddStaticContent("daedalus/Debug/Web");
 
 	gKeepRunning = true;
 	gThread = CreateThread("WebDebug", &WebDebugThread, gServer);

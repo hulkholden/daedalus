@@ -3,6 +3,7 @@
 #define SYSTEM_PATHS_H_
 
 #include <string>
+#include <unordered_map>
 
 #include "absl/strings/string_view.h"
 
@@ -10,6 +11,8 @@ void SetExeFilename(const std::string& filename);
 
 std::string GetRunfilePath(absl::string_view filename);
 bool LoadRunfile(absl::string_view filename, std::string* out);
+
+std::unordered_map<std::string, std::string> GetRunfiles(absl::string_view prefix);
 
 // TODO(strmnnrmn): Eventually this function and GetRunfilePath should be
 // equivalent.

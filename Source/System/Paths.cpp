@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 
@@ -58,6 +59,20 @@ static bool _LoadManifest(std::unordered_map<std::string, std::string>* manifest
 	}
 
 	fclose(fh);
+	gHaveManifest = true;
+	return true;
+}
+
+static bool _EnsureManifest()
+{
+	if (!gHaveManifest)
+	{
+		if (!_LoadManifest(&gManifestMap))
+		{
+			return false;
+		}
+		gHaveManifest = true;
+	}
 	return true;
 }
 
@@ -88,13 +103,9 @@ static bool _LoadFile(const std::string& fullpath, std::string* out)
 
 bool LoadRunfile(absl::string_view filename, std::string* out)
 {
-	if (!gHaveManifest)
+	if (!_EnsureManifest())
 	{
-		if (!_LoadManifest(&gManifestMap))
-		{
-			return false;
-		}
-		gHaveManifest = true;
+		return false;
 	}
 	std::string key = absl::StrCat("daedalus/", filename);
 	std::string fullpath = gManifestMap[key];
@@ -105,6 +116,23 @@ bool LoadRunfile(absl::string_view filename, std::string* out)
 	}
 	fprintf(stderr, "File %s mapped to %s\n", key.c_str(), fullpath.c_str());
 	return _LoadFile(fullpath, out);
+}
+
+std::unordered_map<std::string, std::string> GetRunfiles(absl::string_view prefix)
+{
+	std::unordered_map<std::string, std::string> results;
+	if (!_EnsureManifest())
+	{
+		return results;
+	}
+	for (const auto& it : gManifestMap)
+	{
+		if (absl::StartsWith(it.first, prefix))
+		{
+			results[it.first] = it.second;
+		}
+	}
+	return results;
 }
 
 std::string GetDataFilename(absl::string_view filename)
