@@ -73,13 +73,10 @@ BaseRenderer::BaseRenderer()
 	  mScreenWidth(0.f),
 	  mScreenHeight(0.f),
 	  mNumIndices(0),
-	  mVtxClipFlagsUnion(0)
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	  ,
+	  mVtxClipFlagsUnion(0),
 	  mNumTrisRendered(0),
 	  mNumTrisClipped(0),
 	  mNumRect(0)
-#endif
 {
 	for ( u32 i = 0; i < kNumBoundTextures; i++ )
 	{
@@ -159,12 +156,9 @@ void BaseRenderer::Reset()
 	mNumIndices = 0;
 	mVtxClipFlagsUnion = 0;
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	mNumTrisRendered = 0;
 	mNumTrisClipped = 0;
 	mNumRect = 0;
-#endif
-
 }
 
 void BaseRenderer::BeginScene()
@@ -172,10 +166,6 @@ void BaseRenderer::BeginScene()
 	CGraphicsContext::Get()->BeginFrame();
 
 	RestoreRenderStates();
-
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	ResetDebugState();
-#endif
 
 	InitViewport();
 }
@@ -329,27 +319,18 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 		{
 			if( mTnL.Flags.CullBack )
 			{
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-				DL_PF("    Tri: %d,%d,%d (Culled -> Back Face)", v0, v1, v2);
 				++mNumTrisClipped;
-#endif
 				return false;
 			}
 		}
 		else if( !mTnL.Flags.CullBack )
 		{
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-			DL_PF("    Tri: %d,%d,%d (Culled -> Front Face)", v0, v1, v2);
 			++mNumTrisClipped;
-#endif
 			return false;
 		}
 	}
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	DL_PF("    Tri: %d,%d,%d (Rendered)", v0, v1, v2);
 	++mNumTrisRendered;
-#endif
 
 	if (mNumIndices + 3 <= kMaxIndices)
 	{
@@ -363,7 +344,6 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 	}
 
 	mVtxClipFlagsUnion |= f0 | f1 | f2;
-
 	return true;
 }
 

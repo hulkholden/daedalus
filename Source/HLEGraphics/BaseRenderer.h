@@ -287,15 +287,10 @@ public:
 	inline c32			GetBlendColour() const				{ return mBlendColour; }
 	inline u32			GetFillColour() const				{ return mFillColour; }
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	// Rendering stats
 	inline u32			GetNumTrisRendered() const			{ return mNumTrisRendered; }
 	inline u32			GetNumTrisClipped() const			{ return mNumTrisClipped; }
 	inline u32			GetNumRect() const					{ return mNumRect; }
-
-
-	virtual void 		ResetDebugState()					{}
-#endif
 
 	inline float		N64ToScreenX(float x) const			{ return x * mN64ToScreenScale.x + mN64ToScreenTranslate.x; }
 	inline float		N64ToScreenY(float y) const			{ return y * mN64ToScreenScale.y + mN64ToScreenTranslate.y; }
@@ -422,12 +417,10 @@ protected:
 	// trivially accept everything without clipping
 	u32 mVtxClipFlagsUnion;
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	// Stats
 	u32					mNumTrisRendered;
 	u32					mNumTrisClipped;
 	u32					mNumRect;
-#endif
 };
 
 extern BaseRenderer * gRenderer;
