@@ -277,65 +277,69 @@ bool BaseRenderer::TestVerts(u32 v0, u32 vn) const
 // Returns true if triangle visible and rendered, false otherwise
 bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 {
-	DAEDALUS_ASSERT( v0 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v0 );
-	DAEDALUS_ASSERT( v1 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v1 );
-	DAEDALUS_ASSERT( v2 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v2 );
+	DAEDALUS_ASSERT(v0 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v0);
+	DAEDALUS_ASSERT(v1 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v1);
+	DAEDALUS_ASSERT(v2 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v2);
 
-	if (v0 >= kMaxN64Vertices) return false;
-	if (v1 >= kMaxN64Vertices) return false;
-	if (v2 >= kMaxN64Vertices) return false;
+	if (v0 >= kMaxN64Vertices)
+		return false;
+	if (v1 >= kMaxN64Vertices)
+		return false;
+	if (v2 >= kMaxN64Vertices)
+		return false;
 
-	const u32 & f0 = mVtxProjected[v0].ClipFlags;
-	const u32 & f1 = mVtxProjected[v1].ClipFlags;
-	const u32 & f2 = mVtxProjected[v2].ClipFlags;
+	const u32& f0 = mVtxProjected[v0].ClipFlags;
+	const u32& f1 = mVtxProjected[v1].ClipFlags;
+	const u32& f2 = mVtxProjected[v2].ClipFlags;
 
-	if ( f0 & f1 & f2 )
+	if (f0 & f1 & f2)
 	{
-		++mNumTrisClipped;
+		mNumTrisClipped++;
 		return false;
 	}
 
 	// Cull BACK or FRONT faceing tris early in the pipeline //Corn
-	if( mTnL.Flags.TriCull )
+	if (mTnL.Flags.TriCull)
 	{
-		const v4 & A = mVtxProjected[v0].ProjectedPos;
-		const v4 & B = mVtxProjected[v1].ProjectedPos;
-		const v4 & C = mVtxProjected[v2].ProjectedPos;
+		const v4& A = mVtxProjected[v0].ProjectedPos;
+		const v4& B = mVtxProjected[v1].ProjectedPos;
+		const v4& C = mVtxProjected[v2].ProjectedPos;
 
 		// Avoid using 1/w, will use five more mults but save three divides //Corn
 		// Precalc reused w combos so compiler does a proper job
-		const f32 ABw  = A.w*B.w;
-		const f32 ACw  = A.w*C.w;
-		const f32 BCw  = B.w*C.w;
-		const f32 AxBC = A.x*BCw;
-		const f32 AyBC = A.y*BCw;
-		const f32 NSign = (((B.x*ACw - AxBC)*(C.y*ABw - AyBC) - (C.x*ABw - AxBC)*(B.y*ACw - AyBC)) * ABw * C.w);
-		if( NSign <= 0.0f )
+		const f32 ABw   = A.w * B.w;
+		const f32 ACw   = A.w * C.w;
+		const f32 BCw   = B.w * C.w;
+		const f32 AxBC  = A.x * BCw;
+		const f32 AyBC  = A.y * BCw;
+		const f32 cross = (B.x * ACw - AxBC) * (C.y * ABw - AyBC) - (C.x * ABw - AxBC) * (B.y * ACw - AyBC);
+		const f32 sign  = cross * ABw * C.w;
+		if (sign <= 0.0f)
 		{
-			if( mTnL.Flags.CullBack )
+			if (mTnL.Flags.CullBack)
 			{
-				++mNumTrisClipped;
+				mNumTrisClipped++;
 				return false;
 			}
 		}
-		else if( !mTnL.Flags.CullBack )
+		else if (!mTnL.Flags.CullBack)
 		{
-			++mNumTrisClipped;
+			mNumTrisClipped++;
 			return false;
 		}
 	}
 
-	++mNumTrisRendered;
+	mNumTrisRendered++;
 
 	if (mNumIndices + 3 <= kMaxIndices)
 	{
-		mIndexBuffer[ mNumIndices++ ] = (u16)v0;
-		mIndexBuffer[ mNumIndices++ ] = (u16)v1;
-		mIndexBuffer[ mNumIndices++ ] = (u16)v2;
+		mIndexBuffer[mNumIndices++] = (u16)v0;
+		mIndexBuffer[mNumIndices++] = (u16)v1;
+		mIndexBuffer[mNumIndices++] = (u16)v2;
 	}
 	else
 	{
-		DAEDALUS_ERROR( "Array overflow, too many Indices" );
+		DAEDALUS_ERROR("Array overflow, too many Indices");
 	}
 
 	mVtxClipFlagsUnion |= f0 | f1 | f2;
