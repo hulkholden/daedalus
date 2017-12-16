@@ -291,24 +291,19 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 
 	if ( f0 & f1 & f2 )
 	{
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-		DL_PF("    Tri: %d,%d,%d (Culled -> NDC box)", v0, v1, v2);
 		++mNumTrisClipped;
-#endif
 		return false;
 	}
 
-	//
-	//Cull BACK or FRONT faceing tris early in the pipeline //Corn
-	//
+	// Cull BACK or FRONT faceing tris early in the pipeline //Corn
 	if( mTnL.Flags.TriCull )
 	{
 		const v4 & A = mVtxProjected[v0].ProjectedPos;
 		const v4 & B = mVtxProjected[v1].ProjectedPos;
 		const v4 & C = mVtxProjected[v2].ProjectedPos;
 
-		//Avoid using 1/w, will use five more mults but save three divides //Corn
-		//Precalc reused w combos so compiler does a proper job
+		// Avoid using 1/w, will use five more mults but save three divides //Corn
+		// Precalc reused w combos so compiler does a proper job
 		const f32 ABw  = A.w*B.w;
 		const f32 ACw  = A.w*C.w;
 		const f32 BCw  = B.w*C.w;
