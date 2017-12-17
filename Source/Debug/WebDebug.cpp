@@ -107,8 +107,13 @@ void WebDebugConnection::BeginResponse(int code, int content_length, const char*
 
 size_t WebDebugConnection::Write(const void* p, size_t len)
 {
+	// Webby treats 0 byte writes as requests to flush the connection
+	// which seems to cause Chrome to close the connection early.
+	if (len == 0)
+		return 0;
+
 	mBytesWritten += len;
-	return WebbyWrite(mConnection, p, len);
+	return WebbyWrite(mConnection, p, len) ? -1 : len;
 }
 
 void WebDebugConnection::Flush()
