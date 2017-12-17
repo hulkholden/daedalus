@@ -15,8 +15,9 @@
 #include "System/IO.h"
 #include "Ultra/ultra_gbi.h"
 
+static const u32 kBufferLen = 1024;
 
-DLDebugOutput * gDLDebugOutput = NULL;
+DLDebugOutput * gDLDebugOutput = nullptr;
 
 void DLDebug_SetOutput(DLDebugOutput * output)
 {
@@ -29,29 +30,35 @@ DLDebugOutput::~DLDebugOutput()
 
 void DLDebugOutput::Print(const char* fmt, ...)
 {
+	char buffer[kBufferLen];
+
 	va_list va;
 	va_start(va, fmt);
-	vsnprintf(mBuffer, kBufferLen, fmt, va);
+	vsnprintf(buffer, kBufferLen, fmt, va);
 	va_end(va);
-	Write(mBuffer);
+	Write(buffer);
 }
 
 void DLDebugOutput::PrintCommand(const char* fmt, ...)
 {
+	char buffer[kBufferLen];
+
 	va_list va;
 	va_start(va, fmt);
-	vsnprintf(mBuffer, kBufferLen, fmt, va);
+	vsnprintf(buffer, kBufferLen, fmt, va);
 	va_end(va);
-	AddCommand(mBuffer);
+	AddCommand(buffer);
 }
 
 void DLDebugOutput::PrintNote(const char* fmt, ...)
 {
+	char buffer[kBufferLen];
+
 	va_list va;
 	va_start(va, fmt);
-	vsnprintf(mBuffer, kBufferLen, fmt, va);
+	vsnprintf(buffer, kBufferLen, fmt, va);
 	va_end(va);
-	AddNote(mBuffer);
+	AddNote(buffer);
 }
 
 std::string MakeColourTextRGB(u8 r, u8 g, u8 b)

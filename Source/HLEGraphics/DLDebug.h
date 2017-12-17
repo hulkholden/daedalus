@@ -51,10 +51,6 @@ public:
 
 	virtual void AddCommand(absl::string_view msg) = 0;
 	virtual void AddNote(absl::string_view msg) = 0;
-
-private:
-	static const u32 kBufferLen = 1024;
-	char	mBuffer[kBufferLen];
 };
 
 extern DLDebugOutput * gDLDebugOutput;
