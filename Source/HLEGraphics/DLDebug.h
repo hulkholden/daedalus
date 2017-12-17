@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_DLDEBUG_H_
 #define HLEGRAPHICS_DLDEBUG_H_
 
+#include "absl/strings/string_view.h"
+
 #include "Ultra/ultra_sptask.h" // Ugh, could just fwd-decl OSTask, if it wasn't a crazy typedef union.
 #include "System/DataSink.h"
 #include "Base/Macros.h"
@@ -38,15 +40,17 @@ public:
 	virtual ~DLDebugOutput();
 
 	void Print(const char * fmt, ...);
-	void PrintLine(const char * fmt, ...);	// Automatically appends a newline.
 
-	// Adds some extra information about the execution of this instruction.
-	void AddNote(const char * fmt, ...);
+	void PrintCommand(const char * fmt, ...);
+	void PrintNote(const char * fmt, ...);
 
-	virtual size_t Write(const void * p, size_t len) = 0;
+	virtual void Write(absl::string_view msg) = 0;
 
 	virtual void BeginInstruction(u32 idx, u32 cmd0, u32 cmd1, u32 depth, const char * name) = 0;
 	virtual void EndInstruction() = 0;
+
+	virtual void AddCommand(absl::string_view msg) = 0;
+	virtual void AddNote(absl::string_view msg) = 0;
 
 private:
 	static const u32 kBufferLen = 1024;
@@ -59,28 +63,30 @@ inline bool DLDebug_IsActive() { return gDLDebugOutput != nullptr; }
 
 #define DL_ACTIVE()  DLDebug_IsActive()
 
-#define DL_PF(...)                                  \
-	do                                              \
-	{                                               \
-		if (gDLDebugOutput)                         \
-		{                                           \
-			gDLDebugOutput->PrintLine("");          \
-			gDLDebugOutput->PrintLine(__VA_ARGS__); \
-		}                                           \
+#define DL_PF(...)                              \
+	do                                          \
+	{                                           \
+		if (gDLDebugOutput)                     \
+		{                                       \
+			gDLDebugOutput->Print(__VA_ARGS__); \
+			gDLDebugOutput->Print("\n");        \
+		}                                       \
 	} while (0)
 
 #define DL_NOTE(...)                              \
 	do                                            \
 	{                                             \
 		if (gDLDebugOutput)                       \
-			gDLDebugOutput->AddNote(__VA_ARGS__); \
+			gDLDebugOutput->PrintNote(__VA_ARGS__); \
 	} while (0)
 
-#define DL_COMMAND(...)                             \
-	do                                              \
-	{                                               \
-		if (gDLDebugOutput)                         \
-			gDLDebugOutput->PrintLine(__VA_ARGS__); \
+#define DL_COMMAND(...)                         \
+	do                                          \
+	{                                           \
+		if (gDLDebugOutput)                     \
+		{                                       \
+			gDLDebugOutput->PrintCommand(__VA_ARGS__); \
+		}                                       \
 	} while (0)
 
 #define DL_BEGIN_INSTR(idx, c0, c1, depth, nm)                        \

@@ -27,125 +27,76 @@ DLDebugOutput::~DLDebugOutput()
 {
 }
 
-void DLDebugOutput::PrintLine(const char * fmt, ...)
+void DLDebugOutput::Print(const char* fmt, ...)
 {
-    va_list va;
-    va_start(va, fmt);
-    // I've never been confident that this returns a sane value across platforms.
-    /*len = */vsnprintf( mBuffer, kBufferLen, fmt, va );
-    va_end(va);
-
-    // This should be guaranteed...
-    mBuffer[kBufferLen-1] = 0;
-    size_t len = strlen(mBuffer);
-
-    // Append a newline, if there's space in the buffer.
-    if (len < kBufferLen)
-    {
-        mBuffer[len] = '\n';
-        ++len;
-    }
-
-    Write(mBuffer, len);
+	va_list va;
+	va_start(va, fmt);
+	vsnprintf(mBuffer, kBufferLen, fmt, va);
+	va_end(va);
+	Write(mBuffer);
 }
 
-void DLDebugOutput::Print(const char * fmt, ...)
+void DLDebugOutput::PrintCommand(const char* fmt, ...)
 {
-    //char buffer[kBufferLen];
-
-    va_list va;
-    va_start(va, fmt);
-    // I've never been confident that this returns a sane value across platforms.
-    /*len = */vsnprintf( mBuffer, kBufferLen, fmt, va );
-    va_end(va);
-
-
-    // This should be guaranteed...
-    mBuffer[kBufferLen-1] = 0;
-    size_t len = strlen(mBuffer);
-
-    Write(mBuffer, len);
+	va_list va;
+	va_start(va, fmt);
+	vsnprintf(mBuffer, kBufferLen, fmt, va);
+	va_end(va);
+	AddCommand(mBuffer);
 }
 
-// TODO(strmnnrmn): Dedupe the body.
-void DLDebugOutput::AddNote(const char* fmt, ...)
+void DLDebugOutput::PrintNote(const char* fmt, ...)
 {
-    va_list va;
-    va_start(va, fmt);
-    // I've never been confident that this returns a sane value across platforms.
-    /*len = */vsnprintf( mBuffer, kBufferLen, fmt, va );
-    va_end(va);
-
-    // This should be guaranteed...
-    mBuffer[kBufferLen-1] = 0;
-    size_t len = strlen(mBuffer);
-
-    // Append a newline, if there's space in the buffer.
-    if (len < kBufferLen)
-    {
-        mBuffer[len] = '\n';
-        ++len;
-    }
-
-    //Write(mBuffer, len);
+	va_list va;
+	va_start(va, fmt);
+	vsnprintf(mBuffer, kBufferLen, fmt, va);
+	va_end(va);
+	AddNote(mBuffer);
 }
 
 std::string MakeColourTextRGB(u8 r, u8 g, u8 b)
 {
-    std::string rgb = absl::StrCat(r, ", ", g, ", ", b);
+	std::string rgb = absl::StrCat(r, ", ", g, ", ", b);
 
-    if ((r < 128 && g < 128) ||
-        (g < 128 && b < 128) ||
-        (b < 128 && r < 128))
-    {
-        return absl::StrCat("<span style='color: white; background-color: rgb(", rgb, ")'>", rgb, "</span>");
-    }
-    return absl::StrCat("<span style='background-color: rgb(", rgb, ")'>", rgb, "</span>");
+	if ((r < 128 && g < 128) || (g < 128 && b < 128) || (b < 128 && r < 128))
+	{
+		return absl::StrCat("<span style='color: white; background-color: rgb(", rgb, ")'>", rgb, "</span>");
+	}
+	return absl::StrCat("<span style='background-color: rgb(", rgb, ")'>", rgb, "</span>");
 }
 
 std::string MakeColourTextRGBA(u8 r, u8 g, u8 b, u8 a)
 {
-    std::string rgb = absl::StrCat(r, ", ", g, ", ", b);
-    std::string rgba = absl::StrCat(rgb, ", ", a);
+	std::string rgb  = absl::StrCat(r, ", ", g, ", ", b);
+	std::string rgba = absl::StrCat(rgb, ", ", a);
 
-    if ((r < 128 && g < 128) ||
-        (g < 128 && b < 128) ||
-        (b < 128 && r < 128))
-    {
-        return absl::StrCat("<span style='color: white; background-color: rgb(", rgb, ")'>", rgba, "</span>");
-    }
-    return absl::StrCat("<span style='background-color: rgb(", rgb, ")'>", rgba, "</span>");
+	if ((r < 128 && g < 128) || (g < 128 && b < 128) || (b < 128 && r < 128))
+	{
+		return absl::StrCat("<span style='color: white; background-color: rgb(", rgb, ")'>", rgba, "</span>");
+	}
+	return absl::StrCat("<span style='background-color: rgb(", rgb, ")'>", rgba, "</span>");
 }
 
 std::string MakeColourTextRGBA(u32 fill_colour)
 {
-    u8 r = (fill_colour >> 24) & 0xff;
-    u8 g = (fill_colour >> 16) & 0xff;
-    u8 b = (fill_colour >>  8) & 0xff;
-    u8 a = (fill_colour >>  0) & 0xff;
+	u8 r = (fill_colour >> 24) & 0xff;
+	u8 g = (fill_colour >> 16) & 0xff;
+	u8 b = (fill_colour >> 8) & 0xff;
+	u8 a = (fill_colour >> 0) & 0xff;
 
-    return MakeColourTextRGBA(r, g, b, a);
+	return MakeColourTextRGBA(r, g, b, a);
 }
 
-static const char * const kBlendColourSources[] = {
-  "G_BL_CLR_IN",
-  "G_BL_CLR_MEM",
-  "G_BL_CLR_BL",
-  "G_BL_CLR_FOG",
+static const char* const kBlendColourSources[] = {
+    "G_BL_CLR_IN", "G_BL_CLR_MEM", "G_BL_CLR_BL", "G_BL_CLR_FOG",
 };
 
-static const char * const kBlendSourceFactors[] = {
-  "G_BL_A_IN",
-  "G_BL_A_FOG",
-  "G_BL_A_SHADE",
-  "G_BL_0",
+static const char* const kBlendSourceFactors[] = {
+    "G_BL_A_IN", "G_BL_A_FOG", "G_BL_A_SHADE", "G_BL_0",
 };
 
-static const char * const kBlendDestFactors[] = {
-  "G_BL_1MA",
-  "G_BL_A_MEM",
-  "G_BL_1",
-  "G_BL_0",
+static const char* const kBlendDestFactors[] = {
+    "G_BL_1MA", "G_BL_A_MEM", "G_BL_1", "G_BL_0",
 };
 
 static const char * const kMulInputRGB[32] =

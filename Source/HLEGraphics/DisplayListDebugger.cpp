@@ -91,9 +91,9 @@ class HTMLDebugOutput : public DLDebugOutput
    public:
 	explicit HTMLDebugOutput(WebDebugConnection *connection) : Connection(connection) {}
 
-	size_t Write(const void *p, size_t len) override
+	void Write(absl::string_view msg) override
 	{
-		return Connection->Write(p, len);
+		Connection->Write(msg.data(), msg.length());
 	}
 
 	void BeginInstruction(u32 idx, u32 cmd0, u32 cmd1, u32 depth, const char *name) override
@@ -104,7 +104,19 @@ class HTMLDebugOutput : public DLDebugOutput
 
 	void EndInstruction() override
 	{
-		Print("</span>");
+		Write("</span>");
+	}
+
+	void AddCommand(absl::string_view msg) override
+	{
+		Write(msg);
+		Write("\n");
+	}
+
+	void AddNote(absl::string_view msg) override
+	{
+		Write(msg);
+		Write("\n");
 	}
 
 	WebDebugConnection *Connection;

@@ -552,10 +552,10 @@ void DLParser_GBI1_Line3D(MicroCodeCommand command)
 
 		DL_COMMAND("gsSPLine3D(%d, %d, %d, %d);", v0_idx, v1_idx, v2_idx, v3_idx);
 		DL_NOTE("%s",
-			(a_added && b_added) ? "" :
-			(a_added) ? "  // b rejected" :
-			(b_added) ? "  // a rejected" :
-			"  // both rejected");
+			(a_added && b_added) ? "both accepted" :
+			(a_added) ? "rejected" :
+			(b_added) ? "a rejected" :
+			"both rejected");
 
 		command.inst.cmd0 = *pCmdBase++;
 		command.inst.cmd1 = *pCmdBase++;
@@ -590,7 +590,7 @@ void DLParser_GBI1_Tri1(MicroCodeCommand command)
 		tris_added |= added;
 
 		DL_COMMAND("gsSP1Triangle(%d, %d, %d, %d);", v0_idx, v1_idx, v2_idx, command.gbi1tri1.flag);
-		DL_NOTE(added ? "" : "rejected");
+		DL_NOTE(added ? "accepted" : "rejected");
 
 		command.inst.cmd0 = *pCmdBase++;
 		command.inst.cmd1 = *pCmdBase++;
