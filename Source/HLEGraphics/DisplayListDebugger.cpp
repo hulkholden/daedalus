@@ -89,37 +89,55 @@ static void Base64Encode(const void *data, size_t len, DataSink *sink)
 class HTMLDebugOutput : public DLDebugOutput
 {
    public:
-	explicit HTMLDebugOutput(WebDebugConnection *connection) : Connection(connection) {}
+	explicit HTMLDebugOutput(WebDebugConnection *connection) : mConnection(connection) {}
 
 	void Write(absl::string_view msg) override
 	{
-		Connection->Write(msg.data(), msg.length());
+		mConnection->Write(msg.data(), msg.length());
 	}
 
 	void BeginInstruction(u32 idx, u32 cmd0, u32 cmd1, u32 depth, const char *name) override
 	{
-		Print("<span class=\"hle-instr\" id=\"I%d\">", idx);
+		mCurrentIndex = idx;
+		mInstructionName = name;
+
+		// TODO: use name as a tip
+		Print("<span class='hle-instr' id='I%d'>", idx);
 		Print("%05d %08x%08x %*s ", idx, cmd0, cmd1, depth * 2, "");
 	}
 
 	void EndInstruction() override
 	{
-		Write("</span>");
+		Write("</span>\n");
+		mCurrentIndex = -1;
 	}
 
 	void AddCommand(absl::string_view msg) override
 	{
 		Write(msg);
-		Write("\n");
 	}
 
 	void AddNote(absl::string_view msg) override
 	{
-		Write(msg);
-		Write("\n");
+		if (mCurrentIndex >= 0)
+		{
+			Write("<div class='hle-note'>");
+			Write(msg);
+			Write("</div>");
+		}
+		else
+		{
+			// If no instruction is active, just print this as regular debug info.
+			Write(msg);
+			Write("\n");
+		}
 	}
 
-	WebDebugConnection *Connection;
+  private:
+	WebDebugConnection* mConnection;
+
+	int mCurrentIndex = -1;
+	const char* mInstructionName = nullptr;
 };
 
 bool DLDebugger_IsDebugging() { return gDebugging; }

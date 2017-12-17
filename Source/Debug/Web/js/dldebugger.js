@@ -33,7 +33,15 @@
         $.post('/dldebugger?dump', function (ret) {
           var $pre = $('<pre />');
           $pre.html(ret);
+
+          $pre.find('.hle-note').hide();
+
           $dlistOutput.html($pre);
+
+          $pre.find('.hle-note').parent().click(function() {
+            $(this).find('.hle-note').toggle();
+            return false;
+          });
 
           // FIXME: setScrubTime here? At least need to set position.
         });
