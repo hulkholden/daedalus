@@ -58,8 +58,6 @@ void DLParser_Last_Legion_0x00(MicroCodeCommand command)
 			gDlistStack.address[gDlistStackPointer] = pc1;
 
 			DL_PF("    Address=0x%08x", pc1);
-			DL_PF("    \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/");
-			DL_PF("    ############################################");
 		}
 
 		if (pc2 && pc2 != 0xffffff && pc2 < MAX_RAM_ADDRESS)
@@ -69,8 +67,6 @@ void DLParser_Last_Legion_0x00(MicroCodeCommand command)
 			gDlistStack.address[gDlistStackPointer] = pc2;
 
 			DL_PF("    Address=0x%08x", pc2);
-			DL_PF("    \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/");
-			DL_PF("    ############################################");
 		}
 	}
 	else if ((command.inst.cmd1) == 0)
@@ -86,14 +82,8 @@ void DLParser_Last_Legion_0x00(MicroCodeCommand command)
 
 void DLParser_TexRect_Last_Legion(MicroCodeCommand command)
 {
-	MicroCodeCommand command2;
-	MicroCodeCommand command3;
-
-	//
-	// Fetch the next two instructions
-	//
-	DLParser_FetchNextCommand(&command2);
-	DLParser_FetchNextCommand(&command3);
+	MicroCodeCommand command2 = DLParser_FetchNextCommand();
+	MicroCodeCommand command3 = DLParser_FetchNextCommand();
 
 	RDP_TexRect tex_rect;
 	tex_rect.cmd0 = command.inst.cmd0;

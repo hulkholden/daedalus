@@ -31,9 +31,9 @@ void DLParser_GBI0_Vtx_WRUS(MicroCodeCommand command)
 	u32 addr = RDPSegAddr(command.inst.cmd1);
 	u32 v0 = ((command.inst.cmd0 >> 16) & 0xff) / 5;
 	u32 n = (command.inst.cmd0 >> 9) & 0x7f;
-	u32 len = (command.inst.cmd0) & 0x1ff;
+	// u32 len = (command.inst.cmd0) & 0x1ff;
 
-	DL_PF("    Address[0x%08x] v0[%d] Num[%d] Len[0x%04x]", addr, v0, n, len);
+	DL_COMMAND("gsSPVertex(0x%08x, %d, %d);", addr, n, v0);
 
 	DAEDALUS_ASSERT((v0 + n) < 32, "Warning, attempting to load into invalid vertex positions");
 

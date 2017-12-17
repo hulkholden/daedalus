@@ -26,6 +26,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 struct RDP_OtherMode;
 
+std::string MakeColourTextRGB(u8 r, u8 g, u8 b);
+std::string MakeColourTextRGBA(u8 r, u8 g, u8 b, u8 a);
+std::string MakeColourTextRGBA(u32 fill_colour);
+
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 
 class DLDebugOutput
@@ -35,6 +39,9 @@ public:
 
 	void Print(const char * fmt, ...);
 	void PrintLine(const char * fmt, ...);	// Automatically appends a newline.
+
+	// Adds some extra information about the execution of this instruction.
+	void AddNote(const char * fmt, ...);
 
 	virtual size_t Write(const void * p, size_t len) = 0;
 
@@ -50,24 +57,45 @@ extern DLDebugOutput * gDLDebugOutput;
 
 inline bool DLDebug_IsActive() { return gDLDebugOutput != nullptr; }
 
-#define DL_PF(...)										\
-	do {												\
-		if( gDLDebugOutput )							\
-			gDLDebugOutput->PrintLine( __VA_ARGS__ );	\
-	} while(0)
+#define DL_ACTIVE()  DLDebug_IsActive()
 
-#define DL_BEGIN_INSTR(idx, c0, c1, depth, nm) 		\
-	do {											\
-		if (gDLDebugOutput)							\
-			gDLDebugOutput->BeginInstruction(idx, c0, c1, depth, nm);	\
-	} while(0)
+#define DL_PF(...)                                  \
+	do                                              \
+	{                                               \
+		if (gDLDebugOutput)                         \
+		{                                           \
+			gDLDebugOutput->PrintLine("");          \
+			gDLDebugOutput->PrintLine(__VA_ARGS__); \
+		}                                           \
+	} while (0)
 
-#define DL_END_INSTR() 								\
-	do {											\
-		if (gDLDebugOutput) 						\
-			gDLDebugOutput->EndInstruction();		\
-	} while(0)
+#define DL_NOTE(...)                              \
+	do                                            \
+	{                                             \
+		if (gDLDebugOutput)                       \
+			gDLDebugOutput->AddNote(__VA_ARGS__); \
+	} while (0)
 
+#define DL_COMMAND(...)                             \
+	do                                              \
+	{                                               \
+		if (gDLDebugOutput)                         \
+			gDLDebugOutput->PrintLine(__VA_ARGS__); \
+	} while (0)
+
+#define DL_BEGIN_INSTR(idx, c0, c1, depth, nm)                        \
+	do                                                                \
+	{                                                                 \
+		if (gDLDebugOutput)                                           \
+			gDLDebugOutput->BeginInstruction(idx, c0, c1, depth, nm); \
+	} while (0)
+
+#define DL_END_INSTR()                        \
+	do                                        \
+	{                                         \
+		if (gDLDebugOutput)                   \
+			gDLDebugOutput->EndInstruction(); \
+	} while (0)
 
 void 		DLDebug_SetOutput(DLDebugOutput * output);
 
@@ -81,7 +109,10 @@ void		DLDebug_DumpRDPOtherModeH(u32 mask, u32 data);
 
 #else
 
+#define DL_ACTIVE() (0)
 #define DL_PF(...)								do { DAEDALUS_USE(__VA_ARGS__); } while(0)
+#define DL_NOTE(...)							do { DAEDALUS_USE(__VA_ARGS__); } while(0)
+#define DL_COMMAND(...)							do { DAEDALUS_USE(__VA_ARGS__); } while(0)
 
 #define DL_BEGIN_INSTR(idx, c0, c1, depth, nm)  do { } while(0)
 #define DL_END_INSTR()							do { } while(0)

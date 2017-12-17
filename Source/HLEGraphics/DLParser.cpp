@@ -20,18 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Daedalus.h"
 #include "DLParser.h"
 
-#include "DLDebug.h"
-#include "BaseRenderer.h"
-#include "N64PixelFormat.h"
-#include "Graphics/NativePixelFormat.h"
-#include "RDP.h"
-#include "RDPStateManager.h"
-#include "TextureCache.h"
-#include "ConvertImage.h"			// Convert555ToRGBA
-#include "Microcode.h"
-#include "uCodes/UcodeDefs.h"
-#include "uCodes/Ucode.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 
+#include "Base/MathUtil.h"
 #include "Config/ConfigOptions.h"
 #include "Core/CPU.h"
 #include "Core/Memory.h"
@@ -39,12 +31,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Console.h"
 #include "Debug/Dump.h"
 #include "Graphics/GraphicsContext.h"
+#include "Graphics/NativePixelFormat.h"
+#include "HLEGraphics/BaseRenderer.h"
+#include "HLEGraphics/ConvertImage.h"			// Convert555ToRGBA
+#include "HLEGraphics/DLDebug.h"
 #include "HLEGraphics/HLEGraphics.h"
-#include "Base/MathUtil.h"
+#include "HLEGraphics/Microcode.h"
+#include "HLEGraphics/N64PixelFormat.h"
+#include "HLEGraphics/RDP.h"
+#include "HLEGraphics/RDPStateManager.h"
+#include "HLEGraphics/TextureCache.h"
+#include "HLEGraphics/uCodes/Ucode.h"
+#include "HLEGraphics/uCodes/UcodeDefs.h"
+#include "System/IO.h"
 #include "Ultra/ultra_gbi.h"
 #include "Ultra/ultra_rcp.h"
 #include "Ultra/ultra_sptask.h"
-#include "System/IO.h"
 #include "Utility/Profiler.h"
 
 
@@ -177,24 +179,37 @@ inline void FinishRDPJob()
 }
 
 // Reads the next command from the display list, updates the PC.
-inline void	DLParser_FetchNextCommand( MicroCodeCommand * p_command )
+inline MicroCodeCommand	DLParser_FetchNextCommand()
 {
-	// Current PC is the last value on the stack
-	u32 & pc( gDlistStack.address[gDlistStackPointer] );
+	u32 pc = gDlistStack.address[gDlistStackPointer];
+	DAEDALUS_ASSERT(pc + 8 <= MAX_RAM_ADDRESS, "Display list PC is out of range: 0x%08x", pc);
+	MicroCodeCommand command = *(MicroCodeCommand*)(gu8RamBase + pc);
+	gDlistStack.address[gDlistStackPointer] += 8;
+	return command;
+}
 
-	DAEDALUS_ASSERT(pc < MAX_RAM_ADDRESS, "Display list PC is out of range: 0x%08x", pc );
-	*p_command = *(MicroCodeCommand*)(gu8RamBase + pc);
-	pc+= 8;
+inline void DLParser_PushDisplayList()
+{
+	gDlistStackPointer++;
+}
+
+inline void DLParser_SetDisplayList(u32 address)
+{
+	gDlistStack.address[gDlistStackPointer] = address & (MAX_RAM_ADDRESS - 1);
 }
 
 inline void DLParser_PopDL()
 {
-	DL_PF("    Returning from DisplayList: level=%d", gDlistStackPointer+1);
-	DL_PF("    ############################################");
-	DL_PF("    /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\ /\\");
-	DL_PF(" ");
-
 	gDlistStackPointer--;
+}
+
+static std::string GetTileIdxText(int tile_idx)
+{
+	switch (tile_idx) {
+		case G_TX_LOADTILE:	return "G_TX_LOADTILE";
+		case G_TX_RENDERTILE: return "G_TX_RENDERTILE";
+	}
+	return absl::StrCat(tile_idx);
 }
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
@@ -226,48 +241,63 @@ extern u32 gViHeightMinusOne;
 #include "uCodes/Ucode_Sprite2D.h"
 #include "uCodes/Ucode_S2DEX.h"
 
-static const char * const gFormatNames[8] = {"RGBA", "YUV", "CI", "IA", "I", "?1", "?2", "?3"};
-static const char * const gSizeNames[4]   = {"4bpp", "8bpp", "16bpp", "32bpp"};
-static const char * const gOnOffNames[2]  = {"Off", "On"};
+static const char * const gFormatNames[8] = {
+	"G_IM_FMT_RGBA",
+	"G_IM_FMT_YUV",
+	"G_IM_FMT_CI",
+	"G_IM_FMT_IA",
+	"G_IM_FMT_I",
+	"G_IM_FMT_?1",
+	"G_IM_FMT_?2",
+	"G_IM_FMT_?3",
+};
+static const char * const gSizeNames[4] =
+{
+	"G_IM_FMT_SIZ_4b",
+	"G_IM_FMT_SIZ_8b",
+	"G_IM_FMT_SIZ_16b",
+	"G_IM_FMT_SIZ_32b",
+};
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 
 void DLParser_DumpVtxInfo(u32 address, u32 v0_idx, u32 num_verts)
 {
-	if (DLDebug_IsActive())
+	if (!DLDebug_IsActive())
 	{
-		s8 *pcSrc = (s8 *)(gu8RamBase + address);
-		s16 *psSrc = (s16 *)(gu8RamBase + address);
-
-		for ( u32 idx = v0_idx; idx < v0_idx + num_verts; idx++ )
-		{
-			f32 x = f32(psSrc[0^0x1]);
-			f32 y = f32(psSrc[1^0x1]);
-			f32 z = f32(psSrc[2^0x1]);
-
-			u16 wFlags = u16(gRenderer->GetVtxFlags( idx )); //(u16)psSrc[3^0x1];
-
-			u8 a = pcSrc[12^0x3];
-			u8 b = pcSrc[13^0x3];
-			u8 c = pcSrc[14^0x3];
-			u8 d = pcSrc[15^0x3];
-
-			s16 nTU = psSrc[4^0x1];
-			s16 nTV = psSrc[5^0x1];
-
-			f32 tu = f32(nTU) * (1.0f / 32.0f);
-			f32 tv = f32(nTV) * (1.0f / 32.0f);
-
-			const v4 & t = gRenderer->GetTransformedVtxPos( idx );
-			const v4 & p = gRenderer->GetProjectedVtxPos( idx );
-
-			psSrc += 8;			// Increase by 16 bytes
-			pcSrc += 16;
-
-			DL_PF("    #%02d Flags: 0x%04x Pos:{% 0.1f,% 0.1f,% 0.1f} Tex:{% 7.2f,% 7.2f} Extra: %02x %02x %02x %02x Tran:{% 0.3f,% 0.3f,% 0.3f,% 0.3f} Proj:{% 6f,% 6f,% 6f,% 6f}",
-				idx, wFlags, x, y, z, tu, tv, a, b, c, d, t.x, t.y, t.z, t.w, p.x/p.w, p.y/p.w, p.z/p.w, p.w);
-		}
+		return;
 	}
+
+    const char * cols[] = {"#", "x", "y", "z", "?", "u", "v", "norm", "rgba"};
+
+	DL_NOTE("<table class='vertex-table'>");
+    DL_NOTE("<tr><th>%s</th></tr>", absl::StrJoin(cols, "</th><th>").c_str());
+
+	std::string v[ARRAYSIZE(cols)];
+
+	const FiddledVtx * pVtxBase = reinterpret_cast<const FiddledVtx*>(gu8RamBase + address);
+	for ( u32 idx = v0_idx; idx < v0_idx + num_verts; idx++ )
+	{
+		const FiddledVtx & vert = pVtxBase[idx - v0_idx];
+
+		v[0] = absl::StrCat(idx);
+		v[1] = absl::StrCat(vert.x);
+		v[2] = absl::StrCat(vert.y);
+		v[3] = absl::StrCat(vert.z);
+		v[4] = absl::StrCat(vert.flag);
+		v[5] = absl::StrCat(vert.tu);
+		v[6] = absl::StrCat(vert.tv);
+		v[7] = absl::StrCat(vert.norm_x, ",", vert.norm_y, ",", vert.norm_z, ",", vert.norm_a);
+		v[8] = MakeColourTextRGBA(vert.rgba_r, vert.rgba_g, vert.rgba_b, vert.rgba_a);
+
+		// TODO(strmnnrmn): Also include computed properties.
+		//u32 clip_flags = gRenderer->GetVtxFlags( idx );
+		//const v4 & t = gRenderer->GetTransformedVtxPos( idx );
+		//const v4 & p = gRenderer->GetProjectedVtxPos( idx );
+
+		DL_NOTE("<tr><td>%s</td></tr>", absl::StrJoin(v, "</td><td>").c_str());
+	}
+	DL_NOTE("</table>");
 }
 #endif
 
@@ -395,7 +425,7 @@ static u32 DLParser_ProcessDList(u32 instruction_limit)
 
 	while(gDlistStackPointer >= 0)
 	{
-		DLParser_FetchNextCommand( &command );
+		command = DLParser_FetchNextCommand();
 
 		DL_BEGIN_INSTR(current_instruction_count, command.inst.cmd0, command.inst.cmd1, gDlistStackPointer, gUcodeName[command.inst.cmd]);
 
@@ -492,8 +522,6 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 	DLDebug_DumpTaskInfo(pTask);
 #endif
 
-	DL_PF("DP: Firing up RDP!");
-
 	gRenderer->SetVIScales();
 	gRenderer->ResetMatrices(stack_size);
 	gRenderer->Reset();
@@ -561,11 +589,7 @@ void RDP_MoveMemLight(u32 light_idx, const N64Light *light)
 	s8 dir_y = light->dir_y;
 	s8 dir_z = light->dir_z;
 
-	const bool valid = (dir_x | dir_y | dir_z) != 0;
-	DAEDALUS_USE(valid);
-
-	DL_PF("    Light[%d] RGB[%d, %d, %d] x[%d] y[%d] z[%d]", light_idx, r, g, b, dir_x, dir_y, dir_z);
-	DL_PF("    Light direction is %s",valid ? "valid" : "invalid");
+	DL_NOTE("col (%s) dir (%d, %d, %d)", MakeColourTextRGB(r, g, b).c_str(), dir_x, dir_y, dir_z);
 
 	//Light color
 	gRenderer->SetLightCol( light_idx, r, g, b );
@@ -585,20 +609,17 @@ void RDP_MoveMemViewport(u32 address)
 {
 	DAEDALUS_ASSERT( address+16 < MAX_RAM_ADDRESS, "MoveMem Viewport, invalid memory" );
 
-	// address is offset into RD_RAM of 8 x 16bits of data...
+	// Address is offset into RD_RAM of 8 x 16bits of data...
+	// TODO(strmnrmn): Why doesn't this need byteswapping?
 	N64Viewport *vp = (N64Viewport*)(gu8RamBase + address);
 
-	// With D3D we had to ensure that the vp coords are positive, so
-	// we truncated them to 0. This happens a lot, as things
-	// seem to specify the scale as the screen w/2 h/2
+	v2 vec_scale( vp->scale_x / 4.0f, vp->scale_y / 4.0f );
+	v2 vec_trans( vp->trans_x / 4.0f, vp->trans_y / 4.0f );
 
-	v2 vec_scale( vp->scale_x * 0.25f, vp->scale_y * 0.25f );
-	v2 vec_trans( vp->trans_x * 0.25f, vp->trans_y * 0.25f );
+	DL_NOTE("Scale: %d %d", vp->scale_x, vp->scale_y);
+	DL_NOTE("Trans: %d %d", vp->trans_x, vp->trans_y);
 
 	gRenderer->SetN64Viewport( vec_scale, vec_trans );
-
-	DL_PF("    Scale: %d %d", vp->scale_x, vp->scale_y);
-	DL_PF("    Trans: %d %d", vp->trans_x, vp->trans_y);
 }
 
 //Nintro64 uses Sprite2d
@@ -614,23 +635,22 @@ void DLParser_Nothing( MicroCodeCommand command )
 
 void DLParser_SetKeyGB( MicroCodeCommand command )
 {
-	DL_PF( "    SetKeyGB (Ignored)" );
+	DL_COMMAND("gsDPSetKeyGB(?);");
 }
 
 void DLParser_SetKeyR( MicroCodeCommand command )
 {
-	DL_PF( "    SetKeyR (Ignored)" );
+	DL_COMMAND("gsDPSetKeyR(?);");
 }
 
 void DLParser_SetConvert( MicroCodeCommand command )
 {
-	DL_PF( "    SetConvert (Ignored)" );
+	DL_COMMAND("gsDPSetConvert(?);");
 }
 
 void DLParser_SetPrimDepth( MicroCodeCommand command )
 {
-	DL_PF("    SetPrimDepth z[0x%04x] dz[0x%04x]",
-		command.primdepth.z, command.primdepth.dz);
+	DL_COMMAND("gsDPSetPrimDepth(%d, %d);", command.primdepth.z, command.primdepth.dz);
 
 	gRenderer->SetPrimitiveDepth( command.primdepth.z );
 }
@@ -647,18 +667,34 @@ void DLParser_RDPSetOtherMode( MicroCodeCommand command )
 #endif
 }
 
-void DLParser_RDPLoadSync( MicroCodeCommand command )	{ /*DL_PF("    LoadSync: (Ignored)");*/ }
-void DLParser_RDPPipeSync( MicroCodeCommand command )	{ /*DL_PF("    PipeSync: (Ignored)");*/ }
-void DLParser_RDPTileSync( MicroCodeCommand command )	{ /*DL_PF("    TileSync: (Ignored)");*/ }
+void DLParser_RDPLoadSync( MicroCodeCommand command )
+{
+	DL_COMMAND("gsDPLoadSync();");
+}
+void DLParser_RDPPipeSync( MicroCodeCommand command )
+{
+	DL_COMMAND("gsDPPipeSync();");
+}
+void DLParser_RDPTileSync( MicroCodeCommand command )
+{
+	DL_COMMAND("gsDPTileSync();");
+}
 
 void DLParser_RDPFullSync( MicroCodeCommand command )
 {
-	// We now do this regardless
+	DL_COMMAND("gsDPFullSync();");
+
 	// This is done after DLIST processing anyway
 	// FinishRDPJob();
-
-	/*DL_PF("    FullSync: (Generating Interrupt)");*/
 }
+
+static const char* const kScissorModeNames[] =
+{
+	"G_SC_NON_INTERLACE",
+	"?",
+	"G_SC_EVEN_INTERLACE",
+	"G_SC_ODD_INTERLACE",
+};
 
 void DLParser_SetScissor( MicroCodeCommand command )
 {
@@ -680,7 +716,9 @@ void DLParser_SetScissor( MicroCodeCommand command )
 		gRenderer->SetN64Viewport( vec_scale, vec_trans );
 	}
 
-	DL_PF("    x0=%d y0=%d x1=%d y1=%d mode=%d", scissors.left, scissors.top, scissors.right, scissors.bottom, command.scissor.mode);
+	DL_COMMAND("gsDPSetScissor(%s, %d, %d, %d, %d);",
+		kScissorModeNames[command.scissor.mode],
+		scissors.left, scissors.top, scissors.right, scissors.bottom);
 
 	// Set the cliprect now...
 	if ( scissors.left < scissors.right && scissors.top < scissors.bottom )
@@ -689,17 +727,28 @@ void DLParser_SetScissor( MicroCodeCommand command )
 	}
 }
 
+const char* GetClampMirrorWrapText(bool clamp, bool mirror)
+{
+	if (clamp && mirror) return "GG_TX_MIRROR|G_TX_CLAMP";
+	if (clamp) return "G_TX_CLAMP";
+	if (mirror) return "GG_TX_MIRROR";
+	return "GG_TX_WRAP";
+}
+
 void DLParser_SetTile( MicroCodeCommand command )
 {
 	RDP_Tile tile;
 	tile.cmd0 = command.inst.cmd0;
 	tile.cmd1 = command.inst.cmd1;
 
-	gRDPStateManager.SetTile( tile );
+	DL_COMMAND("gsDPSetTile(%s, %s, %d, %d, %s, %d, %s, %d, %d, %s, %d, %d);",
+		gFormatNames[tile.format], gSizeNames[tile.size],
+		tile.line, tile.tmem, GetTileIdxText(tile.tile_idx).c_str(),
+		tile.palette,
+		GetClampMirrorWrapText(tile.clamp_s, tile.mirror_s), tile.mask_s, tile.shift_s,
+		GetClampMirrorWrapText(tile.clamp_t, tile.mirror_t), tile.mask_t, tile.shift_t);
 
-	DL_PF( "    Tile[%d] Format[%s/%s] Line[%d] TMEM[0x%03x] Palette[%d]", tile.tile_idx, gFormatNames[tile.format], gSizeNames[tile.size], tile.line, tile.tmem, tile.palette);
-	DL_PF( "      S: Clamp[%s] Mirror[%s] Mask[0x%x] Shift[0x%x]", gOnOffNames[tile.clamp_s],gOnOffNames[tile.mirror_s], tile.mask_s, tile.shift_s );
-	DL_PF( "      T: Clamp[%s] Mirror[%s] Mask[0x%x] Shift[0x%x]", gOnOffNames[tile.clamp_t],gOnOffNames[tile.mirror_t], tile.mask_t, tile.shift_t );
+	gRDPStateManager.SetTile( tile );
 }
 
 void DLParser_SetTileSize( MicroCodeCommand command )
@@ -708,35 +757,55 @@ void DLParser_SetTileSize( MicroCodeCommand command )
 	tile.cmd0 = command.inst.cmd0;
 	tile.cmd1 = command.inst.cmd1;
 
-	DL_PF("    Tile[%d] (%d,%d) -> (%d,%d) [%d x %d]",
-				tile.tile_idx, tile.left/4, tile.top/4,
-		        tile.right/4, tile.bottom/4,
-				((tile.right/4) - (tile.left/4)) + 1,
-				((tile.bottom/4) - (tile.top/4)) + 1);
+	DL_COMMAND("gsDPSetTileSize(%s, %d, %d, %d, %d); // (%d, %d) -> (%d, %d) = [%d, %d]",
+		GetTileIdxText(tile.tile_idx).c_str(),
+		tile.left, tile.top, tile.right, tile.bottom,
+		tile.left/4, tile.top/4,
+        tile.right/4, tile.bottom/4,
+		tile.GetWidth(), tile.GetHeight());
 
 	gRDPStateManager.SetTileSize( tile );
 }
 
 void DLParser_SetTImg( MicroCodeCommand command )
 {
+	DL_COMMAND("gsDPSetTextureImage(%s, %s, %d, 0x%08x);",
+		gFormatNames[command.img.fmt],
+		gSizeNames[command.img.siz],
+		command.img.width + 1,
+		RDPSegAddr(command.img.addr));
+
 	g_TI.Format		= command.img.fmt;
 	g_TI.Size		= command.img.siz;
 	g_TI.Width		= command.img.width + 1;
 	g_TI.Address	= RDPSegAddr(command.img.addr) & (MAX_RAM_ADDRESS-1);
 	//g_TI.bpl		= g_TI.Width << g_TI.Size >> 1;
-
-	DL_PF("    TImg Adr[0x%08x] Format[%s/%s] Width[%d] Pitch[%d] Bytes/line[%d]",
-		g_TI.Address, gFormatNames[g_TI.Format], gSizeNames[g_TI.Size], g_TI.Width, g_TI.GetPitch(), g_TI.Width << g_TI.Size >> 1 );
 }
 
 void DLParser_LoadBlock( MicroCodeCommand command )
 {
-	gRDPStateManager.LoadBlock( command.loadtile );
+	const SetLoadTile & load = command.loadtile;
+
+	DL_COMMAND("gsDPLoadBlock(%s, %d, %d, %d, 0x%08x);",
+		GetTileIdxText(load.tile).c_str(), load.sl, load.tl, load.sh, load.th);
+
+	gRDPStateManager.LoadBlock( load );
 }
 
 void DLParser_LoadTile( MicroCodeCommand command )
 {
-	gRDPStateManager.LoadTile( command.loadtile );
+	const SetLoadTile& load = command.loadtile;
+
+	DL_COMMAND("gsDPLoadTile(%s, %d, %d, %d, %d);",
+		GetTileIdxText(load.tile).c_str(),
+		load.sl / 4, load.tl / 4,
+		load.sh / 4, load.th / 4);
+	DL_NOTE("(%d x %d), (%d, %d)",
+		load.sl / 4, load.tl / 4,
+		(load.sh - load.sl) / 4 + 1,
+		(load.th - load.tl) / 4 + 1);
+
+	gRDPStateManager.LoadTile(load);
 }
 
 void DLParser_LoadTLut( MicroCodeCommand command )
@@ -746,11 +815,8 @@ void DLParser_LoadTLut( MicroCodeCommand command )
 
 void DLParser_TexRect( MicroCodeCommand command )
 {
-	MicroCodeCommand command2;
-	MicroCodeCommand command3;
-
-	DLParser_FetchNextCommand( &command2 );
-	DLParser_FetchNextCommand( &command3 );
+	MicroCodeCommand command2 = DLParser_FetchNextCommand();
+	MicroCodeCommand command3 = DLParser_FetchNextCommand();
 
 	RDP_TexRect tex_rect;
 	tex_rect.cmd0 = command.inst.cmd0;
@@ -777,7 +843,7 @@ void DLParser_TexRect( MicroCodeCommand command )
 	// Fixes black box in SSB when moving far way from the screen and offscreen in Conker
 	if (g_DI.Address == g_CI.Address || g_CI.Format != G_IM_FMT_RGBA)
 	{
-		DL_PF("    Ignoring Texrect");
+		DL_NOTE("Ignoring Texrect");
 		return;
 	}
 
@@ -823,19 +889,18 @@ void DLParser_TexRect( MicroCodeCommand command )
 	v2 xy0( tex_rect.x0 / 4.0f, tex_rect.y0 / 4.0f );
 	v2 xy1( tex_rect.x1 / 4.0f, tex_rect.y1 / 4.0f );
 
-	DL_PF("    Screen(%.1f,%.1f) -> (%.1f,%.1f) Tile[%d]", xy0.x, xy0.y, xy1.x, xy1.y, tex_rect.tile_idx);
-	DL_PF("    Tex:(%#5.3f,%#5.3f) -> (%#5.3f,%#5.3f) (DSDX:%#5f DTDY:%#5f)", rect_s0/32.f, rect_t0/32.f, rect_s1/32.f, rect_t1/32.f, rect_dsdx/1024.f, rect_dtdy/1024.f);
+	DL_COMMAND("gsSPTextureRectangle(%.1f, %.1f, %.1f, %.1f, %s, %#5.3f, %#5.3f, %#5.3f, %#5.3f);",
+		xy0.x, xy0.y, xy1.x, xy1.y,
+		GetTileIdxText(tex_rect.tile_idx).c_str(),
+		st0.s/32.f, st0.t/32.f, st1.s/32.f, st1.t/32.f);
 
 	gRenderer->TexRect( tex_rect.tile_idx, xy0, xy1, st0, st1 );
 }
 
 void DLParser_TexRectFlip( MicroCodeCommand command )
 {
-	MicroCodeCommand command2;
-	MicroCodeCommand command3;
-
-	DLParser_FetchNextCommand( &command2 );
-	DLParser_FetchNextCommand( &command3 );
+	MicroCodeCommand command2 = DLParser_FetchNextCommand();
+	MicroCodeCommand command3 = DLParser_FetchNextCommand();
 
 	RDP_TexRect tex_rect;
 	tex_rect.cmd0 = command.inst.cmd0;
@@ -915,15 +980,14 @@ void Clear_N64DepthBuffer( MicroCodeCommand command )
 
 void DLParser_FillRect( MicroCodeCommand command )
 {
-	//
 	// Removes annoying rect that appears in Conker and fillrects that cover screen in banjo tooie
 	if( g_CI.Format != G_IM_FMT_RGBA )
 	{
-		DL_PF("    Ignoring Fillrect ");
+		DL_PF("Ignoring Fillrect");
 		return;
 	}
 
-	//Always clear Zbuffer if Depthbuffer is selected //Corn
+	// Always clear Zbuffer if Depthbuffer is selected //Corn
 	if (g_DI.Address == g_CI.Address)
 	{
 		CGraphicsContext::Get()->ClearZBuffer();
@@ -931,25 +995,27 @@ void DLParser_FillRect( MicroCodeCommand command )
 #ifdef DAEDALUS_PSP
 		if(gClearDepthFrameBuffer)
 #else
-		if(true)	//This always enabled for PC, this should be optional once we have a GUI to disable it!
+		if(true)	// This always enabled for PC, this should be optional once we have a GUI to disable it!
 #endif
 		{
 			Clear_N64DepthBuffer(command);
 		}
-		DL_PF("    Clearing ZBuffer");
+		DL_NOTE("Clearing ZBuffer");
 		return;
 	}
+
+	DL_COMMAND("gsDPFillRectangle(%d, %d, %d, %d);",
+		command.fillrect.x0, command.fillrect.y0,
+		command.fillrect.x1, command.fillrect.y1);
 
 	// Note, in some modes, the right/bottom lines aren't drawn
 
 	// TODO - Check colour image format to work out how this should be decoded!
 	// Should we init with Prim or Blend colour? Doesn't work well see Mk64 transition before a race
-	c32		colour = c32(0);
+	c32 colour = c32(0);
 
 	u32 cycle_mode = gRDPOtherMode.cycle_type;
-	//
 	// In Fill/Copy mode the coordinates are inclusive (i.e. add 1.0f to the w/h)
-	//
 	if ( cycle_mode >= CYCLE_COPY )
 	{
 		if ( cycle_mode == CYCLE_FILL )
@@ -973,7 +1039,7 @@ void DLParser_FillRect( MicroCodeCommand command )
 			if( gViWidthMinusOne == clear_screen_x && gViHeightMinusOne == clear_screen_y )
 			{
 				CGraphicsContext::Get()->ClearColBuffer( colour );
-				DL_PF("    Clearing Colour Buffer");
+				DL_NOTE("Clearing Colour Buffer");
 				return;
 			}
 		}
@@ -981,35 +1047,40 @@ void DLParser_FillRect( MicroCodeCommand command )
 		command.fillrect.x1++;
 		command.fillrect.y1++;
 	}
-	DL_PF("    Filling Rectangle (%d,%d)->(%d,%d)", command.fillrect.x0, command.fillrect.y0, command.fillrect.x1, command.fillrect.y1);
 
-	//Converting int->float with bitfields, gives some damn good asm on the PSP
 	v2 xy0( (f32)command.fillrect.x0, (f32)command.fillrect.y0 );
 	v2 xy1( (f32)command.fillrect.x1, (f32)command.fillrect.y1 );
 
 	// TODO - In 1/2cycle mode, skip bottom/right edges!?
 	// This is done in BaseRenderer.
-
 	gRenderer->FillRect( xy0, xy1, colour.GetColour() );
 }
 
 void DLParser_SetZImg( MicroCodeCommand command )
 {
-	DL_PF("    ZImg Adr[0x%08x]", RDPSegAddr(command.inst.cmd1));
+	u32 address = RDPSegAddr(command.img.addr);
+
+	DL_COMMAND("gsDPSetDepthImage(0x%08x);", address);
 
 	// No need check for (MAX_RAM_ADDRESS-1) here, since g_DI.Address is never used to reference a RAM location
-	g_DI.Address = RDPSegAddr(command.inst.cmd1);
+	g_DI.Address = address;
 }
 
 void DLParser_SetCImg( MicroCodeCommand command )
 {
+	u32 address = RDPSegAddr(command.img.addr);
+
+	DL_COMMAND("gsDPSetColorImage(%s, %s, %d, 0x%08x);",
+		gFormatNames[command.img.fmt],
+		gSizeNames[command.img.siz],
+		command.img.width + 1,
+		address);
+
 	g_CI.Format = command.img.fmt;
 	g_CI.Size   = command.img.siz;
 	g_CI.Width  = command.img.width + 1;
-	g_CI.Address = RDPSegAddr(command.img.addr) & (MAX_RAM_ADDRESS-1);
+	g_CI.Address = address & (MAX_RAM_ADDRESS-1);
 	//g_CI.Bpl		= g_CI.Width << g_CI.Size >> 1;
-
-	DL_PF("    CImg Adr[0x%08x] Format[%s] Size[%s] Width[%d]", RDPSegAddr(command.inst.cmd1), gFormatNames[ g_CI.Format ], gSizeNames[ g_CI.Size ], g_CI.Width);
 }
 
 void DLParser_SetCombine( MicroCodeCommand command )
@@ -1022,10 +1093,7 @@ void DLParser_SetCombine( MicroCodeCommand command )
 	gRenderer->SetMux( Mux._u64 );
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	if (DLDebug_IsActive())
-	{
-		DLDebug_DumpMux( Mux._u64 );
-	}
+	DLDebug_DumpMux( Mux._u64 );
 #endif
 }
 
@@ -1033,17 +1101,15 @@ void DLParser_SetFillColor( MicroCodeCommand command )
 {
 	u32 fill_colour = command.inst.cmd1;
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	N64Pf5551	n64col( (u16)fill_colour );
-	DL_PF( "    Color5551=0x%04x", n64col.Bits );
-#endif
+	// TODO(strmnnrmn) Colour can be 16 or 32 bit...
+	DL_COMMAND("gsDPSetFillColor(%s);", MakeColourTextRGBA(fill_colour).c_str());
 
 	gRenderer->SetFillColour( fill_colour );
 }
 
 void DLParser_SetFogColor( MicroCodeCommand command )
 {
-	DL_PF("    RGBA: %d %d %d %d", command.color.r, command.color.g, command.color.b, command.color.a);
+	DL_COMMAND("gsDPSetFogColor(%s);", MakeColourTextRGBA(command.inst.cmd1).c_str());
 
 	// Ignore alpha from the command, and always set it to 0.
 	c32	fog_colour( command.color.r, command.color.g, command.color.b, 0 );
@@ -1053,7 +1119,7 @@ void DLParser_SetFogColor( MicroCodeCommand command )
 
 void DLParser_SetBlendColor( MicroCodeCommand command )
 {
-	DL_PF("    RGBA: %d %d %d %d", command.color.r, command.color.g, command.color.b, command.color.a);
+	DL_COMMAND("gsDPSetBlendColor(%s);", MakeColourTextRGBA(command.inst.cmd1).c_str());
 
 	c32	blend_colour( command.color.r, command.color.g, command.color.b, command.color.a );
 
@@ -1062,7 +1128,8 @@ void DLParser_SetBlendColor( MicroCodeCommand command )
 
 void DLParser_SetPrimColor( MicroCodeCommand command )
 {
-	DL_PF("    M:%d L:%d RGBA: %d %d %d %d", command.color.prim_min_level, command.color.prim_level, command.color.r, command.color.g, command.color.b, command.color.a);
+	DL_COMMAND("gsDPSetPrimColor(%d, %d, %s);",
+		command.color.prim_min_level, command.color.prim_level, MakeColourTextRGBA(command.inst.cmd1).c_str());
 
 	c32	prim_colour( command.color.r, command.color.g, command.color.b, command.color.a );
 
@@ -1072,7 +1139,7 @@ void DLParser_SetPrimColor( MicroCodeCommand command )
 
 void DLParser_SetEnvColor( MicroCodeCommand command )
 {
-	DL_PF("    RGBA: %d %d %d %d", command.color.r, command.color.g, command.color.b, command.color.a);
+	DL_COMMAND("gsDPSetEnvColor(%s);", MakeColourTextRGBA(command.inst.cmd1).c_str());
 
 	c32	env_colour( command.color.r, command.color.g,command.color.b, command.color.a );
 
@@ -1081,6 +1148,9 @@ void DLParser_SetEnvColor( MicroCodeCommand command )
 
 // RSP TRI commands.
 // In HLE emulation you NEVER see these commands !
-void DLParser_TriRSP( MicroCodeCommand command ){ DL_PF("    RSP Tri: (Ignored)"); }
+void DLParser_TriRSP( MicroCodeCommand command )
+{
+	DL_PF("    RSP Tri: (Ignored)");
+}
 
 

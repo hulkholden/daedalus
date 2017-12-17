@@ -251,7 +251,7 @@ public:
 	void				SetProjection(u32 address, bool bReplace);
 	void				SetWorldView(u32 address, bool bPush, bool bReplace);
 	inline void			PopWorldView(u32 num = 1)	{if (mModelViewTop > (num-1))	 mModelViewTop-=num;	mWorldProjectValid = false;}
-	void				InsertMatrix(u32 w0, u32 w1);
+	void				InsertMatrix(u32 where, u32 value);
 	void				ForceMatrix(u32 address);
 	inline void			DKRMtxChanged( u32 idx )	{mWPmodified = true; mDKRMatIdx = idx;}
 
@@ -260,7 +260,7 @@ public:
 	void				SetNewVertexInfoConker(u32 address, u32 v0, u32 n);	// For conker..
 	void				SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboard);	// Assumes dwAddress has already been checked!
 	void				SetNewVertexInfoPD(u32 address, u32 v0, u32 n);	// Assumes dwAddress has already been checked!
-	void				ModifyVertexInfo(u32 whered, u32 vert, u32 val);
+	void				ModifyVertexInfo(u32 vert, u32 where, u32 val);
 	void				SetVtxColor(u32 vert, u32 color);
 	inline void			SetVtxTextureCoord(u32 vert, s16 tu, s16 tv) { mVtxProjected[vert].Texture.x = (f32)tu * (1.0f / 32.0f); mVtxProjected[vert].Texture.y = (f32)tv * (1.0f / 32.0f); }
 	inline void			SetVtxXY(u32 vert, float x, float y);
@@ -276,8 +276,8 @@ public:
 	// Returns true if bounding volume is visible within NDC box, false if culled
 	bool				TestVerts(u32 v0, u32 vn) const;
 	inline s32			GetVtxDepth(u32 i) const			{ return (s32)mVtxProjected[ i ].ProjectedPos.z; }
-	inline v4			GetTransformedVtxPos(u32 i) const	{ return mVtxProjected[ i ].TransformedPos; }
-	inline v4			GetProjectedVtxPos(u32 i) const		{ return mVtxProjected[ i ].ProjectedPos; }
+	inline const v4&	GetTransformedVtxPos(u32 i) const	{ return mVtxProjected[ i ].TransformedPos; }
+	inline const v4&	GetProjectedVtxPos(u32 i) const		{ return mVtxProjected[ i ].ProjectedPos; }
 	inline u32			GetVtxFlags(u32 i) const			{ return mVtxProjected[ i ].ClipFlags; }
 
 	inline u64			GetMux() const						{ return mMux; }

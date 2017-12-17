@@ -735,9 +735,6 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 	const Matrix4x4 & mat_world_project = mWorldProject;
 	const Matrix4x4 & mat_world = mModelViewStack[mModelViewTop];
 
-	DL_PF( "    Ambient color RGB[%f][%f][%f] Texture scale X[%f] Texture scale Y[%f]", mTnL.Lights[mTnL.NumLights].Colour.x, mTnL.Lights[mTnL.NumLights].Colour.y, mTnL.Lights[mTnL.NumLights].Colour.z, mTnL.TextureScaleX, mTnL.TextureScaleY);
-	DL_PF( "    Light[%d %s] Texture[%s] EnvMap[%s] Fog[%s]", mTnL.NumLights, (mTnL.Flags.Light)? (mTnL.Flags.PointLight)? "Point":"Normal":"Off", (mTnL.Flags.Texture)? "On":"Off", (mTnL.Flags.TexGen)? (mTnL.Flags.TexGenLin)? "Linear":"Spherical":"Off", (mTnL.Flags.Fog)? "On":"Off");
-
 	// Transform and Project + Lighting or Transform and Project with Colour
 	//
 	for (u32 i = v0; i < v0 + n; i++)
@@ -1100,9 +1097,9 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 	}
 }
 
-void BaseRenderer::ModifyVertexInfo(u32 whered, u32 vert, u32 val)
+void BaseRenderer::ModifyVertexInfo(u32 vert, u32 where, u32 val)
 {
-	switch ( whered )
+	switch ( where )
 	{
 		case G_MWO_POINT_RGBA:
 			{
@@ -1150,8 +1147,8 @@ void BaseRenderer::ModifyVertexInfo(u32 whered, u32 vert, u32 val)
 			break;
 
 		default:
-			Console_Print("ModifyVtx - Setting vert data where: 0x%02x, vert: 0x%08x, val: 0x%08x", whered, vert, val);
-			DL_PF( "    Setting unknown value: where: 0x%02x, vert: 0x%08x, val: 0x%08x", whered, vert, val );
+			Console_Print("ModifyVtx - Setting vert data where: 0x%02x, vert: 0x%08x, val: 0x%08x", where, vert, val);
+			DL_PF( "    Setting unknown value: where: 0x%02x, vert: 0x%08x, val: 0x%08x", where, vert, val );
 			break;
 	}
 }
@@ -1308,12 +1305,6 @@ void BaseRenderer::UpdateTileSnapshot( u32 index, u32 tile_idx )
 	mTileTopLeft[ index ].t = tile_size.top;
 
 	mActiveTile[ index ] = tile_idx;
-
-	DL_PF( "    Use Tile[%d] as Texture[%d] [%dx%d] [%s/%dbpp] [%s u, %s v] -> Adr[0x%08x] PAL[0x%x] Hash[0x%08x] Pitch[%d] TopLeft[%0.3f|%0.3f]",
-			tile_idx, index, ti.GetWidth(), ti.GetHeight(), ti.GetFormatName(), ti.GetSizeInBits(),
-			(mode_u==GL_CLAMP_TO_EDGE)? "Clamp" : "Repeat", (mode_v==GL_CLAMP_TO_EDGE)? "Clamp" : "Repeat",
-			ti.GetLoadAddress(), ti.GetTlutAddress(), ti.GetHashCode(), ti.GetPitch(),
-			mTileTopLeft[ index ].s / 4.f, mTileTopLeft[ index ].t / 4.f );
 }
 
 
@@ -1473,7 +1464,7 @@ void BaseRenderer::SetProjection(u32 address, bool bReplace)
 	mWorldProjectValid = false;
 	SetProjectionMatrix(mProjectionMat);
 
-	DL_PF(
+	DL_NOTE(
 		"	 %#+12.5f %#+12.5f %#+12.7f %#+12.5f\n"
 		"    %#+12.5f %#+12.5f %#+12.7f %#+12.5f\n"
 		"    %#+12.5f %#+12.5f %#+12.7f %#+12.5f\n"
@@ -1501,7 +1492,7 @@ void BaseRenderer::SetDKRMat(u32 address, bool mul, u32 idx)
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	const Matrix4x4 & mtx( mModelViewStack[idx] );
-	DL_PF("    Mtx_DKR: Index %d %s Address 0x%08x\n"
+	DL_NOTE("    Mtx_DKR: Index %d %s Address 0x%08x\n"
 			"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
 			"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
 			"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
@@ -1552,7 +1543,7 @@ void BaseRenderer::SetWorldView(u32 address, bool bPush, bool bReplace)
 
 	mWorldProjectValid = false;
 
-	DL_PF("    Level = %d\n"
+	DL_NOTE("    Level = %d\n"
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
@@ -1603,7 +1594,7 @@ void BaseRenderer::PrintActive()
 	UpdateWorldProject();
 	const Matrix4x4 & mat = mWorldProject;
 
-	DL_PF(
+	DL_NOTE(
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
@@ -1616,7 +1607,7 @@ void BaseRenderer::PrintActive()
 #endif
 
 // Modify the WorldProject matrix, used by Kirby & SSB //Corn
-void BaseRenderer::InsertMatrix(u32 w0, u32 w1)
+void BaseRenderer::InsertMatrix(u32 where, u32 value)
 {
 	mWPmodified = true;	//Signal that Worldproject matrix is changed
 
@@ -1627,24 +1618,24 @@ void BaseRenderer::InsertMatrix(u32 w0, u32 w1)
 		mWorldProjectValid = true;
 	}
 
-	u32 x = (w0 & 0x1F) >> 1;
+	u32 x = (where & 0x1F) >> 1;
 	u32 y = x >> 2;
 	x &= 3;
 
-	if (w0 & 0x20)
+	if (where & 0x20)
 	{
 		//Change fraction part
-		mWorldProject.m[y][x]   = (f32)(s32)mWorldProject.m[y][x] + ((f32)(w1 >> 16) / 65536.0f);
-		mWorldProject.m[y][x+1] = (f32)(s32)mWorldProject.m[y][x+1] + ((f32)(w1 & 0xFFFF) / 65536.0f);
+		mWorldProject.m[y][x]   = (f32)(s32)mWorldProject.m[y][x] + ((f32)(value >> 16) / 65536.0f);
+		mWorldProject.m[y][x+1] = (f32)(s32)mWorldProject.m[y][x+1] + ((f32)(value & 0xFFFF) / 65536.0f);
 	}
 	else
 	{
 		//Change integer part
-		mWorldProject.m[y][x]	= (f32)(s16)(w1 >> 16);
-		mWorldProject.m[y][x+1] = (f32)(s16)(w1 & 0xFFFF);
+		mWorldProject.m[y][x]	= (f32)(s16)(value >> 16);
+		mWorldProject.m[y][x+1] = (f32)(s16)(value & 0xFFFF);
 	}
 
-	DL_PF(
+	DL_NOTE(
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
@@ -1663,7 +1654,7 @@ void BaseRenderer::ForceMatrix(u32 address)
 
 	MatrixFromN64FixedPoint( mWorldProject, address );
 
-	DL_PF(
+	DL_NOTE(
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"
 		"    %#+12.5f %#+12.5f %#+12.5f %#+12.5f\n"

@@ -36,13 +36,13 @@ void DLParser_GBI1_Vtx(MicroCodeCommand command)
 	u32 v0 = command.vtx1.v0;
 	u32 n = command.vtx1.n;
 
-	DL_PF("    Address 0x%08x, v0: %d, Num: %d, Length: 0x%04x", addr, v0, n, command.vtx1.len);
+	DL_COMMAND("gsSPVertex(0x%08x, %d, %d);", addr, n, v0);
 	DAEDALUS_ASSERT((v0 + n) <= 64, "Warning, attempting to load into invalid vertex positions");
 
 	// Wetrix
-	if (addr > MAX_RAM_ADDRESS)
+	if (addr >= MAX_RAM_ADDRESS)
 	{
-		DL_PF("     Address out of range - ignoring load");
+		DL_PF("Address out of range - ignoring load");
 		return;
 	}
 
@@ -67,18 +67,19 @@ void DLParser_GBI1_ModifyVtx(MicroCodeCommand command)
 		return;
 	}
 
-	gRenderer->ModifyVertexInfo(offset, vert, value);
+	gRenderer->ModifyVertexInfo(vert, offset, value);
 }
 
 void DLParser_GBI1_Mtx(MicroCodeCommand command)
 {
 	u32 address = RDPSegAddr(command.mtx1.addr);
 
-	DL_PF("    Command: %s %s %s Length %d Address 0x%08x", command.mtx1.projection == 1 ? "Projection" : "ModelView",
-		  command.mtx1.load == 1 ? "Load" : "Mul", command.mtx1.push == 1 ? "Push" : "NoPush", command.mtx1.len,
-		  address);
+	DL_COMMAND("gsSPMatrix(0x%08x, %s%s%s);",
+		address,
+		command.mtx1.projection == 1 ? "G_MTX_PROJECTION" : "G_MTX_MODELVIEW",
+		command.mtx1.load == 1 ? "|G_MTX_LOAD" : "|G_MTX_MUL",
+		command.mtx1.push == 1 ? "|G_MTX_PUSH" : "");
 
-	// Load matrix from address
 	if (command.mtx1.projection)
 	{
 		gRenderer->SetProjection(address, command.mtx1.load);
@@ -91,7 +92,7 @@ void DLParser_GBI1_Mtx(MicroCodeCommand command)
 
 void DLParser_GBI1_PopMtx(MicroCodeCommand command)
 {
-	DL_PF("    Command: (%s)", command.inst.cmd1 ? "Projection" : "ModelView");
+	DL_COMMAND("gsSPPopMatrix(%s);", command.inst.cmd1 ? "G_MTX_PROJECTION" : "G_MTX_MODELVIEW");
 
 	// Do any of the other bits do anything?
 	// So far only Extreme-G seems to Push/Pop projection matrices
@@ -108,7 +109,7 @@ void DLParser_GBI1_MoveMem(MicroCodeCommand command)
 	{
 		case G_MV_VIEWPORT:
 		{
-			DL_PF("    G_MV_VIEWPORT. Address: 0x%08x", address);
+			DL_COMMAND("gsSPViewport(0x%08x);", address);
 			RDP_MoveMemViewport(address);
 		}
 		break;
@@ -122,15 +123,17 @@ void DLParser_GBI1_MoveMem(MicroCodeCommand command)
 		case G_MV_L6:
 		case G_MV_L7:
 		{
-			u32 light_idx = (type - G_MV_L0) >> 1;
+			u32 light_idx = (type - G_MV_L0) / 2;
 			N64Light* light = (N64Light*)(gu8RamBase + address);
+
+			DL_COMMAND("gsSPLight(0x%08x, LIGHT_%d);", address, light_idx+1);
 			RDP_MoveMemLight(light_idx, light);
 		}
 		break;
 
 		case G_MV_MATRIX_1:
 		{
-			DL_PF("		Force Matrix(1): addr=%08X", address);
+			DL_COMMAND("gsSPForceMatrix(0x%08x);", address);
 			// Rayman 2, Donald Duck, Tarzan, all wrestling games use this
 			gRenderer->ForceMatrix(address);
 			// ForceMatrix takes four cmds
@@ -157,7 +160,7 @@ void DLParser_GBI1_MoveMem(MicroCodeCommand command)
 */
 		default:
 		{
-			DL_PF("    GBI1 MoveMem Type: Ignored!!");
+			DL_PF("GBI1 MoveMem Type: Ignored!! 0x%08x", type);
 		}
 		break;
 	}
@@ -166,48 +169,51 @@ void DLParser_GBI1_MoveMem(MicroCodeCommand command)
 void DLParser_GBI1_MoveWord(MicroCodeCommand command)
 {
 	// Type of movement is in low 8bits of cmd0.
-	u32 value = command.mw1.value;
+	u32 value  = command.mw1.value;
 	u32 offset = command.mw1.offset;
 
 	switch (command.mw1.type)
 	{
 		case G_MW_MATRIX:
 		{
-			DL_PF("    G_MW_MATRIX(1)");
-			gRenderer->InsertMatrix(command.inst.cmd0, command.inst.cmd1);
+			u32 where = command.inst.cmd0;
+			u32 value = command.inst.cmd1;
+			DL_COMMAND("gsSPInsertMatrix(0x%08x, 0x%08x);");
+			gRenderer->InsertMatrix(where, value);
+			break;
 		}
-		break;
 
 		case G_MW_NUMLIGHT:
 		{
 			u32 num_lights = ((value - 0x80000000) >> 5) - 1;
-
-			DL_PF("    G_MW_NUMLIGHT: Val:%d", num_lights);
+			DL_COMMAND("gsSPNumLights(NUMLIGHTS_%d);", num_lights);
 			gRenderer->SetNumLights(num_lights);
+			break;
 		}
-		break;
-		/*
-			case G_MW_CLIP:	// Seems to be unused?
-				{
-					DL_PF("    G_MW_CLIP  ?   : 0x%08x", value);
-				}
-				break;
-		*/
+		case G_MW_CLIP:  // Seems to be unused?
+		{
+			DL_COMMAND("gsSPClipRatio(0x%08x);", value);
+			break;
+		}
+
 		case G_MW_SEGMENT:
 		{
 			u32 segment = (offset >> 2) & 0xF;
-			DL_PF("    G_MW_SEGMENT Seg[%d] = 0x%08x", segment, value);
+			DL_COMMAND("gsSPSegment(%d, %d);", segment, value);
 			gSegments[segment] = value;
+			break;
 		}
-		break;
 
-		case G_MW_FOG:  // WIP, only works for the PSP
+		case G_MW_FOG:
 		{
-#ifdef DAEDALUS_PSP
-			f32 mul = (f32)(s16)(value >> 16);		// Fog mult
-			f32 offs = (f32)(s16)(value & 0xFFFF);  // Fog Offset
+			s16 fm = (s16)(value >> 16);
+			s16 fo = (s16)(value & 0xFFFF);
+			// TODO: There's a gsSPFogPosition() which might be more intuitive?
+			DL_COMMAND("gsSPFogFactor(%d, %d);", fm, fo);
 
-			gRenderer->SetFogMultOffs(mul, offs);
+#ifdef DAEDALUS_PSP
+			gRenderer->SetFogMultOffs((f32)fm, (f32)fo);
+#endif
 
 // HW fog, only works for a few games
 #if 0
@@ -219,18 +225,15 @@ void DLParser_GBI1_MoveWord(MicroCodeCommand command)
 
 			gRenderer->SetFogMinMax(fog_near, fog_far);
 #endif
-// DL_PF(" G_MW_FOG. Mult = 0x%04x (%f), Off = 0x%04x (%f)", wMult, 255.0f * fMult, wOff, 255.0f * fOff );
-// printf("1Fog %.0f | %.0f || %.0f | %.0f\n", min, max, a, b);
-#endif
+			break;
 		}
-		break;
 
 		case G_MW_LIGHTCOL:
 		{
 			u32 field_offset = (offset & 0x7);
-			u32 light_idx = offset >> 5;
+			u32 light_idx    = offset >> 5;
 
-			DL_PF("    G_MW_LIGHTCOL/0x%08x: 0x%08x", offset, value);
+			DL_COMMAND("gsSPLightColor(LIGHT_%d, %s);", light_idx, MakeColourTextRGBA(value).c_str());
 
 			if (field_offset == 0)
 			{
@@ -240,25 +243,28 @@ void DLParser_GBI1_MoveWord(MicroCodeCommand command)
 				u8 b = ((value >> 8) & 0xFF);
 				gRenderer->SetLightCol(light_idx, r, g, b);
 			}
+			break;
 		}
-		break;
 
 		case G_MW_POINTS:  // Used in FIFA 98
 		{
-			DL_PF("    G_MW_POINTS");
-			gRenderer->ModifyVertexInfo((offset % 40), (offset / 40), value);
+			u32 vtx   = offset / 40;
+			u32 where = offset % 40;
+			DL_COMMAND("gsSPModifyVertex(%d, %d, 0x%08x);", vtx, where);
+			gRenderer->ModifyVertexInfo(vtx, where, value);
+			break;
 		}
-		break;
-		/*
-			case G_MW_PERSPNORM:
-				DL_PF("    G_MW_PERSPNORM");
-				break;
-		*/
+		case G_MW_PERSPNORM:
+		{
+			DL_COMMAND("gsSPPerspNormalize(0x%08x);", value);
+			break;
+		}
+
 		default:
 		{
-			DL_PF("    GBI1 MoveWord Type: Ignored!!");
+			DL_COMMAND("gMoveWd(%d, %d, 0x%08x)", command.mw1.type, command.mw1.offset, command.mw1.value);
+			break;
 		}
-		break;
 	}
 }
 
@@ -287,24 +293,26 @@ void DLParser_GBI1_CullDL(MicroCodeCommand command)
 
 void DLParser_GBI1_DL(MicroCodeCommand command)
 {
-#if defined(DAEDALUS_DEBUG_DISPLAYLIST) || defined(DAEDALUS_ENABLE_ASSERTS)
-	u32 addr = RDPSegAddr(command.dlist.addr);
-	DAEDALUS_ASSERT(addr < MAX_RAM_ADDRESS, "Dlist address out of range");
+	DAEDALUS_ASSERT(RDPSegAddr(command.dlist.addr) < MAX_RAM_ADDRESS, "Dlist address out of range");
 	DAEDALUS_ASSERT(gDlistStackPointer < 9, "Dlist array is getting too deep");
 
-	DL_PF("    Address=0x%08x %s", addr,
-		  (command.dlist.param == G_DL_NOPUSH) ? "Jump" : (command.dlist.param == G_DL_PUSH) ? "Push" : "?");
-	DL_PF("    \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/");
-	DL_PF("    ############################################");
-#endif
+	DL_COMMAND("%s(0x%08x);",
+		(command.dlist.param == G_DL_PUSH) ? "gsSPDisplayList" : "gsSPBranchList",
+		RDPSegAddr(command.dlist.addr));
 
-	if (command.dlist.param == G_DL_PUSH) gDlistStackPointer++;
-
-	// Compiler gives much better asm if RDPSegAddr.. is sticked directly here
-	gDlistStack.address[gDlistStackPointer] = RDPSegAddr(command.dlist.addr) & (MAX_RAM_ADDRESS - 1);
+	if (command.dlist.param == G_DL_PUSH)
+	{
+		DLParser_PushDisplayList();
+	}
+	DLParser_SetDisplayList(RDPSegAddr(command.dlist.addr));
 }
 
-void DLParser_GBI1_EndDL(MicroCodeCommand command) { DLParser_PopDL(); }
+void DLParser_GBI1_EndDL(MicroCodeCommand command)
+{
+    DL_COMMAND("gsSPEndDisplayList();");
+
+	DLParser_PopDL();
+}
 
 // When the depth is less than the z value provided, branch to given address
 void DLParser_GBI1_BranchZ(MicroCodeCommand command)
@@ -343,6 +351,33 @@ void DLParser_GBI1_LoadUCode(MicroCodeCommand command)
 	DLParser_InitMicrocode(code_base, code_size, data_base, data_size);
 }
 
+std::string MakeGBI1GeometryModeFlagsText(u32 data)
+{
+	std::vector<std::string> flags;
+
+	if (data & G_ZBUFFER)			flags.push_back("G_ZBUFFER");
+	if (data & G_TEXTURE_ENABLE)	flags.push_back("G_TEXTURE_ENABLE");
+	if (data & G_SHADE)				flags.push_back("G_SHADE");
+	if (data & G_SHADING_SMOOTH)	flags.push_back("G_SHADING_SMOOTH");
+
+	u32 cull = data & G_CULL_BOTH;
+	if (cull == G_CULL_FRONT)		flags.push_back("G_CULL_FRONT");
+	else if (cull == G_CULL_BACK)	flags.push_back("G_CULL_BACK");
+	else if (cull == G_CULL_BOTH)	flags.push_back("G_CULL_BOTH");
+
+	if (data & G_FOG)					flags.push_back("G_FOG");
+	if (data & G_LIGHTING)				flags.push_back("G_LIGHTING");
+	if (data & G_TEXTURE_GEN)			flags.push_back("G_TEXTURE_GEN");
+	if (data & G_TEXTURE_GEN_LINEAR)	flags.push_back("G_TEXTURE_GEN_LINEAR");
+	if (data & G_LOD)					flags.push_back("G_LOD");
+
+	if (flags.empty())
+	{
+		return "0";
+	}
+	return absl::StrJoin(flags, "|");
+}
+
 void DLParser_GBI1_GeometryMode(MicroCodeCommand command)
 {
 	const u32 mask = command.inst.cmd1;
@@ -350,12 +385,12 @@ void DLParser_GBI1_GeometryMode(MicroCodeCommand command)
 	if (command.inst.cmd & 1)
 	{
 		gGeometryMode._u32 |= mask;
-		DL_PF("    Setting mask -> 0x%08x", mask);
+		DL_COMMAND("gsSPSetGeometryMode(%s);", MakeGBI1GeometryModeFlagsText(mask).c_str());
 	}
 	else
 	{
 		gGeometryMode._u32 &= ~mask;
-		DL_PF("    Clearing mask -> 0x%08x", mask);
+		DL_COMMAND("gsSPClearGeometryMode(%s);", MakeGBI1GeometryModeFlagsText(mask).c_str());
 	}
 
 	TnLMode TnL;
@@ -374,18 +409,6 @@ void DLParser_GBI1_GeometryMode(MicroCodeCommand command)
 	TnL.CullBack = gGeometryMode.GBI1_CullBack;
 
 	gRenderer->SetTnLMode(TnL._u32);
-
-	DL_PF("    ZBuffer %s", (gGeometryMode.GBI1_Zbuffer) ? "On" : "Off");
-	DL_PF("    Culling %s",
-		  (gGeometryMode.GBI1_CullBack) ? "Back face" : (gGeometryMode.GBI1_CullFront) ? "Front face" : "Off");
-	DL_PF("    Shade %s", (gGeometryMode.GBI1_Shade) ? "On" : "Off");
-	DL_PF("    Smooth Shading %s", (gGeometryMode.GBI1_ShadingSmooth) ? "On" : "Off");
-	DL_PF("    Lighting %s", (gGeometryMode.GBI1_Lighting) ? "On" : "Off");
-	DL_PF("    Texture %s", (gGeometryMode.GBI1_Texture) ? "On" : "Off");
-	DL_PF("    Texture Gen %s", (gGeometryMode.GBI1_TexGen) ? "On" : "Off");
-	DL_PF("    Texture Gen Linear %s", (gGeometryMode.GBI1_TexGenLin) ? "On" : "Off");
-	DL_PF("    Fog %s", (gGeometryMode.GBI1_Fog) ? "On" : "Off");
-	DL_PF("    LOD %s", (gGeometryMode.GBI1_Lod) ? "On" : "Off");
 }
 
 void DLParser_GBI1_SetOtherModeL(MicroCodeCommand command)
@@ -412,16 +435,18 @@ void DLParser_GBI1_SetOtherModeH(MicroCodeCommand command)
 
 void DLParser_GBI1_Texture(MicroCodeCommand command)
 {
-	DL_PF("    Level[%d] Tile[%d] %s", command.texture.level, command.texture.tile,
-		  command.texture.enable_gbi0 ? "enable" : "disable");
+	DL_COMMAND("gsSPTexture(%f, %f, %d, %s, %s);",
+		command.texture.scaleS / 65535.0f,
+		command.texture.scaleT / 65535.0f,
+		command.texture.level,
+		GetTileIdxText(command.texture.tile).c_str(),
+		command.texture.enable_gbi0 ? "G_ON" : "G_OFF");
 
 	gRenderer->SetTextureTile(command.texture.tile);
 	gRenderer->SetTextureEnable(command.texture.enable_gbi0);
 
 	f32 scale_s = f32(command.texture.scaleS) / (65535.0f * 32.0f);
 	f32 scale_t = f32(command.texture.scaleT) / (65535.0f * 32.0f);
-
-	DL_PF("    ScaleS[%0.4f] ScaleT[%0.4f]", scale_s * 32.0f, scale_t * 32.0f);
 	gRenderer->SetTextureScale(scale_s, scale_t);
 }
 
@@ -431,9 +456,15 @@ void DLParser_GBI1_Reserved(MicroCodeCommand command)
 	DL_UNIMPLEMENTED_ERROR("RDP: Reserved");
 }
 
-void DLParser_GBI1_Noop(MicroCodeCommand command) {}
+void DLParser_GBI1_Noop(MicroCodeCommand command)
+{
+	DL_COMMAND("gsDPNoOp();");
+}
 
-void DLParser_GBI1_SpNoop(MicroCodeCommand command) {}
+void DLParser_GBI1_SpNoop(MicroCodeCommand command)
+{
+	DL_COMMAND("gsSPNoOp();");
+}
 
 void DLParser_GBI1_RDPHalf_Cont(MicroCodeCommand command)
 {
@@ -442,10 +473,15 @@ void DLParser_GBI1_RDPHalf_Cont(MicroCodeCommand command)
 
 void DLParser_GBI1_RDPHalf_2(MicroCodeCommand command)
 {
-	//	Console_Print("Unexpected RDPHalf_2: %08x %08x", command.inst.cmd0, command.inst.cmd1);
+	DL_COMMAND("gsImmp1(G_RDPHALF_2, 0x%08x);", command.inst.cmd1);
 }
 
-void DLParser_GBI1_RDPHalf_1(MicroCodeCommand command) { gRDPHalf1 = command.inst.cmd1; }
+void DLParser_GBI1_RDPHalf_1(MicroCodeCommand command)
+{
+	DL_COMMAND("gsImmp1(G_RDPHALF_1, 0x%08x);", command.inst.cmd1);
+
+	gRDPHalf1 = command.inst.cmd1;
+}
 
 void DLParser_GBI1_Tri2(MicroCodeCommand command)
 {
@@ -504,20 +540,27 @@ void DLParser_GBI1_Line3D(MicroCodeCommand command)
 
 	do
 	{
-		// DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI1_LINE3D");
-
 		u32 v0_idx = command.gbi1line3d.v0 / stride;
 		u32 v1_idx = command.gbi1line3d.v1 / stride;
 		u32 v2_idx = command.gbi1line3d.v2 / stride;
 		u32 v3_idx = command.gbi1line3d.v3 / stride;
 
-		tris_added |= gRenderer->AddTri(v0_idx, v1_idx, v2_idx);
-		tris_added |= gRenderer->AddTri(v2_idx, v3_idx, v0_idx);
+		bool a_added = gRenderer->AddTri(v0_idx, v1_idx, v2_idx);
+		bool b_added = gRenderer->AddTri(v2_idx, v3_idx, v0_idx);
+
+		tris_added |= a_added | b_added;
+
+		DL_COMMAND("gsSPLine3D(%d, %d, %d, %d);", v0_idx, v1_idx, v2_idx, v3_idx);
+		DL_NOTE("%s",
+			(a_added && b_added) ? "" :
+			(a_added) ? "  // b rejected" :
+			(b_added) ? "  // a rejected" :
+			"  // both rejected");
 
 		command.inst.cmd0 = *pCmdBase++;
 		command.inst.cmd1 = *pCmdBase++;
 		pc += 8;
-	} while (command.inst.cmd == G_GBI1_LINE3D);
+	} while (command.inst.cmd == G_GBI1_LINE3D && !DL_ACTIVE());
 
 	gDlistStack.address[gDlistStackPointer] = pc - 8;
 
@@ -539,19 +582,20 @@ void DLParser_GBI1_Tri1(MicroCodeCommand command)
 
 	do
 	{
-		// DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI1_TRI1");
-
-		// Vertex indices are multiplied by 10 for Mario64, by 2 for MarioKart
 		u32 v0_idx = command.gbi1tri1.v0 / stride;
 		u32 v1_idx = command.gbi1tri1.v1 / stride;
 		u32 v2_idx = command.gbi1tri1.v2 / stride;
 
-		tris_added |= gRenderer->AddTri(v0_idx, v1_idx, v2_idx);
+		bool added = gRenderer->AddTri(v0_idx, v1_idx, v2_idx);
+		tris_added |= added;
+
+		DL_COMMAND("gsSP1Triangle(%d, %d, %d, %d);", v0_idx, v1_idx, v2_idx, command.gbi1tri1.flag);
+		DL_NOTE(added ? "" : "rejected");
 
 		command.inst.cmd0 = *pCmdBase++;
 		command.inst.cmd1 = *pCmdBase++;
 		pc += 8;
-	} while (command.inst.cmd == G_GBI1_TRI1);
+	} while (command.inst.cmd == G_GBI1_TRI1 && !DL_ACTIVE());
 
 	gDlistStack.address[gDlistStackPointer] = pc - 8;
 

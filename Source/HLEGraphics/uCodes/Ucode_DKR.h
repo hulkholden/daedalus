@@ -95,7 +95,7 @@ void DLParser_GBI0_Vtx_DKR(MicroCodeCommand command)
 	}
 
 	v0_idx = ((command.inst.cmd0 >> 9) & 0x1F) + gDKRVtxCount;
-	DL_PF("    Address[0x%08x] v0[%d] Num[%d]", address, v0_idx, num_verts);
+	DL_COMMAND("gsSPVertex(0x%08x, %d, %d);", address, num_verts, v0_idx);
 
 	gRenderer->SetNewVertexInfoDKR(address, v0_idx, num_verts, gDKRBillBoard);
 
@@ -115,8 +115,6 @@ void DLParser_DLInMem(MicroCodeCommand command)
 
 	DL_PF("    Address=0x%08x %s", command.inst.cmd1,
 		  (command.dlist.param == G_DL_NOPUSH) ? "Jump" : (command.dlist.param == G_DL_PUSH) ? "Push" : "?");
-	DL_PF("    \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/");
-	DL_PF("    ############################################");
 }
 
 void DLParser_Mtx_DKR(MicroCodeCommand command)

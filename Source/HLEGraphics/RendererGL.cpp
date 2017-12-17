@@ -967,8 +967,8 @@ void RendererGL::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord
 	v2 screen0 = ConvertN64ToScreen(xy0);
 	v2 screen1 = ConvertN64ToScreen(xy1);
 
-	DL_PF( "    Screen:  %.1f,%.1f -> %.1f,%.1f", screen0.x, screen0.y, screen1.x, screen1.y );
-	DL_PF( "    Texture: %.1f,%.1f -> %.1f,%.1f", st0.s / 32.f, st0.t / 32.f, st1.s / 32.f, st1.t / 32.f );
+	DL_NOTE( "NativeScreen: (%.1f,%.1f) -> (%.1f,%.1f)", screen0.x, screen0.y, screen1.x, screen1.y );
+	DL_NOTE( "NativeTexture: (%.1f,%.1f) -> (%.1f,%.1f)", st0.s / 32.f, st0.t / 32.f, st1.s / 32.f, st1.t / 32.f );
 
 	const f32 depth = gRDPOtherMode.depth_source ? mPrimDepth : 0.0f;
 
@@ -988,9 +988,7 @@ void RendererGL::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord
 
 	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, kAllWhite, 4);
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	++mNumRect;
-#endif
 }
 
 void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoord st0, TexCoord st1 )
@@ -1006,8 +1004,8 @@ void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexC
 	v2 screen0 = ConvertN64ToScreen(xy0);
 	v2 screen1 = ConvertN64ToScreen(xy1);
 
-	DL_PF( "    Screen:  %.1f,%.1f -> %.1f,%.1f", screen0.x, screen0.y, screen1.x, screen1.y );
-	DL_PF( "    Texture: %.1f,%.1f -> %.1f,%.1f", st0.s / 32.f, st0.t / 32.f, st1.s / 32.f, st1.t / 32.f );
+	DL_NOTE( "NativeScreen: (%.1f,%.1f) -> (%.1f,%.1f)", screen0.x, screen0.y, screen1.x, screen1.y );
+	DL_NOTE( "NativeTexture: (%.1f,%.1f) -> (%.1f,%.1f)", st0.s / 32.f, st0.t / 32.f, st1.s / 32.f, st1.t / 32.f );
 
 	const f32 depth = gRDPOtherMode.depth_source ? mPrimDepth : 0.0f;
 
@@ -1026,10 +1024,7 @@ void RendererGL::TexRectFlip( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexC
 	};
 
 	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, kAllWhite, 4);
-
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	++mNumRect;
-#endif
 }
 
 void RendererGL::FillRect( const v2 & xy0, const v2 & xy1, u32 color )
@@ -1038,8 +1033,6 @@ void RendererGL::FillRect( const v2 & xy0, const v2 & xy1, u32 color )
 
 	v2 screen0 = ConvertN64ToScreen(xy0);
 	v2 screen1 = ConvertN64ToScreen(xy1);
-
-	DL_PF( "    Screen:  %.1f,%.1f -> %.1f,%.1f", screen0.x, screen0.y, screen1.x, screen1.y );
 
 	const f32 depth = gRDPOtherMode.depth_source ? mPrimDepth : 0.0f;
 
@@ -1066,10 +1059,7 @@ void RendererGL::FillRect( const v2 & xy0, const v2 & xy1, u32 color )
 	};
 
 	RenderDaedalusVtxStreams(GL_TRIANGLE_STRIP, buffer_idx, positions, uvs, colours, 4);
-
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	++mNumRect;
-#endif
 }
 
 void RendererGL::Draw2DTexture(f32 x0, f32 y0, f32 x1, f32 y1,

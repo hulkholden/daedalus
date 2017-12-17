@@ -99,13 +99,12 @@ class HTMLDebugOutput : public DLDebugOutput
 	void BeginInstruction(u32 idx, u32 cmd0, u32 cmd1, u32 depth, const char *name) override
 	{
 		Print("<span class=\"hle-instr\" id=\"I%d\">", idx);
-		Print("%05d %08x%08x %*s%-10s\n", idx, cmd0, cmd1, depth * 2, "", name);
-		Print("<span class=\"hle-detail\" style=\"display:none\">");
+		Print("%05d %08x%08x %*s ", idx, cmd0, cmd1, depth * 2, "");
 	}
 
 	void EndInstruction() override
 	{
-		Print("</span></span>");
+		Print("</span>");
 	}
 
 	WebDebugConnection *Connection;

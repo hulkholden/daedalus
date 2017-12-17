@@ -28,7 +28,7 @@ void DLParser_GBI2_Vtx(MicroCodeCommand command)
 	u32 n = command.vtx2.n;
 	u32 v0 = vend - n;
 
-	DL_PF("    Address[0x%08x] vEnd[%d] v0[%d] Num[%d]", address, vend, v0, n);
+	DL_COMMAND("gsSPVertex(0x%08x, %d, %d);", address, n, v0);
 
 	if (vend > 64)
 	{
@@ -327,8 +327,6 @@ void DLParser_GBI2_DL_Count(MicroCodeCommand command)
 
 	DL_PF("    Address=0x%08x %s", address,
 		  (command.dlist.param == G_DL_NOPUSH) ? "Jump" : (command.dlist.param == G_DL_PUSH) ? "Push" : "?");
-	DL_PF("    \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/ \\/");
-	DL_PF("    ############################################");
 }
 
 void DLParser_GBI2_GeometryMode(MicroCodeCommand command)

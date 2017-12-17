@@ -26,7 +26,7 @@ void DLParser_GBI0_Vtx_SOTE(MicroCodeCommand command)
 	u32 n = ((command.inst.cmd0 >> 4) & 0xfff) / 33 + 1;
 	u32 v0 = 0;
 
-	DL_PF("    Address[0x%08x] v0[%d] Num[%d]", address, v0, n);
+	DL_COMMAND("gsSPVertex(0x%08x, %d, %d);", address, n, v0);
 
 	DAEDALUS_ASSERT(n < 32, "Warning, attempting to load into invalid vertex positions");
 

@@ -37,7 +37,7 @@ void DLParser_Vtx_Conker(MicroCodeCommand command)
 	u32 n = ((command.inst.cmd0 >> 12) & 0xFF);
 	u32 v0 = len - n;
 
-	DL_PF("    Address[0x%08x] Len[%d] v0[%d] Num[%d]", address, len, v0, n);
+	DL_COMMAND("gsSPVertex(0x%08x, %d, %d);", address, n, v0);
 
 	gRenderer->SetNewVertexInfoConker(address, v0, n);
 

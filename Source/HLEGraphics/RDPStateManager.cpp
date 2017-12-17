@@ -104,15 +104,6 @@ void CRDPStateManager::LoadBlock(const SetLoadTile & load)
 
 	bool	swapped = (dxt) ? false : true;
 
-	DL_PF("    Tile[%d] (%d,%d - %d) DXT[0x%04x] = [%d]Bytes/line => [%d]Pixels/line Address[0x%08x]",
-		tile_idx,
-		uls, ult,
-		load.sh,
-		dxt,
-		(g_TI.Width << g_TI.Size >> 1),
-		bytes2pixels( (g_TI.Width << g_TI.Size >> 1), g_TI.Size ),
-		address);
-
 	InvalidateAllTileTextureInfo();		// Can potentially invalidate all texture infos
 
 	const RDP_Tile & rdp_tile = mTiles[tile_idx];
@@ -196,12 +187,6 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 	u32 tile_idx = load.tile;
 	u32 address  = g_TI.GetAddress( uls / 4, ult / 4 );
 	u32 pitch    = g_TI.GetPitch();
-
-	DL_PF("    Tile[%d] (%d,%d)->(%d,%d) [%d x %d] Address[0x%08x]",
-		tile_idx,
-		load.sl / 4, load.tl / 4, load.sh / 4 + 1, load.th / 4 + 1,
-		(load.sh - load.sl) / 4 + 1, (load.th - load.tl) / 4 + 1,
-		address);
 
 	InvalidateAllTileTextureInfo();		// Can potentially invalidate all texture infos
 
