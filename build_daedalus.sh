@@ -22,7 +22,7 @@ function pre_prep(){
     if [ -d $PWD/DaedalusX64 ]; then
         rm -r $PWD/DaedalusX64/EBOOT.PBP
     else
-        mkdir $PWD/DaedalusX64
+        mkdir ..//DaedalusX64
         mkdir ../DaedalusX64/SaveStates
         mkdir ../DaedalusX64/SaveGames
         mkdir ../DaedalusX64/Roms
@@ -33,6 +33,7 @@ function pre_prep(){
 function finalPrep() {
 
     if [ ! -d ../DaedalusX64 ]; then
+	mkdir ../DaedalusX64
         mkdir ../DaedalusX64/SaveStates
         mkdir ../DaedalusX64/SaveGames
         mkdir ../DaedalusX64/Roms
