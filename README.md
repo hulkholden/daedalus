@@ -1,3 +1,6 @@
+# NOTICE: This repository has moved!
+As of March 2019, we've decided to move to a separate repository because forked repositories do not have the same abilities as fresh repos. Check out https://github.com/DaedalusX64/daedalus for the new repository with releases, source code and up-to-date information.
+
 # DaedalusX64
  
 DaedalusX64 is a Nintendo 64 emulator for Linux and PSP, with plans to port to Windows, Mac, PS Vita among other platforms. The PSP port is noteworthy for being the fastest N64 emulator ever on the platform, achieving close to or even full speed in many titles.
