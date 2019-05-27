@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 #include "Buttons.h"
 
-#include "Utility/ModulePSP.h"
+#include "SysPSP/Utility/ModulePSP.h"
 
 #include <pspctrl.h>
 
@@ -42,7 +42,7 @@ bool InitHomeButton()
 {
 	// Start our stack for either kernel or usermode buttons
 	//
-	int impose = CModule::Load("imposectrl.prx");
+	int impose {CModule::Load("imposectrl.prx")};
 
 	//
 	// if imposectrl.prx loaded correctly, let's do some magic to take (forcely) control of HOME button
@@ -79,6 +79,3 @@ void DaedalusReadButtons(u32 buttons)
 	gButtons.type = buttons;
 }
 */
-
-
-

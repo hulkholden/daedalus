@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "Utility/ModulePSP.h"
+#include "ModulePSP.h"
 
 #include <stdio.h>
 
@@ -28,7 +28,7 @@ namespace CModule
 {
 	void Unload( int id )
 	{
-		int ret, status;
+		int ret {0}, status {0};
 		sceKernelStopModule(id, 0, NULL, &status, NULL);	// Stop module first before unloading it
 
 		ret = sceKernelUnloadModule(id);
@@ -54,4 +54,3 @@ namespace CModule
 		return ret;
 	}
 }
-

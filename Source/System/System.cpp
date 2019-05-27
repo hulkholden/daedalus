@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Interface/RomDB.h"
 #ifdef DAEDALUS_PSP
-#include "Graphics/VideoMemoryManager.h"
+#include "SysPSP/Graphics/VideoMemoryManager.h"
 #endif
 
 #include "Graphics/GraphicsContext.h"
@@ -206,7 +206,7 @@ static const RomEntityEntry gRomInitTable[] =
 	{"Graphics",			InitGraphicsPlugin,		DisposeGraphicsPlugin},
 	{"FramerateLimiter",	FramerateLimiter_Reset,	NULL},
 	//{"RSP", RSP_Reset, NULL},
-	{"CPU",					CPU_RomOpen,			CPU_RomClose},
+	{"CPU",					CPU_RomOpen},
 	{"ROM",					ROM_ReBoot,				ROM_Unload},
 	{"Controller",			CController::Reset,		CController::RomClose},
 	{"Save",				Save_Reset,				Save_Fini},
@@ -286,4 +286,3 @@ void System_Finalize()
 		entry.final();
 	}
 }
-

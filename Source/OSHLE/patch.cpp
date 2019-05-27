@@ -504,7 +504,7 @@ void Patch_RecurseAndFind()
 #ifdef DAEDALUS_PSP
 	// Load our font here, Intrafont used in UI is destroyed when emulation starts
 	intraFont* ltn8  = intraFontLoad( "flash0:/font/ltn8.pgf", INTRAFONT_CACHE_ASCII);
-	intraFontSetStyle( ltn8, 1.0f, 0xFF000000, 0xFFFFFFFF, INTRAFONT_ALIGN_CENTER );
+	intraFontSetStyle( ltn8, 1.0f, 0xFFFFFFFF, 0, 0.f, INTRAFONT_ALIGN_CENTER );
 #endif
 #endif
 
@@ -753,7 +753,7 @@ bool Patch_VerifyLocation_CheckSignature(PatchSymbol * ps,
 
 	const u32 * code_base( g_pu32RamBase );
 
-	PatchCrossRef dummy_cr = {~0, PX_JUMP, NULL };
+	PatchCrossRef dummy_cr = {static_cast<u32>(~0), PX_JUMP, NULL };
 
 	if (pcr == NULL)
 		pcr = &dummy_cr;

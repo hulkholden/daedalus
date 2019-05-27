@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Graphics/NativePixelFormat.h"
 #include "Graphics/ColourValue.h"
 #include "VideoMemoryManager.h"
+#include "Utility/FastMemcpy.h"
 
 #include "Math/MathUtil.h"
 
@@ -170,7 +171,7 @@ inline bool swizzle(u8* out, const u8* in, u32 width, u32 height)
 	{
 		//swizzle_slow( out, in, width, height );
 
-		memcpy( out, in, width * height );
+		memcpy_vfpu( out, in, width * height );
 		return false;
 	}
 	else
@@ -470,8 +471,9 @@ namespace
 		png_set_sig_bytes( p_png_struct, SIGNATURE_SIZE );
 		png_read_png( p_png_struct, p_png_info, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_BGR, NULL );
 
-		png_uint_32 width = p_png_info->width;
-		png_uint_32 height = p_png_info->height;
+		png_uint_32 width = png_get_image_width(p_png_struct, p_png_info);//p_png_info->width;
+		png_uint_32 height = png_get_image_height(p_png_struct, p_png_info);//p_png_info->height;
+
 
 		CRefPtr<CNativeTexture>	texture = CNativeTexture::Create( width, height, texture_format );
 
@@ -490,18 +492,18 @@ namespace
 
 			switch( texture_format )
 			{
-			case TexFmt_5650:
-				ReadPngData< NativePf5650 >( width, height, stride, p_png_info->row_pointers, p_png_info->color_type, reinterpret_cast< NativePf5650 * >( p_dest ) );
-				break;
-			case TexFmt_5551:
-				ReadPngData< NativePf5551 >( width, height, stride, p_png_info->row_pointers, p_png_info->color_type, reinterpret_cast< NativePf5551 * >( p_dest ) );
-				break;
-			case TexFmt_4444:
-				ReadPngData< NativePf4444 >( width, height, stride, p_png_info->row_pointers, p_png_info->color_type, reinterpret_cast< NativePf4444 * >( p_dest ) );
-				break;
-			case TexFmt_8888:
-				ReadPngData< NativePf8888 >( width, height, stride, p_png_info->row_pointers, p_png_info->color_type, reinterpret_cast< NativePf8888 * >( p_dest ) );
-				break;
+				case TexFmt_5650:
+					ReadPngData< NativePf5650 >( width, height, stride, png_get_rows(p_png_struct, p_png_info), png_get_color_type(p_png_struct, p_png_info), reinterpret_cast< NativePf5650 * >( p_dest ) );
+					break;
+				case TexFmt_5551:
+					ReadPngData< NativePf5551 >( width, height, stride, png_get_rows(p_png_struct, p_png_info), png_get_color_type(p_png_struct, p_png_info), reinterpret_cast< NativePf5551 * >( p_dest ) );
+					break;
+				case TexFmt_4444:
+					ReadPngData< NativePf4444 >( width, height, stride, png_get_rows(p_png_struct, p_png_info), png_get_color_type(p_png_struct, p_png_info), reinterpret_cast< NativePf4444 * >( p_dest ) );
+					break;
+				case TexFmt_8888:
+					ReadPngData< NativePf8888 >( width, height, stride, png_get_rows(p_png_struct, p_png_info), png_get_color_type(p_png_struct, p_png_info), reinterpret_cast< NativePf8888 * >( p_dest ) );
+					break;
 
 			case TexFmt_CI4_8888:
 			case TexFmt_CI8_8888:
@@ -564,10 +566,10 @@ void	CNativeTexture::SetData( void * data, void * palette )
 			switch( mTextureFormat )
 			{
 			case TexFmt_CI4_8888:
-				memcpy( mpPalette, palette, kPalette4BytesRequired );
+				memcpy_vfpu( mpPalette, palette, kPalette4BytesRequired );
 				break;
 			case TexFmt_CI8_8888:
-				memcpy( mpPalette, palette, kPalette8BytesRequired );
+				memcpy_vfpu( mpPalette, palette, kPalette8BytesRequired );
 				break;
 
 			default:
